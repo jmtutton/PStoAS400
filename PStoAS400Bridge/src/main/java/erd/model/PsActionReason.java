@@ -166,6 +166,13 @@ public class PsActionReason implements Serializable {
 	 * with matching Action Code and Action Reason Code
 	 */
 	public static PsActionReason findByActionCodeAndActionReasonCode(String actionCode, String actionReasonCode) {
+//		!----------------------------------------------------------------------
+//		! ERAC
+//		! Procedure:  HR02-Get-Reason-Description
+//		! Desc:  This routine gets the description field from the Action
+//		!        Reason table when Action = Termination and Action Code equals
+//		!        Other.
+//		!----------------------------------------------------------------------
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {

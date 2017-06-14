@@ -51,19 +51,19 @@ abstract class TriggerSuperclass implements Serializable {
 		this.sequenceNumber = seqNum;
 	}
 	public void setCompletionStatus(String status) {
-		this.completionStatus = status;
+		this.completionStatus = status.trim();
 	}
 	public Integer getSequenceNumber() {
 		return sequenceNumber;
 	}
 	public String getCompletionStatus() {
-		return completionStatus;
+		return completionStatus.trim();
 	}
 	public String getOperatorID() {
-		return operatorID;
+		return operatorID.trim();
 	}
 	public String getEmployeeId() {
-		return employeeId;
+		return employeeId.trim();
 	}
 	public Date getEffectiveDate() {
 		return effectiveDate;
@@ -72,7 +72,7 @@ abstract class TriggerSuperclass implements Serializable {
 		return effectiveSequence;
 	}
 	public String getProcessName() {
-		return processName;
+		return processName.trim();
 	}
 	
 	//long count()

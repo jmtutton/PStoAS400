@@ -82,7 +82,6 @@ do Reset          !Reset.sqc
 end-program
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Process-Main
 ! Desc:  This is the process controling procedure.
 !----------------------------------------------------------------------
@@ -208,7 +207,6 @@ End-If
 End-Procedure Check-interface-runfile
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Get-Trigger-Data
 ! Desc:  This procedure will get the trigger data that needs to be interfaced
 !----------------------------------------------------------------------
@@ -322,7 +320,6 @@ End-Select
 End-Procedure Get-Trigger-Data
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Call-Programs
 ! Desc:  Subroutine will call appropriate programs
 !----------------------------------------------------------------------
@@ -490,7 +487,6 @@ end-evaluate
 End-Procedure Call-Programs
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Update-Trigger-Row
 ! Desc:  This routine update the trigger file flag switch
 !----------------------------------------------------------------------
@@ -510,7 +506,6 @@ Let $CompletionStatus = 'P'     !Reset the completion Status for next pass
 End-Procedure Update-Trigger-Row
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Get-Trigger-Data-NonEmp
 ! Desc:  This procedure will get the trigger data for non employees and multiple 
 ! EIDs that needs to be interfaced
@@ -571,7 +566,6 @@ End-Procedure Get-Trigger-Data-NonEmp
 
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Call-Programs-NonEmp
 ! Desc:  Subroutine will call appropriate programs for Non Emp
 !----------------------------------------------------------------------
@@ -636,9 +630,7 @@ end-evaluate
 End-Procedure Call-Programs-NonEmp
 
 
-
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Update-Trigger-Row_NonEmp
 ! Desc:  This routine update the trigger file flag switch for Non Emp
 !----------------------------------------------------------------------
@@ -657,10 +649,8 @@ Let $NCompletionStatus = 'P'     !Reset the completion Status for next pass
 
 End-Procedure Update-Trigger-Row_NonEmp
 
-!---------------------------------Surya Added End-------------------------!
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Call-System
 ! Desc:  Executes a command line statement stored in the $Command Variable
 !----------------------------------------------------------------------
@@ -675,10 +665,6 @@ while #SubstrStartPos <= #CommandLength
     Let #SubstrStartPos = #SubstrStartPos + 100    !Increase the starting position by 100
     Show $ShowCommand        !ZHR_MOD_ZHRI100A_110B
 end-while   !#SubstrStartPos <= #CommandLength
-
-!#ifdef debugx
-!    show 'before call system Rexec'
-!#end-if !debugx
 
 Let $Command = $RexecScript || ' ' || $Command || ' ' || $RMTSVR  !changed for v8.3
 show '$Command=> ' $Command
@@ -706,7 +692,6 @@ End-Procedure Call-System
 
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Prepare-Error-Parms
 ! Desc:  Makes sure that the parms are the correct length for the error
 !        routine RPG program to recieve them
@@ -725,7 +710,6 @@ Let $OpridErrorParm   =    Substr($AuditOprid,2,5)
 End-Procedure Prepare-Error-Parms
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Call-Error-Routine
 ! Desc:  Builds the command and calls the error routine
 !----------------------------------------------------------------------
@@ -765,7 +749,6 @@ Do Call-System
 End-Procedure Call-Error-Routine
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Call-Error-Routine-NonEmp
 ! Desc:  Builds the command and calls the error routine
 !----------------------------------------------------------------------
@@ -806,7 +789,6 @@ Do Call-System
 End-Procedure Call-Error-Routine-NonEmp
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Check-If-Contractor
 ! Desc:  Checks to see if the employee is a contractor
 !----------------------------------------------------------------------
@@ -841,7 +823,6 @@ End-Procedure Check-If-Contractor
 
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Check-If-Correct102A
 ! Desc:  Checks to see if 102A process has JOB row
 !----------------------------------------------------------------------
@@ -868,7 +849,6 @@ End-Procedure Check-If-Correct102A
 
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Build-Group-Where-Clause
 ! Desc:  This routine will build the where clause that will select the
 !        correct Run-ID to use.
@@ -890,7 +870,6 @@ end-if      !$WhereClause = ''
 End-Procedure   Build-Group-Where-Clause
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Build-Emplid-Where-Clause
 ! Desc:  Builds a where clause based on an employee id entered by the user
 !----------------------------------------------------------------------
@@ -903,7 +882,6 @@ End-Procedure Build-Emplid-Where-Clause
 
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Get-Oprid
 ! Desc:  This routine gets the operator id from the operator definition
 !        table
@@ -932,7 +910,6 @@ End-if    !$Found = 'N'
 End-Procedure Get-Oprid
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  get-LegID-for-seq0
 ! Desc:  This routine gets the Legacy ID from Employee CREF Table for 
 ! Primary EIDs
@@ -955,7 +932,6 @@ end-select
 End-Procedure get-LegID-for-seq0
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  get-LegID-for-seqnum
 ! Desc:  This routine gets the Legacy ID from Alternate EID Table
 !----------------------------------------------------------------------
@@ -984,19 +960,14 @@ End-Procedure get-LegID-for-seqnum
 
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Get-Legacy-Oprid
 ! Desc:  Gets the new oprid from the legacy system
 !----------------------------------------------------------------------
 
 Begin-Procedure Get-Legacy-Oprid
-!#ifdef debugx
-!    show 'inside get legacy oprid'
-!#end-if !debugx
 
 Let $LegEmplid = ''
 Move $Wrk_Emplid to #wrk_emplid
-!Surya Added
 if $PoiFlag = 'N'
   move 0 to #indexNum
 end-if
@@ -1048,7 +1019,6 @@ End-Select
 End-Procedure Get-Legacy-Oprid
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Insert-Oprid
 ! Desc:  This routine will insert a row into the PS_ZHRT_EMPID_CREF table for the
 !        employee if the employee has a record in HR006P
@@ -1074,9 +1044,7 @@ End-Sql
 
 End-Procedure Insert-Oprid
 
-!Surya Added
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Update-Oprid
 ! Desc:  This routine will UPDATE table PS_ZHRR_MULTPL_EID for the
 !        Non Employees and Multiple EIDs if the employee has a record in HR036P
@@ -1100,7 +1068,6 @@ End-Sql
 End-Procedure Update-Oprid
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Insert-Error
 ! Desc:  This is an error routine to keep the program from aending when
 !        an insert fails
@@ -1117,9 +1084,7 @@ Let $Insert-Error-Flag = 'Y'
 
 End-Procedure Insert-Error
 
-!Surya Added
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Update-Error
 ! Desc:  This is an error routine to keep the program from abending when
 !        an insert fails
@@ -1138,7 +1103,6 @@ End-Procedure Update-Error
 
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Format-Employee-Name
 ! Desc:  This routine will change the format of the employee's name
 ! from Last*First MI* (legacy system) to Last, First MI (PeopleSoft Format)
@@ -1162,7 +1126,6 @@ let $PSEmpName = $_New
 End-Procedure  Format-Employee-Name
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Check-Effdt-Transaction
 !----------------------------------------------------------------------
 
@@ -1203,7 +1166,6 @@ END-SELECT
 End-Procedure Check-Effdt-Transaction
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Build-Active-Dir-Output-File
 !----------------------------------------------------------------------
 
@@ -1278,7 +1240,6 @@ do Write-Active-Dir-Output-File
 End-Procedure Build-Active-Dir-Output-File
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  AD-Get-Job-Data
 ! Desc:  Gets the Job data from the job table.
 !----------------------------------------------------------------------
@@ -1319,7 +1280,6 @@ End-Select
 End-Procedure AD-Get-Job-Data
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure: AD-Get-Job-Description
 ! Desc:  This routine will get the Job description for Active Directory File Build
 !----------------------------------------------------------------------
@@ -1342,7 +1302,6 @@ End-select
 End-Procedure AD-Get-Job-Description
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure: AD-Get-EmplStatus-Description
 ! Desc:  This routine will get the Employee Status description for Active Directory File Build
 !----------------------------------------------------------------------
@@ -1368,7 +1327,6 @@ End-Select
 End-Procedure AD-Get-EmplStatus-Description
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  AD-Get-JobStart-Date
 ! Desc:  Gets the Job Start date from the job table.
 !----------------------------------------------------------------------
@@ -1407,7 +1365,6 @@ end-select
 End-Procedure AD-Get-JobStart-Date
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  AD-Get-Pers-Data-Effdt
 ! Desc:  This routine will get the Personal Data row for each of the
 !        employee numbers entered in the trigger file.  Pers_Data_Effdt table
@@ -1440,7 +1397,6 @@ end-select
 end-procedure AD-Get-Pers_Data-Effdt
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  AD-Get-NameSuffix
 ! Desc:  This routine will get the Name Suffix row for each of the
 !        employee numbers entered in the trigger file.
@@ -1468,7 +1424,6 @@ end-select
 end-procedure AD-Get-NameSuffix
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  AD-Get-Personal-Data
 ! Desc:  This routine will get the Personal Data row for each of the
 !        employee numbers entered in the trigger file.
@@ -1492,7 +1447,6 @@ end-select
 end-procedure AD-Get-Personal-Data
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure: AD-Get-Country-Code
 ! Desc:  This routine will get the Country Code for Active Directory File Build
 !----------------------------------------------------------------------
@@ -1514,7 +1468,6 @@ end-select
 End-Procedure AD-Get-Country-Code
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  AD-Get-Business-Phone
 ! Desc:  This routine gets the business phone number from the Peoplesoft
 !        tables.
@@ -1537,7 +1490,6 @@ end-select
 end-procedure AD-Get-Business-Phone
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  AD-Get-Employee-Fax
 ! Desc:  This routine gets the business phone number from the Peoplesoft
 !        tables.
@@ -1558,7 +1510,6 @@ end-select
 end-procedure AD-Get-Employee-Fax
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  AD-Get-LegSuperviorID
 !----------------------------------------------------------------------
 
@@ -1577,7 +1528,6 @@ end-select
 end-procedure AD-Get-LegSuperviorID
 
 !---------------------------------------------------------------------------------------
-! ERAC
 ! Procedure:  AD-Get-Employment-Data
 ! Desc:  This routine will get the Termination Data row for Active Directory File Build
 !---------------------------------------------------------------------------------------
@@ -1619,7 +1569,6 @@ end-select
 end-procedure AD-Get-Employment-Data
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  AD-Get-Names
 ! Desc:  This routine gets the Preferred Name from PS_Names for Active Directory File Build
 !----------------------------------------------------------------------
@@ -1646,7 +1595,6 @@ end-select
 end-procedure AD-Get-Names
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Write-Active-Dir-Output-File
 !----------------------------------------------------------------------
 
@@ -1704,7 +1652,6 @@ Begin-Procedure Write-Active-Dir-Output-File
 End-Procedure Write-Active-Dir-Output-File
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Intialize-AD-WrkFields
 !----------------------------------------------------------------------
 Begin-Procedure Intialize-AD-WrkFields
