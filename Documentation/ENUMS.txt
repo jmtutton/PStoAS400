@@ -1,0 +1,152 @@
+Trigger Source:
+	AS400 Employee - PS_ZHRT_INTTRIGGER
+	AS400 TempMast - ZHR1201A / ZHR206A
+	ERD - ERD Trigger Table
+
+Event Monitor Type:
+	AS400 Employee
+	AS400 TempMast
+	ERD
+
+Event Trigger Status Type (task flag values):
+	P - new
+	C - complete, sent to legacy
+	E - error
+	Z - dummy row value
+	
+
+Event Type:
+Employee
+	New Hire/Rehire
+	Terminatian
+	Job Profile
+	Demographics
+	Date Changes
+	Group Transfer
+Non-Employee
+	New Hire/Rehire
+	Terminate
+	Demographc Change
+ERD Person
+	New Hire/Rehire
+	Terminate
+	Job Profile Change
+	Demographics Change
+	Date Changes
+	Location Transfer
+
+Error Type:
+	Unknown Event
+	Import Error
+	Export Error
+	EID Error
+
+Data Importer Type:
+	Hire
+	Termination
+	Job Profile Changes
+	Demographics Changes
+	Rehire 
+	Dates
+	Group Transfers
+
+Data Exporter Type:
+	ERD
+	AS400
+
+Data Exporter Process Type:
+	ERD
+		Insert
+			Hire
+			Rehire
+		Update
+			Termination
+			Job Profile Change
+			Demographic Change
+			Date Changes
+			Location Transfer
+		Delete
+			Support Cascade Delete
+	AS400
+		Employee
+			ZHRI101A – New Hire / Rehire
+			ZHRI102A – Termination
+			ZHRI104A – Job Profile Changes
+			ZHRI105A – Demographic Changes
+			ZHRI106A – Rehire 
+			ZHRI107A – Date Changes
+			ZHRI109A – Group Transfers
+
+			ZHRI101D – A row deleted in Hire Process
+			ZHRI102D – A row deleted in Term Process
+			ZHRI104D – A row deleted in Job Profile
+			ZHRI105D – A row deleted in Demographics 
+			ZHRI106D – A row deleted in Rehire
+			ZHRI107D – A row deleted in Employment Review, Accomplishment, Contract Data changes
+			ZHRI109D – A row deleted in Group Transfers
+		TempMast
+			ZHRI201A – New Hire / Rehire
+			ZHRI202A – Termination
+			ZHRI205A – Demographic Changes
+
+Process Name:
+			ZHRI101A – New Hire
+			ZHRI102A – Termination
+			ZHRI104A – Job Profile Changes
+			ZHRI105A – Demographic Changes
+			ZHRI106A – Rehire 
+			ZHRI107A – Date Changes
+			ZHRI109A – Group Transfers
+
+			ZHRI101D – A row deleted in Hire Process
+			ZHRI102D – A row deleted in Term Process
+			ZHRI104D – A row deleted in Job Profile
+			ZHRI105D – A row deleted in Demographics 
+			ZHRI106D – A row deleted in Rehire
+			ZHRI107D – A row deleted in Employment Review, Accomplishment, Contract Data changes
+			ZHRI109D – A row deleted in Group Transfers
+
+			ZHRI201A – New Hire Multiple EID
+			ZHRI202A – Termination Multiple EID
+			ZHRI205A – Demographic Changes Multiple EID
+			ZHRI206A – Rehire Multiple EID
+
+
+The SQC also makes sure the data is valid and checks it against the cross reference tables like PS_ZHRT_ETHCD_CREF for ethnic code 
+PS_ZHRT_JOBCD_CREF for Position, Department and Job Status
+PS_ZHRT_RFSRC_CREF for Referral Source
+ZPS_ZGLT_PT12P_CREF for Legal Branch	 
+PS_ZHRT_CMPNY_CREF for Group 
+
+
+The different Proc names are as below:
+ZHRI101A – Hire Process
+ZHRI102A – Termination
+ZHRI104A – Job Profile Changes
+ZHRI105A– Demographics Changes
+ZHRI106A – Rehire 
+ZHRI107A – Dates – Employment Review, Accomplishment and Contract Data changes
+ZHRI109A – Group Transfers
+
+ZHRI101D – A row deleted in Hire Process
+ZHRI102D – A row deleted in Term Process
+ZHRI104D – A row deleted in Job Profile
+ZHRI105D – A row deleted in Demographics 
+ZHRI106D – A row deleted in Rehire
+ZHRI107D – A row deleted in Employment Review, Accomplishment and Contract Data changes
+ZHRI109D – A row deleted in Group Transfers
+TASK_FLAG – values C, P, E and Z
+When the trigger record is first inserted it will be ‘P’ and after sending to legacy the status becomes ‘C’
+When there is an error, the status will be ‘E’, but now most cases even for E, the status is updated as C and moved as an error routine. ‘Z’ is a dummy row value in the Table.
+
+PS_ZHRT_EMPID_CREF PeopleSoft Employee Cross Refer Table  
+
+#Include 'zhri101a.sqc'  !Process to hire employee
+#Include 'zhri102a.sqc'  !Process to terminate an employee
+#Include 'zhri104a.sqc'  !Process for job status change
+#Include 'zhri105a.sqc'  !Process for demographics change
+#Include 'zhri109a.sqc'  !Process for group transfer
+#Include 'zhri107a.sqc'  !Process for converting dates
+#Include 'zhri201a.sqc'  !Process POI/Alt EMP hire/rehire 
+#Include 'zhri202a.sqc'  !Process POI/Alt EMP term
+#Include 'zhri205a.sqc'  !Process POI/Alt EMP changes

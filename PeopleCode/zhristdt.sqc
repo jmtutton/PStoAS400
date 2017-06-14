@@ -1,0 +1,170 @@
+!***********************************************************************!
+!*  Program Name: zhristdt                                             *!
+!***********************************************************************!
+!*  Author:       Surya Sobha                                          *!
+!*  Date:         01/05/17                                             *!
+!*  Project Id:   TEMPMAST                                             *!
+!***********************************************************************!
+!*  Program Summary:  Get the Start Date of POIs and Alternate EIDs    *!
+!*  Conditions: If all rows are Active get the least Active Row's Effdt*!
+!*              If max row is Inactive, get the least Active row just  *!
+!*              before that I row                                      *!
+!*              If there are Inactive rows in between, and max(effdt)  *!
+!*              is Active,get the least Active row after the max(I) row*!
+!***********************************************************************!
+!*  Modifications:
+!*
+!*  DATE        DEVELOPER NAME/Project ID          DESCRIPTION OF CHANGES
+!*  ----        -------------------------          ----------------------
+!* 01/05/17     Surya Sobha/TEMPMAST              Initial Changes
+!***********************************************************************!
+
+!This guards against the SQC being #included twice...
+#ifndef ZHRISTDT-INCLUDED
+
+#define ZHRISTDT-INCLUDED 
+
+begin-setup
+   declare-variable 
+      date $s_dt
+    end-declare
+end-setup
+
+!******************************
+!get the max effdt for every employee
+!  -store the last inactive row before the max effdt into s_dt. If null, use dummy date.
+!  -get the min active effdt after s_dt
+BEGIN-PROCEDURE MAIN-SQL-POI
+
+BEGIN-SELECT
+A.EMPLID
+A.EFFDT &A.EFFDT
+A.EFF_STATUS
+
+  Let $MAX_EFFDT = (&A.EFFDT)
+  !show '$MAX_EFFDT:' $MAX_EFFDT
+  !show '$Wrk_Emplid:' $Wrk_Emplid
+  !show '$Wrk_indexNum: ' $Wrk_indexNum
+ 
+  do get-last-inactive-dt-poi
+  
+  !if there are no inactive rows before, assign dummy date
+  if $last_inactive_dt = '' 
+    let $s_dt = strtodate('01-JAN-1900','DD-MON-YYYY')
+  else
+    let $s_dt = $last_inactive_dt
+	END-IF
+  !show '$s_dt :' $s_dt 
+  
+	!get the min(effdt) greater than the last inactive date
+	do get-min-effdt-poi
+  
+FROM PS_ZHRT_PER_POI_TR A
+WHERE A.EMPLID = $Wrk_Emplid
+AND A.EFFDT = (SELECT MAX(A1.EFFDT) FROM PS_ZHRT_PER_POI_TR A1 WHERE A1.EMPLID = A.EMPLID AND A1.POI_TYPE = A.POI_TYPE AND A1.EFFDT <= SYSDATE)
+END-SELECT
+END-PROCEDURE MAIN-SQL-POI
+
+
+!****************************
+begin-procedure get-min-effdt-poi
+
+LET $LegServiceDate =''
+
+begin-select
+min(A2.EFFDT) &A2.EFFDT
+
+  Let $min_active_effdt = (&A2.EFFDT)
+  Let $LegServiceDate = datetostr(strtodate($min_active_effdt,'DD-MON-YYYY'),'YYYYMMDD')
+  !show '$min_active_effdt: ' $min_active_effdt
+  !show '$LegServiceDate:' $LegServiceDate
+  
+from PS_ZHRT_PER_POI_TR A2
+WHERE A2.EMPLID = $Wrk_Emplid
+AND A2.EFFDT > $s_dt
+end-select
+end-procedure get-min-effdt-poi		  
+
+
+!*************************************
+begin-procedure get-last-inactive-dt-poi
+begin-select
+A3.EFFDT &A3.EFFDT 
+
+  Let $last_inactive_dt = (&A3.EFFDT )
+  !show '$last_inactive_dt: ' $last_inactive_dt
+
+from Ps_Zhrt_Per_Poi_Tr A3
+WHERE A3.emplid = $Wrk_Emplid
+AND A3.EFFDT = (SELECT MAX(A3A.EFFDT) FROM PS_ZHRT_PER_POI_TR A3A WHERE A3A.EMPLID = A3.EMPLID AND A3A.EFF_STATUS = 'I' AND to_char(A3A.EFFDT,'YYYY-MM-DD') < $MAX_EFFDT)
+end-select
+end-procedure get-last-inactive-dt-poi
+
+
+!***************** GET START_DT FOR EMP*************!
+
+!******************************
+!get the max effdt for every employee
+!  -store the last inactive row before the max effdt into s_dt. If null, use dummy date.
+!  -get the min active effdt after s_dt
+BEGIN-PROCEDURE MAIN-SQL-EMP
+
+BEGIN-SELECT
+B.EMPLID
+B.EFFDT &B.EFFDT 
+B.EFF_STATUS
+
+  let $MAX_EFFDT =&B.EFFDT
+  do get-last-inactive-dt-emp
+  
+  !if there are no inactive rows before, assign dummy date
+  if $last_inactive_dt = '' 
+    let $s_dt = strtodate('01-JAN-1900','DD-MON-YYYY')
+  else
+    let $s_dt = $last_inactive_dt
+	END-IF
+  
+	!get the min(effdt) greater than the last inactive date
+	do get-min-effdt-emp
+  
+FROM PS_ZHRR_MULTPL_EID B
+WHERE B.EMPLID = $Wrk_Emplid
+AND B.SEQUENCE = $Wrk_indexNum
+AND B.EFFDT = (SELECT MAX(B1.EFFDT) FROM PS_ZHRR_MULTPL_EID B1 WHERE B1.EMPLID = B.EMPLID AND B1.SEQUENCE = B.SEQUENCE and B1.EFFDT <= SYSDATE)
+END-SELECT
+END-PROCEDURE MAIN-SQL-EMP
+
+
+!****************************
+begin-procedure get-min-effdt-emp
+
+LET $LegServiceDate =''
+
+begin-select
+min(B2.EFFDT) &B2.EFFDT
+
+  Let $min_active_effdt = &B2.EFFDT
+  Let $LegServiceDate = datetostr(strtodate($min_active_effdt,'DD-MON-YYYY'),'YYYYMMDD')
+
+from PS_ZHRR_MULTPL_EID B2
+WHERE B2.EMPLID = $Wrk_Emplid
+AND B2.SEQUENCE = $Wrk_indexNum
+AND B2.EFFDT > $s_dt
+end-select
+end-procedure get-min-effdt-emp		  
+
+
+!*************************************
+begin-procedure get-last-inactive-dt-emp
+begin-select
+B3.EFFDT &B3.EFFDT
+
+  Let $last_inactive_dt =&B3.EFFDT
+
+from PS_ZHRR_MULTPL_EID B3
+WHERE B3.emplid = $Wrk_Emplid
+AND B3.SEQUENCE = $Wrk_indexNum
+AND B3.EFFDT = (SELECT MAX(B3A.EFFDT) FROM PS_ZHRR_MULTPL_EID B3A WHERE B3A.EMPLID = B3.EMPLID AND B3A.SEQUENCE = B3.SEQUENCE AND B3A.EFF_STATUS = 'I' AND to_char(B3A.EFFDT,'YYYY-MM-DD') < $MAX_EFFDT)
+end-select
+end-procedure get-last-inactive-dt-emp
+#endif                                  ! ZHRISTDT-INCLUDED 

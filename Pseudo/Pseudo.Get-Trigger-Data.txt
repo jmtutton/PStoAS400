@@ -1,0 +1,713 @@
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Get-Trigger-Data
+! Desc:  This procedure will get the trigger data that needs to be interfaced
+!----------------------------------------------------------------------
+
+Begin-Procedure Get-Trigger-Data
+
+//completionStatus = 'P'
+Let $CompletionStatus = 'P'
+
+Begin-Select loops=150
+
+//Get New Trigger Data from PS_ZHRT_INTTRIGGER
+//wrkSequence = PS_ZHRT_INTTRIGGER.SEQ_NBR
+PS_ZHRT_INTTRIGGER.SEQ_NBR
+MOVE &PS_ZHRT_INTTRIGGER.SEQ_NBR TO #WrkSequence
+//auditOprid = Ltrim(Rtrim(&PS_ZHRT_INTTRIGGER.OPRID,' '),' ')
+PS_ZHRT_INTTRIGGER.OPRID
+LET $AuditOprid = Ltrim(Rtrim(&PS_ZHRT_INTTRIGGER.OPRID,' '),' ')
+//psEmplid = Ltrim(Rtrim(&PS_ZHRT_INTTRIGGER.EMPLID,' '),' ')
+PS_ZHRT_INTTRIGGER.EMPLID
+LET $PSEmplid = Ltrim(Rtrim(&PS_ZHRT_INTTRIGGER.EMPLID,' '),' ')
+//wrk_EmplID1 = psEmplid
+Move $PSEmplid to #Wrk_EmplID1
+//wrk_Emplid2 = edit(wrk_EmplID1,'099999999')
+LET $Wrk_Emplid2 =  edit(#Wrk_EmplID1,'099999999')
+//psEffdt = formatED effective date
+to_char(PS_ZHRT_INTTRIGGER.EFFDT, 'YYYY-MM-DD') &RZEFFDT
+LET $PSEffdt = &RZEFFDT
+//psEffSeq = PS_ZHRT_INTTRIGGER.EFFSEQ
+PS_ZHRT_INTTRIGGER.EFFSEQ
+Move &PS_ZHRT_INTTRIGGER.EFFSEQ to #PSEffSeq
+//wrkProcess = ltrim(rtrim(&PS_ZHRT_INTTRIGGER.PROC_NAME,' '),' ')
+PS_ZHRT_INTTRIGGER.PROC_NAME
+LET $WrkProcess = ltrim(rtrim(&PS_ZHRT_INTTRIGGER.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
+
+//open file
+If $file_open = 'N'
+!   open $open_file1 as 1 for-append record=337
+!   let $file_open = 'Y'
+End-If
+
+//Check-If-Contractor
+Do Check-If-Contractor
+Let $PoiFlag = 'N'
+
+If $Found = 'N'     !Not a contractor
+and  $PSEmplid <> ''    ! not a blank emplid   ZHR_MOD_ZHRI100A_110A
+!CQ 103011 Added a check for 'ZHRI102A' - to see if corresponding row on JOB 
+	if $WrkProcess = 'ZHRI102A'
+		Do Check-If-Correct102A                
+		if $OK-to-process = 'Y'
+			Do Call-Programs
+		else
+			Let $CompletionStatus = 'C'
+			Do Update-Trigger-Row
+		end-if
+	else
+		Do Call-Programs
+	end-if
+Else
+    If $Found = 'Y'
+		Let $CompletionStatus = 'C'
+	End-if
+	IF $PSEmplid = ''             !ZHR_MOD_ZHRI100A_110A
+		Let $CompletionStatus = 'E'
+	End-if
+End-If    !$Found = 'N'
+
+If $CompletionStatus <> 'P'
+	If ($ADAction_Code <> '') AND ($ADLegOprid <> '')
+		IF $AdFound = 'N'
+		End-If
+	End-If
+	Do Update-Trigger-Row
+End-If    !$CompletionStatus <> 'P'
+
+from PS_ZHRT_INTTRIGGER RZ,PS_JOB JB
+where PS_ZHRT_INTTRIGGER.TASK_FLAG = 'P'
+
+!************************************************************************************
+! Start : ZHR_MOD_INTERFACE_PREHIRE    Modified  Sree 09/15/00
+!************************************************************************************
+	and (PS_ZHRT_INTTRIGGER.EFFDT <= $AsOfToday or PS_ZHRT_INTTRIGGER.PROC_NAME='ZHRI101A' or  PS_ZHRT_INTTRIGGER.PROC_NAME='ZHRI106A')
+
+!************************************************************************************
+! End : ZHR_MOD_INTERFACE_PREHIRE    Modified  Sree 09/15/00
+!************************************************************************************
+!************************************************************************************
+! Brent Martin 2/16/2009 - 
+!        PeopleCode 8.0 fires in different order than 8.3, need to insure the new hire and rehire
+!        appear before the other changes even if they don't show up first in the sequence.
+!************************************************************************************
+	and (case when proc_name in ('ZHRI101A', 'ZHRI106A') then SEQ_NBR else SEQ_NBR*10 END) = 
+		(select min(case when proc_name in ('ZHRI101A', 'ZHRI106A') then SEQ_NBR else SEQ_NBR*10 END)  
+		from  PS_ZHRT_INTTRIGGER RZ2
+		where RZ2.EMPLID = PS_ZHRT_INTTRIGGER.EMPLID
+			and RZ2.TASK_FLAG = 'P'
+			and (RZ2.EFFDT <= SYSDATE or RZ2.PROC_NAME='ZHRI101A' or RZ2.PROC_NAME='ZHRI106A'))
+!********************************************************************************** ! ALS-10/08/2008
+! Andy Lee-Sue  10/08/2008 - Join in JOB record to ensure that only employees that  ! ALS-10/08/2008
+!                            have a JOB record get processed.                       ! ALS-10/08/2008
+!********************************************************************************** ! ALS-10/08/2008
+  and PS_JOB.EMPLID = PS_ZHRT_INTTRIGGER.EMPLID                                                         ! ALS-10/08/2008
+  and PS_JOB.EFFDT = (SELECT MAX(JB2.EFFDT)                                             ! ALS-10/08/2008
+                    FROM  PS_JOB JB2                                                ! ALS-10/08/2008
+                   WHERE  JB2.EMPLID = PS_JOB.EMPLID                                    ! ALS-10/08/2008
+                     AND  JB2.EMPL_RCD = PS_JOB.EMPL_RCD)                               ! ALS-03/11/2009
+  and PS_JOB.EFFSEQ = (SELECT MAX(JB3.EFFSEQ)                                           ! ALS-10/08/2008
+                     FROM PS_JOB JB3                                                ! ALS-10/08/2008
+                    WHERE JB3.EMPLID = PS_JOB.EMPLID                                    ! ALS-10/08/2008
+                     AND  JB3.EMPL_RCD = PS_JOB.EMPL_RCD                                ! ALS-10/08/2008
+                     AND  JB3.EFFDT = PS_JOB.EFFDT)                                     ! ALS-10/08/2008
+End-Select
+
+End-Procedure Get-Trigger-Data
+
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Check-If-Contractor
+! Desc:  Checks to see if the employee is a contractor
+!----------------------------------------------------------------------
+
+Begin-Procedure Check-If-Contractor
+
+Let $Found = 'N'
+
+Begin-Select
+
+'X'
+    Let $Found = 'Y'
+
+From PS_JOB RJ
+where RJ.EMPLID = $PSEmplid
+  and RJ.EMPL_CLASS = 'R'
+  and RJ.EFFDT = (SELECT MAX(EFFDT)
+                    FROM  PS_JOB RJ2
+                   WHERE  RJ2.EMPLID = RJ.EMPLID
+                     AND  RJ2.EMPL_RCD = RJ.EMPL_RCD   !changed for v8.3
+                     AND  RJ2.EFFDT <= $AsOfToday)
+
+  and RJ.EFFSEQ = (SELECT MAX(EFFSEQ)
+                     FROM PS_JOB RJ3
+                    WHERE RJ3.EMPLID = RJ.EMPLID
+                     AND  RJ3.EMPL_RCD = RJ.EMPL_RCD   !changed for v8.3
+                      AND RJ3.EFFDT = RJ.EFFDT)
+
+End-Select
+
+End-Procedure Check-If-Contractor
+
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Check-If-Correct102A
+! Desc:  Checks to see if 102A process has JOB row
+!----------------------------------------------------------------------
+
+Begin-Procedure Check-If-Correct102A                         !CQ 103011
+
+Let $OK-to-process = 'N'
+if $WrkProcess = 'ZHRI102A'
+ do dtu-add-days($PSEffdt,1,$dt102)
+!else
+! let $dt102 = $PSEffdt 
+end-if
+
+Begin-Select
+
+'XX'
+    Let $OK-to-process = 'Y'
+
+From PS_JOB RD
+where RD.EMPLID = $PSEmplid
+  and to_char(RD.EFFDT, 'YYYY-MM-DD') = $dt102
+
+End-Select
+
+End-Procedure Check-If-Correct102A
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Check-Effdt-Transaction
+!----------------------------------------------------------------------
+
+Begin-Procedure Check-Effdt-Transaction
+
+Let $WrkADEffdt = ''
+
+IF $Wrkprocess = 'ZHRI102A'
+  DO dtu-add-days($PSEffdt,1,$WrkADEffdt)
+ ELSE
+  Let $WrkADEffdt = $PSEffdt
+END-IF
+
+Let $AdFound = 'N'
+
+BEGIN-SELECT
+'XA'
+   Let $AdFound = 'Y'
+
+FROM  PS_JOB AD01
+WHERE AD01.EMPLID = $PSEmplid
+      AND to_char(AD01.EFFDT,'YYYY-MM-DD') > $WrkADEffdt
+
+END-SELECT
+
+!-----------------------------!
+
+BEGIN-SELECT
+'XB'
+   Let $AdFound = 'Y'
+
+FROM  PS_PERS_DATA_EFFDT AD02
+WHERE AD02.EMPLID = $PSEmplid
+    AND  to_char(AD02.EFFDT,'YYYY-MM-DD') > $Wrk_ADEffdt
+
+END-SELECT
+
+End-Procedure Check-Effdt-Transaction
+
+
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Build-Active-Dir-Output-File
+!----------------------------------------------------------------------
+
+Begin-Procedure Build-Active-Dir-Output-File
+
+Let $Wrkcreatefile = 'Y'
+If $Wrk_AD_JobDataBuild = 'N'
+   do AD-Get-Job-Data
+End-If
+
+do AD-Get-Job-Description
+do AD-Get-EmplStatus-Description
+
+If $Wrk_AD_PersdataEffdtBuild = 'N'
+ do AD-Get-Pers-Data-Effdt
+End-If
+
+If $Wrk_AD_Getbusinessphone = 'N'
+ do AD-Get-Business-Phone
+End-If
+
+If $Wrk_AD_PersDataBuild = 'N'
+ do AD-Get-Personal-Data
+End-If
+
+If $Wrk_AD_CountryCdBuild = 'N'
+ do AD-Get-Country-Code
+End-If
+
+do AD-Get-Employee-Fax
+do AD-Get-Namesuffix
+do AD-Get-JobStart-Date
+do AD-Get-Employment-Data
+
+If $ADSupervisorID <> ''
+do AD-Get-LegSuperviorID
+End-If
+
+If $Wrk_AD_NamesBuild = 'N'
+ do AD-Get-Names
+End-If
+
+Let $ADEmplid = $PSEmplid
+
+Let $ADFirstName = $ADPSFirstName || ' ' || $ADPSMiddleName       !changed for v8.3
+Let $ADLastName = $ADPSLastName
+
+Let $ADLocation = $PSLocation
+Let $ADJobCd  = $PSJobcode
+Let $ADJobDescr = $PSJobDescription
+Let $ADEmplStatus = $PSEmplStatus
+  If $PSRehireDt <> ''
+    Let $ADHireDt = $PSRehiredt
+  else
+    Let $ADHireDt = $PSHiredt
+  End-If
+If ($PSAction = 'REH')
+and ($PSAction_Reason = 'REH')
+and ($WrkProcess = 'ZHRI102A')
+ Let $ADAction_Code = 'R'
+End-If
+
+Let $ADTermDt = $PSTerminationdt
+
+Let $ADCountry = $PSLoc_Country
+Let $ADFullPartTime = $PSFullPartTime
+Let $ADEmplClass = $PSEmplClass
+Let $ADDeptID  = $PSDeptId
+Let $ADBusinessPhone = $PSBusiness_Phone
+Let $ADLangCd = $PSLangCd
+Let $ADPrfName = $PSPrfName
+
+do Write-Active-Dir-Output-File
+End-Procedure Build-Active-Dir-Output-File
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  AD-Get-Job-Data
+! Desc:  Gets the Job data from the job table.
+!----------------------------------------------------------------------
+
+Begin-Procedure AD-Get-Job-Data
+
+Begin-Select
+
+AD.LOCATION
+    let $PSLocation = ltrim(rtrim(&AD.LOCATION,' '),' ')            !Remove leading and trailing blanks
+AD.FULL_PART_TIME
+    let $PSFullPartTime = ltrim(rtrim(&AD.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
+AD.EMPL_CLASS
+    let $PSEmplClass = ltrim(rtrim(&AD.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
+AD.EMPL_STATUS
+    let $PSEmplStatus = ltrim(rtrim(&AD.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
+AD.DEPTID
+    let $PSDeptid = ltrim(rtrim(&AD.DEPTID,' '),' ')                !Remove leading and trailing blanks
+AD.JOBCODE
+    let $PSJobcode = ltrim(rtrim(&AD.JOBCODE,' '),' ')              !Remove leading and trailing blanks
+
+from PS_JOB AD
+where AD.EMPLID = $Wrk_Emplid
+  and AD.EFFDT = (SELECT MAX(EFFDT)
+                    FROM  PS_JOB AD1
+                   WHERE  AD1.EMPLID = AD.EMPLID
+                     AND  AD1.EMPL_RCD = AD.EMPL_RCD   !changed for v8.3
+                     AND  to_char(AD1.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+
+  and AD.EFFSEQ = (SELECT MAX(EFFSEQ)
+                     FROM PS_JOB AD2
+                    WHERE AD2.EMPLID = AD.EMPLID
+                      AND AD2.EMPL_RCD = AD.EMPL_RCD  !changed for v8.3
+                      AND AD2.EFFDT = AD.EFFDT)
+
+End-Select
+
+End-Procedure AD-Get-Job-Data
+
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure: AD-Get-Job-Description
+! Desc:  This routine will get the Job description for Active Directory File Build
+!----------------------------------------------------------------------
+
+Begin-Procedure AD-Get-Job-Description
+
+let $PSJobDescription = ''
+Begin-Select
+
+AD9.JOBCODE
+AD9.DESCR
+
+let $PSJobDescription = ltrim(rtrim(&AD9.DESCR,' '),' ')
+
+from PS_JOBCODE_TBL AD9
+where AD9.JOBCODE = $PSJobcode
+
+End-select
+
+End-Procedure AD-Get-Job-Description
+
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure: AD-Get-EmplStatus-Description
+! Desc:  This routine will get the Employee Status description for Active Directory File Build
+!----------------------------------------------------------------------
+
+Begin-Procedure AD-Get-EmplStatus-Description
+
+Begin-Select
+
+AD10.XLATLONGNAME
+
+ let $ADEmplStatusDescr = ltrim(rtrim(&AD10.XLATLONGNAME,' '),' ')
+
+from PSXLATITEM AD10                                                                ! ALS-10/08/2008
+
+where AD10.FIELDNAME = 'EMPL_STATUS'
+and AD10.FIELDVALUE = $PSEmplstatus
+and AD10.EFFDT = (Select max(AD11.EFFDT) from PSXLATITEM AD11                       ! ALS-10/08/2008
+                  where AD10.FIELDNAME = AD11.FIELDNAME
+                  and AD10.FIELDVALUE = AD11.FIELDVALUE
+                  and AD11.EFFDT <= SYSDATE                                         ! ALS-10/08/2008
+                                  )
+End-Select
+End-Procedure AD-Get-EmplStatus-Description
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  AD-Get-JobStart-Date
+! Desc:  Gets the Job Start date from the job table.
+!----------------------------------------------------------------------
+
+Begin-Procedure AD-Get-JobStart-Date
+
+Begin-Select
+
+to_char(AD4.EFFDT,'YYYY-MM-DD') &AD4.EFFDT
+
+  Let $ADJobStartYr   = substr(&AD4.EFFDT,1,4)
+  Let $ADJobStartMnth = substr(&AD4.EFFDT,6,2)
+  Let $ADJobStartDay  = substr(&AD4.EFFDT,9,2)
+  Let $ADJobStartdt   = $ADJobStartYr || $ADJobStartMnth || $ADJobStartDay
+
+    let $PSJobStartdt = &AD4.EFFDT
+from PS_JOB AD4
+where AD4.EMPLID = $Wrk_Emplid
+  and AD4.JOBCODE = $PSJobcode
+  and AD4.EFFDT = (SELECT MIN(EFFDT)
+                    FROM  PS_JOB AD5
+                   WHERE  AD4.EMPLID = AD5.EMPLID
+                     AND  AD4.JOBCODE = AD5.JOBCODE
+                     AND  AD4.EMPL_RCD = AD5.EMPL_RCD     !changed for v8.3
+                     AND  to_char(AD5.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+
+  and AD4.EFFSEQ = (SELECT MIN(EFFSEQ)
+                     FROM PS_JOB AD2
+                    WHERE AD2.EMPLID = AD4.EMPLID
+                      AND AD2.EMPL_RCD = AD4.EMPL_RCD     !changed for v8.3
+                      AND AD2.JOBCODE = AD4.JOBCODE
+                      AND AD2.EFFDT = AD4.EFFDT)
+
+end-select
+
+End-Procedure AD-Get-JobStart-Date
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  AD-Get-Pers-Data-Effdt
+! Desc:  This routine will get the Personal Data row for each of the
+!        employee numbers entered in the trigger file.  Pers_Data_Effdt table
+!        no longer has name info, so are using Names table.
+!----------------------------------------------------------------------
+
+Begin-Procedure AD-Get-Pers-Data-effdt
+
+begin-select
+
+ADPDE2A.First_Name
+ADPDE2A.Last_Name
+ADPDE2A.Middle_Name    !added for v8.3
+
+  Let $ADPSLastName   = RTRIM(LTRIM(&ADPDE2A.Last_Name,' '),' ')
+  Let $ADPSFirstName  = RTRIM(LTRIM(&ADPDE2A.First_Name,' '),' ')
+  Let $ADPSMiddleName = RTRIM(LTRIM(&ADPDE2A.Middle_Name,' '),' ')
+  Let $ADPSMiddleName = SUBSTR($ADPSMiddleName,1,1)
+
+from PS_NAMES ADPDE2A     !Changed for v8.3
+where ADPDE2A.Emplid = $PSEmplid
+  and ADPDE2A.NAME_TYPE = 'PRI'                                    !added for v8.3
+  and ADPDE2A.Effdt = (select max(ADPDE2B.effdt) from  PS_NAMES ADPDE2B  !Changed for v8.3
+                       where ADPDE2B.emplid    = ADPDE2A.emplid
+                       and   ADPDE2B.NAME_TYPE = ADPDE2A.NAME_TYPE
+                       and   to_char(ADPDE2B.EFFDT,'YYYY-MM-DD') <= $PSEffdt) !added for v8.3
+
+end-select
+
+end-procedure AD-Get-Pers_Data-Effdt
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  AD-Get-NameSuffix
+! Desc:  This routine will get the Name Suffix row for each of the
+!        employee numbers entered in the trigger file.
+!----------------------------------------------------------------------
+
+Begin-Procedure AD-Get-NameSuffix
+
+begin-select
+
+ANAME.Name_Suffix
+
+  Let $ADNameSuffix  = RTRIM(LTRIM(&ANAME.Name_Suffix,' '),' ')
+  Let $ADNameSuffix  = SUBSTR($ADNameSuffix,1,5)
+
+from PS_NAMES ANAME     !Changed for v8.3
+where ANAME.Emplid = $PSEmplid
+  and ANAME.NAME_TYPE = 'PRI'                                    !added for v8.3
+  and ANAME.Effdt = (select max(ANAME2.effdt) from  PS_NAMES ANAME2  !Changed for v8.3
+                       where ANAME2.emplid     = ANAME.emplid
+                       and   ANAME2.NAME_TYPE  = ANAME.NAME_TYPE
+                       and   to_char(ANAME2.EFFDT,'YYYY-MM-DD') <= $PSEffdt) !added for v8.3
+
+end-select
+
+end-procedure AD-Get-NameSuffix
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure: AD-Get-Country-Code
+! Desc:  This routine will get the Country Code for Active Directory File Build
+!----------------------------------------------------------------------
+
+Begin-Procedure AD-Get-Country-Code
+
+Let $PSLoc_Country = ''
+
+Begin-Select
+
+ADL2.COUNTRY
+    let $PSLoc_Country = ltrim(rtrim(&ADL2.COUNTRY,' '),' ')         !Remove leading and trailing blanks
+
+from PS_LOCATION_TBL ADL2
+where ADL2.LOCATION = $PSLOCATION
+
+end-select
+
+End-Procedure AD-Get-Country-Code
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  AD-Get-Business-Phone
+! Desc:  This routine gets the business phone number from the Peoplesoft
+!        tables.
+!----------------------------------------------------------------------
+
+Begin-Procedure AD-Get-Business-Phone
+
+Let $PSBusiness_Phone = ''
+begin-select
+ADPP2.Phone
+
+ do Remove-Non-Letters-Numbers (&ADPP2.Phone, $PSBusiness_Phone)   !From ZRmvSpcChr.sqc
+
+from PS_Personal_Phone ADPP2
+where ADPP2.Phone_Type = 'BUSN'
+  and ADPP2.Emplid = $PSEmplid
+
+end-select
+
+end-procedure AD-Get-Business-Phone
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  AD-Get-Employee-Fax
+! Desc:  This routine gets the business phone number from the Peoplesoft
+!        tables.
+!----------------------------------------------------------------------
+
+Begin-Procedure AD-Get-Employee-Fax
+
+begin-select
+ADPP3.Phone
+ do Remove-Non-Letters-Numbers (&ADPP3.Phone, $ADEmployeeFax)   !From ZRmvSpcChr.sqc
+
+from PS_Personal_Phone ADPP3
+where ADPP3.Phone_Type = 'FAX'
+  and ADPP3.Emplid = $PSEmplid
+
+end-select
+
+end-procedure AD-Get-Employee-Fax
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  AD-Get-LegSuperviorID
+!----------------------------------------------------------------------
+
+Begin-Procedure AD-Get-LegSuperviorID
+
+begin-select
+RPOD1.ZHRF_LEG_EMPL_ID
+
+  Let $ADLegSupervisorID = &RPOD1.ZHRF_LEG_EMPL_ID
+
+from PS_ZHRT_EMPID_CREF RPOD1
+where RPOD1.Emplid = $ADSupervisorID
+
+end-select
+
+end-procedure AD-Get-LegSuperviorID
+
+!---------------------------------------------------------------------------------------
+! ERAC
+! Procedure:  AD-Get-Employment-Data
+! Desc:  This routine will get the Termination Data row for Active Directory File Build
+!---------------------------------------------------------------------------------------
+
+Begin-Procedure AD-Get-Employment-Data
+
+Let $PSHiredt = ' '
+Let $PSRehiredt = ' '
+Let $PSTerminationdt = ' '
+Let $ADSupervisorID = ' '
+
+begin-select
+
+to_char(ADE.HIRE_DT,'YYYY-MM-DD')       &ADEHire_Dt
+  Let $PSHireYr = substr(&ADEHire_Dt,1,4)
+  Let $PSHireMnth = substr(&ADEHire_Dt,6,2)
+  Let $PSHireDay = substr(&ADEHire_Dt,9,2)
+  Let $PSHiredt = $PSHireYr || $PSHireMnth || $PSHireDay
+
+to_char(ADE.REHIRE_DT,'YYYY-MM-DD')       &ADERehire_Dt
+  Let $PSRehireYr = substr(&ADERehire_Dt,1,4)
+  Let $PSRehireMnth = substr(&ADERehire_Dt,6,2)
+  Let $PSRehireDay = substr(&ADERehire_Dt,9,2)
+  Let $PSRehiredt = $PSRehireYr || $PSRehireMnth || $PSRehireDay
+
+to_char(ADE.TERMINATION_DT,'YYYY-MM-DD')  &ADETermination_Dt
+  Let $PSTermYr = substr(&ADETermination_Dt,1,4)
+  Let $PSTermMnth = substr(&ADETermination_Dt,6,2)
+  Let $PSTermDay = substr(&ADETermination_Dt,9,2)
+  Let $PSTerminationdt =  $PSTermYr || $PSTermMnth || $PSTermDay
+ADE.SUPERVISOR_ID
+  Let $ADSupervisorID = &ADE.SUPERVISOR_ID
+
+from PS_Employment ADE
+where ADE.Emplid = $PSEmplid
+
+end-select
+
+end-procedure AD-Get-Employment-Data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  AD-Get-Names
+! Desc:  This routine gets the Preferred Name from PS_Names for Active Directory File Build
+!----------------------------------------------------------------------
+
+Begin-Procedure AD-Get-Names
+Let $PSPrfName = ''
+
+begin-select
+ADN.First_Name   !changed for v8.3 and defect 993
+
+  Let $PSPrfName = RTRIM(LTRIM(&ADN.First_Name,' '),' ')
+
+from PS_Names ADN
+where ADN.Emplid = $PSEmplid
+  and ADN.NAME_TYPE = 'PRF'
+  and ADN.EFFDT     = (SELECT MAX(EFFDT) FROM PS_Names ADN2   !added for v8.3
+                      WHERE ADN2.EMPLID   = ADN.EMPLID        !added for v8.3
+                      AND ADN2.NAME_TYPE  = ADN.NAME_TYPE     !added for v8.3
+                      AND to_char(ADN2.EFFDT,'YYYY-MM-DD') <= $PSEffdt) !added for v8.3
+
+end-select
+
+end-procedure AD-Get-Names
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Write-Active-Dir-Output-File
+!----------------------------------------------------------------------
+
+Begin-Procedure Write-Active-Dir-Output-File
+
+Write 1 from
+ $ADAction_Code:1          ! Action Code (H=Hire, C=Change, T=Termination)
+ '|':1
+ $ADLegOprid:5             ! Legacy Employee Id
+ '|':1
+ $ADEmplid:11              ! Employee Id
+ '|':1
+ $ADFirstName:30           ! First Name
+ '|':1
+ $ADlastName:30            ! Last Name
+ '|':1
+ $ADPrfName:50             ! Preferred Name
+ '|':1
+ $ADNamesuffix:5           ! Name Suffix Text
+ '|':1
+ $ADLocation:10            ! HR Location
+ '|':1
+ $ADDeptID:5               ! Department ID
+ '|':1
+ $ADJobCd:6                ! Job Title Code
+ '|':1
+ $ADJobDescr:30            ! Job Title Description
+ '|':1
+ $ADEmplStatus:1           ! Work Status
+ '|':1
+ $ADEmplStatusDescr:30     ! Employee Status Description
+ '|':1
+ $ADHireDt:8               ! Hire Date / Rehire Date
+ '|':1
+ $ADTermDt:8               ! Termination Date
+ '|':1
+ $ADJobStartdt:8           ! Current Job Start Date
+ '|':1
+ $ADFullPartTime:1         ! Full/Part Time Flag (F OR P)
+ '|':1
+ $ADEmplClass:1            ! Employee Class
+ '|':1
+ $ADBusinessPhone:24       ! Business Phone Number
+ '|':1
+ $ADEmployeeFax:24         ! Fax Number
+ '|':1
+ $ADSupervisorID:11        ! Supervisor ID
+ '|':1
+ $ADLegSupervisorID:5      ! Leg Supervisor ID
+ '|':1
+ $ADCountry:3              ! Country Code
+ '|':1
+ $ADLangCd:3               ! Language Preference
+
+End-Procedure Write-Active-Dir-Output-File
+

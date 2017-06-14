@@ -1,0 +1,25 @@
+There is currently a "new" database and an "old" database.
+There is a human resources system that uses the new database, and there are legacy systems that access the old database. Basically, we want to copy the data that is entered in the new database into the old database. 
+Whenever data changes in the new database, an event record is created in a table. Our system should get the new events from that table, and it should query the new database and get all of the employee data associated with that event, then it will wrap that data in a rexec call to the old database. 
+We are not able to change any of the structure of the current databases because there are systems that depend on them.
+
+From you I would like to know what design pattern(s) you would recommend to implement this system. Obviously, we'll use JPA to read the database tables in the "new" database, and we are required to use a rexec call to modify the data in the "old" database, but I'm not sure how to architect the in-between part, the processing part. That's where you come in...
+
+
+I would like someone to "hold my hand" while I build this system. You would be a consultant. The start would be helping to architect the system, i.e. what patterns or data structure to use. 
+In that diagram, everything but the "Data Importer / Processor" part is pretty obvious to me. I need your help with that. 
+I am an experienced programmer, but not so much on an architecture level. 
+I am hoping you are an experienced architect that can get me started and give me some help along the way. 
+
+Here is a very simple description of our system should do:
+Monitor events tables for new event records
+If there are new records found, gather all related data
+Transfer related data to a different data store
+
+It isn't super urgent that it be finished very soon, but it needs to be started soon. 
+
+In that diagram, everything but the "Data Importer / Processor" part is pretty obvious to me. I need your help with that. 
+
+For now, I'd like to get a recommendation of what design patterns and/or data structures would be good to use to help me decide if you are the right person for the job. 
+
+OK, I will look at those patterns and try to determine if that is a good solution. Then I'll make a decision of whether I think you're the right person for the job. Thanks!

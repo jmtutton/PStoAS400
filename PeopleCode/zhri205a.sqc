@@ -1,0 +1,443 @@
+!*****************************************************************************
+!*  Program Name:  ZHRI205A.sqc
+!*****************************************************************************
+!*  Author:              Surya Sobha
+!*  Date:                12/27/2016
+!*  Owner:
+!*  Project Id:          TEMPMAST
+!*****************************************************************************
+!*  Program Summary:   Retrieves all data that needs to be interfaced back to
+!*          the legacy system during the Changes for NonEmp/Multiple EDs.
+!*****************************************************************************
+!*  Tables Used:
+!*
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!**********************  PeopleSoft Tables  *************************
+!* PERS_DATA_EFFDT     Select
+!* NAMES               Select                         
+!* ZHRT_PER_POI_TR     Select                        
+!* ZHRR_MULTPL_EID     Select
+!****************************************************************************!
+!*  Modifications:                                                          *!
+!*                                                                          *!
+!*  DATE        DEVELOPER NAME/Project ID           DESCRIPTION OF CHANGES  *!
+!*  ----        -------------------------           ----------------------  *!
+!* 12/28/2016   Surya Sobha/TEMPMAST                Initial Creation        *!
+!****************************************************************************!
+
+!*****************************************************************************
+! ERAC
+! Procedure:  HR201-Initialize-Fields
+! Desc:  Initialize the fields to ensure that that they all start out blank.
+!----------------------------------------------------------------------
+Begin-Procedure HR205-Initialize-Fields
+
+Let $PSEmpl = ' '
+Let $PSGroup = ' '
+Let $PSbranch = ' ' 
+Let $PSLName = ' '    
+Let $PSFName = ' '  
+Let $PSMName = ' '  
+Let $PSNickname = ' '
+Let $PSAddress = ' '
+Let $PSCity = ' '
+Let $PSGender = ' '
+Let $LegServiceDate =' '
+Let $PSDeptid  = ' '
+Let $PSPosition = ' '
+Let $PSReferral_Source = ' '
+Let $PSEMP = Substr($PSEMP,2,5)
+Let $PSPoi = 'N'
+Let $PrefLastname = ' '
+Let $POICat = ' '
+Let $ErrorProgramParm = 'HRZ205A'
+
+
+End-Procedure HR205-Initialize-Fields
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR205-Process-Main
+! Desc:  This is the main processing procedure
+!----------------------------------------------------------------------
+
+Begin-Procedure HR205-Process-Main
+
+       
+!show '$PSAuditemp: '$PSAuditemp
+!show '$Wrk_Emplid: '$Wrk_Emplid
+!show '#indexNum: '#indexNum
+!show '$PSEffdt: ' $PSEffdt
+
+Do HR205-Initialize-Fields
+
+if $Wrk_indexNum = '0'
+   do HR205-Get-POI-data                  !Get POI data 
+   do MAIN-SQL-POI                       !ZHRISTDT.SQC 
+else 
+  do HR205-Get-EMP-data                  !Get Alternate EID Emp data
+  do MAIN-SQL-EMP                       !ZHRISTDT.SQC
+end-if 
+
+
+Do HR205-Get-Personal-Data           !Get data to send back from the personal data tables
+Do HR205-Massage-Data                 !Put the data in the format necessary to send it as parameters                            
+Do Get-Oprid   
+Let $PSEmpl = $PSOprid
+
+If $PSEmpl <> '' and $PSEmpl <> ' ' 
+    Do HR205-Call-RPG-Program        !Builds and executes the call statement with all of the parameters to populate legacy system
+End-if   
+
+
+End-Procedure HR205-Process-Main
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR205-Get-Personal-Data
+! Desc:  This routine will get the Personal Data row for each of the
+!        employee numbers entered in the trigger file.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR205-Get-Personal-Data
+
+
+Begin-Select  
+PER5.SEX            
+     
+     Let $PSGender = ltrim(rtrim(&PER5.Sex,' '),' ') 
+     IF  $PSGender = 'U' 
+      LET  $PSGender = ''
+     END-IF            
+     
+from  PS_PERS_DATA_EFFDT PER5
+where PER5.EMPLID = $Wrk_Emplid
+  and PER5.EFFDT = (SELECT MAX(PER52.EFFDT)
+                      FROM PS_PERS_DATA_EFFDT PER52
+                     WHERE PER52.EMPLID = PER5.EMPLID
+                       AND  to_char(PER52.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+End-Select
+
+
+Begin-Select  
+N5.MIDDLE_NAME
+    Let $PSMName = ltrim(rtrim(&N5.MIDDLE_NAME,' '),' ')
+N5.FIRST_NAME
+    Let $PSFName = ltrim(rtrim(&N5.FIRST_NAME,' '),' ')
+N5.LAST_NAME
+    Let $PSLName = ltrim(rtrim(&N5.LAST_NAME,' '),' ')
+                   
+from  PS_NAMES N5
+where N5.EMPLID = $Wrk_Emplid
+and N5.NAME_TYPE = 'PRI'
+and N5.EFFDT     = (SELECT MAX(N52.EFFDT) FROM PS_NAMES N52
+                      WHERE N52.EMPLID   = N5.EMPLID
+                      AND   N52.NAME_TYPE  = N5.NAME_TYPE
+                      AND   to_char(N52.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+End-Select
+
+End-Procedure HR205-Get-Personal-Data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR205-GET-EMP-POI
+! Desc:  If index number is not 0 then check if EMP or POI
+!----------------------------------------------------------------------
+Begin-Procedure HR205-GET-EMP-POI
+
+Let $PSEmp= 'N'
+Let $PSPoi= 'N'
+
+begin-select
+MUL5.Z_PER_TYPE
+
+    If &MUL5.Z_PER_TYPE = 'E'
+      Let $PSEmp= 'Y'
+      Let $PSPoi= 'N'
+    else
+      Let $PSPoi= 'Y'
+      Let $PSEmp= 'N'
+    end-if     
+
+from PS_ZHRR_POI_EMP_VW MUL5
+where MUL5.Emplid = $Wrk_Emplid       
+
+end-select
+
+End-Procedure HR205-GET-EMP-POI
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR205-Get-POI-data
+! Desc:  Gets the POIs data from the POI table that needs to be
+!        interfaced to the legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR205-Get-POI-data
+
+Begin-Select
+POI5.ZHRF_POI_CATEGORY
+POI5.ZHRF_GRP_NBR,
+POI5.ZHRF_BRANCH,
+POI5.EXPECTED_END_DATE,
+POI5.MANAGER_ID, 
+POI5.ZHRF_PWORD_1,
+POI5.ZHRF_PWORD_2 
+
+    let $POICat = ltrim(rtrim(&POI5.ZHRF_POI_CATEGORY,' '),' ') 
+    let $PSGroup = ltrim(rtrim(&POI5.ZHRF_GRP_NBR,' '),' ') 
+    let $PSbranch = ltrim(rtrim(&POI5.ZHRF_BRANCH,' '),' ') 
+    let $PSNickname = ltrim(rtrim(&POI5.EXPECTED_END_DATE,' '),' ') 
+    let $PSDeptid  = ltrim(rtrim('A',' '),' ')  
+    let $PSReferral_Source  = ltrim(rtrim(&POI5.MANAGER_ID,' '),' ') 
+    let $PSAddress =  ltrim(rtrim(&POI5.ZHRF_PWORD_1,' '),' ')                      
+    let $PSCity = ltrim(rtrim(&POI5.ZHRF_PWORD_2,' '),' ') 
+    
+      do HR205-Get-POI-LegPosNo
+
+FROM PS_ZHRT_PER_POI_TR POI5
+WHERE POI5.EMPLID =  $Wrk_Emplid
+AND POI5.EFFDT = (SELECT MAX(POI1.EFFDT) FROM PS_ZHRT_PER_POI_TR POI1
+                WHERE POI5.EMPLID = POI1.EMPLID
+                AND POI5.POI_TYPE = POI1.POI_TYPE
+                AND to_char(POI1.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+End-Select
+
+End-Procedure HR205-Get-POI-data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR205-Get-EMP-data
+! Desc:  Gets the employees data from the POI table that needs to be
+!        interfaced to the legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR205-Get-EMP-data
+
+Begin-Select
+EMP5.ZHRF_GRP_NBR,
+EMP5.ZHRF_BRANCH,
+EMP5.ZHRF_ALT_EID_TYPE  &EMP5.ZHRF_ALT_EID_TYPE
+
+    let $PSGroup = ltrim(rtrim(&EMP5.ZHRF_GRP_NBR,' '),' ') 
+    let $PSbranch = ltrim(rtrim(&EMP5.ZHRF_BRANCH,' '),' ')
+    let $PSNickname = ''
+    let $PSDeptid  = ltrim(rtrim('A',' '),' ') 
+    let $PSReferral_Source  = ''
+    let $PSAddress =  ''                    
+    let $PSCity = ''
+    let $EMPType = ltrim(rtrim(&EMP5.ZHRF_ALT_EID_TYPE,' '),' ')
+    
+    do HR205-GET-EMP-POI
+    If $PSPoi= 'Y'
+      do HR205-Get-primEid-POIdata
+    else
+      let $PSPosition = '98'    !for Alternate EIDs who are employees, Leg Position will be 98
+      do HR205-Get-Alternate_Type
+    end-if
+
+FROM PS_ZHRR_MULTPL_EID EMP5
+WHERE EMP5.EMPLID = $Wrk_Emplid
+AND EMP5.SEQUENCE = $Wrk_indexNum
+AND EMP5.EFFDT = (SELECT MAX(EMP1.EFFDT) FROM PS_ZHRR_MULTPL_EID EMP1
+                WHERE EMP1.EMPLID = EMP5.EMPLID
+                AND to_char(EMP1.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+End-Select
+
+End-Procedure HR205-Get-EMP-data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR205-Get-primEid-POIdata
+! Desc:  Gets the primary Eids data when the 
+!        interfaced to the legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR205-Get-primEid-POIdata
+
+Begin-Select
+POI5A.ZHRF_POI_CATEGORY
+POI5A.EXPECTED_END_DATE,
+POI5A.MANAGER_ID, 
+POI5A.ZHRF_PWORD_1,
+POI5A.ZHRF_PWORD_2 
+
+    let $POICat = ltrim(rtrim(&POI5A.ZHRF_POI_CATEGORY,' '),' ') 
+    let $PSNickname = ltrim(rtrim(&POI5A.EXPECTED_END_DATE,' '),' ') 
+    let $PSReferral_Source  = ltrim(rtrim(&POI5A.MANAGER_ID,' '),' ') 
+    let $PSAddress =  ltrim(rtrim(&POI5A.ZHRF_PWORD_1,' '),' ')                      
+    let $PSCity = ltrim(rtrim(&POI5A.ZHRF_PWORD_2,' '),' ') 
+    
+    do HR205-Get-POI-LegPosNo
+
+FROM PS_ZHRT_PER_POI_TR POI5A
+WHERE POI5A.EMPLID =  $Wrk_Emplid
+AND POI5A.EFF_STATUS = 'A'
+AND POI5A.EFFDT = (SELECT MAX(POI5A1.EFFDT) FROM PS_ZHRT_PER_POI_TR POI5A1
+                WHERE POI5A1.EMPLID = POI5A.EMPLID
+                AND POI5A1.EFF_STATUS = 'A'
+                AND POI5A1.POI_TYPE = POI5A.POI_TYPE
+                AND POI5A1.EFFDT <= SYSDATE)
+End-Select
+
+End-Procedure HR205-Get-primEid-POIdata
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR205-Get-POI-LegPosNo
+! Desc:  Gets the POIs Legacy Positon Number
+!----------------------------------------------------------------------
+
+Begin-Procedure HR205-Get-POI-LegPosNo
+
+Begin-Select
+Z5.ZPTF_OUTPUT_01,
+Z5.ZPTF_OUTPUT_02
+
+    let $PSPosition = ltrim(rtrim(&Z5.ZPTF_OUTPUT_01,' '),' ')
+    let $PrefLastname = ltrim(rtrim(&Z5.ZPTF_OUTPUT_02,' '),' ')
+    if $PrefLastname <> ''
+      let $PrefLastname = $PrefLastname || ' '
+    end-if
+
+FROM PS_ZPTT_XLAT_TBL Z5
+WHERE  Z5.ZPTF_INPUT_01 = 'TEMPMAST' 
+AND Z5.ZPTF_INPUT_02 = 'POSITION' 
+AND Z5.STATUS ='A'
+AND Z5.ZPTF_INPUT_03 = $POICat
+
+End-Select
+
+End-Procedure HR205-Get-POI-LegPosNo
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR205-Get-Alternate_Type
+! Desc:  Gets the POIs Legacy Positon Number
+!----------------------------------------------------------------------
+
+Begin-Procedure HR205-Get-Alternate_Type
+
+Begin-Select
+Z5A.ZPTF_OUTPUT_01
+
+    let $PrefLastname = ltrim(rtrim(&Z5A.ZPTF_OUTPUT_01,' '),' ')
+    if $PrefLastname <> ''
+      let $PrefLastname = $PrefLastname || ' '
+    end-if
+
+FROM PS_ZPTT_XLAT_TBL Z5A
+WHERE  Z5A.ZPTF_INPUT_01 = 'TEMPMAST' 
+AND Z5A.ZPTF_INPUT_02 = 'Alternate EID Type' 
+AND Z5A.STATUS ='A'
+AND Z5A.ZPTF_INPUT_03 = $EMPType
+
+End-Select
+
+End-Procedure HR205-Get-Alternate_Type
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR205-Massage-Data
+! Desc:  Will massage the data to get it in the form that the RPG program
+!        needs it in to process
+!----------------------------------------------------------------------
+
+Begin-Procedure HR205-Massage-Data
+
+
+!Format the legacy employee ID from the PeopleSoft Oprid for audit field
+Let $PSAuditemp = ltrim(rtrim($PSAuditemp,' '),' ')   !Remove leading and trailing Blanks
+Let $PSAuditemp = ltrim($PSAuditemp,'E')  !Remove the leading 'E' from the employee ID
+Uppercase $PSAuditemp    !Be sure in all CAPS
+
+Uppercase $PSGroup     !Be sure in all CAPS
+Uppercase $PSbranch    !Be sure in all CAPS
+
+!Format the employee last name
+Let $PSLName = $PrefLastname || $PSLName
+Uppercase $PSLName  !Be sure in all CAPS
+!Do Replace-Character($PSLName,'''','''''',$PSLName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+
+!Format the employee first name
+Uppercase $PSFName !Be sure in all CAPS
+!Do Replace-Character($PSFName,'''','''''',$PSFName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+
+!Format the employee middle initial
+Let $PSMName = substr($PSMName,1,1)
+Uppercase $PSMName  !Be sure in all CAPS
+
+!Format the employee gender
+Uppercase $PSGender       !Be sure in all CAPS
+
+!Format Position and Department
+Uppercase $PSPosition   !Make Sure in all CAPS
+Uppercase $PSDeptid    !Make Sure in all CAPS
+
+!Format Recruit Source Information
+Uppercase $PSReferral_Source  !Make Sure in all CAPS
+
+End-Procedure HR205-Massage-Data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR205-Call-RPG-Program
+! Desc:  This routine calls the RPG program to update the legacy
+!        files.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR205-Call-RPG-Program
+
+
+!Call the RPG program passing it the list of parameters needed to update
+!the legacy files.
+
+Let $Part2 = 'Parm('''                 ||
+             $PSAuditemp               ||
+             ''' '''                   ||       
+             $PSEmpl                   ||
+             ''' '''                   ||
+             $PSGroup                  ||
+             ''' '''                   ||
+             $PSbranch                 ||
+             ''' '''                   ||
+             $PSLName                  ||
+             ''' '''                   ||
+             $PSFName                  ||
+             ''' '''                   ||
+             $PSMName                  ||
+             ''' '''                   ||
+             $PSNickname               ||
+             ''' '''                   ||
+             $PSGender                 ||
+             ''' '''                   ||
+             $LegServiceDate           ||
+             ''' '''                   ||
+             $PSDeptid                 ||
+             ''' '''                   ||
+             $PSPosition               ||
+             ''' '''                   ||
+             $PSReferral_Source        ||
+             ''' '''                   ||
+             $PSAddress                ||
+             ''' '''                   ||
+             $PSCity                   ||
+             ''')" '
+
+Let $Part1 = '"CALL ' || $Library ||'/HRZ205A '
+Let $Command = $Part1||$Part2
+
+
+Do Call-System            !From ZHRI100A.SQR
+!show 'Command : ' $Command
+
+IF #Status = 0
+    Let $NCompletionStatus = 'C'
+End-if        !#Status
+
+End-Procedure HR205-Call-RPG-Program
+
+
+#Include 'zhristdt.sqc'  !get the start date for POI and EMP

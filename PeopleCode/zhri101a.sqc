@@ -1,0 +1,1106 @@
+!*****************************************************************************
+!*  Program Name:  ZHRI101A.SQC
+!*****************************************************************************
+!*  Author:              Johnny Bridges, Enterprise Rent-A-Car
+!*  Date:                6/10/99
+!*  Owner:
+!*  Project Id:          ZHR_MOD_INTERFACE
+!*****************************************************************************
+!*  Program Summary:   Retrieves all data that needs to be interfaced back to
+!*                     the legacy system during the hire process.
+!*****************************************************************************
+!*  Tables Used:
+!*
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!**********************  PeopleSoft Tables  *************************
+!* PERSONAL_DATA       Employee Personal Information Tbl       Select
+!* PERS_DATA_EFFDT     Effective Dated Personal Info Tbl       Not used in v8.3
+!* PERSONAL_PHONE      Employee Personal Phone table           Select
+!* DIVERSITY           Employee Diversity Table                Select
+!* JOB                 Employee Job Data                       Select
+!* PS_PERS_APPL_INFO   Added for v8.3                          Select
+!* NAMES               Added for v8.3                          Select
+!* ADDRESSES           Added for v8.3                          Select
+!* PERS_APPL_REF       Added for v9.0                          Select               ! ALS-10/08/2008
+!* HRS_SOURCE_I        Added for v9.0                          Select               ! ALS-10/08/2008
+!*
+!**********************  Non-PeopleSoft Tables  *********************
+!* HR006P              Legacy Employee master file             Select
+!*
+!*********************  Cross Reference Files  **********************
+!* PS_ZHRT_JOBCD_CREF  JobCode Cross Reference Table           Select
+!* ZPS_ZGLT_PT12P_CREF Dept ID/Product ID Cross Reference File Select
+!* PS_ZHRT_CMPNY_CREF  Company cross reference Table           Select
+!* PS_ZHRT_RFSRC_CREF  Referral Source Cross Reference Table   Select
+!* PS_ZHRT_ETHCD_CREF  Ethnic Code Cross Reference Table       Select
+!*
+!*  Input/Output Files:
+!*
+!*  FILE NAME         INPUT/OUTPUT        DESCRIPTION
+!*  ---------         ------------        -----------
+!*
+!*****************************************************************************
+!*
+!*  Modifications:
+!*
+!*    DATE          DEVELOPER NAME/PROJECT ID                     DESCRIPTION OF CHANGES
+!*    ----          --------------                                ----------------------
+!*  07/16/99         Johnny Bridges/ZHR_MOD_INTERFACE             Converted to sqc.
+!*
+!*  08/07/1999       Johnny Bridges/ZHR_MOD_INTERFACE             Changed message text on error selecting from Xref tables
+!*                                                                Removed unnecessary/commented code
+!*
+!* 08/09/1999       Johnny Bridges/ZHR_MOD_INTERFACE              Changed the logic for handleing a referral source code that is not in
+!*                                                                the cross reference table pt010p to write an error only when the field
+!*                                                                was left blank.  If the field was not left blank but is still not found in PT010P
+!*                                                                then the value will be defaulted to 'O' (Other) in legacy along with the description
+!*                                                                for the fieldvalue in the xlattable send as the specific referral source.
+!*
+!*                                                                Added a field to be populated and passed, specific referral source will be passed
+!*                                                                when referral source code is not in the Xref table PT010P else it will be blank
+!*
+!*  08/10/1999      Johnny Bridges/ZHR_MOD_INTERFACE              Added Rpad to the specific referral source to ensure that it is 35 long
+!*
+!*  08/18/1999      Johnny Bridges/ZHR_MOD_INTERFACE              Removed cross reference table PT012P and used PT003P to fill the dept
+!*  08/27/1999      Gwen Salabay/ZHR_MOD_INTERFACE                Removed cross reference table PT004P and used PT102P.
+!*                                                                Added status check to select for PT003P, PT005P, PT006P,
+!*                                                                PT010P, and PT014P.
+!*
+!* 09/14/1999      Johnny Bridges/ZHR_MOD_INTERFACE               Added Logic to retrieve the office phone and pass it as a parameter to the legacy system
+!*                                                                Change to get the Legacy Job Status Code from PT003P instead of hard coding the xref
+!*
+!* 09/17/1999      Johnny Bridges/ZHR_MOD_INTERFACE               Changed build of $Where in routine HR01-GET-BRANCH so program would compile.
+!*
+!* 09/20/1999      Johnny Bridges/ZHR_MOD_INTERFACE               Changed build of $Where in routine HR01-GET-BRANCH so program would execute.
+!*
+!* 09/22/1999      Johnny Bridges/ZHR_MOD_INTERFACE               Changed to have error program parm set at the begining only so that it can be used by common routines.
+!*
+!* 10/18/1999      Johnny Bridges/ZHR_MOD_INTERFACE               Changed to only select rows from job record where action = HIR or REH
+!*
+!* 12/22/1999      Johnny Bridges/ZHR_MOD_INTERFACE               Changed to correctly use the department when geting the branch for a corp location
+!*
+!*
+!* 12/28/99      Johnny Bridges /ZHR_M0D_INTERFACE                Changed to use the jobcode_setid from the job table instead of using the cross reference table pt014p
+!*
+!* 1/17/00      Johnny Bridges/ZHR_MOD_INTERFACE                  Changed to not call RPG interface program if a critical error has been found.
+!*
+!* 04/10/2000    Christopher W Bates/ ZHR_MOD_FIXES                Changed build of legacy employee name field to pull from PS table NAME field.
+!*
+!* 09/21/2000   Sreedhar Kondepudi/ZHR_MOD_INTERFACE_PREHIRE  Changed to Hire or Rehire an employee before the Effective Date.
+!*
+!* 11/07/2000   Christopher W Bates/PS Rehost                 Prepare program to run on Unix
+!* 01/04/2001   Christopher W Bates/ZHR_MOD_CLEANUP_INTERFACE Replace AS400 Cross reference file with new PeopleSoft cross reference tables
+!* 03/30/2001   Christopher W Bates/ZHR_MOD_REHOST_INTERFACE  Modify program to run on UNIX.
+!*
+!  10/04/2001   Sreedhar Kondepudi/ZHR_FIX_DEFECT#2312        Modified to avoid ORA-Null value error while
+!                                                             inserting into the table ZHRT_EMPID_CREF
+!  11/29/2001   Sreedhar Kondepudi/ZHR_ACTIVEDIR_INTERFACE    Modified as part of User Account Automation(UAA)
+!                                                             Project.
+!  02/06/2002   Sreedhar Kondepudi/ZHR_ACTIVEDIR_INTERFACE    Excluded transactions for Date changes (ZHRI107A) to be written to
+!                                                             Active Directory.
+!* 04/12/2002   Sandy Meyer/Z_UPGRADE83_E98405                Made modifications for upgrade to v8.3.
+!*
+!* 05/21/2002   Sandy Meyer/Z_UPGRADE83_E98405                Splitting Pers_Data_Effdt select into 4 selects.
+!*
+!* 05/30/2002   Sandy Meyer/Z_UPGRADE83_E98405                Fixed middle initial appearing twice in legacy.
+!*                                                            Removed Ltrim and Rtrim from PS and legacy ethnic code.
+!*
+!* 07/11/2002   Sandy Meyer/Z_UPGRADE83_E98405                Fixed Defect 993 (nickname not flowing) and Defect 981
+!*                                                            (NID not flowing or flowing duplicates). Also changed getting
+!*                                                            main from from ps_personal_phone instead of from ps_personal_data.
+!*
+!* 7/15/02     Heather Sphar/Z_UPGRADE83_E98405               Fixed code so that birth date and gender would pass a value and not blanks.
+!*
+!* 07/30/02    Sandy Meyer/Z_UPGRADE83_E98405                 Fixed Defect #1108 (Business Phone defaulting to previous entry on hire).
+!*
+!* 10/08/2008  Andy Lee-Sue / ZHR_ZHRI100ASQR                 Modified for HR 8.3 to 9.0 upgrade and to run via process scheduler.
+!                                                             - replaced field REFERRAL_SOURCE with HRS_SOURCE_ID from table PERS_APPL_REF
+!                                                               in procedure HR01-Get-Personal-Data
+!*****************************************************************************
+!*---------------------------------------------------------------------------!
+!* Modifications:  Change PT102P to ZPS_ZGLT_PT12P_CREF                      !
+!* Author:         G. Eldridge                                               !
+!* Date:           9/30/2002                                                 !
+!* Owner:          Cindy Henken                                              !
+!* Project ID:     Z_REMOVE_PT102P                                           !
+!*---------------------------------------------------------------------------!
+!*****************************************************************************
+!*---------------------------------------------------------------------------!
+!* Modifications:  Remove Corporate logic.                                   !
+!* Author:         G. Eldridge                                               !
+!* Date:           10/8/2002                                                 !
+!* Owner:          Cindy Henken                                              !
+!* Project ID:     Z_REMOVE_CORP                                             !
+!*---------------------------------------------------------------------------!
+
+!*---------------------------------------------------------------------------!
+!* Modifications:  Added Suffix to last name field, Change tables obtaining  !
+!                  birthdate and gender information                          !
+!* Author:         R. Doelger                                                !
+!* Date:           12/5/2002                                                 !
+!* Owner:          Cindy Henken                                              !
+!* Project ID:     Z_MOD_SUFFIX_GENDER_BD                                    !
+!*---------------------------------------------------------------------------!
+!* Modifications:  Removed code that was firing error messages that were     !
+!                  going to the HRIS MS01 user ID. Per CQ 8120.              !
+!* Author:         J. O'Neill                                                !
+!* Date:           4/27/2007                                                 !
+!* Owner           Amit Hans                                                 !
+!* Project ID:     ZHR_MOD_ERROR_REMOVAL                                     !
+!*---------------------------------------------------------------------------!
+! Shelly Smith   07/03/2007   ZHR_EEO_2007_ONLINE
+!                Changed the reference from ps_diversity to ps_divers_ethnic.  These changes were required for
+!                the EEO project for 2007.  If the employee has more than one ethnic code specified on their
+!                record.  The program will now send a value of 'O' for Other.
+!------------------------------------------------------------------------------------
+! Robert Doelger 1/10/2008  ZHR_LVL-GRANDFATHER
+! Commented out error logic for job code and ethnic logic.
+!----------------------------------------------------------------------
+!*************************************************************************************
+!John O'Neill     6/9/09      INT_LEGACY_615_CHANGES
+!                 Added code to look for DTA/CNV and TER/CNV action/reasons. For the Vanguard integration
+!                 active VG employees are going in with a DTA/CNV row and terms are going in with a TER/CNV
+!                 row. In order to get these employees an E-id this SQC had to be modified to pull those
+!                 action reasons.
+!************************************************************************************************************
+! Diana Shen	01/11/2012    CQ112725 Changes for Global Functionality
+!                             Get the country code based on REG_REGION instead of Location
+!*************************************************************************************
+! Louisa Bartell 05/18/2015    CQ230619 Remove SSN - blank out the field
+!                              Search on CQ230619
+!*************************************************************************************
+! ERAC
+! Procedure:  HR01-Initialize-Fields
+! Desc:  Initialize the fields to ensure that that they all start out blank.
+!        Added many new $PS fields because some variables needed clearing.  v8.3
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Initialize-Fields
+
+Let $LegAuditEmplid = ' '        !Legacy Emplid for audit field
+Let $LegAddEmplid = ' '          !Legacy Alternate Employee Id for the employee being hired
+Let $LegGroup = ' '              !Legacy Group
+Let $LegBranch = ' '             !Legacy Branch
+Let $LegLastName = ' '           !Legacy Last Name
+Let $LegFirstName = ' '          !Legacy First Name
+Let $LegMiddleInit = ' '         !Legacy Middle Initial
+Let $LegMaritalStatus = ' '      !Legacy Marital Status
+Let $LegNickName = ' '           !Legacy Nickname
+Let $LegJobStatus = ' '          !Legacy Job Status
+Let $LegGender = ' '             !Legacy Gender
+Let $LegBirthYear = ' '          !Legacy Birth Date
+Let $LegBirthMonth = ' '         !Legacy Birth Month
+Let $LegBirthDay = ' '           !Legacy Birth Day
+Let $LegServiceYear = ' '        !Legacy Service Year
+Let $LegServiceMonth = ' '       !Legacy Service Month
+Let $LegServiceDay = ' '         !Legacy Service Day
+Let $LegUnionFlag = ' '          !Legacy Union Flag
+Let $LegRace = ' '               !Legacy Race
+Let $LegTimeCardFlag = ' '       !Legacy Time Card Flag
+Let $LegNid = ' '                !Legacy National Id (Social Security Number)
+Let $LegDepartment = ' '         !Legacy Department
+Let $LegSubDept = ' '            !Legacy Sub Dept
+Let $LegPosition = ' '           !Legacy Position
+Let $LegReferralSource = ' '     !Legacy Referral Source Code
+Let $LegAddress1 = ' '           !Legacy Address1
+Let $LegCity = ' '               !Legacy City
+Let $LegState = ' '              !Legacy State
+Let $LegZip = ' '                !Legacy Zip
+Let $LegHomeAreaCode = ' '       !Legacy Home Area code
+Let $LegHomePhone = ' '          !Legacy Employee Home phone number
+Let $LegHomePhoneError = ' '     !Flag to mark that the home phone number was too long
+Let $LegWrkAreaCode = ' '        !Legacy Work Area code
+Let $LegWorkPhone = ' '          !Legacy Employee Work phone number
+Let $LegWorkPhoneError = ' '     !Flag to mark that the Work phone number was too long
+Let $PSNAMEPREFIX = ' '          !Flag to mark that the Work phone number was too long
+Let $HireRehireFlag = ' '        !Flag that indicates if this is a hire or a rehire
+Let $LegGroup = ' '
+Let $LegBranch = ' '
+Let $PSSex = ' '
+Let $PSBirthdate = ' '
+Let $PSHomePhone = ' '
+Let $PSLangCd = ' '
+Let $PSNid = ' '
+Let $PSNidType = ' '
+Let $PSMaritalStatus = ' '
+Let $PSName = ' '
+Let $PSMiddleName = ' '
+Let $PSPreferredName = ' '
+Let $PSFirstName = ' '
+Let $PSLastName = ' '
+Let $PSSuffix = ' '              !Z_MOD_SUFFIX_GENDER_BD
+Let $PSNamePrefix = ' '
+Let $PSAddress1 = ' '
+Let $PSAction = ' '
+Let $PSAction_Reason = ' '
+Let $PSAction_Reason_All = ' '
+Let $PSCity = ' '
+Let $PSState = ' '
+Let $PSPostal = ' '
+Let $PSCounty = ' '
+Let $PSCompany = ' '
+Let $PSLocation = ' '
+Let $PSBusinessUnit = ' '
+Let $PSRegTemp = ' '
+Let $PSFullPartTime = ' '
+Let $PSEmplClass = ' '
+Let $PSFLSAStatus = ' '
+Let $PSEmplStatus = ' '
+Let $PSDeptID = ' '
+Let $PSSetID = ' '
+Let $PSEthnicCode = ' '
+Let $PSReferralSource = ' '
+Let $PSJobCode = ' '
+Let $PSFullPartTime = ' '
+Let $PSDeptid = ' '
+Let $WrkSrchLoc = ' '
+Let $WrkSrchDep = ' '
+Let $PSCompany = ' '
+Let $PSLoc_Country = ' '
+Let $PSSpecific_Refer_Src = ' '
+Let $CallRpg = 'Y'               !Flag that is used to stop call to RPG portion of the interface
+Let $PSSupervisorID = ' '
+Let $PSLangCd = ' '
+Let $PSBusiness_Phone = ' '
+Let $ErrorProgramParm = 'HRZ101A'
+let $PS_NID_COUNTRY = ' '         !dshen  01/12/2012
+
+End-Procedure HR01-Initialize-Fields
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Process-Main
+! Desc:  This is the process controling procedure.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Process-Main !(#Wrk_Sequence, $Wrk_Oprid, $Wrk_Emplid, $Wrk_Effdt, #Wrk_Effseq, $Wrk_Process_Name, $AsOfToday, :$CompletionStatus)
+
+DO HR01-INITIALIZE-FIELDS
+Do HR01-Get-Job-Data                !Get data to send back from the Job table
+Do HR01-Get-Personal-Data           !Get data to send back from the personal data tables
+Do HR01-Get-Main-Phone              !added for v8.3 and Defect 985.
+Do HR01-Get-Office-Phone            !Get data to send back from the personal phone table
+Do HR01-Get-Ethnic-Group            !Get data to send back from the diversity table
+Do HR01-Massage-Data                !Put the data in the format necessary to send it as parameters
+If $CallRpg = 'Y'
+    Do HR01-Build-Call-Statement        !Builds and executes the call statement with all of the parameters to populate legacy system
+    Do Get-Oprid                        !See if oprid already exists if not add the new employee as a PeopleSoft Operator    ZADDOPR.SQC
+    Let $ADLegOprid = $PSOprid
+Else
+    Let $CompletionStatus = 'C'
+End-if    !$CallRpg = 'Y'
+
+End-Procedure HR01-Process-Main
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Massage-Data
+! Desc:  Will massage the data to get it in the form that the RPG program
+!        needs it in to process
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Massage-Data
+
+!Determine whether a Hire or a Rehire based on the process name
+If $Wrk_Process_Name = 'ZHRI101A'
+    LET $HireRehireFlag = 'H'     !Move an 'H' to the flag if it is a hire
+else
+    LET $HireRehireFlag = 'R'     !Move an 'R' to the flag if it is a rehire
+End-If    !$Wrk_Process_Name = 'ZHRI101A'
+
+!Format the legacy employee ID from the PeopleSoft Oprid for audit field
+Let $LegAuditEmplid = ltrim(rtrim($Wrk_Oprid,' '),' ')   !Remove leading and trailing Blanks
+Let $LegAuditEmplid = ltrim($LegAuditEmplid,'E')  !Remove the leading 'E' from the employee ID
+Uppercase $LegAuditEmplid    !Be sure in all CAPS
+
+!Format the legacy alternate employee id for the employee being hired
+Let $LegAddEmplid = ltrim(rtrim($Wrk_Emplid2,' '),' ')
+
+!Format the Group number that the employee is assigned to from the Company Field
+Do HR01-Get-Group
+Uppercase $LegGroup     !Be sure in all CAPS
+
+!Format the Branch code that the employee is assigned to from the Location Field
+Do HR01-Get-Branch
+Uppercase $LegBranch    !Be sure in all CAPS
+
+!Unstring NAME into lastname, firstname
+!Unstring $PSName by ',' into $PSLastName $PSFirstName $dummy     !Split NAME into legacy lastname, firstname
+
+!Format the employee last name
+Let $LegLastName = $PSLastName
+Uppercase $LegLastName  !Be sure in all CAPS
+Do Replace-Character($LegLastName,'''','''''',$LegLastName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+
+!Format the employee first name
+Let $LegFirstName = $PSFirstName
+Uppercase $LegFirstName !Be sure in all CAPS
+Do Replace-Character($LegFirstName,'''','''''',$LegFirstName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+
+!Format the employee middle initial
+Let $LegMiddleInit = substr($PSMiddleName,1,1)
+Uppercase $LegMiddleInit  !Be sure in all CAPS
+!Do Replace-Character($LegMiddleName,'''','''''',$LegMiddleName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+
+!Format employee marital status
+Let $LegMaritalStatus = $PSMaritalStatus
+Uppercase $LegMaritalStatus  !Be sure in all CAPS
+
+!Format employee nickname
+Let $LegNickName = $PSPreferredName
+Uppercase $LegNickName     !Be sure in all CAPS
+Do Replace-Character($LegNickName,'''','''''',$LegNickName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+
+!Format the employee gender
+Let $LegGender = $PSSex
+Uppercase $LegGender       !Be sure in all CAPS
+
+!Format the employee birthdate from CCYY-MM-DD to Month, Day, and Year
+Unstring $PSBirthDate by '-' into $LegBirthYear $LegBirthMonth $LegBirthDay
+
+!Format the Employee Service Month, Day, and Year
+Unstring $PSEffdt by '-' into $LegServiceYear $LegServiceMonth $LegServiceDay
+
+!Format Union Flag
+If ($PSEmplClass = 'O')
+    Let $LegUnionFlag = 'Y'
+else
+    Let $LegUnionFlag = 'N'
+End-If    !$PSEmplClass = 'O'
+
+!Format employee race
+do HR01-Get-Legacy-Ethnic-Code
+Uppercase $LegRace      !Make Sure in all CAPS
+
+!Format Time Card Flag
+If ($PSFlsaStatus = 'N')
+    Let $LegTimeCardFlag = 'Y'
+else
+    Let $LegTimeCardFlag = 'N'
+End-If    !$PSFlsaStatus = 'N'
+
+!Format national id
+!CQ230619 Comment out 2 lines below
+!Let $LegNid = $PSNid
+!Uppercase $LegNid      !Make Sure in all CAPS
+Let $LegNid = ' '      !CQ230619
+
+!Format Sub-Department
+Let $LegSubDept = '03'   !Default sub department to 03
+
+!Format Position and Department
+Do HR01-Get-Position
+Uppercase $LegPosition   !Make Sure in all CAPS
+Uppercase $LegDepartment    !Make Sure in all CAPS
+
+!Format Recruit Source Information
+Do HR01-Get-Referral-Source
+Uppercase $LegReferralSource  !Make Sure in all CAPS
+
+!Format Address1
+Let $LegAddress1 = $PSAddress1
+Uppercase $LegAddress1        !Make Sure in all CAPS
+Do Replace-Character($LegAddress1,'''','''''',$LegAddress1) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+
+!Format City
+Let $LegCity = $PSCity
+Uppercase $LegCity     !Make Sure in all CAPS
+Do Replace-Character($LegCity,'''','''''',$LegCity)  !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+
+!Format State
+Let $LegState = $PSState
+Uppercase $LegState    !Make Sure in all CAPS
+
+!Format Postal code (Zip)
+Let $LegZip = $PSPostal
+Uppercase $LegZip      !Make Sure in all CAPS
+Do Replace-Character($LegZip,'''','''''',$LegZip)  !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+
+!Format Home Phone number
+Let $WrkOldPhone = $PSHomePhone
+Do Remove-Non-Letters-Numbers ($WrkOldPhone,$WrkNewPhone)        !ZRmvSpcChr.sqc
+Let #Phone-length = length($WrkNewPhone)
+If (#Phone-length > 10)     !Populate flag to be sent as parm if the phone number is greater than 10
+    Let $LegHomePhoneError  = 'Y'
+else
+    Let $LegHomePhoneError  = 'N'
+End-If    !#Phone-length > 10
+Let $LegHomeAreaCode = substr($WrkNewPhone,1,3)    !Get Area Code
+Let $LegHomePhone = substr($WrkNewPhone,4,7)       !Get rest of number
+
+!Format Work Phone number
+Let $WrkOldPhone = $PSBusiness_Phone      !changed for Defect #1108
+Do Remove-Non-Letters-Numbers($WrkOldPhone,$WrkNewPhone)        !ZRmvSpcChr.sqc
+Let #Phone-length = length($WrkNewPhone)
+If (#Phone-length > 10)     !Populate flag to be sent as parm if the phone number is greater than 10
+    Let $LegWrkPhoneError  = 'Y'
+else
+    Let $LegWrkPhoneError  = 'N'
+End-If    !#Phone-length > 10
+
+Let $LegWrkAreaCode = substr($WrkNewPhone,1,3)
+Let $LegWorkPhone = substr($WrkNewPhone,4,7)
+
+End-Procedure HR01-Massage-Data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Build-Call-Statement
+! Desc:  Prepares the parameters to pass to the RPG program
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Build-Call-Statement
+
+Let $Command = ' "CALL '               ||
+$Library                               ||
+'/HRZ101A '                            ||
+'PARM('''                              ||
+$LegAuditEmplid                        ||     !Legacy Emplid for audit field
+''' '''                                ||
+$LegAddEmplid                          ||       !Legacy Alternate Employee Id for the employee being hired
+''' '''                                ||
+$LegGroup                              ||           !Legacy Group
+''' '''                                ||
+$LegBranch                             ||          !Legacy Branch
+''' '''                                ||
+$LegLastName                           ||        !Legacy Last Name
+''' '''                                ||
+$LegFirstName                          ||       !Legacy First Name
+''' '''                                ||
+$LegMiddleInit                         ||      !Legacy Middle Initial
+''' '''                                ||
+$LegMaritalStatus                      ||   !Legacy Marital Status
+''' '''                                ||
+$LegNickName                           ||        !Legacy Nickname
+''' '''                                ||
+$LegJobStatus                          ||       !Legacy Job Status
+''' '''                                ||
+$LegGender                             ||          !Legacy Gender
+''' '''                                ||
+$LegBirthYear                          ||       !Legacy Birth Date
+''' '''                                ||
+$LegBirthMonth                         ||      !Legacy Birth Month
+''' '''                                ||
+$LegBirthDay                           ||        !Legacy Birth Day
+''' '''                                ||
+$LegServiceYear                        ||     !Legacy Service Year
+''' '''                                ||
+$LegServiceMonth                       ||    !Legacy Service Month
+''' '''                                ||
+$LegServiceDay                         ||      !Legacy Service Day
+''' '''                                ||
+$LegUnionFlag                          ||       !Legacy Union Flag
+''' '''                                ||
+$LegRace                               ||            !Legacy Race
+''' '''                                ||
+$LegTimeCardFlag                       ||    !Legacy Time Card Flag
+''' '''                                ||
+$LegNid                                ||             !Legacy National Id (Social Security Number)
+''' '''                                ||
+$LegDepartment                         ||      !Legacy Department
+''' '''                                ||
+$LegSubDept                            ||         !Legacy Sub Dept
+''' '''                                ||
+$LegPosition                           ||       !Legacy Position
+''' '''                                ||
+$LegReferralSource                     || !Legacy Referral Source Code
+''' '''                                ||
+$PSSpecific_Refer_Src                  || !Legacy Referral Source Code
+''' '''                                ||
+$LegAddress1                           ||        !Legacy Address1
+''' '''                                ||
+$LegCity                               ||            !Legacy City
+''' '''                                ||
+$LegState                              ||           !Legacy State
+''' '''                                ||
+$LegZip                                ||             !Legacy Zip
+''' '''                                ||
+$LegHomeAreaCode                       ||    !Legacy Home Area code
+''' '''                                ||
+$LegHomePhone                          ||       !Legacy Employee Home phone number
+''' '''                                ||
+$LegHomePhoneError                     ||  !Flag to mark that the home phone number was too long
+''' '''                                ||
+$LegWrkAreaCode                        ||    !Legacy Work Area code
+''' '''                                ||
+$LegWorkPhone                          ||       !Legacy Employee Work phone number
+''' '''                                ||
+$LegWrkPhoneError                      ||  !Flag to mark that the Work phone number was too long
+''' '''                                ||
+$PSNAMEPREFIX                          ||  !Flag to mark that the Work phone number was too long
+''' '''                                ||
+$HireRehireFlag                        ||     !Flag that indicates if this is a hire or a rehire
+''' '''                                ||      !dshen 01/11/2012
+$PS_NID_COUNTRY                        ||         !dshen 01/11/2012
+ ''')"'
+
+Do Call-System
+
+If (#Status = 0)      !If ended normally
+    Let $CompletionStatus = 'C'     !Status of Completed normally
+End-If    !#Status = 0
+
+End-Procedure HR01-Build-Call-Statement
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Get-Legacy-Ethnic-Code
+! Desc:  Gets the legacy ethnic code that corresponds to the PeopleSoft
+!        ethnic code using the cross reference table.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Get-Legacy-Ethnic-Code
+
+Let $Found = 'N'
+
+Begin-Select
+
+CPT6.ZHRF_LEGETHNICCD
+    Let $LegRace = &CPT6.ZHRF_LEGETHNICCD   !changed for v8.3
+
+    Let $Found = 'Y'
+
+from PS_ZHRT_ETHCD_CREF CPT6
+where CPT6.ETHNIC_GROUP = $PSEthnicCode
+  and CPT6.STATUS = 'A'
+
+End-Select
+
+If $Found = 'N'
+
+    ! Let $ErrorMessageParm = 'The ethnic code is not in the XRef table PS_ZHRT_ETHCD_CREF'
+    ! Do Call-Error-Routine
+
+End-If    !$Found = 'N'
+
+End-Procedure HR01-Get-Legacy-Ethnic-Code
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Get-Position
+! Desc:  Get the Legacy position from the cross reference table using the
+!        jobcode setid, jobcode, empl_class, full_part_time, reg_temp,
+!        and deptid from PeopleSoft
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Get-Position
+
+Let $Found = 'N'
+
+Begin-Select
+
+RPT3.ZHRF_LEGPOSITIONCD
+    Let $LegPosition = &RPT3.ZHRF_LEGPOSITIONCD      !Move to a program field
+RPT3.ZHRF_LEGDEPTCD
+    Let $LegDepartment = &RPT3.ZHRF_LEGDEPTCD        !Move to a program field
+RPT3.ZHRF_LEGJOBSTSCD
+    Let $LegJobStatus = &RPT3.ZHRF_LEGJOBSTSCD       !Move to a program field
+
+    Let $Found = 'Y'
+
+from PS_ZHRT_JOBCD_CREF RPT3
+where RPT3.SETID_JOBCODE = $PSSetID and RPT3.JOBCODE = $PSJobCode
+  and RPT3.EMPL_CLASS = $PSEmplClass and RPT3.FULL_PART_TIME = $PSFullPartTime
+  and RPT3.REG_TEMP = $PSRegTemp and RPT3.DEPARTMENT = $PSDeptid
+  and RPT3.STATUS = 'A'
+
+End-Select
+
+If $Found = 'N'
+
+    ! Let $WrkCriticalFlag = 'Y'
+    ! Let $CallRPG = 'N'
+    ! Let $ErrorMessageParm = 'Setid,Jobcode,EmplClass,F/P Time,R/T,Deptid not found in PS_ZHRT_JOBCD_CREF'
+   !  Do Call-Error-Routine
+    ! Let $WrkCriticalFlag = 'N'
+
+End-If    !$Found = 'N'
+
+End-Procedure HR01-Get-Position
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Get-Referral-Source
+! Desc:  Gets the legacy referral source from the cross reference file
+!        using the PeopleSoft Referral Source code
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Get-Referral-Source
+
+Let $Found = 'N'
+
+Begin-Select
+
+CPT10.ZHRF_LEGRECRUITSRC
+    Let $LegReferralSource = &CPT10.ZHRF_LEGRECRUITSRC         !Move to a program field
+
+    Let $Found = 'Y'
+
+from PS_ZHRT_RFSRC_CREF CPT10
+where CPT10.REFERRAL_SOURCE = $PSReferralSource
+  and CPT10.STATUS = 'A'
+
+End-Select
+
+if ($Found = 'N')
+
+    If $PSReferralSource = ' '   !If the Referral Source code was not entered in PS
+       Let $LegReferralSource = ' '
+       Let $ErrorMessageParm = 'Referral source not selected in PeopleSoft.'
+       Do Call-Error-Routine
+    Else
+       Let $LegReferralSource = 'O'   !If not found default to O (Other)
+!       Do Select_From_Xlat ('REFERRAL_SOURCE', $PSReferralSource, 'ENG', $ShortName, $LongName)  !READXLATB.SQC  ! ALS-10/08/2008 - Commented Out
+!       Let $PSSpecific_Refer_Src = substr($LongName,1,35)                                                        ! ALS-10/08/2008 - Commented Out
+       Let $PSSpecific_Refer_Src = substr($PSRefSourceDescr,1,35)                                                 ! ALS-10/08/2008
+    End-If    !$PSReferralSource = ' '
+
+end-if    !$Found = 'N'
+
+Let $PSSpecific_Refer_Src = Rpad($PSSpecific_Refer_Src,35,' ')  !Make sure not less than 35 long
+
+End-Procedure HR01-Get-Referral-Source
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Get-Branch
+! Desc:  Gets the branch from the cross reference file using Location
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Get-Branch
+
+Let $WrkSrchLoc = ltrim(rtrim($PSLocation,' '),' ')
+
+Let $Where = 'Where CPT2.ZGLF_PT2DPT = ''' ||
+                  $WrkSrchLoc ||
+                  ''' and ' ||
+                  'CPT2.ZGLF_PT2STS = ' ||
+                  '''A'''
+
+Let $Found = 'N'
+
+Begin-Select
+
+CPT2.ZGLF_PT2OBR
+    Let $LegBranch = ltrim(rtrim(&CPT2.ZGLF_PT2OBR,' '),' ')     !Remove leading and trailing blanks
+
+    Let $Found = 'Y'
+
+from ZPS_ZGLT_PT12P_CREF CPT2
+[$Where]         !Where clause built above
+
+End-Select
+
+End-Procedure HR01-Get-Branch
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Get-Group
+! Desc:  Gets the group from the cross reference file using Company
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Get-Group
+
+Let $Found = 'N'
+
+Begin-Select
+
+CPT5.ZHRF_LEGGROUP
+    Let $LegGroup = ltrim(rtrim(&CPT5.ZHRF_LEGGROUP,' '),' ')              !Remove leading and trailing blanks
+
+    Let $Found = 'Y'
+
+from PS_ZHRT_CMPNY_CREF CPT5
+where CPT5.COMPANY = $PSCompany
+  and CPT5.STATUS = 'A'
+
+End-Select
+
+If $Found = 'N'
+     Let $WrkCriticalFlag = 'Y'
+     Let $CallRPG = 'N'
+     Let $ErrorMessageParm = 'The Company entered is not in the cross reference table PS_ZHRT_CMPNY_CREF'
+     Do Call-Error-Routine
+     Let $WrkCriticalFlag = 'N'
+End-If    !$Found = 'N'
+
+End-Procedure HR01-Get-Group
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Get-job-data
+! Desc:  Gets the employees data from the job table that needs to be
+!        interfaced to the legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Get-job-data
+
+Begin-Select
+
+CJ.COMPANY
+    Let $PSCompany = ltrim(rtrim(&CJ.COMPANY,' '),' ')              !Remove leading and trailing blanks
+CJ.LOCATION
+    Let $PSLocation = ltrim(rtrim(&CJ.LOCATION,' '),' ')            !Remove leading and trailing blanks
+CJ.BUSINESS_UNIT
+    Let $PSBusinessUnit = ltrim(rtrim(&CJ.BUSINESS_UNIT,' '),' ')   !Remove leading and trailing blanks
+to_char(CJ.EFFDT, 'YYYY-MM-DD')         &CJ.EFFDT
+    Let $PSEffdt = &CJ.EFFDT                                        !Convert date format
+CJ.REG_TEMP
+    Let $PSRegTemp = ltrim(rtrim(&CJ.REG_TEMP,' '),' ')             !Remove leading and trailing blanks
+CJ.FULL_PART_TIME
+    Let $PSFullPartTime = ltrim(rtrim(&CJ.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
+CJ.EMPL_CLASS
+    Let $PSEmplClass = ltrim(rtrim(&CJ.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
+CJ.FLSA_STATUS
+    Let $PSFlsaStatus = ltrim(rtrim(&CJ.FLSA_STATUS,' '),' ')       !Remove leading and trailing blanks
+CJ.EMPL_STATUS
+    Let $PSEmplStatus = ltrim(rtrim(&CJ.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
+CJ.DEPTID
+    Let $PSDeptid = ltrim(rtrim(&CJ.DEPTID,' '),' ')                !Remove leading and trailing blanks
+CJ.JOBCODE
+    Let $PSJobcode = ltrim(rtrim(&CJ.JOBCODE,' '),' ')              !Remove leading and trailing blanks
+CJ.SETID_JOBCODE
+    Let $PSSetID = substr(&CJ.SETID_JOBCODE,1,5)                    !Move to a program field
+CJ.ACTION
+    Let $PSAction = &CJ.ACTION
+CJ.ACTION_REASON
+    Let $PSAction_Reason = &CJ.ACTION_REASON
+CJ.REG_REGION                                                        !dshen 01/11/2012
+    let $PS_REG_REGION = ltrim(rtrim(&CJ.REG_REGION,' '),' ')        !dshen 01/11/2012
+
+    Let $PSAction_Reason_All = $PSAction || $PSAction_Reason
+
+    Let $Wrk_AD_JobDataBuild = 'Y'                 !sree-UAAMOD
+     
+
+from PS_JOB CJ
+where CJ.EMPLID = $Wrk_Emplid
+  and CJ.EMPL_RCD = 0           !changed for v8.3
+  and CJ.EFFDT = (SELECT MAX(EFFDT)
+                    FROM  PS_JOB CJ2
+                   WHERE  CJ2.EMPLID = CJ.EMPLID
+                     AND  CJ2.EMPL_RCD = CJ.EMPL_RCD    !changed for v8.3
+                     AND  (CJ2.ACTION IN ('HIR','REH')
+                     OR (CJ2.ACTION = 'DTA' AND CJ2.ACTION_REASON = 'CNV')      !JXO 6/5/09 Added code for integration
+                     OR (CJ2.ACTION = 'TER' AND CJ2.ACTION_REASON = 'CNV'))     !JXO 6/5/09 Added code for integration
+                    ! AND  CJ2.EFFDT <= $AsOfToday)
+!********************************************************************************************
+! BEGIN ** SREE **MOD 09/21
+!********************************************************************************************
+
+                  AND  to_char(CJ2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+!********************************************************************************************
+! END  ** SREE ** MOD 09/21
+!********************************************************************************************
+
+  and CJ.EFFSEQ = (SELECT MAX(EFFSEQ)
+                     FROM PS_JOB CJ3
+                    WHERE CJ3.EMPLID = CJ.EMPLID
+                      AND CJ3.EMPL_RCD = CJ.EMPL_RCD     !changed for v8.3
+                      AND (CJ3.ACTION IN ('HIR','REH')
+                      OR (CJ3.ACTION = 'DTA' AND CJ3.ACTION_REASON = 'CNV')     !JXO 6/5/09 Added code for integration
+                      OR (CJ3.ACTION = 'TER' AND CJ3.ACTION_REASON = 'CNV'))    !JXO 6/5/09 Added code for integration
+                      AND CJ3.EFFDT = CJ.EFFDT)
+End-Select
+
+End-Procedure HR01-Get-job-data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Get-Personal-Data
+! Desc:  Gets the employees data from the personal data effdt table that
+!        needs to be interfaced to the legacy system.
+!        All this data used to come from pers_data_effdt.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Get-Personal-Data
+
+Begin-Select  !changed for v8.3
+CPDE.MAR_STATUS
+CPDE.SEX            !Z_MOD_SUFFIX_GENDER_BD
+     Let $PSMaritalStatus = ltrim(rtrim(&CPDE.MAR_STATUS,' '),' ')
+     Let $PSSex = ltrim(rtrim(&CPDE.SEX,' '),' ')                 !Z_MOD_SUFFIX_GENDER_BD
+from  PS_PERS_DATA_EFFDT CPDE
+where CPDE.EMPLID = $Wrk_Emplid
+  and CPDE.EFFDT = (SELECT MAX(EFFDT)
+                      FROM PS_PERS_DATA_EFFDT CPDE2
+                     WHERE CPDE2.EMPLID = CPDE.EMPLID
+                       AND  to_char(CPDE2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+End-Select
+
+Begin-Select                                    !Z_MOD_SUFFIX_GENDER_BD
+to_char(PPD.BIRTHDATE, 'YYYY-MM-DD')            &PPDBIRTHDATE
+    Let $PSBirthdate = &PPDBIRTHDATE
+from PS_PERSON PPD
+where PPD.EMPLID = $Wrk_Emplid
+End-Select                                      !Z_MOD_SUFFIX_GENDER_BD
+
+Begin-Select       !added for v8.3
+!CPD.SEX                                                  !Z_MOD_SUFFIX_GENDER_BD
+!    Let $PSSex = ltrim(rtrim(&CPD.SEX,' '),' ')
+!to_char(CPD.BIRTHDATE, 'YYYY-MM-DD')            &CPDBIRTHDATE
+   ! Let $PSBirthdate = &CPDBIRTHDATE                     !Z_MOD_SUFFIX_GENDER_BD
+CPD.LANG_CD   &CPD.Lang_Cd
+
+    Let $Wrk_AD_PersDataBuild = 'Y'                 !sree-UAAMOD
+    Let $PSLangCd = RTRIM(LTRIM(&CPD.Lang_Cd,' '),' ')
+
+from PS_PERSONAL_DATA CPD
+where CPD.EMPLID = $Wrk_Emplid
+End-Select
+
+Do HR01-get-location-country        !Get the country used to get the national id  
+
+
+Begin-Select  !added for Defect 981
+CPNID.NATIONAL_ID
+    Let $PSNid = ltrim(rtrim(&CPNID.NATIONAL_ID,' '),' ')
+CPNID.NATIONAL_ID_TYPE
+    Let $PSNidType = ltrim(rtrim(&CPNID.NATIONAL_ID_TYPE,' '),' ')
+    
+  
+
+from PS_PERS_NID CPNID
+where CPNID.EMPLID = $Wrk_Emplid
+  and CPNID.COUNTRY = $PS_REG_REGION                                                !dshen 01/11/2012 replace $PSloc_country with PS_REG_REGION
+  and CPNID.primary_nid='Y'                                                         !dshen 01/12/2012
+End-Select
+
+
+
+DO GET-2CHAR-COUNTRY                                                                !dshen 01/12/2012
+
+! Begin-Select  !added for v8.3                                                     ! ALS-10/08/2008 - Commented Out
+! CPAI.REFERRAL_SOURCE                                                              ! ALS-10/08/2008 - Commented Out
+!    Let $PSReferralSource = ltrim(rtrim(&CPAI.REFERRAL_SOURCE,' '),' ')            ! ALS-10/08/2008 - Commented Out
+! from PS_PERS_APPL_INFO CPAI      !added for v8.3                                  ! ALS-10/08/2008 - Commented Out
+! where CPAI.EMPLID = $Wrk_Emplid                                                   ! ALS-10/08/2008 - Commented Out
+! and CPAI.EFFDT = (SELECT MAX(EFFDT)                                               ! ALS-10/08/2008 - Commented Out
+!                      FROM PS_PERS_APPL_INFO CPAI2                                 ! ALS-10/08/2008 - Commented Out
+!                     WHERE CPAI2.EMPLID = CPAI.EMPLID                              ! ALS-10/08/2008 - Commented Out
+!                       AND to_char(CPAI2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)          ! ALS-10/08/2008 - Commented Out
+!
+Begin-Select                                                                        ! ALS-10/08/2008
+CPAI.HRS_SOURCE_ID                                                                  ! ALS-10/08/2008
+CHSI.HRS_SOURCE_NAME                                                                ! ALS-10/08/2008
+CHSI.HRS_SOURCE_DESCR                                                               ! ALS-10/08/2008
+    Let $PSReferralSource = ltrim(rtrim(&CHSI.HRS_SOURCE_NAME,' '),' ')             ! ALS-10/08/2008
+    Let $PSRefSourceDescr = ltrim(rtrim(&CHSI.HRS_SOURCE_DESCR,' '),' ')            ! ALS-10/08/2008
+from PS_PERS_APPL_REF CPAI,                                                         ! ALS-10/08/2008
+     PS_HRS_SOURCE_I CHSI                                                           ! ALS-10/08/2008
+  where CPAI.EMPLID = $Wrk_Emplid                                                   ! ALS-10/08/2008
+    and CPAI.EFFDT = (SELECT MAX(CPAI2.EFFDT)                                       ! ALS-10/08/2008
+                        FROM PS_PERS_APPL_REF CPAI2                                 ! ALS-10/08/2008
+                          WHERE CPAI2.EMPLID = CPAI.EMPLID                          ! ALS-10/08/2008
+                            AND to_char(CPAI2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)      ! ALS-10/08/2008
+    and CHSI.HRS_SOURCE_ID = CPAI.HRS_SOURCE_ID                                     ! ALS-10/08/2008
+End-Select
+
+Begin-Select  !added for v8.3
+CN.NAME
+    Let $PSName = ltrim(rtrim(&CN.NAME,' '),' ')
+CN.MIDDLE_NAME
+    Let $PSMiddleName = ltrim(rtrim(&CN.MIDDLE_NAME,' '),' ')
+CN.FIRST_NAME
+    Let $PSFirstName = ltrim(rtrim(&CN.FIRST_NAME,' '),' ')
+CN.LAST_NAME
+    Let $PSLastName = ltrim(rtrim(&CN.LAST_NAME,' '),' ')
+CN.NAME_SUFFIX                                              !Z_MOD_SUFFIX_GENDER_BD
+CN.NAME_PREFIX
+    Let $PSNamePrefix = ltrim(rtrim(&CN.NAME_PREFIX,' '),' ')
+    Let $PSNamePrefix = SUBSTR($PSNamePrefix,1,3)
+    UPPERCASE $PSNamePrefix
+ If &CN.NAME_SUFFIX <> ' '                                  !Z_MOD_SUFFIX_GENDER_BD
+    Let $PSSuffix =   RTRIM(LTRIM(&CN.NAME_SUFFIX,' '),' ')  !Z_MOD_SUFFIX_GENDER_BD
+    Let $PSLastName = $PSLastName || ' ' || $PSSuffix        !Z_MOD_SUFFIX_GENDER_BD
+ End-if    !&CN.Name_Suffix <> ' '                          !Z_MOD_SUFFIX_GENDER_BD
+
+    Let $ADPSLastName   = RTRIM(LTRIM(&CN.Last_Name,' '),' ')    !sree-UAAMOD  !changed for v8.3
+    Let $ADPSFirstName  = RTRIM(LTRIM(&CN.First_Name,' '),' ')   !sree-UAAMOD  !changed for v8.3
+    Let $ADPSMiddleName = RTRIM(LTRIM(&CN.Middle_Name,' '),' ')  !added for v8.3
+    Let $ADPSMiddleName = SUBSTR($ADPSMiddleName,1,1)            !added for v8.3
+    Let $Wrk_AD_PersDataEffdtBuild = 'Y'                         !sree-UAAMOD
+
+from  PS_NAMES CN
+where CN.EMPLID = $Wrk_Emplid
+and CN.NAME_TYPE = 'PRI'
+and CN.EFFDT     = (SELECT MAX(EFFDT) FROM PS_NAMES CN2
+                      WHERE CN2.EMPLID   = CN.EMPLID
+                      AND   CN2.NAME_TYPE  = CN.NAME_TYPE
+                      AND   to_char(CN2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+End-Select
+
+Begin-Select   !added for Defect 993
+CNAME.FIRST_NAME
+
+    Let $PSPreferredName = ltrim(rtrim(&CNAME.FIRST_NAME,' '),' ')
+
+from  PS_NAMES CNAME
+where CNAME.EMPLID = $Wrk_Emplid
+and CNAME.NAME_TYPE = 'PRF'
+and CNAME.EFFDT     = (SELECT MAX(EFFDT) FROM PS_NAMES CNAME2
+                      WHERE CNAME2.EMPLID   = CNAME.EMPLID
+                      AND   CNAME2.NAME_TYPE  = CNAME.NAME_TYPE
+                      AND   to_char(CNAME2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+End-Select
+
+Begin-Select     !added for v8.3
+CAD.ADDRESS1
+    Let $PSAddress1 = ltrim(rtrim(&CAD.ADDRESS1,' '),' ')
+CAD.CITY
+    Let $PSCity = ltrim(rtrim(&CAD.CITY,' '),' ')
+CAD.STATE
+    Let $PSState = ltrim(rtrim(&CAD.STATE,' '),' ')
+CAD.POSTAL
+    Let $PSPostal = ltrim(rtrim(&CAD.POSTAL,' '),' ')
+CAD.COUNTY
+    Let $PSCounty = ltrim(rtrim(&CAD.COUNTY,' '),' ')
+from PS_ADDRESSES CAD
+where CAD.EMPLID = $Wrk_Emplid
+  and CAD.ADDRESS_TYPE = 'HOME'
+  and CAD.EFFDT    = (SELECT MAX(EFFDT) FROM PS_ADDRESSES CAD2
+                      WHERE CAD2.EMPLID   = CAD.EMPLID
+                      AND   CAD2.ADDRESS_TYPE  = CAD.ADDRESS_TYPE
+                      AND   to_char(CAD2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+End-Select
+
+End-Procedure HR01-Get-Personal-Data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Get-Location-Country
+! Desc:  Gets the country that the location is in to determine which
+!        national id to pass back to the legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Get-Location-Country
+
+Begin-Select
+
+CLT.COUNTRY
+    LET $PSLoc_Country = &CLT.COUNTRY
+    Let $Wrk_AD_CountryCdBuild = 'Y'                 !sree-UAAMOD
+
+from PS_LOCATION_TBL CLT
+where CLT.LOCATION = $PSLocation
+
+End-Select
+
+End-Procedure HR01-Get-Location-Country
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Get-Office-Phone
+! Desc:  Gets the employees office phone number to send to legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Get-Office-Phone
+
+Begin-Select
+
+CPP.PHONE
+
+ do Remove-Non-Letters-Numbers (&CPP.Phone, $PSOfficePhone)   !From ZRmvSpcChr.sqc
+
+ Let $PSBusiness_Phone = $PSOfficePhone
+ Let $Wrk_AD_Getbusinessphone = 'Y'
+
+from PS_PERSONAL_PHONE CPP
+
+where   CPP.EMPLID = $Wrk_Emplid
+  and   CPP.PHONE_TYPE = 'BUSN'
+
+End-Select
+
+End-Procedure HR01-Get-Office-Phone
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Get-Main-Phone
+! Desc:  This routine gets the main phone number from the Peoplesoft
+!        tables and formats them for the legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Get-Main-Phone
+
+begin-select
+
+CPPM3.Phone
+
+  Let $PSHomePhone = ltrim(rtrim(&CPPM3.PHONE,' '),' ')
+
+from  PS_Personal_Phone CPPM3
+where CPPM3.Phone_Type = 'MAIN'
+  and CPPM3.Emplid = $Wrk_Emplid
+end-select
+
+end-procedure HR01-Get-Main-Phone
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR01-Get-Ethnic-Group
+! Desc:  Gets the ethnic group of the employee
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Get-Ethnic-Group
+
+
+  Let #PS_ETHNIC_COUNT = 0
+begin-select
+DE.ETHNIC_GRP_CD
+
+  Let $PS_Ethnic_Group_CD = &DE.ETHNIC_GRP_CD
+  Let #PS_ETHNIC_COUNT = #PS_ETHNIC_COUNT + 1
+
+FROM PS_DIVERS_ETHNIC DE
+WHERE DE.EMPLID  = $Wrk_Emplid
+END-SELECT
+
+      !if greater than one, the interface will send 'O' for 'Other'
+  If #PS_ETHNIC_COUNT > 1
+    Let $PSEthnicCode = 'O'
+
+    Else
+    Do GET-ETHNIC-CODE
+  End-if    !#PS_ETHNIC_COUNT > 1
+
+End-procedure HR01-Get-Ethnic-Group
+
+!----------------------------------------------------------------------
+! Erac
+! Procedure: GET-ETHNIC-CODE
+! Desc:  This procedure will get the ethnic code value to send to medstat
+!----------------------------------------------------------------------
+Begin-procedure GET-ETHNIC-CODE
+begin-select
+EG.ETHNIC_GROUP
+
+  Let $PS_Ethnic_Group = &EG.ETHNIC_GROUP
+  Let $PSEthnicCode = $PS_Ethnic_Group
+
+FROM PS_ETHNIC_GRP_TBL EG
+WHERE ETHNIC_GRP_CD = $PS_Ethnic_Group_CD
+END-SELECT
+
+End-procedure GET-ETHNIC-CODE
+
+
+!----------------------------------------------------------------------------
+! ERAC
+! Procedure: GET-2CHAR-COUNTRY
+! DESC: This procedure will get the 2 character country code
+!-----------------------------------------------------------------------------
+BEGIN-PROCEDURE GET-2CHAR-COUNTRY                     !dshen 01/11/2012
+BEGIN-SELECT
+CTRY.COUNTRY_2CHAR
+   
+ 
+   let $PS_NID_COUNTRY=ltrim(rtrim(&CTRY.COUNTRY_2CHAR,' '),' ')
+   let $PS_NID_COUNTRY=substr($PS_NID_COUNTRY,1,2)
+
+FROM PS_COUNTRY_TBL  CTRY
+WHERE CTRY.country=$PS_REG_REGION
+
+END-SELECT
+END-PROCEDURE

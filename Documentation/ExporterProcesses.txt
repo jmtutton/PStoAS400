@@ -1,0 +1,265 @@
+ZHRI100a.sqr – This SQR runs looking for any Triger data and invokes the Call to the Legacy Libraries and updates the Legacy Files. There is a sleep time of 15 seconds between each call.
+For ZHRI101a (Hire) and ZHRI106a (Rehire) Procedures, the where condition of the main SQL in the procedure ‘Get-Trigger-Data’ has been setup in a way that the SEQ NBR is greater for them and these records(any hire/rehire) gets processed first, before any other procedures.
+The below SQCs are called from the SQR
+
+1.	HR01-Process-Main – Called from ZHRI100a SQR, calls zhri100a.sqc.
+Proc_Name that uses this SQC are - ZHRI101A (hire), ZHRI106A (rehire)
+The SQC also makes sure the data is valid and checks it against the cross reference tables like PS_ZHRT_ETHCD_CREF for ethnic code 
+PS_ZHRT_JOBCD_CREF for Position, Department and Job Status
+PS_ZHRT_RFSRC_CREF for Referral Source
+ZPS_ZGLT_PT12P_CREF for Legal Branch	 
+PS_ZHRT_CMPNY_CREF for Group 
+If the values are not present then the Error routine from the main SQR is executed.
+The procedure ‘HR01-Build-Call-Statement’ gives all the data that is present in the command call to Legacy. The HireRehire Flag on the data is identified by the proc name in the trigger data.
+
+PS_JOB
+HR01-Build-Call-Statement
+LEG SRV YEAR/MON/DAY (EFFDT)
+LEG UNION FLAG (EMPL_CLASS)
+LEG TIMECARD FLAG (FLSA_STATUS)
+LEG NID (““)
+
+PS_NAMES
+LEG LAST NAME (LAST_NAME)
+LEG FIRST NAME (FIRST_NAME)
+LEG MIDDLE INITIAL (MIDDLE_NAME)
+LEG NICKNAME (FIRST_NAME)
+NAME PREFIX (NAME_PREFIX)
+
+PS_PERS_DATA_EFFDT
+LEG MARITAL STATUS (MAR_STATUS)
+LEG GENDER (SEX)
+
+PS_PERSON
+LEG BIRTH YEAR /MON/DAY (BIRTHDATE)
+
+PS_ADDRESSES
+LEG ADDRESS (ADDRESS1)
+LEG CITY (CITY)
+LEG STATE (STATE)
+LEG ZIP (POSTAL)
+
+PS_COUNTRY_TBL
+PS NID COUNTRY (COUNTRY_2CHAR)
+
+PS_PERSONAL_PHONE
+LEG HOME AREA CODE.PHONE/ERROR (PHONE - HOME)
+LEG WORK AREA CODE.PHONE/ERROR (PHONE - WORK)
+	
+PS_ZHRT_JOBCD_CREF
+LEG JOB STATUS (ZHRF_LEGJOBSTSCD)
+LEG POSITION (ZHRF_LEGPOSITIONCD)
+LEG DEPTID (ZHRF_LEGDEPTCD)
+LEG SUB DEPTID (‘03’)
+
+PS_ZHRT_ETHCD_CREF
+LEG RACE (ZHRF_LEGETHNICCD)
+
+PS_ZHRT_RFSRC_CREF	
+LEG REF SRC (ZHRF_LEGRECRUITSRC)
+	
+PS_HRS_SOURCE_I (HRS_SOURCE_DESCR)	
+LEG SPECIFIC REF SRC (HRS_SOURCE_DESCR)
+	
+PS_ZHRT_CMPNY_CREF	
+LEG GROUP (ZHRF_LEGGROUP)
+
+ZPS_ZGLT_PT12P_CREF (ZGLF_PT2OBR)
+LEG BRANCH (ZGLF_PT2OBR)
+
+
+2.	HR02-Process-Main – Called from ZHRI100a SQR, calls zhri102a.sqc.
+Proc_Name that uses this SQC - ZHRI102A (term)
+The SQC also makes sure the data is valid and checks it against the cross reference table -PS_ZHRT_TRMRS_CREF for legacy codes for Term action/action reason. 
+If the values are not present then the Error routine from the main SQR is executed.
+The procedure ‘HR02-Process-Data’ gives all the data that is present in the command call to Legacy.
+
+PS_JOB
+	TERM MONTH
+	TERM DAY
+	TERM YEAR
+	REHIRE MONTH
+	REHIRE DAY
+	REHIRE YEAR
+	AUDIT OPRID
+	TERM REASON
+
+PS_JOB.ACTION
+PS_JOB.ACTION_REASON
+	PS_ZHRT_TRMRS_CREF
+		VOLUNT/INVOL (ZHRF_LEGTERMCD)
+		TERM CODE (ZHRF_LEGTERMRSN)
+
+
+
+3.	HR04-Process-Main – Called from ZHRI100a SQR, calls zhri104a.sqc.
+Proc_Name that uses this SQC - ZHRI104A (Job Profile Changes)
+The SQC also makes sure the data is valid and checks it against the cross reference table - PS_ZHRT_JOBCD_CREF for Position, Department and Job Status
+PS_ZHRT_CMPNY_CREF for Legal Group
+If the values are not present then the Error routine from the main SQR is executed.
+The procedure ‘HR04-Call-RPG’ gives all the data that is present in the command call to Legacy.
+
+PS_JOB
+	WORK STATUS
+	UNION FLAG
+	TIMECARD FLAG
+	EFFDT
+	LEGACY SUBDEPTID (““)
+
+PS_JOB.COMPANY
+PS_JOB. SETID_JOBCODE
+PS_JOB. JOBCODE
+PS_JOB.EMPL_CLASS
+PS_JOB.FULL_PART_TIME
+PS_JOB.REG_TEMP
+PS_JOB.DEPTID
+
+
+ZPS_ZGLT_PT12P_CREF
+	LEGACY BRANCH (ZGLF_PT2OBR)
+
+PS_ZHRT_JOBCD_CREF
+	LEGACY DEPTID (ZHRF_LEGDEPTCD)
+	LEGACY POSITION (ZHRF_LEGPOSITIONCD)
+	LEGACY JOBSTATUS (ZHRF_LEGJOBSTSCD)
+
+
+4.	HR05-Process-Main – Called from ZHRI100a SQR, calls zhri105a.sqc.
+Proc_Name that uses this SQC - ZHRI105A (Demographics Changes)
+The SQC also makes sure the data is valid and checks it against the cross reference table – 
+PS_ZHRT_EMPID_CREF for emplid
+PS_ZHRT_ETHCD_CREF for ethnic code 
+PS_ZHRT_RFSRC_CREF for Referral Source
+ZPS_ZGLT_PT12P_CREF for Legal Branch	 
+PS_ZHRT_CMPNY_CREF for Group
+If the values are not present then the Error routine from the main SQR is executed.
+The procedure ‘HR05-Call-RPG-Program’ gives all the data that is present in the command call to Legacy. 
+
+
+
+
+
+
+
+AS400 Procedures
+Object	Object Type	Attribute	Description
+HRZUPDATE 	*PGM    	RPG       	PSAI: Total by Cust w/ no detail                  
+HRZ100A   	*PGM    	RPGLE     	PT  Populate Data Structure HC000X                
+HRZ101A   	*PGM    	RPGLE     	PT  Batch Pgm - New Hire/Rehire                   
+HRZ102A   	*PGM    	RPGLE     	PT  Batch Pgm - Terminate an Employee.            
+HRZ104A   	*PGM    	RPGLE     	PT  Batch Pgm - Employee job profile change.      
+HRZ104JON 	*PGM    	RPGLE     	PT  Batch Pgm - Employee job profile change.      
+HRZ105A   	*PGM    	RPGLE     	PT  Batch Pgm - Demographic Changes               
+HRZ107A   	*PGM    	RPGLE     	PT  Batch Pgm - Update Employee Dates.            
+HRZ109A   	*PGM    	RPGLE     	PT  Batch Pgm - Corporate function CCHR09         
+HRZ110A   	*PGM    	RPGLE     	PT  Sndemsg to PeopleSoft HR mailbox              
+HRZ116A   	*PGM    	RPGLE     	HR Update PT005P from FTPed data                  
+HRZ130A   	*PGM    	RPGLE     	PT Updates cust files after records corrected     
+HRZ902A   	*PGM    	RPGLE     	HR Capture Global Customer Parameters             
+
+
+
+
+
+
+		
+
+
+
+
+	
+	
+	
+	
+	
+
+
+
+
+
+5.	HR07-Process-Main – Called from ZHRI100a SQR, calls zhri107a.sqc.
+Proc_Name that uses this SQC - ZHRI107A (Employment Review, Accomplishment and Contract Data Changes)
+The procedure ‘HR07-Call-RPG’ gives all the data that is present in the command call to Legacy.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6.	HR09-Process-Main – Called from ZHRI100a SQR, calls zhri109a.sqc.
+Proc_Name that uses this SQC - ZHRI109	A (Group Transfer Changes)
+The SQC also makes sure the data is valid and checks it against the cross reference table - ZPS_ZGLT_PT12P_CREF for Legal Branch
+PS_ZHRT_CMPNY_CREF for Legal Group
+If the values are not present then the Error routine from the main SQR is executed.
+The procedure ‘HR09-Call-RPG’ gives all the data that is present in the command call to Legacy.
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+Get-Oprid
+The SQR ZHRI100a has the procedure ‘Get-Oprid’, which is called by all the SQCs
+This Process actually creates the EID in PSHR from Legacy Systems. Legacy has a master tale HR036P which already contains the EIDs during the hiring in PS.
+The proc verifies the emplid in change, is present in the Cross Reference table - PS_ZHRT_EMPID_CREF between PS and Legacy. If the emplid is not present (which usually happens for HIRE/REHIRE), it calls another procedure to pick the emplid (EID/oprid) from the master table - HR036P (this table resides in Legacy System). The procedure also inserts the missing data into the PS_ZHRT_EMPID_CREF table.	
+Zhri101a.sqc which is the HIRE process calls this procedure after the command call to Legacy, and all other procedures calls it before the command call. 
+
+
+
+
+
+
+			
+
+
+
+		YES	NO	
+
+
+
+
+			
+
+
+
+zbas002b.sh – Triggered from the ZHRI100a SQR 
+AS/400 machine name – ELLIB and the remote server - central.corp.erac.com
+A successful command will be – (this is for Job Profile Changes- zhri104a for the Oprid – 151BM )
+/usr/local/barch/PS90HRPD/scripts/zbas002b.sh "CALL ELLIB/HRZ104A PARM('151BM' '375PC' 'M5' 'N' ' ' 'CC038' 'F' 'A' 'N' 'N' '08212016')" central.corp.erac.com 
+
+Error Handling - 
+The Error routine is called whenever there is any error, for example the legacy equivalent is not found.
+Also for all the procedures where there is a deletion – ZHRI101D, ZHRI102D, ZHRI104D, ZHRI105D, ZHRI106D, ZHRI107D, ZHRI109D Error routine is called.
+The Error message shouldn’t be more than 75 characters
+Examples for an error command- for EMPLIDs’ 308508 and 956143 – leading 0s’ removed.
+
+/usr/local/barch/PS90HRPD/scripts/zbas002b.sh "CALL ELLIB/HRZ110A PARM('HRZ104A' '000308508' ' ' 'A row was deleted on the job-profile process    
+
+/usr/local/barch/PS90HRPD/scripts/zbas002b.sh "CALL ELLIB/HRZ110A PARM('HRZ109A' '000956143' ' ' 'Company not found in XRef Table PS_ZHRT_CMPNY_CREF 
+
+All procedures related to Active Directory (AD) are no longer used as ERD is used instead.
+
+ZHRI110a.sqr – This SQR runs every third Saturday of a month, and cleans the Trigger table - PS_ZHRT_INTTRIGGER.
+It will move rows from the Trigger table to the History Table.  It will also delete rows from the history file after they have resided there for one year. 

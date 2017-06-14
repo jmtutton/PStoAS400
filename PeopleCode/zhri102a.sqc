@@ -1,0 +1,299 @@
+!*********************************************************************
+!*  Program Name: ZHRI102A
+!*********************************************************************
+!*  Author:       Art Wamser, Enterprise Rent-A-Car
+!*  Date:         6/21/99
+!*  Owner:        Data Architecture
+!*  Project Id:   ZHR_MOD_INTERFACE
+!*********************************************************************
+!*  Program Summary:  Update the Legacy files which where modified by
+!*  the HR program ZHRI102A.  Only specific fields will be updated.
+!*  Those fields are those which were changed on the AAHR02 screen.
+!*********************************************************************
+!*  Tables Used:
+!*        TABLE                        DESCRIPTION                           ACCESS
+!*        -----                        -----------                           ------
+!*        PS_Job                       Job Table                             Input
+!*        PS_Action Reason             Action Reason Table                   Input
+!*        PS_ZHRT_TRMRS_CREF           Termntn Reason Cross Reference Table  Input
+****************************************************************************
+
+Procedures Defined in This File:
+PROCEDURE              				DESCRIPTION                            
+-----------        					-----------                         
+HR02-Initialize-Fields
+HR02-Process-Main
+HR02-Get-Job
+HR02-Process-Data
+HR02-Trim-Parameters
+HR02-Get-Action-Reason
+HR02-Get-Reason-Description
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR02-Initialize-Fields
+! Desc:  Initialize the fields to ensure that that they all start out blank.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR02-Initialize-Fields
+
+LET $PSEmpl = ' '
+LET $PSTermMnth = ' '
+LET $PsTermDay = ' '
+LET $PSTermYr = ' '
+LET $PSReHireMnth = ' '
+LET $PSReHireDay = ' '
+LET $PSReHireYr = ' '
+LET $PSVolInvol = ' '
+LET $PSTermCode = ' '
+LET $PSTermReason = ' '
+Let $PSAction_Reason = ' '
+
+Let $PSAuditOperId = substr($PSAuditOperId,2,5)
+Let $ErrorProgramParm = 'HRZ102A'
+
+End-Procedure HR02-Initialize-Fields
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR02-Process-Main
+! Desc:  This is the main processing procedure
+!----------------------------------------------------------------------
+
+Begin-Procedure HR02-Process-Main
+
+Do HR02-Initialize-Fields   !Execute a routine that will move blanks to all of the parms on the SBMRMTCMD
+
+Move 1 to #NumberOfDays   !Set the number of days to add to the passed date
+Do dtu-add-days($PSDateIn, #NumberOfDays, $PSDate)    !Add one day to the date using DateMath.sqc
+
+show 'zhri102a.sqc $PSDate: ' $PSDate
+
+do HR02-Get-Job            !From ZHRI100A.SQR
+do Get-Oprid
+    Let $ADLegOprid = $PSOprid
+
+Let $PSEmpl = $PSOprid
+show 'zhri102a.sqc $PSEmpl: ' $PSEmpl
+If $PSEmpl <> '' and $PSEmpl <> ' '  !If the new oprid is not blank and it is not null on return
+    Let $PSDate = $PSDateIn    !Move the original date back to psdate.
+    do HR02-Process-Data
+End-if    !$PSEmpl <> '' and $PSEmpl <> ' '
+
+
+End-Procedure HR02-Process-Main
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR02-Get-Job
+! Desc:  This routine will the Job Data row for each of the
+!        employee numbers entered in the trigger file.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR02-Get-Job
+
+begin-select
+CJ5.ACTION
+CJ5.ACTION_REASON
+CJ5.Location
+CJ5.Full_Part_Time
+CJ5.Company
+CJ5.Business_Unit
+CJ5.Empl_Class
+CJ5.Empl_Status
+CJ5.DeptId
+CJ5.JobCode
+
+   Let $PSAction = &CJ5.ACTION
+   Let $PSAction_Reason = &CJ5.ACTION_REASON
+   Let $PSLocation = &CJ5.Location
+   Let $PSCompany = &CJ5.Company
+   Let $PSBusinessUnit = &CJ5.Business_Unit
+   Let $PSEmplClass = &CJ5.Empl_Class
+   Let $PSEmplStatus = &CJ5.Empl_Status
+   Let $PSDeptId = &CJ5.DeptId
+   Let $PSJobCode = &CJ5.JobCode
+   Let $Wrk_AD_JobDataBuild = 'Y'                 !sree-UAAMOD
+
+   Let $PSAction = rtrim($PSAction,' ')                                             ! ALS-08/03/2009
+   Let $PSAction_Reason = rtrim($PSAction_Reason,' ')                               ! ALS-08/03/2009
+
+   If $PSAction <> 'REH'
+        do HR02-Get-Action-Reason
+   End-If    !$PSAction <> 'REH'
+
+from PS_Job CJ5
+where CJ5.Emplid = $PSEmplid
+  and TO_CHAR(CJ5.EFFDT, 'YYYY-MM-DD') = $PSDate
+  and CJ5.EFFSEQ = #PSEFFSEQ
+  and CJ5.EMPL_RCD = 0             ! changed for v8.3
+
+end-select
+
+End-Procedure HR02-Get-Job
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR02-Process-Data
+! Desc:  This routine moves 'N' to change address parameter and calls
+!        the RPG program.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR02-Process-Data
+
+Let $PSChange = 'N'
+
+if ($PSAction = 'REH')
+and ($PSAction_Reason = 'REH')
+  Let $PSRehireYr = substr($PSDate,1,4)
+  Let $PSRehireMnth = substr($PSDate,6,2)
+  Let $PSRehireDay = substr($PSDate,9,2)
+end-if    !$PSAction = 'REH' and $PSAction_Reason = 'REH'
+
+if ($psAction = 'TER' or $psAction = 'RET' or $psAction = 'TWP' or $psAction = 'TWB')
+  Let $PSTermYr = substr($PSDate,1,4)
+  Let $PSTermMnth = substr($PSDate,6,2)
+  Let $PSTermDay = substr($PSDate,9,2)
+end-if    !$PSAction = 'TER'
+
+Do Remove-Non-Letters-Numbers ($PSTermReason,$PSTermReason)        !ZRmvSpcChr.sqc
+
+
+do HR02-Trim-Parameters     !Routine to trim the parameters to insure that there are not a larger number of blanks being passed
+
+Let $Part2 = 'Parm('''         ||
+             $PSEmpl             ||
+             ''' '''         ||
+             $PSTermMnth         ||
+             ''' '''         ||
+             $PsTermDay          ||
+             ''' '''         ||
+             $PSTermYr           ||
+             ''' '''         ||
+             $PSReHireMnth       ||
+             ''' '''         ||
+             $PSReHireDay        ||
+             ''' '''         ||
+             $PSReHireYr         ||
+             ''' '''         ||
+             $PSVolInvol         ||
+             ''' '''         ||
+             $PSTermCode         ||
+             ''' '''         ||
+             $PSAuditOperId      ||
+             ''' '''         ||
+             $PSTermReason       ||
+             ''')" '
+
+Let $Part1 = '"CALL ' || $Library ||'/HRZ102A '
+Let $Command = $Part1||$Part2
+
+
+Do Call-System             !From ZHRI100A.SQR
+
+if (#Status = 0)
+    let $CompletionStatus = 'C'   !Completed Normally
+end-if    !#Status = 0
+
+
+End-Procedure HR02-Process-Data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR02-Trim-Parameters
+! Desc:  This routine trims all leading and trailing blanks from the
+!        data.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR02-Trim-Parameters
+
+   Let $PSAuditOperId= RTRIM(LTRIM($PSAuditOperId,' '),' ')
+   Let $PSEmpl = RTRIM(LTRIM($PSEmpl,' '),' ')
+   Let $PSTermMnth = RTRIM(LTRIM($PSTermMnth,' '),' ')
+   Let $PsTermDay = RTRIM(LTRIM($PsTermDay,' '),' ')
+   Let $PSTermYr = RTRIM(LTRIM($PSTermYr,' '),' ')
+   Let $PSReHireMnth = RTRIM(LTRIM($PSReHireMnth,' '),' ')
+   Let $PSReHireDay = RTRIM(LTRIM($PSReHireDay,' '),' ')
+   Let $PSReHireYr = RTRIM(LTRIM($PSReHireYr,' '),' ')
+   Let $PSState = RTRIM(LTRIM($PSState,' '),' ')
+   Let $PSZip = RTRIM(LTRIM($PSZip,' '),' ')
+   Let $PSVolInvol = RTRIM(LTRIM($PSVolInvol,' '),' ')
+   Let $PSTermCode = RTRIM(LTRIM($PSTermCode,' '),' ')
+   Let $PSTermReason = RTRIM(LTRIM($PSTermReason,' '),' ')
+! $PSTermReason is at most 30 positions long, but HRZ102A receives it with a length of 35 positons.
+   Let $PSTermReason = Rpad($PSTermReason,35,' ')  !Make sure not less than 35 long
+
+End-Procedure HR02-Trim-Parameters
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR02-Get-Action-Reason
+! Desc:  This routine will determine if a termination was voluntary or
+!        involuntary basedd on Action and Action Reason codes.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR02-Get-Action-Reason
+
+Let $Found = 'N'   !Initialize the record found variable
+
+Begin-Select
+
+CPT16.ZHRF_LEGTERMCD
+    Let $PSVolInvol = &CPT16.ZHRF_LEGTERMCD
+CPT16.ZHRF_LEGTERMRSN
+    Let $PSTermCode = &CPT16.ZHRF_LEGTERMRSN
+
+     If $PSTermCode = 'O' and $PSAction = 'TER'
+        Do HR02-Get-Reason-Description
+     End-If    !$PSTermCode = 'O'
+    Let $Found = 'Y'     !Mark that a record was found
+
+from PS_ZHRT_TRMRS_CREF CPT16
+where CPT16.STATUS = 'A'
+  and CPT16.ACTION = $PSAction
+  and CPT16.ACTION_REASON = $PSAction_Reason
+
+End-Select
+
+If $Found = 'N'
+     Let $ErrorMessageParm = 'Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF'
+     Do Call-Error-Routine       !From ZHRI100A.SQR
+
+
+     !Default the Action and reason in the legacy system
+     Let $PSVolInvol = 'V'
+     Let $PSTermCode = 'O'
+     Let $PSTermReason = 'ACTION REASON NOT SELECTED IN PS'
+End-If    !$Found = 'N'
+
+End-Procedure HR02-Get-Action-Reason
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR02-Get-Reason-Description
+! Desc:  This routine gets the description field from the Action
+!        Reason table when Action = Termination and Action Code equals
+!        Other.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR02-Get-Reason-Description
+
+begin-select
+CART.Action
+CART.Action_Reason
+CART.Descr
+
+   Let $PSTermReason = &CART.Descr
+   Uppercase $PSTermReason
+
+from PS_Actn_Reason_Tbl CART
+where CART.Action = $PSAction
+  and CART.Action_Reason = $PSAction_Reason
+
+END-SELECT
+
+End-Procedure HR02-Get-Reason-Description
+

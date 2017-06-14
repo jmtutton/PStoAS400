@@ -1,0 +1,288 @@
+!*********************************************************************
+!*  Program Name: ZHRI107A
+!*********************************************************************
+!*  Program Summary:  The purpose of this program is to update
+!*  specific fields in two legacy files, HR006P and ZLIFM#1.
+!*  These fields are those in which were changed somewhere in
+!*  PeopleSoft and are needed to be sent back to the legacy system,
+!*  specifically, the AAHR01, Option 7 screen.  This program is being
+!*  used to build this specific piece for interfacing PeopleSoft
+!*  back to the legacy system.
+!*********************************************************************
+!*  Tables Used:
+!*      TABLE                DESCRIPTION                 ACCESS
+!*      -----                -----------                 ------
+!*      PSOprDefn            Operator Definition Table   Input
+!*      PS_Employee_Review   Employee Review Table       Input
+!*      PS_Accomplishments   Accomplishments Table       Input
+!*      PS_Contract_Data     Contract Data Table         Input
+!*      PS_ZHRT_INTTRIGGER   Trigger Table               Select
+!*********************************************************************
+
+HR07-Initialize-Fields
+HR07-Process-Main
+HR07-Get-Employee-Review
+HR07-Get-Accomplishments
+HR07-Get-Contract-Data
+HR07-Call-RPG
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR07-Initialize-Fields
+! Desc:  This will initialize the fields at each call.
+!----------------------------------------------------------------------
+Begin-Procedure HR07-Initialize-Fields
+
+Let $LegacyEmplid = ' '
+Let $LegacyUserEmplid = ' '
+Let $LegHireDtMonth = ' '
+Let $LegHireDtDay = ' '
+Let $LegHireDtYear = ' '
+Let $LegTermDtMonth = ' '
+Let $LegTermDtDay = ' '
+Let $LegTermDtYear = ' '
+Let $LegLstRevDtMonth = ' '
+Let $LegLstRevDtDay = ' '
+Let $LegLstRevDtYear = ' '
+Let $LegNxtRevDtMonth = ' '
+Let $LegNxtRevDtDay = ' '
+Let $LegNxtRevDtYear = ' '
+Let $LegNegDrugTstMonth = ' '
+Let $LegNegDrugTstDay = ' '
+Let $LegNegDrugTstYear = ' '
+Let $LegPhysTstMonth = ' '
+Let $LegPhysTstDay = ' '
+Let $LegPhysTstYear = ' '
+Let $LegContractDtMonth = ' '
+Let $LegContractDtDay = ' '
+Let $LegContractDtYear = ' '
+Let $LegEffdt = $PSEffdt
+Let $LegCompanySeniorityMonth = ' '
+Let $LegCompanySeniorityDay = ' '
+Let $LegCompanySeniorityYear = ' '
+
+Let $ErrorProgramParm = 'HRZ107A'
+
+!Remove leading 'E' from the PS employee operator ID to comply with the 5 long legacy format
+Let $LegacyuserEmplid = substr($AuditOPRID,2,5)
+
+Uppercase $LegacyuserEmplid !Make sure it is in all caps in case ID has a letter in it
+
+End-Procedure HR07-Initialize-Fields
+
+ !----------------------------------------------------------------------
+ ! ERAC
+ ! Procedure:  HR07-Process-Main
+ ! Desc:  This procedure will execute procedures to retrieve the Peoplesoft values that will be
+ !        used to update HR006P and ZLIFM#1 (legacy files) for the fields
+ !        found in the screen of Option 7 of the AAHR01 legacy application.
+ !        This routine will select only those records contained in the
+ !        Trigger File which signals they are ready for updating legacy.
+ !        It will control all processing.
+ !----------------------------------------------------------------------
+Begin-Procedure HR07-Process-Main
+
+Do HR07-Initialize-Fields
+
+!call procedures to get necessary PeopleSoft changed values for legacy
+do Get-Oprid                          !gets valid operator ID using code from ZHRI100A.sqr
+Let $LegacyEmplid = $PSOprid
+If $LegacyEmplid <> '' and $LegacyEmplid <> ' '  !New oprid not null or blank on return
+    do HR07-Get-Employee-Review
+    do HR07-Get-Accomplishments
+    do HR07-Get-Contract-Data
+    do HR07-Call-RPG
+End-if    !$LegacyEmplid <> '' and $LegacyEmplid <> ' '
+
+End-Procedure HR07-Process-Main
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR07-Get-Employee-Review
+! Desc:  This procedure retrieves the Next Review Date and Last Review Date
+!        from the PeopleSoft Employee Review Table to send back to
+!        Option 7 of AAHR01 in legacy.
+!----------------------------------------------------------------------
+Begin-Procedure HR07-Get-Employee-Review
+
+begin-select
+to_char(CER7.NEXT_REVIEW_DT, 'YYYY-MM-DD')  &CER7NEXT_REVIEW_DT
+  Let $PSNextReviewDate = &CER7NEXT_REVIEW_DT
+  Let $LegNextReviewDate = $PSNextReviewDate
+CER7.EFFDT
+    Let $LegLastReviewDate = $LegEffdt
+
+  !Format next review date and last review date so legacy will accept it (MM field, DD field and CCYY field)
+  Unstring $PSNextReviewDate by '-' into $LegNxtRevDtYear $LegNxtRevDtMonth $LegNxtRevDtDay
+  Unstring $LegLastReviewDate by '-' into $LegLstRevDtYear $LegLstRevDtMonth $LegLstRevDtDay
+
+from PS_Employee_Review CER7
+where CER7.Emplid = $PSEMPLID
+  and CER7.EMPL_RCD = 0     !changed for v8.3
+  and to_char(CER7.EFFDT, 'YYYY-MM-DD') = $PSEFFDT
+
+end-select
+
+end-procedure HR07-Get-Employee-Review
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR07-Get-Accomplishments
+! Desc:  This procedure retrieves the Negative Drug Test Date and Physical
+!        Test Date from the PeopleSoft Accomplishments Table to send
+!        back to Option 7 of AAHR01.
+!----------------------------------------------------------------------
+Begin-Procedure HR07-Get-Accomplishments
+
+begin-select
+to_char(CA7.DT_ISSUED, 'YYYY-MM-DD')  &CA7DT_ISSUED
+    Let $PSIssueDate = &CA7DT_ISSUED
+CA7.ACCOMPLISHMENT
+    Let $SelectAccomplishment = Ltrim(Rtrim(&CA7.ACCOMPLISHMENT,' '),' ')
+
+    !select the correct accomplishment to pull in the correct date
+    evaluate $SelectAccomplishment
+
+        !when accomplishment is equal to negative drug test
+        when = 'DRUGTST'
+            Let $LegNegDrugTestDate = $PSIssueDate
+            !Format negative drug test date so legacy will accept it (MM field, DD field and CCYY field)
+            Unstring $PSIssueDate by '-' into $LegNegDrugTstYear $LegNegDrugTstMonth $LegNegDrugTstDay
+            break                 !Exit the evaluate statement
+
+        !when accomplishment is equal to physical test date for level 3
+        when = 'PHYS L3'
+            Let $LegPhysical3TestDate = $PSIssueDate
+            !Format physical test date so legacy will accept it (MM field, DD field and CCYY field)
+            Unstring $PSIssueDate by '-' into $LegPhysTstYear $LegPhysTstMonth $LegPhysTstDay
+            break                 !Exit the evaluate statement
+
+        !when accomplishment is equal to physical test date for level 4
+        when = 'PHYS L4'
+            Let $LegPhysical4TestDate = $PSIssueDate
+            !Format physical test date so legacy will accept it (MM field, DD field and CCYY field)
+            Unstring $PSIssueDate by '-' into $LegPhysTstYear $LegPhysTstMonth $LegPhysTstDay
+            break                 !Exit the evaluate statement
+
+        !when equal to anything else, do not get issue date
+        when-other
+            break                 !Exit the evaluate statement
+
+    end-evaluate   !$SelectAccomplishment
+
+ !select the maximum issue date in order to get the most current physical/drug test date because an employee could have multiple rows
+
+from PS_ACCOMPLISHMENTS CA7
+where CA7.Emplid = $PSEMPLID
+    and CA7.ACCOMPLISHMENT in ('DRUGTST', 'PHYS L3', 'PHYS L4')
+    and CA7.DT_ISSUED = (select max(CA72.DT_ISSUED)
+                           from PS_ACCOMPLISHMENTS CA72
+                          where CA72.EMPLID = CA7.EMPLID
+                            and CA72.ACCOMPLISHMENT = CA7.ACCOMPLISHMENT
+                            and CA72.DT_ISSUED <= $AsofToday)
+
+End-select
+
+End-Procedure HR07-Get-Accomplishments
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR07-Get-Contract-Data
+! Desc:  This procedure retrieves the contract date from the PeopleSoft
+!        Contract Data Table to send back to Option 7 of AAHR01.
+!----------------------------------------------------------------------
+Begin-Procedure HR07-Get-Contract-Data
+
+Begin-Select
+to_char(CCD7.CONTRACT_BEGIN_DT, 'YYYY-MM-DD')  &CCD7EFFDT   !changed for v8.3
+   Let $LegContractDate = &CCD7EFFDT
+
+    !Format contract date so legacy will accept it (MM field, DD field and CCYY field)
+    Unstring $LegContractDate by '-' into $LegContractDtYear $LegContractDtMonth $LegContractDtDay
+
+ !select the maximum contract date to get the most current one because an employee can have more than 1 active contract
+
+from PS_CONTRACT_DATA CCD7
+where CCD7.Emplid = $PSEmplid
+  and CCD7.CONTRACT_BEGIN_DT = (select MAX(CONTRACT_BEGIN_DT) from PS_CONTRACT_DATA CCD8   !changed for v8.3
+                     WHERE CCD8.EMPLID = CCD7.EMPLID
+                       AND CCD8.CONTRACT_BEGIN_DT <= $AsofToday)   !changed for v8.3
+
+End-Select
+
+End-Procedure HR07-Get-Contract-Data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR07-Call-RPG
+! Desc:  This procedure calls the RPG program to update the legacy
+!        files/fields needed by Option 7 of AAHR01.
+!----------------------------------------------------------------------
+Begin-Procedure HR07-Call-RPG
+
+!Setup the parm list with what needs to be passed to the RPG program to update the legacy system
+ Let $Command = ' "CALL '                ||
+     $Library                            ||
+     '/HRZ107A '                         ||
+     'PARM('''                           ||
+     $LegacyEmplid                       ||
+     ''' '''                             ||
+     $LegacyUserEmplid                   ||
+     ''' '''                             ||
+     $LegHireDtMonth                     ||
+     ''' '''                             ||
+     $LegHireDtDay                       ||
+     ''' '''                             ||
+     $LegHireDtYear                      ||
+     ''' '''                             ||
+     $LegTermDtMonth                     ||
+     ''' '''                             ||
+     $LegTermDtDay                       ||
+     ''' '''                             ||
+     $LegTermDtYear                      ||
+     ''' '''                             ||
+     $LegLstRevDtMonth                   ||
+     ''' '''                             ||
+     $LegLstRevDtDay                     ||
+     ''' '''                             ||
+     $LegLstRevDtYear                    ||
+     ''' '''                             ||
+     $LegNxtRevDtMonth                   ||
+     ''' '''                             ||
+     $LegNxtRevDtDay                     ||
+     ''' '''                             ||
+     $LegNxtRevDtYear                    ||
+     ''' '''                             ||
+     $LegNegDrugTstMonth                 ||
+     ''' '''                             ||
+     $LegNegDrugTstDay                   ||
+     ''' '''                             ||
+     $LegNegDrugTstYear                  ||
+     ''' '''                             ||
+     $LegPhysTstMonth                    ||
+     ''' '''                             ||
+     $LegPhysTstDay                      ||
+     ''' '''                             ||
+     $LegPhysTstYear                     ||
+     ''' '''                             ||
+     $LegContractDtMonth                 ||
+     ''' '''                             ||
+     $LegContractDtDay                   ||
+     ''' '''                             ||
+     $LegContractDtYear                  ||
+     ''' '''                             ||
+     $LegCompanySeniorityMonth           ||
+     ''' '''                             ||
+     $LegCompanySeniorityDay             ||
+     ''' '''                             ||
+     $LegCompanySeniorityYear            ||
+     ''')" '
+
+Do Call-System    !Do a remote call to the RPG program, HRZ107A, in order to pass the parms from code in ZHRI100A.sqr
+
+if (#STATUS = 0 )
+  Let $CompletionStatus = 'C'
+end-if    !#STATUS = 0
+
+End-Procedure HR07-Call-RPG
+

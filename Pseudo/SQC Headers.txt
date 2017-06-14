@@ -1,0 +1,251 @@
+!*****************************************************************************
+!*  Program Name:  ZHRI100A.SQR
+!*****************************************************************************
+!*  Author:	Rakesh Govani, Enterprise Rent-A-Car
+!*****************************************************************************
+!*  Program Summary:  Interfaces the PeopleSoft data to the Legacy data
+!*****************************************************************************
+!*
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!*  Job                PeopleSoft Employee Job Table          Select
+!*  ZHRT_INTTRIGGER    PeopleSoft to Legacy Interface Table   Update
+!*  PS_ZHRT_EMPID_CREF PeopleSoft Employee Cross Refer Table  Select/Insert
+!*  HR006P             Employee Master file (Legacy System)   Select
+!*  PSXLATITEM         Translate Table                        Select
+!*****************************************************************************
+!*****************************************************************************
+
+
+!*****************************************************************************
+!*  Program Name:  ZHRI101A.SQC
+!*****************************************************************************
+!*  Author:	Johnny Bridges, Enterprise Rent-A-Car
+!*****************************************************************************
+!*  Program Summary:   Retrieves all data that needs to be interfaced back to
+!*                     the legacy system during the hire process.
+!*****************************************************************************
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!**********************  PeopleSoft Tables  *************************
+!* PERSONAL_DATA       Employee Personal Information Tbl       Select
+!* PERS_DATA_EFFDT     Effective Dated Personal Info Tbl       Not used in v8.3
+!* PERSONAL_PHONE      Employee Personal Phone table           Select
+!* DIVERSITY           Employee Diversity Table                Select
+!* JOB                 Employee Job Data                       Select
+!* PS_PERS_APPL_INFO   Added for v8.3                          Select
+!* NAMES               Added for v8.3                          Select
+!* ADDRESSES           Added for v8.3                          Select
+!* PERS_APPL_REF       Added for v9.0                          Select
+!* HRS_SOURCE_I        Added for v9.0                          Select
+!*
+!**********************  Non-PeopleSoft Tables  *********************
+!* HR006P              Legacy Employee master file             Select
+!*
+!*********************  Cross Reference Files  **********************
+!* PS_ZHRT_JOBCD_CREF  JobCode Cross Reference Table           Select
+!* ZPS_ZGLT_PT12P_CREF Dept ID/Product ID Cross Reference File Select
+!* PS_ZHRT_CMPNY_CREF  Company cross reference Table           Select
+!* PS_ZHRT_RFSRC_CREF  Referral Source Cross Reference Table   Select
+!* PS_ZHRT_ETHCD_CREF  Ethnic Code Cross Reference Table       Select
+!*****************************************************************************
+!*****************************************************************************
+
+
+!*****************************************************************************
+!*  Program Name: ZHRI102A.SQC
+!*****************************************************************************
+!*  Author:	Art Wamser, Enterprise Rent-A-Car
+!*********************************************************************
+!*  Program Summary:  Termination
+!*********************************************************************
+!*  TABLE                        DESCRIPTION                           ACCESS
+!*  -----                        -----------                           ------
+!*  PS_Job                       Job Table                             Input
+!*  PS_Action Reason             Action Reason Table                   Input
+!*  PS_ZHRT_TRMRS_CREF           Termntn Reason Cross Reference Table  Input
+!*****************************************************************************
+!*****************************************************************************
+
+
+!*****************************************************************************
+!*  Program Name:  ZHRI104A.SQC
+!*****************************************************************************
+!*  Author:	Rakesh Govani, Enterprise Rent-A-Car
+!*****************************************************************************
+!*  Program Summary:  Job Profile Changes
+!*****************************************************************************
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!*  JOB                 PeopleSoft Job table
+!*  PS_ZHRT_JOBCD_CREF  Job Code Cross Reference Table
+!*  ZPS_ZGLT_PT12P_CREF Company cross reference file
+!*  PS_ZHRT_CMPNY_CREF  Company cross reference file
+!*****************************************************************************
+!*****************************************************************************
+
+
+!**********************************************************************!
+!*  Program Name: ZHRI105A.SQC                                        *!
+!**********************************************************************!
+!*  Author:	Art Wamser, Enterprise Rent-A-Car                   *!
+!**********************************************************************!
+!*  Program Summary:  Demographics Changes.  The two legacy files which were updated
+!*  by this program was HR006P and ZLIFEMASPF.  Only specific fields
+!*  will be updated.  Those fields are those which were changed on
+!*  the AAHR05 screen.
+!*                                                                    *!
+!**********************************************************************!
+!*        TABLE              DESCRIPTION                 ACCESS       *!
+!*        -----              -----------                 ------       *!
+!*        PS_Pers_Data_Effdt Personal Data Effective Date             *!
+!*                           Table                       Input        *!
+!*        PS_Personal_Data   Personal Data Table         Input        *!
+!*        PS_Job             Job Table                   Input        *!
+!*        ZHRT_EmpID_CRef    Employee ID Cross Reference Input        *!
+!*        PS_Pers_Nid        Personal National Id Table  Input        *!
+!*        PS_Names           Names Table                 Input        *!
+!*        PS_Personal_Phone  Personal Phone Table        Input        *!
+!*        PS_Citizenship     Citizenship Table           Input        *!
+!*        PS_Diversity       Diversity Table             Input        *!
+!*        PS_Drivers_Lic     Drivers License Table       Input        *!
+!*        PS_Emergency_Cntct Emergency Contact Table     Input        *!
+!*        PS_Trigger         Trigger Table               Input        *!
+!***********************************************************************
+!***********************************************************************
+
+
+!*****************************************************************************
+!*  Program Name: ZHRI107A.SQC
+!*****************************************************************************
+!*  Author:	Heather Sphar, Enterprise Rent-A-Car
+!*********************************************************************
+!*  Program Summary:  Dates – Employment Review, Accomplishment and Contract Data changes
+!*  The purpose of this program is to update
+!*  specific fields in two legacy files, HR006P and ZLIFM#1.
+!*  These fields are those in which were changed somewhere in
+!*  PeopleSoft and are needed to be sent back to the legacy system,
+!*  specifically, the AAHR01, Option 7 screen.  This program is being
+!*  used to build this specific piece for interfacing PeopleSoft
+!*  back to the legacy system.
+!*********************************************************************
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!*  PSOprDefn            Operator Definition Table   Input
+!*  PS_Employee_Review   Employee Review Table       Input
+!*  PS_Accomplishments   Accomplishments Table       Input
+!*  PS_Contract_Data     Contract Data Table         Input
+!*  PS_ZHRT_INTTRIGGER   Trigger Table               Select
+!*****************************************************************************
+!*****************************************************************************
+
+
+!*****************************************************************************
+!*  Program Name:  ZHRI109A.SQC
+!*****************************************************************************
+!*  Author:	Rakesh Govani, Enterprise Rent-A-Car
+!*****************************************************************************
+!*  Program Summary:  Group Transfers
+!*
+!*****************************************************************************
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!*****************************************************************************
+!*****************************************************************************
+
+
+!*****************************************************************************
+!*  Program Name:  ZHRI110A.SQR
+!*****************************************************************************
+!*  Author:	Jim Gonzales, Enterprise Rent-A-Car
+!*****************************************************************************
+!*  Program Summary:  This program will move rows from the Trigger table to 
+!*  the History Table.  It will also delete rows from the history file after 
+!*  they have resided there for one year.
+!*
+!*****************************************************************************
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!*  PS_ZHRT_INTTRIGGER     Interface Trigger                      Select, Delete
+!*  PS_ZHRT_HISTRIGGER     Interface Trigger History              Insert, Delete
+!*****************************************************************************
+!*****************************************************************************
+
+
+!*****************************************************************************
+!*  Program Name:  ZHRI201A.SQC
+!*****************************************************************************
+!*  Author:	Surya Sobha
+!*****************************************************************************
+!*  Program Summary:   New Hire/Rehire process for NonEmp/Multiple EDs.
+!*****************************************************************************
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!**********************  PeopleSoft Tables  *************************
+!* PERS_DATA_EFFDT     Select
+!* NAMES               Select                         
+!* ZHRT_PER_POI_TR     Select                        
+!* ZHRR_MULTPL_EID     Select
+!**********************  Non-PeopleSoft Tables  *********************
+!* HR036P              Legacy Employee master file             Select
+!*****************************************************************************
+!*****************************************************************************
+
+
+!*********************************************************************
+!*  Program Name: ZHRI202A.SQC
+!*********************************************************************
+!*  Author:	Surya Sobha
+!*********************************************************************
+!*  Program Summary:  Terminate process for NonEmp/Multiple EDs.
+!*  HR program ZHRI202A. Only specific fields will be updated.
+!*  Those fields are those which were changed on the AAHR02 screen.
+!*********************************************************************
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!* ZHRT_PER_POI_TR                    POI Table                           Input                     
+!* ZHRR_MULTPL_EID                    EMP Table                           Input
+!*****************************************************************************
+!*****************************************************************************
+
+
+!*****************************************************************************
+!*  Program Name:  ZHRI205A.SQC
+!*****************************************************************************
+!*  Author:	Surya Sobha
+!*****************************************************************************
+!*  Program Summary:   Demographic Change process for NonEmp/Multiple EDs.
+!*****************************************************************************
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!**********************  PeopleSoft Tables  *************************
+!* PERS_DATA_EFFDT     Select
+!* NAMES               Select                         
+!* ZHRT_PER_POI_TR     Select                        
+!* ZHRR_MULTPL_EID     Select
+!*****************************************************************************
+!*****************************************************************************
+
+
+!***********************************************************************!
+!*  Program Name: ZHRISTDT.SQR                                         *!
+!***********************************************************************!
+!*  Author:	Surya Sobha                                          *!
+!***********************************************************************!
+!*  Program Summary:  Get the Start Date of POIs and Alternate EIDs    *!
+!*  Conditions: If all rows are Active get the least Active Row's Effdt*!
+!*              If max row is Inactive, get the least Active row just  *!
+!*              before that I row                                      *!
+!*              If there are Inactive rows in between, and max(effdt)  *!
+!*              is Active,get the least Active row after the max(I) row*!
+!***********************************************************************!
+!************************************************************************
+
+
+
+
+
+
+
+
+

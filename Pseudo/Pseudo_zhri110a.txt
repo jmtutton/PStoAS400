@@ -1,0 +1,255 @@
+!*****************************************************************************
+!*  Program Name:  ZHRI110A
+!*****************************************************************************
+!*  Author:              Jim Gonzales, Enterprise Rent-A-Car
+!*  Date:                9/2/1999
+!*  Owner:               PS Data Conversion/Interface Team
+!*  Project ID:          ZHR_MOD_INTERFACE
+!*****************************************************************************
+!*  Program Summary:  This program will move rows from the Trigger table to the History Table.  It will also
+!*                    delete rows from the history file after they have resided there for one year.
+!*
+!*****************************************************************************
+!*  Tables Used:
+!*
+!*  Table                  Description                            Access
+!*  PS_ZHRT_INTTRIGGER     Interface Trigger                      Select, Delete
+!*  PS_ZHRT_HISTRIGGER     Interface Trigger History              Insert, Delete                           ------
+!*
+!*
+!*
+!*  Input/output Files:
+!*
+!*  File Name         Input/output        Description
+!*  ---------         ------------        -----------
+!*
+!*****************************************************************************
+
+Process-Main
+Check-Old-Enough($AsOfToday,$WrkEffdt,:#num_days)
+Update-History-Row
+Delete-Trigger-Record
+Delete-History-Row
+
+!**********************************************************************
+!
+#include 'setenv.sqc' !Set environment
+
+begin-program
+!
+  Let $DTTM_STAMP1 = DATETOSTR(Datenow(),'MM/DD/YYYY HH:MI:SS')		! 07/29/2008- Begin
+  Display ''
+  Show 'Process Start Date & Time Stamp: ' $DTTM_STAMP1			! 07/29/2008- End
+!
+  Do GET-CURRENT-DATETIME  !Gets the current date and time using curdttim.sqc
+  Do stdapi-init           !Interface with process request, from STDAPI.SQC
+
+  Display '- Entering Process-Main...'					! 07/29/2008
+  Do Process-Main
+  Display '- Entering Delete-History-Row...'				! 07/29/2008  
+  Do Delete-History-Row
+!
+  Do Reset                       					! RESET.SQC, Reset printer & print 'End of Report'
+  Do Stdapi-Term                      					! STDAPI.SQC, Process Scheduler Interface, executes EOJ.SQC
+!
+  Let $DTTM_STAMP2 = DATETOSTR(Datenow(),'MM/DD/YYYY HH:MI:SS')		! 07/29/2008- Begin
+  Display ''
+  Show 'Process Start Date & Time Stamp: ' $DTTM_STAMP2			! 07/29/2008- End
+!  
+end-program
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Process-Main
+! Desc:  This is the process controling procedure.
+!----------------------------------------------------------------------
+
+Begin-Procedure Process-Main
+!											! 07/29/2008- Begin
+  #ifdef debug
+  Display 'Entered Process-Main.'
+  #endif
+!											! 07/29/2008- End
+Begin-Select
+
+RZ.SEQ_NBR
+    Move &RZ.SEQ_NBR TO #WrkSequence
+RZ.OPRID
+    Move &RZ.OPRID TO $WrkOprid
+RZ.EMPLID
+    Move &RZ.EMPLID to $WrkEmplid
+RZ.EFFDT
+    Let $WrkEffdt = &RZ.EFFDT
+RZ.EFFSEQ
+    Move &RZ.EFFSEQ to #WrkFSeq
+RZ.PROC_NAME
+    Move &RZ.PROC_NAME to $WrkProc
+RZ.TASK_FLAG
+    Move &RZ.TASK_FLAG to $WrkTask
+
+    Do Check-old-enough($AsOfToday,$WrkEffdt,#num_days)
+
+    If #num_days > 30
+        Do Update-History-Row
+    End-if    !#num_days > 30
+
+FROM PS_ZHRT_INTTRIGGER RZ
+where RZ.TASK_FLAG <> 'P'    						!ZHR_MOD_ZHRI100A_110A
+order by seq_nbr
+End-Select
+
+
+Do Delete-Trigger-Record
+
+!											! 07/29/2008- Begin
+  #ifdef debug
+  Display 'Exiting Process-Main.'
+  #endif
+!											! 07/29/2008- End
+End-Procedure Process-Main
+
+
+!----------------------------------------------------------------------
+! Erac
+! Procedure:  Check-Old-Enough
+! Desc:  This will get the difference in number of days between the
+!        effective date and the current date
+!----------------------------------------------------------------------
+
+Begin-procedure Check-Old-Enough($AsOfToday,$WrkEffdt,:#num_days)
+!
+declare-variable
+ date $Date1
+end-declare
+
+declare-variable
+ date $Date2
+end-declare
+!											! 07/29/2008- Begin
+  #ifdef debug
+  Display 'Entered Check-Old-Enough.'
+  #endif
+!											! 07/29/2008- End
+
+Let $Date1 = $AsOfToday
+Let $Date2 = $WrkEffDt
+
+Let #num_days = datediff($Date1,$Date2,'day')
+!											! 07/29/2008- Begin
+  #ifdef debug
+  Display 'Exiting Check-Old-Enough.'
+  #endif
+!											! 07/29/2008- End
+End-procedure Check-Old-Enough
+
+
+!----------------------------------------------------------------------
+! Erac
+! Procedure:  Update-History-Row
+! Desc:  This will update the history table with the data from the trigger
+!        table and the current (or archive) date and remove it from the trigger table
+!----------------------------------------------------------------------
+
+Begin-procedure Update-History-Row
+!											! 07/29/2008- Begin
+  #ifdef debug
+  Display 'Entering Update-History-Row.'
+  #endif
+!											! 07/29/2008- End
+Begin-SQL
+Insert into PS_ZHRT_HISTRIGGER
+  (SEQ_NBR,
+  OPRID,
+  EMPLID,
+  EFFDT,
+  EFFSEQ,
+  PROC_NAME,
+  TASK_FLAG,
+  Archive_DT)
+values (
+  #WrkSequence,
+  $WrkOprid,
+  $WrkEmplid,
+  $WrkEffdt,
+  #WrkFSeq,
+  $WrkProc,
+  $WrkTask,
+  $AsOfToday)
+
+End-SQL
+
+!											! 07/29/2008- Begin
+  #ifdef debug
+  Display 'Exiting Update-History-Row.'
+  #endif
+!											! 07/29/2008- End
+End-procedure Update-History-Row
+
+
+!----------------------------------------------------------------------
+! Erac
+! Procedure:  Delete-Trigger-Record
+! Desc:  Deletes all trigger records where the sequence number exists in the history file
+!----------------------------------------------------------------------
+
+Begin-procedure Delete-Trigger-Record
+!											! 07/29/2008- Begin
+  #ifdef debug
+  Display 'Entering Delete-Trigger-Record.'
+  #endif
+!											! 07/29/2008- End
+Begin-SQL
+
+DELETE from PS_ZHRT_INTTRIGGER
+  WHERE SEQ_NBR IN (SELECT SEQ_NBR FROM PS_ZHRT_HISTRIGGER)
+
+End-SQL
+!											! 07/29/2008- Begin
+  #ifdef debug
+  Display 'Exiting Delete-Trigger-Record.'
+  #endif
+!											! 07/29/2008- End
+End-procedure Delete-Trigger-Record
+
+!----------------------------------------------------------------------
+! Erac
+! Procedure:  Delete-History-Row
+! Desc:  Deletes all History Records that have been on file at least one year.
+!------------------------------------------------------------------------
+
+Begin-Procedure Delete-History-Row
+!											! 07/29/2008- Begin
+  #ifdef debug
+  Display 'Entering Delete-History-Row.'
+  #endif
+!											! 07/29/2008- End
+Let #Year = substr($AsOfToday,8,4)
+Let #Year = #Year - 1
+Let $Year = #Year
+Let $Year = Substr($Year, 1, 4)
+Let $PurgeDt = Substr($AsOfToday,1,7) || $Year
+
+Begin-SQL
+
+DELETE from PS_ZHRT_HISTRIGGER
+    WHERE Archive_DT < $PurgeDt
+
+End-SQL
+!											! 07/29/2008- Begin
+  #ifdef debug
+  Display 'Exiting Delete-History-Row.'
+  #endif
+!											! 07/29/2008- End
+End-Procedure Delete-History-Row
+
+
+!***********************************************************************
+#Include 'curdttim.sqc'  !Get-Current-DateTime procedure
+#Include 'datemath.sqc'  !Performs arithmetic operations on dates
+#Include 'datetime.sqc'  !Routines for date and time formatting
+#Include 'number.sqc'    !Routines to format numbers
+#Include 'readxlat.sqc'  !Read Translate Table
+#Include 'reset.sqc'     !End of Program
+#INCLUDE 'stdapi.sqc'    !STANDARD PROGRAM INTERFACE
+

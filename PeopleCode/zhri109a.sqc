@@ -1,0 +1,439 @@
+!*****************************************************************************
+!*  Program Name:  ZHRI109A
+!*****************************************************************************
+!*  Author:              Rakesh Govani, Enterprise Rent-A-Car
+!*  Date:                7/9/1999
+!*  Owner:
+!*  Project Id:          ZHR_MOD_INTERFACE
+!*****************************************************************************
+!*  Program Summary:  SQC to interface during a group transfer
+!*
+!*****************************************************************************
+!*  Tables Used:
+!*
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!*
+!*
+!*  Input/Output Files:
+!*
+!*  FILE NAME         INPUT/OUTPUT        DESCRIPTION
+!*  ---------         ------------        -----------
+!*
+!*****************************************************************************
+!*
+!*  Modifications:
+!*
+!*    DATE          DEVELOPER NAME/PROJECT ID               DESCRIPTION OF CHANGES
+!*    ----          --------------               ----------------------
+!* 07/09/1999       Johnny Bridges/ZHR_MOD_INTERFACE               Converted to SQC
+!*
+!* 08/07/1999       Johnny Bridges/ZHR_MOD_INTERFACE               Changed Error message text on failed selects to the cross reference tables
+!*                                                                 Removed code that was commented out
+!* 08/27/1999       Gwen Salabay/ZHR_MOD_INTERFACE                 Removed PT004P.  Replaced with PT102P.
+!*                                                                 Added Status Indicator check for PT005P.
+!*
+!* 09/14/1999      Johnny Bridges/ZHR_MOD_INTERFACE               Removed the routine that gets the Oprid and put it in the main sqr because it
+!*                                                                is shared by all of the SQCs.
+!*
+!* 09/22/1999      Johnny Bridges/ZHR_MOD_INTERFACE               Changed to move program error parm in the initialization routine so that it can be used by common routine
+!*
+!* 09/24/1999      Johnny Bridges/ZHR_MOD_INTERFACE               Added code to stop processing the record if a PSOPRDEFN record cannot be added
+!*
+!* 9/24/99      Johnny Bridges/ZHR_MOD_INTERFACE                  changed to build where clause when getting branch
+!*
+!* 9/27/99      Johnny Bridges/ZHR_MOD_INTERFACE                  chanded to fix where clause
+!*
+!* 12/23/99        Johnny Bridges/ZHR_MOD_INTERFACE         Changed to correctly get the branch when getting for a corporate group
+!*
+!* 11/15/2000    Christopher W Bates/PeopleSoft Rehost        Prepare program to run on Unix
+!* 01/04/2001    Christopher W Bates/ZHR_MOD_CLEANUP_INTERFACE    Replaced PT005P with PS_ZHRT_CMPNY_CREF
+!* 03/27/2001    Christopher W Bates/ZHR_MOD_REHOST_INTERFACE     Modify program to run on UNIX
+!*
+!  10/04/2001   Sreedhar Kondepudi/ZHR_FIX_DEFECT#2312        Modified to avoid ORA-Null value error while
+!                                                             inserting into the table ZHRT_EMPID_CREF
+!  11/29/2001   Sreedhar Kondepudi/ZHR_ACTIVEDIR_INTERFACE    Modified as part of User Account Automation(UAA)
+!                                                             Project.
+!  03/22/2002   Sreedhar Kondepudi/ZHR_ACTIVEDIR_INTERFACE    Don't send transactions to Active Directory which are less
+!                                                             than Job Data Row or Pers Effdt row.
+!*
+!* 04/05/2002   Sandy Meyer/Z_UPGRADE83_E98405              Made modifications for upgrade to v8.3.
+!*
+!* 06/04/2002   Sandy Meyer/Z_UPGRADE83_E98405              Let $Command was missing a " so parameters never were sent to AS/400.
+!*
+!  09/11/2002   Jack Veilleux / ZHR_PRDSPT_INTF_ERROR         Moved call of Do Prepare Error Parms routine to inside of Error
+!                                                             per each D Proceses (101 - 109) section of Call Program routine.
+!  09/19/2002   Brian Groom / ZHR_PRDSPT_INTF_FIXRPGCALL     Modified to call the Rpg program for non critical errors.
+!
+!*************************************************************************************************************************!
+!*---------------------------------------------------------------------------!
+!* Modifications:  Change PT102P to ZPS_ZGLT_PT12P_CREF                      !
+!* Author:         G. Eldridge                                               !
+!* Date:           10/1/2002                                                 !
+!* Owner:          Cindy Henken                                              !
+!* Project ID:     Z_REMOVE_PT102P                                           !
+!*---------------------------------------------------------------------------!
+!*---------------------------------------------------------------------------!
+!* Modifications:  Remove Corporate logic.                                   !
+!* Author:         G. Eldridge                                               !
+!* Date:           10/8/2002                                                 !
+!* Owner:          Cindy Henken                                              !
+!* Project ID:     Z_REMOVE_CORP                                             !
+!*---------------------------------------------------------------------------!
+!  03/03/2010   Louisa Bartell / CQ 86984                    Modified to get latest seq from ps_job - search on CQ 86984.
+!
+!--------------------------------------------------------------------------------------------------------------------------------
+!  01/12/2012   Diana Shen     CQ 112725
+!                              Add a new field NID Country Code
+!**************************************************************************************************
+! Louisa Bartell 05/18/2015    CQ230619 Remove SSN - blank out the field
+!                              Search on CQ230619
+!**************************************************************************************************
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR09-Initialize-Fields
+! Desc:  Initialize the fields to ensure that that they all start out blank.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR09-Initialize-Fields
+
+Let $LegEmplid = ' '
+Let $LegUserEmplid = ' '
+Let $LegGroup = ' '
+Let $LegBranch = ' '
+Let $LegCountryCode = ' '
+Let $LegNid = ' '
+Let $LegEffdt = ' '
+Let $PSLoc_Country = ' '
+Let $PSLOCATION  = ' '
+Let $PSCompany = ' '
+Let $WrkSrchGrp = ' '
+Let $WrkSrchLoc = ' '
+Let $WrkSrchDep = ' '
+Let $CallRpg = 'Y'
+Let $ErrorProgramParm = 'HRZ109A'
+let $PSNid = ' '                  !dshen  01/12/2012
+let $PS_REG_REGION= ' '           !dshen  01/12/2012
+End-Procedure HR09-Initialize-Fields
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR09-Process-Main
+! Desc:  This is the process controling procedure.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR09-Process-Main!(#WrkSequence, $PSUserOprid, $Wrk_Emplid, $PSEffdt, #WrkEffseq, :$CompletionStatus)
+
+Do HR09-Initialize-Fields
+Do HR09-Get-Job-Data
+Do HR09-Get-Region                              !dshen 01/12/2012
+Do HR09-Get-Personal-Data
+Do Get-Oprid                                    !ZHRI100A.SQR
+Let $ADLegOprid = $PSOprid
+
+Let $NewEmpOprid = $PSOprid
+If $NewEmpOprid <> '' and $NewEmpOprid <> ' '   !New Oprid not equal null or blank on return
+Do HR09-Massage-Data
+If $CallRpg = 'Y'
+   Do HR09-Call-RPG
+Else
+    Let $CompletionStatus = 'C'
+End-If
+
+End-if    !$NewEmpOprid <> '' and $NewEmpOprid <> ' '
+End-Procedure HR09-Process-Main
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR09-Get-Personal-Data
+! Desc:  Gets the employees National ID from the PERS_NID table
+!----------------------------------------------------------------------
+
+Begin-Procedure HR09-Get-Personal-Data
+
+
+Begin-Select
+CPNID3.NATIONAL_ID
+    let $PSNid = ltrim(rtrim(&CPNID3.NATIONAL_ID,' '),' ')            !Remove leading and trailing blanks
+   
+
+from PS_PERS_NID CPNID3
+where CPNID3.EMPLID = $Wrk_Emplid                   !sree**10/04/01
+and CPNID3.COUNTRY =  $PS_REG_REGION                ! dshen 01/12/2012 replace $PSLOC_COUNTRY with $PS_REG_REGION
+and CPNID3.PRIMARY_NID='Y'                          ! dshen 01/12/2012
+
+End-Select
+
+
+
+End-Procedure HR09-Get-Personal-Data
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR09-Get-job-data
+! Desc:  Gets the employees data from the job table that needs to be
+!        interfaced to the legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR09-Get-job-data
+
+Begin-Select
+
+CJ8.COMPANY
+    let $PSCompany = ltrim(rtrim(&CJ8.COMPANY,' '),' ')              !Remove leading and trailing blanks
+CJ8.LOCATION
+    let $PSLocation = ltrim(rtrim(&CJ8.LOCATION,' '),' ')            !Remove leading and trailing blanks
+CJ8.DEPTID
+    let $PSDeptid = ltrim(rtrim(&CJ8.DEPTID,' '),' ')                !Remove leading and trailing blanks
+CJ8.BUSINESS_UNIT
+    let $PSBusinessUnit = ltrim(rtrim(&CJ8.BUSINESS_UNIT,' '),' ')   !Remove leading and trailing blanks
+CJ8.JOBCODE
+    let $PSJobCode = ltrim(rtrim(&CJ8.JOBCODE,' '),' ')                  !Remove leading and trailing blanks
+CJ8.EMPL_CLASS
+    let $PSEmplClass = ltrim(rtrim(&CJ8.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
+CJ8.EMPL_STATUS
+    let $PSEmplStatus = ltrim(rtrim(&CJ8.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
+CJ8.FULL_PART_TIME
+    let $PSfullparttime = ltrim(rtrim(&CJ8.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
+
+
+
+ let $Wrk_AD_JobDataBuild = 'Y'                 !sree-UAAMOD
+
+
+from PS_JOB CJ8
+where CJ8.EMPLID = $Wrk_Emplid                         !sree**10/04/01
+and to_char(CJ8.EFFDT,'YYYY-MM-DD') = $PSEffdt
+!AND CJ8.EFFSEQ =   #WrkEffseq                   !CQ 86984
+AND CJ8.EFFSEQ =                                 !CQ 86984
+         (SELECT MAX(CJ8B.EFFSEQ)                !CQ 86984
+          FROM  PS_JOB CJ8B                      !CQ 86984
+          WHERE CJ8B.EMPLID   = CJ8.EMPLID       !CQ 86984
+            AND CJ8B.EMPL_RCD = CJ8.EMPL_RCD     !CQ 86984
+            AND CJ8B.EFFDT    = CJ8.EFFDT)       !CQ 86984
+and CJ8.EMPL_RCD = 0           !changed for v8.3
+
+End-Select
+
+Begin-Select
+
+CLT3.COUNTRY
+    let $PSLoc_Country = ltrim(rtrim(&CLT3.COUNTRY,' '),' ')         !Remove leading and trailing blanks
+    Let $Wrk_AD_CountryCdBuild = 'Y'                                !sree-UAAMOD
+
+from PS_LOCATION_TBL CLT3
+where CLT3.LOCATION = $PSLOCATION
+
+End-Select
+
+End-Procedure HR09-Get-job-data
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR09-Massage-Data
+! Desc:  Will massage the data to get it in the form that the RPG program
+!        needs it in to process
+!----------------------------------------------------------------------
+
+Begin-Procedure HR09-Massage-Data
+
+!Format the legacy employee ID from the PeopleSoft Oprid
+let $LegEmplid = ltrim($NewEmpOprid,'E')  !Remove the leading 'E' from the employee ID
+Uppercase $LegEmplid    !Be sure in all CAPS
+
+!Format the legacy employee ID from the PeopleSoft Oprid
+let $LegUserEmplid = ltrim($PSUserOprid,'E')  !Remove the leading 'E' from the employee ID
+Uppercase $LegUserEmplid    !Be sure in all CAPS
+
+!Format the Group number that the employee is assigned to from the Company Field
+Do HR09-Get-Group
+Uppercase $LegGroup     !Be sure in all CAPS
+
+!Format the Branch code that the employee is assigned to from the Location Field
+Do HR09-Get-Branch
+Uppercase $LegBranch    !Be sure in all CAPS
+
+!Format the Country code that the employee is assigned to
+Do HR09-Get-Country
+Uppercase $LegCountryCode    !Be sure in all CAPS
+
+!Format national id
+!CQ230619 Comment out 2 lines below
+!let $LegNid = $PSNid
+!Uppercase $LegNid
+let $LegNid = ' '         !CQ230619
+
+
+!Format the Effective Date
+Unstring $PSEffdt by '-' into $WrkYear $WrkMonth $WrkDay
+Let $LegEffdt = $WrkMonth || $WrkDay || $WrkYear
+
+End-Procedure HR09-Massage-Data
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR09-Call-RPG
+   ! Desc:  Prepares the parameters to pass to the RPG program
+!----------------------------------------------------------------------
+
+Begin-Procedure HR09-Call-RPG
+
+
+
+Let $Command =   ' "CALL '                     ||
+                 $Library                      ||
+                 '/HRZ109A '                   ||
+                 'PARM('''                     ||
+                 $LegEmplid                    ||
+                 ''' '''                       ||
+                 $LegUserEmplid                ||
+                 ''' '''                       ||
+                 $LegGroup                     ||
+                 ''' '''                       ||
+                 $LegBranch                    ||
+                 ''' '''                       ||
+                 $LegCountryCode               ||
+                 ''' '''                       ||
+                 $LegNid                       ||
+                 ''' '''                       ||
+                 $LegEffdt                     ||
+                 ''')"'         !changed 06/04/02
+
+Do Call-System    !ZHRI100A.SQR
+
+if (#STATUS = 0)
+    Let $CompletionStatus = 'C'
+end-if      !  #STATUS = 0
+
+
+
+End-Procedure HR09-Call-RPG
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR09-Get-Group
+! Desc:  Gets the group from the cross reference file using Company
+!----------------------------------------------------------------------
+
+Begin-Procedure HR09-Get-Group
+
+Let $Found = 'N'
+
+Begin-Select
+
+CPT53.ZHRF_LEGGROUP
+    let $LegGroup = ltrim(rtrim(&CPT53.ZHRF_LEGGROUP,' '),' ')  !Remove leading and trailing blanks
+
+    Let $Found = 'Y'
+
+from PS_ZHRT_CMPNY_CREF CPT53
+where CPT53.COMPANY = $PSCompany
+  and CPT53.STATUS = 'A'
+
+End-Select
+
+If $Found = 'N'
+     Let $ErrorMessageParm = 'Company not found in XRef Table PS_ZHRT_CMPNY_CREF'
+     Let $WrkCriticalFlag = 'Y'    !sree*09/12/02
+     Let $CallRpg = 'N'
+     Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR     Do Prepare-Error-Parms    !From ZHRI100A.SQR
+     Do Call-Error-Routine  !ZHRI100A.SQR
+End-If    !$Found = 'N'
+
+End-Procedure HR09-Get-Group
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR09-Get-Branch
+! Desc:  Gets the branch from the cross reference file using Location
+!----------------------------------------------------------------------
+
+Begin-Procedure HR09-Get-Branch
+
+
+Let $Where = 'Where CPT23.ZGLF_PT2OGP = '''               !Build $Where
+                  || $LegGroup
+                  || ''' and CPT23.ZGLF_PT2DPT = '''
+                  || $PSLocation
+                  || ''' and CPT23.ZGLF_PT2STS = '''
+                  || 'A'''
+
+
+Let $Found = 'N'
+
+Begin-Select
+
+CPT23.ZGLF_PT2OBR
+    let $LegBranch = ltrim(rtrim(&CPT23.ZGLF_PT2OBR,' '),' ')     !Remove leading and trailing blanks
+
+    Let $Found = 'Y'
+
+from ZPS_ZGLT_PT12P_CREF CPT23
+[$Where]
+End-Select
+
+If $Found = 'N'
+     Let $ErrorMessageParm = 'Company, Location, Department combo is not found in Xref Table PT102P'
+     Let $WrkCriticalFlag = 'Y'    !sree*09/12/02
+     Let $CallRpg = 'N'
+     Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR     Do Prepare-Error-Parms    !From ZHRI100A.SQR
+     Do Call-Error-Routine    !ZHRI100A.SQR
+End-If    !$Found = 'N'
+
+End-Procedure HR09-Get-Branch
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR09-Get-Country
+! Desc: This subroutine will get 2 position country code
+!----------------------------------------------------------------------
+
+Begin-Procedure HR09-Get-Country
+
+Begin-Select
+
+CCT3.COUNTRY_2CHAR
+   let $LegCountryCode = ltrim(rtrim(&CCT3.COUNTRY_2CHAR,' '),' ')     !Remove leading and trailing blanks
+
+from PS_COUNTRY_TBL CCT3
+where CCT3.COUNTRY = $PS_REG_REGION                     !dshen 01/12/2012 replace $PSLOC_COUNTRY with $PS_REG_REGION
+
+End-Select
+
+End-Procedure HR09-Get-Country
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR09-Get-Region
+! Desc: This subroutine will REG_REGION
+!----------------------------------------------------------------------
+Begin-Procedure HR09-Get-Region             !dshen 01/12/2012
+
+Begin-Select
+J8.REG_REGION                                                       !dshen 01/12/2012
+    let $PS_REG_REGION = ltrim(rtrim(&J8.REG_REGION,' '),' ')        !dshen 01/12/2012
+
+from PS_JOB J8
+where J8.EMPLID = $Wrk_Emplid       
+and J8.effdt = (select max(effdt) from PS_JOB J8a
+                 where J8a.emplid = J8.emplid
+                   and J8a.empl_rcd = J8.empl_rcd)
+AND J8.EFFSEQ =                                  
+         (SELECT MAX(J8B.EFFSEQ)                 
+          FROM  PS_JOB J8B                       
+          WHERE J8B.EMPLID   = J8.EMPLID        
+            AND J8B.EMPL_RCD = J8.EMPL_RCD     
+            AND J8B.EFFDT    = J8.EFFDT)        
+and J8.EMPL_RCD = 0           !changed for v8.3
+End-Select
+
+End-Procedure  

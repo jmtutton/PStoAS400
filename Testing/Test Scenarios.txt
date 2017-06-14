@@ -1,0 +1,19 @@
+HR01-Get-Ethnic-Group from ZHRI101A.SQC
+//	      !if greater than one, the interface will send 'O' for 'Other'
+//	  If #PS_ETHNIC_COUNT > 1
+//	    Let $PSEthnicCode = 'O'
+Needs two records in PS_DIVERS_ETHNIC with the same EMPLID value and different ETHNIC_GRP_CD values
+
+
+
+
+
+
+
+
+
+
+
+
+
+

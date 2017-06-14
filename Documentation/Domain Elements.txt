@@ -1,0 +1,27 @@
+Trigger Event Monitor Services (ERD Person, AS400 Employee, AS400 TempMast)
+	check that resources are available
+	get next set of Events
+	push Events to the Event Queue
+
+Event Queue
+	push Event
+	pop Event
+
+Data Processing Engine pops next Event from Event Queue and assigns it to a Data Importer Service instance
+
+
+Data Importer Services
+	based on Event data, get Person data from the appropriate data store
+	if error getting data, set error state and wait
+	if errored out, have Updater Service update Event and send message
+
+Data Exporter Services (ERD Exporter, AS400 Exporter)
+	based on Event data, export Person data to the appropriate data store
+	if error setting data, set error state and wait
+	if errored out, have Updater Service update Event and send message
+
+Updater Service
+	update status of trigger table record: error or complete
+	email on error
+	log Event
+

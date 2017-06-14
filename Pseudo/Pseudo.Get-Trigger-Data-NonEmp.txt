@@ -1,0 +1,59 @@
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Get-Trigger-Data-NonEmp
+! Desc:  This procedure will get the trigger data for non employees and multiple 
+! EIDs that needs to be interfaced
+!----------------------------------------------------------------------
+
+Begin-Procedure Get-Trigger-Data-NonEmp
+
+Let $NCompletionStatus = 'P'   !Initialize the CompletionStatus field
+
+Begin-Select loops=150
+
+RN.SEQ_NBR
+    MOVE &RN.SEQ_NBR TO #NWrkSequence
+RN.OPRID
+    LET $NAuditOprid = Ltrim(Rtrim(&RN.OPRID,' '),' ')
+    LET $AuditOprid = Ltrim(Rtrim(&RZ.OPRID,' '),' ')
+RN.EMPLID
+    LET $NPSEmplid = Ltrim(Rtrim(&RN.EMPLID,' '),' ')
+    Move $NPSEmplid to #NWrk_EmplID1
+    LET $NWrk_Emplid2 =  edit(#NWrk_EmplID1,'099999999')
+
+to_char(RN.EFFDT, 'YYYY-MM-DD') &RNEFFDT
+    LET $NPSEffdt = &RNEFFDT
+RN.EFFSEQ
+    Move &RN.EFFSEQ to #NPSEffSeq
+RN.PROC_NAME
+    LET $NWrkProcess = ltrim(rtrim(&RN.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
+RN.SEQUENCE 
+    move &RN.SEQUENCE TO #indexNum 
+
+   DO Call-Programs-NonEmp  
+   
+   IF  $NPSEmplid = ''             !ZHR_MOD_ZHRI100A_110A
+      Let $NCompletionStatus = 'E'
+   End-if
+   Let $PoiFlag = 'Y'
+   
+   If $NCompletionStatus <> 'P'
+     Do Update-Trigger-Row_NonEmp
+   End-If  
+
+from PS_ZHRT_ALTTRIGGER RN
+where RN.TASK_FLAG = 'P'
+and (RN.EFFDT <= $AsOfToday or RN.PROC_NAME='ZHRI201A' or  RN.PROC_NAME='ZHRI206A')
+and (case when proc_name in ('ZHRI201A', 'ZHRI206A') then SEQ_NBR else SEQ_NBR*10 END) = 
+      (select min(case when proc_name in ('ZHRI201A', 'ZHRI206A') then SEQ_NBR else SEQ_NBR*10 END)  
+                 from  PS_ZHRT_ALTTRIGGER RN2
+                  where RN2.EMPLID = RN.EMPLID
+                    AND RN2.SEQUENCE = RN.SEQUENCE
+                    AND RN2.PROC_NAME = RN.PROC_NAME 
+                    and RN2.TASK_FLAG = 'P'                                         
+                    and (RN2.EFFDT <= SYSDATE or RN2.PROC_NAME='ZHRI201A' or        
+                         RN2.PROC_NAME='ZHRI206A'))                                 
+ 
+End-Select
+
+End-Procedure Get-Trigger-Data-NonEmp

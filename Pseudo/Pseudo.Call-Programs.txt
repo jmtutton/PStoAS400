@@ -1,0 +1,166 @@
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Call-Programs
+! Desc:  Subroutine will call appropriate programs
+!----------------------------------------------------------------------
+
+Begin-Procedure Call-Programs
+
+do Intialize-AD-WrkFields
+
+evaluate $WrkProcess
+
+    when = 'ZHRI101A'
+        !Move fields to be used in the called SQC
+        Let $Wrk_Oprid = $AuditOprid
+        Let $Wrk_Emplid = $PSEmplid
+        Let $Wrk_Effdt = $PSEffdt
+        move #PSEffseq to #Wrk_Effseq
+        Let $Wrk_Process_Name = $WrkProcess
+        Let $Wrk_Inf_ = ' '
+        Let $ADAction_Code = 'H'
+        Let $ADLegOprid = ''
+        Do HR01-Process-Main    !ZHRI101A.SQC
+        break
+
+    when = 'ZHRI102A'
+        !Move fields to be used in the called SQC
+        Move #Wrk_Sequence to #WrkSeqNbr
+        Let $PSAuditOperId = $AuditOprid
+        Let $PSDateIn = $PSEffdt
+        Let $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+        Let $ADAction_Code = 'T'
+        Let $ADLegOprid = ''
+
+        Do HR02-Process-Main    !ZHRI102A.SQC
+        break
+
+    when = 'ZHRI104A'
+        !Move fields to be used in the called SQC
+        Let $PSUserOprid = $AuditOprid
+        Let $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+        Move #PSEffseq to #WrkEffseq
+        Let $ADAction_Code = 'C'
+        Let $ADLegOprid = ''
+
+        Do HR04-Process-Main    !ZHRI104A.SQC
+        break
+
+    when = 'ZHRI105A'
+        !Move fields to be used in the called SQC
+        Let $PSemp = $AuditOprid
+        Let $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+        Let $ADAction_Code = 'C'
+        Let $ADLegOprid = ''
+        Let $Wrk_ADCountryCdBuild = 'Y'                 !sree-UAAMOD
+
+        Do HR05-Process-Main    !ZHRI105A.SQC
+        break
+
+    when = 'ZHRI106A'
+        !Move fields to be used in the called SQC
+        Let $Wrk_Oprid = $AuditOprid
+        Let $Wrk_Emplid = $PSEmplid
+        Let $Wrk_Effdt = $PSEffdt
+        move #PSEffseq to #Wrk_Effseq
+        Let $Wrk_Process_Name = $WrkProcess
+        Let $ADAction_Code = 'R'
+
+        Do HR01-Process-Main       !ZHRI101A.SQC
+        break
+
+    when = 'ZHRI107A'
+        Let $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+        Let $ADAction_Code = ''
+        Let $ADLegOprid = ''
+        Do HR07-Process-Main
+        break
+
+    when = 'ZHRI109A'
+        !Move fields to be used in the called SQC
+        Let $PSUserOprid = $AuditOprid
+        Let $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+        Move #PSEffseq to #WrkEffseq
+        Let $ADAction_Code = 'C'
+        Let $ADLegOprid = ''
+        Do HR09-Process-Main        !ZHRI100A.SQC
+        break
+
+    when = 'ZHRI101D'     !Row deleted on hire
+        Let $ErrorProgramParm = 'HRZ101A'
+        Let $ErrorMessageParm = 'A row was deleted on the hire process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
+
+    when = 'ZHRI102D'     !Row deleted on term
+        Let $ErrorProgramParm = 'HRZ102A'
+        Let $ErrorMessageParm = 'A row was deleted on the termination process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
+
+    when = 'ZHRI104D'     !Row deleted on jobstatus change
+        Let $ErrorProgramParm = 'HRZ104A'
+        Let $ErrorMessageParm = 'A row was deleted on the job-profile process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
+
+    when = 'ZHRI105D'     !Row deleted on demographis change
+        Let $ErrorProgramParm = 'HRZ105A'
+        Let $ErrorMessageParm = 'A row was deleted on the demographics process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
+
+    when = 'ZHRI106D'     !Row deleted on rehire
+        Let $ErrorProgramParm = 'HRZ101A'
+        Let $ErrorMessageParm = 'A row was deleted on the re-hire process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
+
+    when = 'ZHRI107D'     !Row deleted on
+        Let $ErrorProgramParm = 'HRZ107A'
+        Let $ErrorMessageParm = 'A row was deleted on the dates process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
+
+    when = 'ZHRI109D'
+        Let $ErrorProgramParm = 'HRZ109A'
+        Let $ErrorMessageParm = 'A row was deleted on the group transfer process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
+
+    when-other
+        Let $CompletionStatus = 'E'     !update to an E to prevent looping and to mark the record in error
+        Do Update-Trigger-Row
+        break
+
+end-evaluate
+
+End-Procedure Call-Programs

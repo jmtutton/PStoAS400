@@ -1,0 +1,53 @@
+!**********************  PeopleSoft Tables  *************************
+!* HR006P		Employee Master file (Legacy System)   	Select
+!* HRS_SOURCE_I        	Added for v9.0                          Select
+!* PERS_APPL_REF       	Added for v9.0                          Select
+!* PERS_DATA_EFFDT     	Effective Dated Personal Info Tbl       Not used in v8.3
+!* PERSONAL_DATA       	Employee Personal Information Tbl       Select
+!* PERSONAL_PHONE      	Employee Personal Phone table           Select
+!* PS_Accomplishments   Accomplishments Table       		Input
+!* PS_Action Reason 	Action Reason Table                   	Input
+!* PS_ADDRESSES		Added for v8.3                          Select
+!* PS_Citizenship     	Citizenship Table           		Input
+!* PS_Contract_Data     Contract Data Table         		Input
+PS_COUNTRY_TBL		2CHAR-COUNTRY
+!* PS_Diversity       	Diversity Table             		Input
+PS_DIVERS_ETHNIC
+!* PS_Drivers_Lic     	Drivers License Table       		Input
+!* PS_Emergency_Cntct 	Emergency Contact Table     		Input
+!* PS_Employee_Review   Employee Review Table       		Input
+PS_ETHNIC_GRP_TBL	ETHNIC-CODE
+!* PS_JOB		PeopleSoft Employee Job Data            Select
+PS_LOCATION_TBL
+!* PS_NAMES           	Names Table                 		Input
+!* PS_PERS_APPL_INFO   	Added for v8.3                          Select
+PS_PERS_APPL_REF
+!* PS_PERS_DATA_EFFDT  	Personal Data Effective Date
+!* PS_PERS_NID        	Personal National Id Table for Location Country
+PS_PERSON		Personal Data
+!* PS_PERSONAL_DATA    	Personal Data Table         		Input
+!* PS_PERSONAL_PHONE  	Personal Phone Table        		Input
+!* PS_Trigger         	Trigger Table               		Input
+!* PS_ZHRT_CMPNY_CREF  	Company cross reference file for Group
+!* PS_ZHRT_EMPID_CREF 	PeopleSoft Employee Cross Refer Table  	Select/Insert
+PS_ZHRT_ETHCD_CREF
+!* PS_ZHRT_HISTRIGGER	Interface Trigger History              	Insert, Delete
+!* PS_ZHRT_INTTRIGGER	Interface Trigger                      	Select, Delete
+!* PS_ZHRT_JOBCD_CREF	Job Code Cross Reference Table
+PS_ZHRT_RFSRC_CREF	Referral Source Cross Reference Table
+!* PS_ZHRT_TRMRS_CREF	Termntn Reason Cross Reference Table  	Input
+!* PSOprDefn            Operator Definition Table   		Input
+!* PSXLATITEM         	Translate Table                        	Select
+!* ZHRR_MULTPL_EID	EMP Table                           	Input
+!* ZHRT_EmpID_CRef    	Employee ID Cross Reference 		Input
+!* ZHRT_INTTRIGGER    	PeopleSoft to Legacy Interface Table   	Update
+!* ZHRT_PER_POI_TR	POI Table                           	Input                     
+!* ZPS_ZGLT_PT12P_CREF	Company cross reference file for Branch
+
+
+
+
+
+
+
+

@@ -1,0 +1,64 @@
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Call-Programs-NonEmp
+! Desc:  Subroutine will call appropriate programs for Non Emp
+!----------------------------------------------------------------------
+
+Begin-Procedure Call-Programs-NonEmp
+
+
+
+evaluate $NWrkProcess
+
+    when = 'ZHRI201A'
+        !Move fields to be used in the called SQC
+        Let $Wrk_Oprid = $NAuditOprid
+        Let $Wrk_Emplid = $NPSEmplid
+        Let $Wrk_Effdt = $NPSEffdt
+        move #NPSEffseq to #Wrk_Effseq
+        let $Wrk_indexNum = to_char(#indexNum)
+        Let $Wrk_Process_Name = $NWrkProcess
+
+        Do HR201-Process-Main    !ZHRI201A.SQC
+        break
+
+    when = 'ZHRI202A'
+        !Move fields to be used in the called SQC
+        Let $PSAuditOperId = $NAuditOprid
+        Let $PSDateIn = $NPSEffdt
+        Let $Wrk_Emplid = $NPSEmplid 
+        let $Wrk_indexNum = to_char(#indexNum)                   
+
+        Do HR202-Process-Main    !ZHRI202A.SQC
+        break
+
+    when = 'ZHRI205A'
+        !Move fields to be used in the called SQC
+        Let $PSAuditemp = $NAuditOprid
+        Let $Wrk_Emplid = $NPSEmplid                              
+        let $Wrk_indexNum = to_char(#indexNum)
+        Let $PSEffdt =  $NPSEffdt     
+        Do HR205-Process-Main    !ZHRI105A.SQC
+        break
+
+    when = 'ZHRI206A'
+        !Move fields to be used in the called SQC
+        Let $Wrk_Oprid = $NAuditOprid
+        Let $Wrk_Emplid = $NPSEmplid
+        Let $Wrk_Effdt = $NPSEffdt
+        move #NPSEffseq to #Wrk_Effseq
+        let $Wrk_indexNum = to_char(#indexNum)
+        Let $Wrk_Process_Name = $NWrkProcess
+
+        Do HR201-Process-Main       !ZHRI201A.SQC
+        break
+
+  
+    when-other
+        Let $CompletionStatus = 'E'     !update to an E to prevent looping and to mark the record in error
+        Do Update-Trigger-Row_NonEmp  !Surya Added 
+        break
+
+end-evaluate
+
+End-Procedure Call-Programs-NonEmp

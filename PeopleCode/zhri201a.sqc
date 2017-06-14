@@ -1,0 +1,468 @@
+!*****************************************************************************
+!*  Program Name:  ZHRI201A.sqc
+!*****************************************************************************
+!*  Author:              Surya Sobha
+!*  Date:                12/27/2016
+!*  Owner:
+!*  Project Id:          TEMPMAST
+!*****************************************************************************
+!*  Program Summary:   Retrieves all data that needs to be interfaced back to
+!*          the legacy system during the hire process for NonEmp/Multiple EDs.
+!*****************************************************************************
+!*  Tables Used:
+!*
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!**********************  PeopleSoft Tables  *************************
+!* PERS_DATA_EFFDT     Select
+!* NAMES               Select                         
+!* ZHRT_PER_POI_TR     Select                        
+!* ZHRR_MULTPL_EID     Select
+!**********************  Non-PeopleSoft Tables  *********************
+!* HR036P              Legacy Employee master file             Select
+!****************************************************************************!
+!*  Modifications:                                                          *!
+!*                                                                          *!
+!*  DATE        DEVELOPER NAME/Project ID           DESCRIPTION OF CHANGES  *!
+!*  ----        -------------------------           ----------------------  *!
+!* 12/28/2016   Surya Sobha/TEMPMAST                Initial Creation        *!
+!****************************************************************************!
+
+!*****************************************************************************
+! ERAC
+! Procedure:  HR201-Initialize-Fields
+! Desc:  Initialize the fields to ensure that that they all start out blank.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR201-Initialize-Fields
+
+Let $LegAuditEmplid = ' '        !Legacy Emplid for audit field
+Let $LegAddEmplid = ' '          !Legacy Alternate Employee Id for the employee being hired
+let $Legindex = ' '              !Legacy Index Number
+Let $LegGroup = ' '              !Legacy Group
+Let $LegBranch = ' '             !Legacy Branch
+Let $LegLastName = ' '           !Legacy Last Name
+Let $LegFirstName = ' '          !Legacy First Name
+Let $LegMiddleInit = ' '         !Legacy Middle Initial
+Let $LegNickName = ' '           !Legacy Nickname
+Let $LegGender = ' '             !Legacy Gender
+LET $LegServiceDate =' '         !Legacy Start Date
+Let $LegDepartment = ' '         !Legacy Department
+Let $LegPosition = ' '           !Legacy Position
+Let $LegReferralSource = ' '     !Legacy Referral Source Code
+Let $LegAddress1 = ' '           !Legacy Address1
+Let $LegCity = ' '               !Legacy City
+Let $HireRehireFlag = ' '        !Flag that indicates if this is a hire or a rehire
+Let $PSSex = ' '
+Let $PSMiddleName = ' '
+Let $PSFirstName = ' '
+Let $PSLastName = ' '
+Let $PSDeptID = ' '
+Let $PSSetID = ' '
+Let $PSEthnicCode = ' '
+Let $PSReferralSource = ' '
+Let $PSJobCode = ' '
+Let $PSFullPartTime = ' '
+Let $ErrorProgramParm = 'HRZ201A'
+let $PSPoi = 'N'
+let $PrefLastname = ' '
+let $POICat = ' '
+
+End-Procedure HR201-Initialize-Fields
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR201-Process-Main
+! Desc:  This is the process controling procedure.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR201-Process-Main 
+
+       
+!show '$Wrk_Oprid: '  $Wrk_Oprid
+!show '$Wrk_Emplid: ' $Wrk_Emplid
+!show '$Wrk_Effdt: '  $Wrk_Effdt
+!show '$Wrk_indexNum: ' $Wrk_indexNum
+!show '$Wrk_Process_Name: ' $Wrk_Process_Name
+
+DO HR201-INITIALIZE-FIELDS
+if $Wrk_indexNum = '0'
+   do HR201-Get-POI-data                  !Get POI data 
+   do MAIN-SQL-POI                       !ZHRISTDT.SQC
+else 
+  do HR201-Get-EMP-data                  !Get Alternate EID Emp data
+  do MAIN-SQL-EMP                       !ZHRISTDT.SQC
+end-if 
+
+Do HR201-Get-Personal-Data           !Get data to send back from the personal data tables
+Do HR201-Massage-Data                !Put the data in the format necessary to send it as parameters
+
+Do HR201-Build-Call-Statement        !Builds and executes the call statement with all of the parameters to populate legacy system
+Do Get-Oprid                        !See if oprid already exists if not add the new employee as a PeopleSoft Operator    ZADDOPR.SQC
+
+
+End-Procedure HR01-Process-Main
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR201-Massage-Data
+! Desc:  Will massage the data to get it in the form that the RPG program
+!        needs it in to process
+!----------------------------------------------------------------------
+
+Begin-Procedure HR201-Massage-Data
+
+!Determine whether a Hire or a Rehire based on the process name
+If $Wrk_Process_Name = 'ZHRI201A'
+    LET $HireRehireFlag = 'H'     !Move an 'H' to the flag if it is a hire
+else
+    LET $HireRehireFlag = 'R'     !Move an 'R' to the flag if it is a rehire
+End-If    !$Wrk_Process_Name = 'ZHRI201A'
+
+!Format the legacy employee ID from the PeopleSoft Oprid for audit field
+Let $LegAuditEmplid = ltrim(rtrim($Wrk_Oprid,' '),' ')   !Remove leading and trailing Blanks
+Let $LegAuditEmplid = ltrim($LegAuditEmplid,'E')  !Remove the leading 'E' from the employee ID
+Uppercase $LegAuditEmplid    !Be sure in all CAPS
+
+!Format the legacy alternate employee id for the employee being hired
+Let $Wrk_Emplid1 = ltrim(rtrim($Wrk_Emplid,' '),' ')
+let #Wrk_Emplid1 = to_number($Wrk_Emplid1)
+LET $LegAddEmplid =  edit(#Wrk_Emplid1,'099999999')
+
+!Get the Index#
+let $Legindex = $Wrk_indexNum
+
+Uppercase $LegGroup     !Be sure in all CAPS
+Uppercase $LegBranch    !Be sure in all CAPS
+
+!Format the employee last name
+Let $PSLastName = $PrefLastname || $PSLastName
+Let $LegLastName = $PSLastName
+Uppercase $LegLastName  !Be sure in all CAPS
+!Do Replace-Character($LegLastName,'''','''''',$LegLastName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+
+!Format the employee first name
+Let $LegFirstName = $PSFirstName
+Uppercase $LegFirstName !Be sure in all CAPS
+!Do Replace-Character($LegFirstName,'''','''''',$LegFirstName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+
+!Format the employee middle initial
+Let $LegMiddleInit = substr($PSMiddleName,1,1)
+Uppercase $LegMiddleInit  !Be sure in all CAPS
+!Do Replace-Character($LegMiddleName,'''','''''',$LegMiddleName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+
+!Format the employee gender
+Let $LegGender = $PSSex
+Uppercase $LegGender       !Be sure in all CAPS
+
+!Format Position and Department
+Uppercase $LegPosition   !Make Sure in all CAPS
+Uppercase $LegDepartment    !Make Sure in all CAPS
+
+!Format Recruit Source Information
+Uppercase $LegReferralSource  !Make Sure in all CAPS
+
+End-Procedure HR201-Massage-Data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR201-Get-Personal-Data
+! Desc:  Gets the employees data from the personal data effdt table that
+!        needs to be interfaced to the legacy system.
+!        All this data used to come from pers_data_effdt.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR201-Get-Personal-Data
+
+Begin-Select  
+PER1.SEX            
+     
+     Let $PSSex = ltrim(rtrim(&PER1.SEX,' '),' ') 
+     IF  $PSSex = 'U' 
+      LET  $PSSex = ''
+     END-IF            
+     
+from  PS_PERS_DATA_EFFDT PER1
+where PER1.EMPLID = $Wrk_Emplid
+  and PER1.EFFDT = (SELECT MAX(PER12.EFFDT)
+                      FROM PS_PERS_DATA_EFFDT PER12
+                     WHERE PER12.EMPLID = PER1.EMPLID
+                       AND  to_char(PER12.EFFDT,'YYYY-MM-DD') <= $Wrk_Effdt)
+End-Select 
+
+
+Begin-Select  
+N1.MIDDLE_NAME
+    Let $PSMiddleName = ltrim(rtrim(&N1.MIDDLE_NAME,' '),' ')
+N1.FIRST_NAME
+    Let $PSFirstName = ltrim(rtrim(&N1.FIRST_NAME,' '),' ')
+N1.LAST_NAME
+    Let $PSLastName = ltrim(rtrim(&N1.LAST_NAME,' '),' ')
+                   
+from  PS_NAMES N1
+where N1.EMPLID = $Wrk_Emplid
+and N1.NAME_TYPE = 'PRI'
+and N1.EFFDT     = (SELECT MAX(N12.EFFDT) FROM PS_NAMES N12
+                      WHERE N12.EMPLID   = N1.EMPLID
+                      AND   N12.NAME_TYPE  = N1.NAME_TYPE
+                      AND   to_char(N12.EFFDT,'YYYY-MM-DD') <= $Wrk_Effdt)
+End-Select
+
+End-Procedure HR201-Get-Personal-Data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR201-Get-POI-data
+! Desc:  Gets the POIs data from the POI table that needs to be
+!        interfaced to the legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR201-Get-POI-data
+
+Begin-Select
+POI.ZHRF_POI_CATEGORY
+POI.ZHRF_GRP_NBR,
+POI.ZHRF_BRANCH,
+POI.EXPECTED_END_DATE,
+POI.MANAGER_ID, 
+POI.ZHRF_PWORD_1,
+POI.ZHRF_PWORD_2 
+
+    let $POICat = ltrim(rtrim(&POI.ZHRF_POI_CATEGORY,' '),' ') 
+    let $LegGroup = ltrim(rtrim(&POI.ZHRF_GRP_NBR,' '),' ') 
+    let $LegBranch = ltrim(rtrim(&POI.ZHRF_BRANCH,' '),' ') 
+    let $LegNickName = ltrim(rtrim(&POI.EXPECTED_END_DATE,' '),' ') 
+    let $LegDepartment  = ltrim(rtrim('A',' '),' ') 
+    let $LegReferralSource  = ltrim(rtrim(&POI.MANAGER_ID,' '),' ') 
+    let $LegAddress1 =  ltrim(rtrim(&POI.ZHRF_PWORD_1,' '),' ')                      
+    let $LegCity = ltrim(rtrim(&POI.ZHRF_PWORD_2,' '),' ') 
+    
+    do HR201-Get-POI-LegPosNo
+
+FROM PS_ZHRT_PER_POI_TR POI
+WHERE POI.EMPLID =  $Wrk_Emplid
+AND POI.EFFDT = (SELECT MAX(POI1.EFFDT) FROM PS_ZHRT_PER_POI_TR POI1
+                WHERE POI.EMPLID = POI1.EMPLID
+                AND POI.POI_TYPE = POI1.POI_TYPE
+                AND to_char(POI1.EFFDT,'YYYY-MM-DD') <= $Wrk_Effdt)
+End-Select
+
+End-Procedure HR201-Get-POI-data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR201-Get-EMP-data
+! Desc:  Gets the employees data from the POI table that needs to be
+!        interfaced to the legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR201-Get-EMP-data
+
+Begin-Select
+EMP.ZHRF_GRP_NBR,
+EMP.ZHRF_BRANCH,
+EMP.ZHRF_ALT_EID_TYPE  &EMP.ZHRF_ALT_EID_TYPE
+
+    let $LegGroup = ltrim(rtrim(&EMP.ZHRF_GRP_NBR,' '),' ') 
+    let $LegBranch = ltrim(rtrim(&EMP.ZHRF_BRANCH,' '),' ')
+    let $LegNickName = ''
+    let $LegDepartment  = ltrim(rtrim('A',' '),' ') 
+    let $LegReferralSource  = ''
+    let $LegAddress1 =  ''                    
+    let $LegCity = ''  
+    let $EMPType = ltrim(rtrim(&EMP.ZHRF_ALT_EID_TYPE,' '),' ')
+    
+    do HR201-GET-EMP-POI
+    If $PSPoi= 'Y'
+      do HR201-Get-primEid-POIdata
+    else
+      let $LegPosition = '98' !for Alternate EIDs who are employees, Leg Position will be 98
+      do HR201-Get-Alternate_Type
+    end-if
+
+FROM PS_ZHRR_MULTPL_EID EMP
+WHERE EMP.EMPLID = $Wrk_Emplid
+AND EMP.SEQUENCE = $Wrk_indexNum
+AND EMP.EFFDT = (SELECT MAX(EMP1.EFFDT) FROM PS_ZHRR_MULTPL_EID EMP1
+                WHERE EMP1.EMPLID = EMP.EMPLID
+                AND to_char(EMP1.EFFDT,'YYYY-MM-DD') <= $Wrk_Effdt)
+End-Select
+
+End-Procedure HR201-Get-EMP-data
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR201-GET-EMP-POI
+! Desc:  If index number is not 0 then check if EMP or POI
+!----------------------------------------------------------------------
+Begin-Procedure HR201-GET-EMP-POI
+
+Let $PSEmp= 'N'
+Let $PSPoi= 'N'
+
+begin-select
+MUL.Z_PER_TYPE
+
+    If &MUL.Z_PER_TYPE = 'E'
+      Let $PSEmp= 'Y'
+      Let $PSPoi= 'N'
+    else
+      Let $PSPoi= 'Y'
+      Let $PSEmp= 'N'
+    end-if     
+
+from PS_ZHRR_POI_EMP_VW MUL
+where MUL.Emplid = $Wrk_Emplid         
+
+end-select
+
+End-Procedure HR201-GET-EMP-POI
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR201-Get-primEid-POIdata
+! Desc:  Gets the primary Eids data when the 
+!        interfaced to the legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR201-Get-primEid-POIdata
+
+Begin-Select
+PED.ZHRF_POI_CATEGORY
+PED.EXPECTED_END_DATE,
+PED.MANAGER_ID, 
+PED.ZHRF_PWORD_1,
+PED.ZHRF_PWORD_2 
+
+    let $POICat = ltrim(rtrim(&PED.ZHRF_POI_CATEGORY,' '),' ') 
+    let $LegNickName = ltrim(rtrim(&PED.EXPECTED_END_DATE,' '),' ') 
+    let $LegReferralSource  = ltrim(rtrim(&PED.MANAGER_ID,' '),' ') 
+    let $LegAddress1 =  ltrim(rtrim(&PED.ZHRF_PWORD_1,' '),' ')                      
+    let $LegCity = ltrim(rtrim(&PED.ZHRF_PWORD_2,' '),' ') 
+    
+    do HR201-Get-POI-LegPosNo
+
+FROM PS_ZHRT_PER_POI_TR PED
+WHERE PED.EMPLID =  $Wrk_Emplid
+AND PED.EFF_STATUS = 'A'
+AND PED.EFFDT = (SELECT MAX(PED1.EFFDT) FROM PS_ZHRT_PER_POI_TR PED1
+                WHERE PED1.EMPLID = PED.EMPLID
+                AND PED1.EFF_STATUS = 'A'
+                AND PED1.POI_TYPE = PED.POI_TYPE
+                AND PED1.EFFDT <= SYSDATE)
+End-Select
+
+End-Procedure HR201-Get-primEid-POIdata
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR201-Get-POI-LegPosNo
+! Desc:  Gets the POIs Legacy Positon Number
+!----------------------------------------------------------------------
+
+Begin-Procedure HR201-Get-POI-LegPosNo
+
+Begin-Select
+Z.ZPTF_OUTPUT_01,
+Z.ZPTF_OUTPUT_02
+
+    let $LegPosition = ltrim(rtrim(&Z.ZPTF_OUTPUT_01,' '),' ')
+    let $PrefLastname = ltrim(rtrim(&Z.ZPTF_OUTPUT_02,' '),' ')
+    if $PrefLastname <> ''
+      let $PrefLastname = $PrefLastname || ' '
+    end-if
+
+FROM PS_ZPTT_XLAT_TBL Z
+WHERE  Z.ZPTF_INPUT_01 = 'TEMPMAST' 
+AND Z.ZPTF_INPUT_02 = 'POSITION' 
+AND Z.STATUS ='A'
+AND Z.ZPTF_INPUT_03 = $POICat
+
+End-Select
+
+End-Procedure HR201-Get-POI-LegPosNo
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR201-Get-Alternate_Type
+! Desc:  Gets the POIs Legacy Positon Number
+!----------------------------------------------------------------------
+
+Begin-Procedure HR201-Get-Alternate_Type
+
+Begin-Select
+Z1.ZPTF_OUTPUT_01
+
+    let $PrefLastname = ltrim(rtrim(&Z1.ZPTF_OUTPUT_01,' '),' ')
+    if $PrefLastname <> ''
+      let $PrefLastname = $PrefLastname || ' '
+    end-if
+
+FROM PS_ZPTT_XLAT_TBL Z1
+WHERE  Z1.ZPTF_INPUT_01 = 'TEMPMAST' 
+AND Z1.ZPTF_INPUT_02 = 'Alternate EID Type' 
+AND Z1.STATUS ='A'
+AND Z1.ZPTF_INPUT_03 = $EMPType
+
+End-Select
+
+End-Procedure HR201-Get-Alternate_Type
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR201-Build-Call-Statement
+! Desc:  Prepares the parameters to pass to the RPG program
+!----------------------------------------------------------------------
+
+Begin-Procedure HR201-Build-Call-Statement
+
+Let $Command = ' "CALL '               ||
+$Library                               ||
+'/HRZ201A '                            ||
+'PARM('''                              ||
+$LegAuditEmplid                        ||     !Legacy Emplid for audit field
+''' '''                                ||
+$LegAddEmplid                          ||       !Legacy Alternate Employee Id for the employee being hired
+''' '''                                ||
+$Legindex                              ||           !Legacy Index Number
+''' '''                                ||
+$LegGroup                              ||           !Legacy Group
+''' '''                                ||
+$LegBranch                             ||          !Legacy Branch
+''' '''                                ||
+$LegLastName                           ||        !Legacy Last Name
+''' '''                                ||
+$LegFirstName                          ||       !Legacy First Name
+''' '''                                ||
+$LegMiddleInit                         ||      !Legacy Middle Initial
+''' '''                                ||
+$LegNickName                           ||        !Legacy Nickname
+''' '''                                ||
+$LegGender                             ||          !Legacy Gender
+''' '''                                ||
+$LegServiceDate                        ||     !Legacy Start Date
+''' '''                                ||
+$LegDepartment                         ||      !Legacy Department
+''' '''                                ||
+$LegPosition                           ||       !Legacy Position
+''' '''                                ||
+$LegReferralSource                     || !Legacy Referral Source Code
+''' '''                                ||
+$LegAddress1                           ||        !Legacy Address1
+''' '''                                ||
+$LegCity                               ||            !Legacy City
+''' '''                                ||
+$HireRehireFlag                        ||     !Flag that indicates if this is a hire or a rehire
+ ''')"'
+
+Do Call-System
+!show 'Command : ' $Command
+
+If (#Status = 0)      !If ended normally
+    Let $NCompletionStatus = 'C'     !Status of Completed normally
+End-If    !#Status = 0
+
+End-Procedure HR201-Build-Call-Statement
+
+#Include 'zhristdt.sqc'  !get the start date for POI and EMP

@@ -1,0 +1,3 @@
+!**********************  Non-PeopleSoft Tables  *********************
+!* HR006P              Legacy Employee master file             Select
+!* HR036P              Legacy Employee master file             Select

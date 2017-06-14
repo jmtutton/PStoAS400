@@ -1,0 +1,501 @@
+!*****************************************************************************
+!*  Program Name:  ZHRI104A.SQC
+!*****************************************************************************
+!*  Author:              Rakesh Govani, Enterprise Rent-A-Car
+!*  Date:                6/17/99
+!*  Owner:
+!*  Project Id:          ZHR_MOD_INTERFACE
+!*****************************************************************************
+!*  Program Summary:  None
+!*
+!*****************************************************************************
+!*  Tables Used:
+!*
+!*  TABLE              DESCRIPTION                            ACCESS
+!*  -----              -----------                            ------
+!* PS_JOB              PeopleSoft Job table
+!* PS_ZHRT_JOBCD_CREF  Job Code Cross Reference Table
+!* ZPS_ZGLT_PT12P_CREF Company cross reference file
+!* PS_ZHRT_CMPNY_CREF  Company cross reference file
+!*
+!*  Input/Output Files:
+!*
+!*  FILE NAME         INPUT/OUTPUT        DESCRIPTION
+!*  ---------         ------------        -----------
+!*
+!*****************************************************************************
+!*
+!*  Modifications:
+!*
+!*    DATE          DEVELOPER NAME/Project ID               DESCRIPTION OF CHANGES
+!*    ----          -------------------------               ----------------------
+!*  07/19/1999      Johnny Bridges/ZHR_MOD_INTERFACE        Converted to SQC
+!*
+!*  08/07/1999      Johnny Bridges/ZHR_MOD_INTERFACE        Changed the error message text on failed selects from Xref tables
+!*                                                          Deleted unnecessary/commented code
+!*
+!*  08/18/1999      Johnny Bridges/ZHR_MOD_INTERFACE        Removed cross reference table PT012P and used PT003P to fill the dept
+!*  08/27/1999      Gwen Salabay/ZHR_MOD_INTERFACE          Removed cross reference table PT004P and used PT102P.
+!*                                                          Added Status Indicator check for PT003P and PT005P.
+!*
+!* 09/14/1999      Johnny Bridges/ZHR_MOD_INTERFACE         Change to get the Legacy Job Status Code from PT003P instead of hard coding the xref
+!*
+!* 09/14/1999      Johnny Bridges/ZHR_MOD_INTERFACE         Removed the routine that gets the Oprid and put it in the main sqr because it
+!*                                                          is shared by all of the SQCs.
+!* 09/22/1999      Johnny Bridges/ZHR_MOD_INTERFACE         Changed to have error program parm set at the begining only so that it can be used by common routines.
+!*
+!* 09/24/1999      Johnny Bridges/ZHR_MOD_INTERFACE         Added code to stop processing the record if a PSOPRDEFN record cannot be added
+!*
+!* 9/24/99         Johnny Bridges/ZHR_MOD_INTERFACE         changed to build where clause when getting branch
+!*
+!* 12/23/99        Johnny Bridges/ZHR_MOD_INTERFACE         Changed to correctly get the branch when getting for a corporate group
+!* 11/07/2000   Sreedhar Kondepudi/ZHR_MOD_REHOST_INTERFACE Modified as part of UNIX Rehost
+!*
+!* 01/04/2001      Christopher W Bates/ZHR_MOD_CLEANUP_INTERFACE
+!*                                                          Replaced AS400 cross reference files with PeopleSoft cross reference tables
+!* 03/30/2001   Christopher W Bates/ZHR_MOD_REHOST_INTERFACE  Modify program to run on UNIX.
+!
+!  10/04/2001   Sreedhar Kondepudi/ZHR_FIX_DEFECT#2312        Modified to avoid ORA-Null value error while
+!                                                             inserting into the table ZHRT_EMPID_CREF
+!  11/29/2001   Sreedhar Kondepudi/ZHR_ACTIVEDIR_INTERFACE    Modified as part of User Account Automation(UAA)
+!                                                             Project.
+!*
+!* 04/05/2002   Sandy Meyer/Z_UPGRADE83_E98405              Made modifications for upgrade to v8.3.
+!*
+!
+!  09/11/2002   Jack Veilleux / ZHR_PRDSPT_INTF_ERROR         Moved call of Do Prepare Error Parms routine to inside of Error
+!                                                             per each D Proceses (101 - 109) section of Call Program routine.
+!  09/19/2002   Brian Groom / ZHR_PRDSPT_INTF_FIXRPGCALL     Modified to call the Rpg program for non critical errors.
+!
+!**************************************************************************************************
+!*---------------------------------------------------------------------------!
+!* Modifications:  Change PT102P to ZPS_ZGLT_PT12P_CREF                      !
+!* Author:         G. Eldridge                                               !
+!* Date:           10/1/2002                                                 !
+!* Owner:          Cindy Henken                                              !
+!* Project ID:     Z_REMOVE_PT102P                                           !
+!*---------------------------------------------------------------------------!
+!*---------------------------------------------------------------------------!
+!* Modifications:  Remove Corporate logic.                                   !
+!* Author:         G. Eldridge                                               !
+!* Date:           10/8/2002                                                 !
+!* Owner:          Cindy Henken                                              !
+!* Project ID:     Z_REMOVE_CORP                                             !
+!*---------------------------------------------------------------------------!
+!Modifications:  remove job code error                                       !
+!* Author:         RDoelger                                                  !
+!* Date:           1/10/2008                                                 !
+!* Owner:          Barclay Nothaus                                           !
+!* Project ID:     ZHR_Grandfather P                                         !
+!*---------------------------------------------------------------------------!
+!  03/03/2010   Louisa Bartell / CQ 86984                   Modified to get latest seq from ps_job - search on CQ 86984.
+!**************************************************************************************************
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR04-Initialize-Fields
+! Desc:  Initialize the fields to ensure that that they all start out blank.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR04-Initialize-Fields
+
+Let $LegEmplid = ' '
+Let $LegUserEmplid = ' '
+Let $LegBranch = ' '
+Let $LegDepartment = ' '
+Let $LegSubDepartment = ' '
+Let $LegPosition = ' '
+Let $LegJobStatus = ' '
+Let $LegWorkStatus = ' '
+Let $LegUnionFlag = ' '
+Let $LegTimeCardFlag = ' '
+Let $LegEffdt = ' '
+Let $LegGroup = ' '
+Let $LegBranch = ' '
+Let $PSSetID = ' '
+Let $PSEmplClass = ' '
+Let $PSRegTemp = ' '
+Let $PSJobCode = ' '
+Let $PSFullPartTime = ' '
+Let $PSDeptid = ' '
+Let $WrkSrchGrp = ' '
+Let $WrkSrchLoc = ' '
+Let $WrkSrchDep = ' '
+Let $PSCompany =  ' '
+Let $CallRpg = 'Y'
+
+Let $ErrorProgramParm = 'HRZ104A'
+
+
+End-Procedure HR04-Initialize-Fields
+
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR04-Process-Main
+! Desc:  This is the process controling procedure.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR04-Process-Main
+
+Do HR04-Initialize-Fields
+Do HR04-Get-Job-Data
+Do Get-Oprid                                     !From ZHRI100A.SQR
+Let $ADLegOprid = $PSOprid
+Let $NewEmpOprid = $PSOprid
+If $NewEmpOprid <> '' and $NewEmpOprid <> ' '    !New Oprid not blank or null
+Do HR04-Massage-Data
+If $CallRpg = 'Y'
+        Do HR04-Call-RPG
+Else
+    Let $CompletionStatus = 'C'
+End-iF
+
+End-if    !$NewEmpOprid <> '' and $NewEmpOprid <> ' '
+
+End-Procedure HR04-Process-Main
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR04-Get-job-data
+! Desc:  Gets the employees data from the job table that needs to be
+!        interfaced to the legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR04-Get-job-data
+
+Begin-Select
+
+CJ6.COMPANY
+    let $PSCompany = ltrim(rtrim(&CJ6.COMPANY,' '),' ')              !Remove leading and trailing blanks
+CJ6.BUSINESS_UNIT
+    let $PSBusinessUnit = ltrim(rtrim(&CJ6.BUSINESS_UNIT,' '),' ')   !Remove leading and trailing blanks
+CJ6.LOCATION
+    let $PSLocation = ltrim(rtrim(&CJ6.LOCATION,' '),' ')            !Remove leading and trailing blanks
+CJ6.SETID_JOBCODE
+    let $PSSetID = ltrim(rtrim(&CJ6.SETID_JOBCODE,' '),' ')          !Remove leading and trailing blanks
+CJ6.EMPL_STATUS
+    let $PSEmplStatus = ltrim(rtrim(&CJ6.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
+CJ6.ACTION
+    let $PSAction = ltrim(rtrim(&CJ6.ACTION,' '),' ')                !Remove leading and trailing blanks
+CJ6.REG_TEMP
+    let $PSRegTemp = ltrim(rtrim(&CJ6.REG_TEMP,' '),' ')             !Remove leading and trailing blanks
+CJ6.FULL_PART_TIME
+    let $PSFullPartTime = ltrim(rtrim(&CJ6.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
+CJ6.EMPL_CLASS
+    let $PSEmplClass = ltrim(rtrim(&CJ6.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
+CJ6.FLSA_STATUS
+    let $PSFlsaStatus = ltrim(rtrim(&CJ6.FLSA_STATUS,' '),' ')       !Remove leading and trailing blanks
+CJ6.DEPTID
+    let $PSDeptid = ltrim(rtrim(&CJ6.DEPTID,' '),' ')                !Remove leading and trailing blanks
+CJ6.JOBCODE
+    let $PSJobcode = ltrim(rtrim(&CJ6.JOBCODE,' '),' ')              !Remove leading and trailing blanks
+
+ let $Wrk_AD_JobDataBuild = 'Y'                 !sree-UAAMOD
+
+from PS_JOB CJ6
+where CJ6.EMPLID = $Wrk_Emplid                  !sree**10/04/01
+and to_char(CJ6.EFFDT, 'YYYY-MM-DD') =    $PSEffdt
+!AND CJ6.EFFSEQ =   #WrkEffseq                   !CQ 86984
+AND CJ6.EFFSEQ =                                 !CQ 86984
+         (SELECT MAX(CJ6B.EFFSEQ)                !CQ 86984
+          FROM  PS_JOB CJ6B                      !CQ 86984
+          WHERE CJ6B.EMPLID   = CJ6.EMPLID       !CQ 86984
+            AND CJ6B.EMPL_RCD = CJ6.EMPL_RCD     !CQ 86984
+            AND CJ6B.EFFDT    = CJ6.EFFDT)       !CQ 86984
+and CJ6.EMPL_RCD = 0                             !changed for v8.3
+
+End-Select
+
+End-Procedure HR04-Get-job-data
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR04-Massage-Data
+! Desc:  Will massage the data to get it in the form that the RPG program
+!        needs it in to process
+!----------------------------------------------------------------------
+
+Begin-Procedure HR04-Massage-Data
+
+!Format the legacy employee ID from the PeopleSoft Oprid
+let $LegEmplid = ltrim($NewEmpOprid,'E')  !Remove the leading 'E' from the employee ID
+Uppercase $LegEmplid    !Be sure in all CAPS
+
+!Format the legacy employee ID from the PeopleSoft Oprid
+let $LegUserEmplid = ltrim($PSUserOprid,'E')  !Remove the leading 'E' from the employee ID
+Uppercase $LegUserEmplid    !Be sure in all CAPS
+
+!Format the Group number that the employee is assigned to from the Company Field
+Do HR04-Get-Group
+Uppercase $LegGroup     !Be sure in all CAPS
+
+!Format the Branch code that the employee is assigned to from the Location Field
+Do HR04-Get-Branch
+Uppercase $LegBranch    !Be sure in all CAPS
+
+!Format Work Status using the Empl_Status and Action_Reason fields from PeopleSoft
+!evaluate $PSAction
+
+!    when = 'TER'
+!    when = 'RET'
+!    when = 'TWB'
+!    when = 'TWP'
+!        let $LegWorkStatus = 'T'
+!        break    !exit evaluate statement
+
+!    when = 'LOA'
+!    when = 'PLA'
+!        let $LegWorkStatus = 'L'
+!        break    !exit evaluate statement
+
+!    when = 'LTD'
+!    when = 'LTO'
+!        let $LegWorkStatus = 'D'
+!        break    !exit evaluate statement
+
+!    when = 'ASG'
+!    when = 'HIR'
+!    when = 'REC'
+!    when = 'REH'
+!    when = 'RFD'
+!    when = 'RFL'
+!        let $LegWorkStatus = 'A'
+!        break    !exit evaluate statement
+
+!    when-other
+!        let $LegWorkStatus = ' '
+!        break    !exit evaluate statement
+
+!end-evaluate   !$PSRegTemp
+
+!Format Work Status using the Empl_Status ONLY from PeopleSoft !CQ 86984 - removed code above based on Action
+evaluate $PSEmplStatus
+
+    when = 'D'
+    when = 'Q'
+    when = 'R'
+    when = 'T'
+    when = 'U'
+    when = 'V'
+    when = 'X'
+        let $LegWorkStatus = 'T'
+        break    !exit evaluate statement
+
+    when = 'P'
+    when = 'L'
+        let $LegWorkStatus = 'L'
+        break    !exit evaluate statement
+
+    when = 'A'
+    when = 'S'
+        let $LegWorkStatus = 'A'
+        break    !exit evaluate statement
+
+    when-other
+        let $LegWorkStatus = ' '
+        break    !exit evaluate statement
+
+end-evaluate   !$PSRegTemp 
+
+!Format Union Flag
+If ($PSEmplClass = 'O')
+    let $LegUnionFlag = 'Y'
+else
+    let $LegUnionFlag = 'N'
+End-If    !$PSEmplClass = 'O'
+
+!Format Time Card Flag
+If ($PSFlsaStatus = 'N')
+    let $LegTimeCardFlag = 'Y'
+else
+    let $LegTimeCardFlag = 'N'
+End-If    !$PSFlsaStatus = 'N'
+
+!Format national id
+let $LegNid = $PSNid
+Uppercase $LegNid
+
+
+!Format Position and Department
+Do HR04-Get-Position
+Uppercase $LegPosition
+Uppercase $LegDepartment
+
+!Format the Effective Date
+Unstring $PSEffdt by '-' into $WrkYear $WrkMonth $WrkDay             !E2774K **Rehost**11/10/2000
+Let $LegEffdt = $WrkMonth || $WrkDay || $WrkYear
+
+End-Procedure HR04-Massage-Data
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR04-Call-RPG
+! Desc:  Prepares the parameters to pass to the RPG program
+!----------------------------------------------------------------------
+
+Begin-Procedure HR04-Call-RPG
+
+
+Let $Command =   '"CALL '       ||
+                 $Library                      ||
+                 '/HRZ104A '                   ||
+                 'PARM('''                   ||
+                 $LegEmplid                    ||
+                 ''' '''                   ||
+                 $LegUserEmplid                ||
+                 ''' '''                   ||
+                 $LegBranch                    ||
+                 ''' '''                   ||
+                 $LegDepartment                ||
+                 ''' '''                   ||
+                 $LegSubDepartment             ||
+                 ''' '''                   ||
+                 $LegPosition                  ||
+                 ''' '''                   ||
+                 $LegJobStatus                 ||
+                 ''' '''                   ||
+                 $LegWorkStatus                ||
+                 ''' '''                   ||
+                 $LegUnionFlag                 ||
+                 ''' '''                   ||
+                 $LegTimeCardFlag              ||
+                 ''' '''                   ||
+                 $LegEffdt                     ||
+                 ''')"'
+
+Do Call-System               !From ZHRI100A.SQR
+
+if (#STATUS = 0)
+    Let $CompletionStatus = 'C'
+end-if      !  #STATUS = 0
+
+
+
+End-Procedure HR04-Call-RPG
+
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR04-Get-Position
+! Desc:  Get the Legacy position from the cross reference table using the
+!        jobcode setid, jobcode, empl_class, full_part_time, reg_temp,
+!        and deptid from PeopleSoft
+!----------------------------------------------------------------------
+
+Begin-Procedure HR04-Get-Position
+
+Let $Found = 'N'
+
+Begin-Select
+
+CPT3.ZHRF_LEGPOSITIONCD                                        !sree**rehost
+    let $LegPosition = &CPT3.ZHRF_LEGPOSITIONCD                !sree**rehost
+CPT3.ZHRF_LEGDEPTCD                                            !sree**rehost
+    Let $LegDepartment = &CPT3.ZHRF_LEGDEPTCD                  !sree**rehost
+CPT3.ZHRF_LEGJOBSTSCD                                          !sree**rehost
+    Let $LegJobStatus = &CPT3.ZHRF_LEGJOBSTSCD                 !sree**rehost
+
+
+    Let $Found = 'Y'
+
+from PS_ZHRT_JOBCD_CREF CPT3                                                          !sree**rehost
+where CPT3.SETID_JOBCODE = $PSSetID     and CPT3.JOBCODE = $PSJobCode                 !sree**rehost
+  and CPT3.EMPL_CLASS = $PSEmplClass and CPT3.FULL_PART_TIME = $PSFullPartTime        !sree**rehost
+  and CPT3.REG_TEMP = $PSRegTemp   and CPT3.DEPARTMENT = $PSDeptid                    !sree**rehost
+  and CPT3.STATUS = 'A'                                                               !sree**rehost
+
+End-Select
+
+If $Found = 'N'
+   ! Let $ErrorMessageParm = 'Setid,Jobcode,EmplClass,F/P Time,R/T,Deptid not in XRef PS_ZHRT_JOBCD_CREF'
+   ! Let $WrkCriticalFlag = 'Y'    !sree*09/12/02
+   ! Let $CallRpg = 'N'
+   ! Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+   ! Do Call-Error-Routine         !From ZHRI100A.SQR
+End-If    !$Found = 'N'
+
+
+End-Procedure HR04-Get-Position
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR04-Get-Branch
+! Desc:  Gets the branch from the cross reference file using Location
+!----------------------------------------------------------------------
+
+Begin-Procedure HR04-Get-Branch
+
+
+Let $Where = 'Where CPT24.ZGLF_PT2OGP = '''               !Build $Where
+                  || $LegGroup
+                  || ''' and CPT24.ZGLF_PT2DPT = '''
+                  || $PSLocation
+                  || ''' and CPT24.ZGLF_PT2STS = '''
+                  || 'A'''
+
+
+Let $Found = 'N'
+
+Begin-Select
+
+CPT24.ZGLF_PT2OBR
+    let $LegBranch = ltrim(rtrim(&CPT24.ZGLF_PT2OBR,' '),' ')     !Remove leading and trailing blanks
+
+    Let $Found = 'Y'
+
+from ZPS_ZGLT_PT12P_CREF CPT24
+[$Where]
+End-Select
+
+If $Found = 'N'
+     Let $ErrorMessageParm = 'Company, Location, Department combo ' ||
+                             'not found in XRef table'
+     Let $WrkCriticalFlag = 'Y'    !sree*09/12/02
+     Let $CallRpg = 'N'
+     Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+     Do Call-Error-Routine      !From ZHRI100A.SQR
+End-If    !$Found = 'N'
+
+End-Procedure HR04-Get-Branch
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR04-Get-Group
+! Desc:  Gets the group from the cross reference file using Company
+!----------------------------------------------------------------------
+
+Begin-Procedure HR04-Get-Group
+
+Let $Found = 'N'
+
+Begin-Select
+
+CPT52.ZHRF_LEGGROUP                                                                                    !sree**rehost
+    let $LegGroup = ltrim(rtrim(&CPT52.ZHRF_LEGGROUP,' '),' ')   !Remove leading and trailing blanks       !sree**rehost
+
+    Let $Found = 'Y'
+
+from PS_ZHRT_CMPNY_CREF CPT52                                     !sree**rehost
+where CPT52.COMPANY = $PSCompany                                  !sree**rehost
+and CPT52.STATUS = 'A'                                            !sree**rehost
+
+End-Select
+
+If $Found = 'N'
+     Let $ErrorMessageParm = 'Company not found in XRef Table PS_ZHRT_CMPNY_CREF'
+     Let $WrkCriticalFlag = 'Y'    !sree*09/12/02
+ Let $CallRpg = 'N'
+Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+     Do Call-Error-Routine     !From ZHRI100A.SQR
+End-If    !$Found = 'N'
+
+End-Procedure HR04-Get-Group
+

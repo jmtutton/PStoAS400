@@ -1,0 +1,142 @@
+!*********************************************************************
+!*  Program Name: ZHRI202A
+!*********************************************************************
+!*  Author:       Surya Sobha
+!*  Date:         12/29/16
+!*  Owner:        Data Architecture
+!*  Project Id:   TEMPMAST
+!*********************************************************************
+!*  Program Summary:  Update the Legacy files which where modified by
+!*  the HR program ZHRI202A.  Only specific fields will be updated.
+!*  Those fields are those which were changed on the AAHR02 screen.
+!*********************************************************************
+!*  Tables Used:
+!*        TABLE                        DESCRIPTION                           ACCESS
+!*        -----                        -----------                           ------
+!* ZHRT_PER_POI_TR                    POI Table                           Input                     
+!* ZHRR_MULTPL_EID                    EMP Table                           Input
+!*********************************************************************
+
+HR202-Initialize-Fields
+HR202-Process-Main
+HR202-Get-Term-Date
+HR202-Call-System
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR202-Initialize-Fields
+! Desc:  Initialize the fields to ensure that that they all start out blank.
+!----------------------------------------------------------------------
+
+Begin-Procedure HR202-Initialize-Fields
+
+LET $PSEmpl = ' '
+LET $PSTermDate = ' '
+
+Let $ErrorProgramParm = 'HRZ202A'
+
+End-Procedure HR202-Initialize-Fields
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR202-Process-Main
+! Desc:  This is the main processing procedure
+!----------------------------------------------------------------------
+
+Begin-Procedure HR202-Process-Main
+      
+!show '$PSAuditOperId: ' $PSAuditOperId
+!show '$PSDateIn: '  $PSDateIn
+!show '$PSDateIn: ' $PSDateIn
+!show '#indexNum: ' #indexNum
+
+Do HR202-Initialize-Fields   !Execute a routine that will move blanks to all of the parms on the SBMRMTCMD
+
+!Format the legacy employee ID from the PeopleSoft Oprid for audit field
+Let $PSauditEmpl = ltrim(rtrim($PSAuditOperId,' '),' ')   !Remove leading and trailing Blanks
+Let $PSauditEmpl = ltrim($PSauditEmpl,'E')  !Remove the leading 'E' from the employee ID
+Uppercase $PSauditEmpl    !Be sure in all CAPS
+!show '$PSauditEmpl: ' $PSauditEmpl
+  !do HR202-get-term-date
+Let $PSTermDate = datetostr(strtodate($PSDateIn,'YYYY-MM-DD'),'YYYYMMDD')
+!show '$PSTermDate: ' $PSTermDate
+
+do Get-Oprid
+Let $PSEmpl = $PSOprid
+
+If $PSEmpl <> '' and $PSEmpl <> ' '  !If the new oprid is not blank and it is not null on return
+    do HR202-Call-System
+End-if    !$PSEmpl <> '' and $PSEmpl <> ' '
+
+End-Procedure HR202-Process-Main
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR202-get-term-date
+! Desc:  Gets the term date for POI/EMP
+!----------------------------------------------------------------------
+
+Begin-Procedure HR202-get-term-date
+
+
+Begin-Select
+POI2.EFFDT
+
+    let $PSTermDate = LTRIM(RTRIM(&POI2.EFFDT,' '),' ')
+
+FROM PS_ZHRT_PER_POI_TR POI2
+WHERE POI2.EMPLID =  $Wrk_Emplid
+AND POI2.EFFDT = (SELECT MAX(POI1.EFFDT) FROM PS_ZHRT_PER_POI_TR POI1
+                WHERE POI1.EMPLID = POI2.EMPLID
+                AND POI1.POI_TYPE = POI2.POI_TYPE
+                AND to_char(POI1.EFFDT,'YYYY-MM-DD') <= $PSDateIn)
+End-Select
+
+
+Begin-Select
+EMP2.EFFDT
+
+    let $PSTermDate = LTRIM(RTRIM(&EMP2.EFFDT,' '),' ')
+
+FROM PS_ZHRR_MULTPL_EID EMP2
+WHERE EMP2.EMPLID = $Wrk_Emplid
+AND EMP2.SEQUENCE = $Wrk_indexNum
+AND EMP2.EFFDT = (SELECT MAX(EMP1.EFFDT) FROM PS_ZHRR_MULTPL_EID EMP1
+                WHERE EMP1.EMPLID = EMP2.EMPLID
+                AND to_char(EMP1.EFFDT,'YYYY-MM-DD') <= $PSDateIn)
+End-Select
+
+End-Procedure HR202-get-term-date
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR202-Call-System
+! Desc:  This routine calls the Legacy system
+!----------------------------------------------------------------------
+
+Begin-Procedure HR202-Call-System
+
+
+Let $Part2 = 'Parm('''       ||
+             $PSauditEmpl    ||
+             ''' '''         ||
+             $PSOprid        ||
+             ''' '''         ||
+             $PSTermDate     ||
+             ''')" '
+
+Let $Part1 = '"CALL ' || $Library ||'/HRZ202A '
+Let $Command = $Part1||$Part2
+
+
+Do Call-System             !From ZHRI100A.SQR
+!show 'Command : ' $Command
+
+if (#Status = 0)
+    let $NCompletionStatus = 'C'   !Completed Normally
+end-if    !#Status = 0
+
+
+End-Procedure HR202-Call-System

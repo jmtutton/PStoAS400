@@ -1,0 +1,25 @@
+resources available? --> wait
+
+get next set of Events
+
+push Events to Even Queue
+
+pop next Event
+
+assign Event to Data Importer Service
+
+based on Event data, get Person data from the appropriate data store
+
+error getting data? --> set error state and wait
+
+errored out? --> have Updater Service send error message, update Event status in trgger table, and log Event
+
+assign Person to Data Exporter Service
+
+based on Event data, export Person data to the appropriate data store
+
+error setting data? --> set error state and wait
+
+errored out? --> have Updater Service send error message, update Event status in trigger table, and log failed Event
+
+have Updater Service update Event status in trigger table, and log successful Event

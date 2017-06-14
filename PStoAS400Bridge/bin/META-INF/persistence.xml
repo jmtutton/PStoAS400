@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="PStoAS400Bridge">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<class>com.ehi.erd.EmployeeTrigger</class>
+		<class>com.ehi.erd.NonPersonTrigger</class>
+		<class>com.ehi.erd.PsAddress</class>
+		<class>com.ehi.erd.PsAccomplishment</class>
+		<class>com.ehi.erd.PsActnReasonTbl</class>
+		<class>com.ehi.erd.PsCitizenship</class>
+		<class>com.ehi.erd.PsContractData</class>
+		<class>com.ehi.erd.PsCountryTbl</class>
+		<class>com.ehi.erd.PsDiversEthnic</class>
+		<class>com.ehi.erd.PsDriversLic</class>
+		<class>com.ehi.erd.PsEmergencyCntct</class>
+		<class>com.ehi.erd.PsEmployeeReview</class>
+		<class>com.ehi.erd.PsEmployment</class>
+		<class>com.ehi.erd.PsEmplChecklist</class>
+		<class>com.ehi.erd.PsEthnicGrpTbl</class>
+		<class>com.ehi.erd.PsHrsSourceI</class>
+		<class>com.ehi.erd.PsJob</class>
+		<class>com.ehi.erd.PsJobCodeTbl</class>
+		<class>com.ehi.erd.PsLocationTbl</class>
+		<class>com.ehi.erd.PsName</class>
+		<class>com.ehi.erd.PsOrigHirEmpVw</class>
+		<class>com.ehi.erd.PsPerson</class>
+		<class>com.ehi.erd.PsPersonalData</class>
+		<class>com.ehi.erd.PsPersonalPhone</class>
+		<class>com.ehi.erd.PsPersApplRef</class>
+		<class>com.ehi.erd.PsPersDataEffdt</class>
+		<class>com.ehi.erd.PsPersNid</class>
+		<class>com.ehi.erd.PsZhrrMultplEid</class>
+		<class>com.ehi.erd.PsZhrtCmpnyCref</class>
+		<class>com.ehi.erd.PsZhrtEmpIdCref</class>
+		<class>com.ehi.erd.PsZhrtEthCdCref</class>
+		<class>com.ehi.erd.PsZhrtJobCdCref</class>
+		<class>com.ehi.erd.PsZhrtRfSrcCref</class>
+		<class>com.ehi.erd.PsZhrtTrmrsCref</class>
+		<class>com.ehi.erd.PsZpttVariable</class>
+		<class>com.ehi.erd.PsZhrtPerPoiTr</class>
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/>
+			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@ppddbl44.corp.erac.com:1521:PS90HRQA"/>
+			<property name="javax.persistence.jdbc.user" value="e859v1"/>
+			<property name="javax.persistence.jdbc.password" value="Chang#m3"/>
+			
+			<!-- alternatively to <class> and <property> declarations, you can use a regular hibernate.cfg.xml file -->
+			<!-- property name="hibernate.ejb.cfgfile" value="/org/hibernate/ejb/test/hibernate.cfg.xml"/ -->
+		</properties>
+	</persistence-unit>
+</persistence>

@@ -1,0 +1,17 @@
+!*********************  Cross Reference Files  **********************
+!* PS_ZHRT_JOBCD_CREF  JobCode Cross Reference Table           Select
+!* ZPS_ZGLT_PT12P_CREF Dept ID/Product ID Cross Reference File Select
+!* PS_ZHRT_CMPNY_CREF  Company cross reference Table           Select
+!* PS_ZHRT_RFSRC_CREF  Referral Source Cross Reference Table   Select
+!* PS_ZHRT_ETHCD_CREF  Ethnic Code Cross Reference Table       Select
+!* PERS_APPL_REF       Added for v9.0                          Select
+!* PS_ZHRT_JOBCD_CREF  JobCode Cross Reference Table           Select
+!* ZPS_ZGLT_PT12P_CREF Dept ID/Product ID Cross Reference File Select
+!* PS_ZHRT_CMPNY_CREF  Company cross reference Table           Select
+!* PS_ZHRT_RFSRC_CREF  Referral Source Cross Reference Table   Select
+!* PS_ZHRT_ETHCD_CREF  Ethnic Code Cross Reference Table       Select
+!* PS_ZHRT_TRMRS_CREF  Termntn Reason Cross Reference Table    Input
+!* PS_ZHRT_JOBCD_CREF  Job Code Cross Reference Table
+!* ZPS_ZGLT_PT12P_CREF Company cross reference file
+!* PS_ZHRT_CMPNY_CREF  Company cross reference file
+!* ZHRT_EmpID_CRef     Employee ID Cross Reference Input        *!
