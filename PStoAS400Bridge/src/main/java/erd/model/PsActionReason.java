@@ -187,4 +187,9 @@ public class PsActionReason implements Serializable {
 	    return null;	
 	}
 
+	public static String findReasonDescriptionByActionAndActionReason(String action, String actionReason) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
