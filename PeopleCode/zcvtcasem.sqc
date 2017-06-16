@@ -1,0 +1,140 @@
+!This guards against the SQC being #included twice...
+#ifndef ZCvtCaseM-INCLUDED
+
+#define ZCvtCaseM-INCLUDED
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  M800-Convert-Case
+! Desc:  This procedure will change the case of the variable that is passed
+!        to mixed making the first letter of each word Uppercase.  It will
+!        also take into account some special characters such as Mc
+!----------------------------------------------------------------------
+
+
+begin-procedure M800-CONVERT-CASE
+! if field is blank, skip this procedure
+! --------------------------------------
+   if   substr($work_a, 1, 3) = '   '
+     or $work_a               = ''
+        let  $new             = ' '
+        goto END-CASE
+   end-if
+
+! set everything to lowercase as default
+! --------------------------------------
+   let  $work_b               =  lower($work_a)
+
+! initialization
+! --------------
+   let  $new                  =  $null
+   let  #current              =  1
+   let  #length               =  length($work_b)
+   let  $prev                 =  ' '
+
+! rule of thumb, if previous byte is ' ' or ',' or '/' or '.' capitalize
+! character (note, 1st time through, previous byte id ' ')
+! ----------------------------------------------------------------------
+
+   while  #current <= #length
+      if  substr($work_b, #current, 2)  =  'mc'
+           ! special check for 'mc'
+           ! ----------------------
+             let  $char       =  'Mc'
+             let  $new        =  $new||$char
+             let  $char       =  ' '
+             let  #current    =  #current + 1
+      else
+      if  substr($work_b, #current, 3)  =  'vp '
+           ! special check for 'VP'
+           ! ----------------------
+             let  $char       =  'VP '
+             let  $new        =  $new||$char
+             let  $char       =  ' '
+             let  #current    =  #current + 2
+      else
+      if  substr($work_b, #current, 4)  =  'ceo '
+           ! special check for 'CEO'
+           ! ----------------------
+             let  $char       =  'CEO '
+             let  $new        =  $new||$char
+             let  $char       =  ' '
+             let  #current    =  #current + 3
+      else
+      if  substr($work_b, #current, 3)  =  'ii '
+           ! special check for 'II'
+           ! ----------------------
+             let  $char       =  'II '
+             let  $new        =  $new||$char
+             let  $char       =  ' '
+             let  #current    =  #current + 2
+      else
+      if  substr($work_b, #current, 4)  =  'iii '
+           ! special check for 'III'
+           ! ----------------------
+             let  $char       =  'III '
+             let  $new        =  $new||$char
+             let  $char       =  ' '
+             let  #current    =  #current + 3
+      else
+      if  substr($work_b, #current - 1, 4)  =  ' iv '
+           ! special check for 'IV '
+           ! ----------------------
+             let  $char       =  'IV'
+             let  $new        =  $new||$char
+             let  $char       =  ' '
+             let  #current    =  #current + 2
+      else
+!   THIS WILL SET ANY 2 CHARACTERS IN PARAENS TO UPPER CASE
+!     SUCH AS STATE ABBRV'S.  EXAMPLE (ga) -- (GA)
+      let #bstx           =  #current + 3
+      if  substr($work_b, #current, 1)  =  '(' and
+          substr($work_b, #bstx, 1)  =  ')'
+             let  #bstx       =  0
+             let  $bstnew     =  substr($work_b, #current, 4)
+             let  $bstnew     =  upper($bstnew)
+             let  $char       =  $bstnew
+             let  $new        =  $new||$char
+             let  $char       =  ' '
+             let  #current    =  #current + 4
+      else
+!
+      if  $prev  = ' '  or
+          $prev  = ','  or
+          $prev  = '.'  or
+          $prev  = '/'  or
+          $prev  = '&'  or
+          $prev  = '('  or
+          $prev  = '''' or
+          $prev  = '-'
+           ! capitalize the current character and
+           ! concatenate to $new
+           ! ------------------------------------
+              let  $work_c    =  substr($work_b, #current, 1)
+              let  $char      =  upper($work_c)
+              let  $new       =  $new||$char
+      else
+        ! concatenate to $new
+        ! -------------------
+          let  $char          =  substr($work_b, #current, 1)
+          let  $new           =  $new||$char
+      end-if
+      end-if
+      end-if
+      end-if
+      end-if
+      end-if
+      end-if
+      end-if
+
+      let $prev    = $char
+
+      let #current = #current + 1
+
+   end-while
+
+   let  $new       = rtrim($new,' ')
+
+END-CASE:
+end-procedure  M800-CONVERT-CASE
+#EndIf

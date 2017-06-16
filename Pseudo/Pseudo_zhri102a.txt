@@ -14,7 +14,7 @@
 !*********************************************************************
 ****************************************************************************
 Procedures Defined in This File:
-PROCEDURE              				DESCRIPTION                            
+PROCEDURE              				DESCRIPTION
 -----------        					-----------                         
 HR02-Initialize-Fields              Initialize the fields to ensure that that they all start out blank.
 HR02-Process-Main                   This is the main processing procedure

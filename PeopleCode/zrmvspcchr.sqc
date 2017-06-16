@@ -1,0 +1,128 @@
+!*****************************************************************************
+!*  Program Name:  ZRmvSpcChr.sqc
+!*****************************************************************************
+!*  Author:              Johnny Bridges, Enterprise Rent-A-Car
+!*  Date:                6/16/99
+!*  Owner:
+!*****************************************************************************
+!*  Program Summary:  Converts a string getting rid of any non-numeric
+!*                    and non-Letter characters
+!*****************************************************************************
+!*  Tables Used:
+!*
+!*  TABLE      DESCRIPTION                            ACCESS
+!*  -----      -----------                            ------
+!*
+!*
+!*
+!*  Input/Output Files:
+!*
+!*  FILE NAME         INPUT/OUTPUT        DESCRIPTION
+!*  ---------         ------------        -----------
+!*
+!*****************************************************************************
+!*
+!*  Modifications:
+!*
+!*    DATE          DEVELOPER NAME               DESCRIPTION OF CHANGES
+!*    ----          --------------               ----------------------
+!*
+!*
+!* 11/30/99      Johnny Bridges                 Changed to allow spaces to remain in remove non letter number routine
+!*
+!* 12/29/99      Johnny Bridges                 Added a character check routine called Validate-Characters
+!*****************************************************************************
+
+
+begin-procedure Remove-Non-Letters-Numbers ($WrkStringOld,:$WrkStringNew)
+    !Set the list of valid characters
+let $ValidValues = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+let  $WrkStringOld = ltrim(rtrim($WrkStringOld,' '),' ')     !Remove leading and trailing blanks
+let  $WrkStringNew  =  $null   !Make sure the new string field is blank to start
+let  #current =  1  !Initialize the current position field
+let  #length =  length($WrkStringOld)    !Find the length of the string field passed
+
+
+while  #current <= #length   !Process every character in the string
+
+    let $Char = substr($WrkStringOld, #current, 1)   !Get the next position to evaluate
+
+    let #StringPos = instr($ValidValues,$Char,1)    !Check to see if the Character exists in the Valid Values field
+
+    if  #StringPos <> 0    !Character not in Valid Values
+
+          let  $WrkStringNew  =  $WrkStringNew || $Char  !Add the character to the new string
+
+    End-If  !#String <> 0
+
+    let #current = #current + 1
+
+end-while  !#current <= #length
+
+let $WrkStringNew = rtrim($WrkStringNew,' ')  !Remove trailing blanks from field returned with the new converted string
+
+end-procedure  Remove-Non-Letters-Numbers
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Replace-Character
+! Desc:  This procedure will look for a string of characters within a
+!        string and replace them with another string
+!----------------------------------------------------------------------
+
+Begin-Procedure Replace-Character($InputString,$StringToReplace,$ReplacementString,:$OutputString)
+
+let $WorkString = $InputString   !Move the passed string to a working field
+
+!get the length of the working strings
+let #WorkStringLength = length($WorkString)
+let #StringtoReplaceLength = length($StringtoReplace)
+let #ReplacementStringLength = length($ReplacementString)
+
+   let #ReplaceBeginingPos = instr($WorkString,$StringtoReplace,1)  !Find first occurance of string to replace
+while  #ReplaceBeginingPos <> 0   !Process every occurance of the string to replace
+    let #WorkStringLength = length($WorkString)    !get the length of the Working string
+
+    let $WrkString1 = substr($WorkString,1,#ReplaceBeginingPos - 1)  !get the part of the string before the string to remove
+    !get the part of the string after the string to remove
+    let $WrkString2 = substr($WorkString,#ReplaceBeginingPos + #StringtoReplaceLength,#WorkStringLength - #ReplaceBeginingPos + #StringtoReplaceLength + 1)
+    let $WorkString = $WrkString1 || $ReplacementString || $WrkString2  !Build new string statement
+    let #WrkString1Length = length($WrkString1)  !Get length of wrkstringlength
+    !Find next occurence of string after replaced portion
+    let #ReplaceBeginingPos = instr($WorkString,$StringtoReplace,#WrkString1Length + #ReplacementStringLength + 1)
+end-while  !#ReplaceBeginingPos <> 0
+
+let $OutPutString = $WorkString    !Move result to parm to pass back
+
+End-Procedure Replace-Character
+
+
+
+!----------------------------------------------------------------------
+! Erac
+! Procedure:  Validate-Characters
+! Desc:  Checks passed field for non-numeric characters and returns a 'Y'
+!         if one is found
+!----------------------------------------------------------------------
+
+Begin-procedure Validate-Characters($Field-to-Check,$ValidValues,:$Non-Numbers-Exist)
+
+Let #StringPosFound = 0
+Let $Non-Numbers-Exist = 'N'
+Let #StringPosition = 1
+Let #FieldCheckLength = length($Field-to-Check)      !length of the field that is to be checked for non-numbers
+
+While #StringPosition <= #FieldCheckLength
+    Let $CharToCheck = Substr($Field-to-Check,#StringPosition,1)
+    Let #StringPosFound = instr($ValidValues,$CharToCheck,1)    !Check to see if the Character exists in the Valid Values field
+    If #StringPosFound = 0
+        Let $Non-Numbers-Exist = 'Y'
+    End-if    !#StringPosFound = 0
+    Add 1 to #StringPosition
+End-while   !#StringPosition <= #FieldCheckLength
+
+
+End-procedure Validate-Characters
+

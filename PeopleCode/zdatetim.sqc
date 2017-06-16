@@ -1,0 +1,57 @@
+!-----------------------------*ERAC*-----------------------------------!
+!  File:        ZDATETIME.SQC (Custom routine to convert string date to!
+!                              to true date and call delivered         !
+!                              DATETIME.SQC procedures                 !
+!----------------------------------------------------------------------!
+!  Description: This SQC was necessary due to the requirement to       !
+!               convert all date fields to string dates based upon     !
+!               SQR 4.3.4 date bug.                                    !
+!----------------------------------------------------------------------!
+! Inputs:       $in, $date, $time, $native,$indate1,$indate2           !
+! Outputs:      $out,#dY,#dM,#dD                                       !
+!----------------------------------------------------------------------!
+! AUTHOR          DATE      MODIFICATION     PROJECT ID                !
+! Thomas Beiter  11/10/00   Initial version.    ZHR_MOD_REHOST         !
+!----------------------------------------------------------------------!
+
+!*****************************
+!  ZFormat-Datetime          *
+!  tnb110900 ZHR_MOD_REHOST  *
+!*****************************
+
+begin-procedure ZFormat-DateTime($in, :$out, $date, $time, $native)
+
+#ifdef debugx
+  display 'Entering DATETIME.SQC: Format-DateTime'
+  display ' Input $in: ' noline
+  display $in
+  display ' Input $date: ' noline
+  display $date
+  display ' Input $time: ' noline
+  display $time
+  display ' Input $native: ' noline
+  display $native
+#end-if
+
+  LET $in = strtodate($in,'YYYY-MM-DD')
+  DO Format-DateTime($in, $out, $date, $time, $native)
+
+END-PROCEDURE !ZFormat-DateTime
+
+begin-procedure ZDiff-Date($indate1,$indate2,:#dY,:#dM,:#dD)
+
+  #ifdef debugx
+    display 'Entering DATETIME.SQC: Diff-Date'
+    display ' Input $indate1: ' noline
+    display $indate1
+    display ' Input $indate2: ' noline
+    display $indate2
+  #end-if
+
+  LET $indate1 = strtodate($indate1,'YYYY-MM-DD')
+  LET $indate2 = strtodate($indate2,'YYYY-MM-DD')
+
+  DO Diff-Date($indate1,$indate2,#dY,#dM,#dD)
+
+end-procedure !ZDiff-Date
+
