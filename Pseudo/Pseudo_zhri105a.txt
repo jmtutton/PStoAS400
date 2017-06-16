@@ -1,5 +1,5 @@
 !**********************************************************************!
-!*  Program Name: ZHRI105A                                            *!
+!*  Program Name: ZHRI105A.SQC
 !**********************************************************************!
 !*  Program Summary:  Update the Legacy files which where modified by *!
 !*  the HR program ZHRI105A.  The two legacy files which were updated *!

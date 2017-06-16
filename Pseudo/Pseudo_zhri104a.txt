@@ -17,12 +17,12 @@
 
 HR04-Initialize-Fields
 HR04-Process-Main
-HR04-Get-job-data
+HR04-Get-Job-Data
 HR04-Massage-Data
 HR04-Call-RPG
 HR04-Get-Position
 HR04-Get-Branch
-HR04-Get-Group!
+HR04-Get-Group
 
 !----------------------------------------------------------------------
 ! ERAC

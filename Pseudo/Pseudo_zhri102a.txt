@@ -1,5 +1,5 @@
 !*********************************************************************
-!*  Program Name: ZHRI102A
+!*  Program Name: ZHRI102A.SQC
 !*********************************************************************
 !*  Program Summary:  Update the Legacy files which where modified by
 !*  the HR program ZHRI102A.  Only specific fields will be updated.
@@ -12,6 +12,17 @@
 !*        PS_Action Reason             Action Reason Table                   Input
 !*        PS_ZHRT_TRMRS_CREF           Termntn Reason Cross Reference Table  Input
 !*********************************************************************
+****************************************************************************
+Procedures Defined in This File:
+PROCEDURE              				DESCRIPTION                            
+-----------        					-----------                         
+HR02-Initialize-Fields              Initialize the fields to ensure that that they all start out blank.
+HR02-Process-Main                   This is the main processing procedure
+HR02-Get-Job                        This routine will the Job Data row for each of the employee numbers entered in the trigger file.
+HR02-Process-Data                   This routine moves 'N' to change address parameter and calls the RPG program.
+HR02-Trim-Parameters                This routine trims all leading and trailing blanks from the data.
+HR02-Get-Action-Reason              This routine will determine if a termination was voluntary or involuntary basedd on Action and Action Reason codes.
+HR02-Get-Reason-Description         This routine gets the description field from the Action Reason table when Action = Termination and Action Code equals Other.
 
 !----------------------------------------------------------------------
 ! Procedure:  HR02-Initialize-Fields
@@ -38,6 +49,7 @@ Let $ErrorProgramParm = 'HRZ102A'
 End-Procedure HR02-Initialize-Fields
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  HR02-Process-Main
 ! Desc:  This is the main processing procedure
 !----------------------------------------------------------------------
@@ -67,6 +79,7 @@ End-Procedure HR02-Process-Main
 
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  HR02-Get-Job
 ! Desc:  This routine will the Job Data row for each of the
 !        employee numbers entered in the trigger file.
@@ -116,6 +129,7 @@ End-Procedure HR02-Get-Job
 
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  HR02-Process-Data
 ! Desc:  This routine moves 'N' to change address parameter and calls
 !        the RPG program.
@@ -181,6 +195,7 @@ end-if    !#Status = 0
 End-Procedure HR02-Process-Data
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  HR02-Trim-Parameters
 ! Desc:  This routine trims all leading and trailing blanks from the
 !        data.
@@ -207,6 +222,7 @@ Begin-Procedure HR02-Trim-Parameters
 End-Procedure HR02-Trim-Parameters
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  HR02-Get-Action-Reason
 ! Desc:  This routine will determine if a termination was voluntary or
 !        involuntary basedd on Action and Action Reason codes.
@@ -250,7 +266,8 @@ End-Procedure HR02-Get-Action-Reason
 
 
 !----------------------------------------------------------------------
--! Procedure:  HR02-Get-Reason-Description
+! ERAC
+! Procedure:  HR02-Get-Reason-Description
 ! Desc:  This routine gets the description field from the Action
 !        Reason table when Action = Termination and Action Code equals
 !        Other.

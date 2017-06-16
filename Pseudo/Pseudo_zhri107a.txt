@@ -1,5 +1,5 @@
 !*********************************************************************
-!*  Program Name: ZHRI107A
+!*  Program Name: ZHRI107A.SQC
 !*********************************************************************
 !*  Program Summary:  The purpose of this program is to update
 !*  specific fields in two legacy files, HR006P and ZLIFM#1.

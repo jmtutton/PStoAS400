@@ -1,5 +1,5 @@
 !*****************************************************************************
-!*  Program Name:  ZHRI201A.sqc
+!*  Program Name:  ZHRI201A.SQC
 !*****************************************************************************
 !*  Program Summary:   Retrieves all data that needs to be interfaced back to
 !*          the legacy system during the hire process for NonEmp/Multiple EDs.

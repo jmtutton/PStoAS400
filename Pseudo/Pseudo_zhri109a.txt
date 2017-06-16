@@ -1,5 +1,5 @@
 !*****************************************************************************
-!*  Program Name:  ZHRI109A
+!*  Program Name:  ZHRI109A.SQC
 !*****************************************************************************
 !*  Program Summary:  SQC to interface during a group transfer
 !*

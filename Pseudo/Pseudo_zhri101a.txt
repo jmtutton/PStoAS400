@@ -1,5 +1,5 @@
 ****************************************************************************
-Program Name:  ZHRI101A.sqc
+Program Name:  ZHRI101A.SQC
 Program Summary:   Retrieves all data that needs to be interfaced back to
                    the legacy system during the hire process.
 ****************************************************************************
