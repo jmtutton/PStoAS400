@@ -1403,7 +1403,7 @@ End-Procedure  Format-Employee-Name
 
 !----------------------------------------------------------------------
 ! ERAC
-! Procedure:  Check-Effdt-Transaction
+! Procedure:  Build-Active-Dir-Output-File
 !----------------------------------------------------------------------
 
 Begin-Procedure Check-Effdt-Transaction
@@ -2067,5 +2067,4 @@ End-Procedure Intialize-AD-WrkFields
 #Include 'zhri201a.sqc'  !Process POI/Alt EMP hire/rehire 
 #Include 'zhri202a.sqc'  !Process POI/Alt EMP term
 #Include 'zhri205a.sqc'  !Process POI/Alt EMP changes
-
 

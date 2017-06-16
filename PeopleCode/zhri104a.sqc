@@ -13,7 +13,7 @@
 !*
 !*  TABLE              DESCRIPTION                            ACCESS
 !*  -----              -----------                            ------
-!* PS_JOB              PeopleSoft Job table
+!* JOB                 PeopleSoft Job table
 !* PS_ZHRT_JOBCD_CREF  Job Code Cross Reference Table
 !* ZPS_ZGLT_PT12P_CREF Company cross reference file
 !* PS_ZHRT_CMPNY_CREF  Company cross reference file

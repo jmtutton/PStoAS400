@@ -1,5 +1,5 @@
 !*********************************************************************
-!*  Program Name: ZHRI202A
+!*  Program Name: ZHRI102A
 !*********************************************************************
 !*  Author:       Surya Sobha
 !*  Date:         12/29/16
@@ -7,7 +7,7 @@
 !*  Project Id:   TEMPMAST
 !*********************************************************************
 !*  Program Summary:  Update the Legacy files which where modified by
-!*  the HR program ZHRI202A.  Only specific fields will be updated.
+!*  the HR program ZHRI102A.  Only specific fields will be updated.
 !*  Those fields are those which were changed on the AAHR02 screen.
 !*********************************************************************
 !*  Tables Used:

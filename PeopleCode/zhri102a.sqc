@@ -16,18 +16,49 @@
 !*        PS_Job                       Job Table                             Input
 !*        PS_Action Reason             Action Reason Table                   Input
 !*        PS_ZHRT_TRMRS_CREF           Termntn Reason Cross Reference Table  Input
-****************************************************************************
-
-Procedures Defined in This File:
-PROCEDURE              				DESCRIPTION                            
------------        					-----------                         
-HR02-Initialize-Fields
-HR02-Process-Main
-HR02-Get-Job
-HR02-Process-Data
-HR02-Trim-Parameters
-HR02-Get-Action-Reason
-HR02-Get-Reason-Description
+!*********************************************************************
+!*  Modifications:
+!*
+!*  DATE        DEVELOPER NAME/Project ID          DESCRIPTION OF CHANGES
+!*  ----        -------------------------          ----------------------
+!* 07/16/1999   Johnny Bridges/ZHR_MOD_INTERFACE    Changed to eliminate code that was not needed by the interface
+!*
+!* 07/19/1999   Johnny Bridges/ZHR_MOD_INTERFACE    Converted to SQC
+!*
+!* 08/07/1999   Johnny Bridges/ZHR_MOD_INTERFACE    Removed all unnecessary code and all commented code
+!*
+!*                                                  Removed hard coding that translated the action reason
+!                                                   and converted to use a translate table with a select statement
+!*
+!* 08/17/1999  Johnny Bridges/ZHR_MOD_INTERFACE     Changed to only execute the Get-Action-Reason routine when not a Re-Instate
+!*
+!* 09/14/1999  Johnny Bridges/ZHR_MOD_INTERFACE     Removed the routine that gets the Oprid and put it in the main sqr because it
+!*                                                  is shared by all of the SQCs.
+!*
+!* 09/22/1999  Johnny Bridges/ZHR_MOD_INTERFACE     Changed to have error program parm set at the begining only so that it can be used by common routines.
+!*
+!* 09/24/1999  Johnny Bridges/ZHR_MOD_INTERFACE     Added code to stop processing the record if a PSOPRDEFN record cannot be added
+!
+!* 11/30/1999  Sandy Meyer/ZHR_MOD_INTERFACE        The Reason For Leaving field on HR006P sometimes contains invalid
+!*                                                  characters in the last 2 position.  Added code to pad the field
+!                                                   ($PSTermReason) to 35 positions.
+!* 11/12/2000   Sreedhar Kondepudi/ZHR_MOD_REHOST_INTERFACE   Modified to run on Unix.
+!
+!* 01/04/2001  Christopher W Bates/ZHR_MOD_CLEANUP_INTERFACE
+!*                                                  Replace PT016P with PS_ZHRT_TRMRS_CREF
+!* 03/30/2001   Christopher W Bates/ZHR_MOD_REHOST_INTERFACE  Modify program to run on UNIX.
+!
+!* 10/04/2001   Sreedhar Kondepudi/ZHR_FIX_DEFECT#2312        Modified to avoid ORA-Null value error while
+!                                                             inserting into the table ZHRT_EMPID_CREF
+!  11/29/2001   Sreedhar Kondepudi/ZHR_ACTIVEDIR_INTERFACE    Modified as part of User Account Automation(UAA)
+!                                                             Project.
+!*
+!* 04/05/2002   Sandy Meyer/Z_UPGRADE83_E98405              Made modifications for upgrade to v8.3.
+!*
+!* 08/03/2009   Andy Lee-Sue / ZHR_90MAINT_CQ12656          Modified to trim spaces if any from the ACTION and
+!*                                                          ACTION_REASON prior to reading the PS_ZHRT_TRMRS_CREF
+!*                                                          table.
+!****************************************************************************************************************!
 
 !----------------------------------------------------------------------
 ! ERAC
