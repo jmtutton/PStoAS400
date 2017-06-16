@@ -2,8 +2,12 @@ package erd.controller;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
+import erd.model.AS400Package;
 import erd.model.AdWrkFields;
 import erd.model.CrossReferenceTerminationReason;
 import erd.model.PsActionReason;
@@ -26,6 +30,8 @@ public class EmployeeTermination {
 	
 	TriggerEmployee trigger;
 	AdWrkFields adWrkFields;
+	PsJob psJob;
+	AS400Package as400Package;
 	
 	public EmployeeTermination(TriggerEmployee trigger, AdWrkFields adWrkFields) {
 		this.trigger = trigger;
@@ -105,7 +111,7 @@ public class EmployeeTermination {
 	//				HR02-Get-Job  //This routine will the Job Data row for each of the employee numbers entered in the trigger file.
 	//					HR02-Get-Action-Reason  //This routine will determine if a termination was voluntary or involuntary basedd on Action and Action Reason codes.
 	//						HR02-Get-Reason-Description  //This routine gets the description field from the Action Reason table when Action = Termination and Action Code equals Other.
-	//				ZHRI100A.Get-Oprid
+	//				ZHRI100A.Get-OprId
 	//				HR02-Process-Data  //This routine moves 'N' to change address parameter and calls the RPG program.
 	//					HR02-Trim-Parameters  //This routine trims all leading and trailing blanks from the data.
 	//					ZHRI100A.Call-System
@@ -198,7 +204,7 @@ public class EmployeeTermination {
 			psTerminationDay = new SimpleDateFormat("dd").format(psDate);
 //		END-IF
 		}
-//		DO Remove-Non-Letters-Numbers ($PSTermReason,$PSTermReason)        !ZRmvSpcChr.sqc
+//		DO Remove-Non-Letters-Numbers ($PSTermReason, $PSTermReason)        !ZRmvSpcChr.sqc
 		psTerminationReason = psTerminationReason.replaceAll("[^a-zA-Z0-9]", "");
 //		DO HR02-Trim-Parameters     !Routine to trim the parameters to insure that there are not a larger number of blanks being passed
 		HR02TrimParameters();
@@ -351,6 +357,92 @@ public class EmployeeTermination {
 			psTerminationReason = "ACTION REASON NOT SELECTED IN PS";
 //		END-IF    !$Found = 'N'
 		}
+	}
+	
+	/**
+	 */
+	private void makeAS400PackageForHRZ102AProcess() {
+		String processName = "HRZ102A";
+		
+		List<String> parameterList = new ArrayList<String>();
+		parameterList.add("employeeId");
+		parameterList.add("terminationMonth");
+		parameterList.add("terminationDay");
+		parameterList.add("terminationYear");
+		parameterList.add("rehireMonth");
+		parameterList.add("rehireDay");
+		parameterList.add("rehireYear");
+		parameterList.add("voluntaryOrInvoluntary");
+		parameterList.add("terminationCode");
+		parameterList.add("auditOperatorId");
+		parameterList.add("terminationReason");
+
+		HashMap<String, String> parameterMap = new HashMap<String, String>();
+		
+		as400Package = new AS400Package(processName, parameterList, parameterMap);
+	}
+	
+	/**
+	 */
+	private void makeAS400PackageForErrorProcess() {
+		String processName = "HRZ110A";		
+		List<String> parameterList = new ArrayList<String>();
+		HashMap<String, String> parameterMap = new HashMap<String, String>();
+		ZHRI100A.callErrorRoutine();
+		String errorProgramParm = "";
+		String wrkEmployeeId2 = "";
+		String blankSpaceParm = "";
+		String errorMessageParm = "Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF";
+		String wrkCriticalFlag = "";
+		String addDateErrorParm = "";
+		String addTimeErrorParm = "";
+		String opridErrorParm = "";
+		String yesOrNoParm = ""; //TODO: What should this value really be called
+		//!Make Sure that the ErrorMessageParm is always 75 Characters long
+		errorMessageParm = String.format("%75s", errorMessageParm);
+//		LET $Command =   '"CALL '       ||
+//		                 $Library                     ||
+//		                 '/HRZ110A '                  ||
+//		                 'PARM('''                    ||
+//		                 $ErrorProgramParm            ||
+//		                 ''' '''                      ||
+//		                 $Wrk_EmplId2                 ||
+//		                 ''' '''                      ||
+//		                 ' '                          ||
+//		                 ''' '''                      ||
+//		                 $ErrorMessageParm            ||
+//		                 ''' '''                      ||
+//		                 $WrkCriticalFlag             ||
+//		                 ''' '''                      ||
+//		                 $AddDateErrorParm            ||
+//		                 ''' '''                      ||
+//		                 $AddTimeErrorParm            ||
+//		                 ''' '''                      ||
+//		                 $OpridErrorParm              ||
+//		                 ''' '''                      ||
+//		                 'Y'                          ||
+//		                 ''')" '
+		parameterList.add("errorProgramParm");
+		parameterList.add("wrkEmployeeId2");
+		parameterList.add("blankSpaceParm");
+		parameterList.add("errorMessageParm");
+		parameterList.add("wrkCriticalFlag");
+		parameterList.add("addDateErrorParm");
+		parameterList.add("addTimeErrorParm");
+		parameterList.add("opridErrorParm");
+		parameterList.add("yesOrNoParm");
+		
+		parameterMap.put("errorProgramParm", errorProgramParm);
+		parameterMap.put("wrkEmployeeId2", wrkEmployeeId2);
+		parameterMap.put("blankSpaceParm", blankSpaceParm);
+		parameterMap.put("errorMessageParm", errorMessageParm);
+		parameterMap.put("wrkCriticalFlag", wrkCriticalFlag);
+		parameterMap.put("addDateErrorParm", addDateErrorParm);
+		parameterMap.put("addTimeErrorParm", addTimeErrorParm);
+		parameterMap.put("opridErrorParm", opridErrorParm);
+		parameterMap.put("yesOrNoParm", yesOrNoParm);
+		
+		as400Package = new AS400Package(processName, parameterList, parameterMap);
 	}
 	
 }
