@@ -17,6 +17,7 @@ import erd.model.PsAddress;
 import erd.model.PsCitizenship;
 import erd.model.PsContractData;
 import erd.model.PsCountry;
+import erd.model.PsDbOwner;
 import erd.model.PsDiversityEthnicity;
 import erd.model.PsDriversLicense;
 import erd.model.PsEmergencyContact;
@@ -326,7 +327,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsZhrrMultplEid() {
+	public void testCrossReferenceMultipleEmployeeId() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<CrossReferenceMultipleEmployeeId> query =
@@ -337,7 +338,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsZhrtCmpnyCref() {
+	public void testCrossReferenceCompany() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<CrossReferenceCompany> query =
@@ -348,7 +349,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsZhrtEmpIdCref() {
+	public void testCrossReferenceEmployeeId() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<CrossReferenceEmployeeId> query =
@@ -359,7 +360,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsZhrtEthCdCref() {
+	public void testCrossReferenceEthnicCode() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<CrossReferenceEthnicCode> query =
@@ -370,7 +371,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsZhrtJobCdCref() {
+	public void testCrossReferenceJobCode() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<CrossReferenceJobCode> query =
@@ -381,7 +382,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsZhrtPerPoiTr() {
+	public void testCrossReferencePersonOfInterest() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<CrossReferencePersonOfInterest> query =
@@ -414,14 +415,30 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsZpttVariable() {
+	public void testPsVariable() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
-		TypedQuery<PsVariable> query =
-				em.createNamedQuery("PsZpttVariable.findAll", PsVariable.class);
+		TypedQuery<PsVariable> query = em.createNamedQuery("PsVariable.findAll", PsVariable.class);
 		query.setMaxResults(MAX_RESULTS);
 		List<PsVariable> results = query.getResultList();
 		assertNotNull(results);
+	}
+	
+	@Test
+	public void testPsDbOwner() {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		TypedQuery<PsDbOwner> query = em.createNamedQuery("PsDbOwner.findAll", PsDbOwner.class);
+		query.setMaxResults(MAX_RESULTS);
+		List<PsDbOwner> results = query.getResultList();
+		assertNotNull(results);
+	}
+	
+	@Test
+	public void testPsDbOwner_FindDbName() {
+		String results = PsDbOwner.findDbName();
+		assertNotNull(results);
+		System.out.println("PsDbOwner.dbName: " + results);
 	}
 
 }

@@ -5,6 +5,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * The persistent class for the PS_ZHRR_MULTPL_EID database table.
@@ -19,6 +20,9 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	@Id
 	@Column(name="EMPLID", nullable=false, length=11)
 	private String employeeId;
+
+	@Column(name="ZHRF_LEG_EMPL_ID", nullable=false, length=5)
+	private String legacyEmployeeId;
 
 	@Column(name="BUSINESS_UNIT", nullable=false, length=5)
 	private String businessUnit;
@@ -49,9 +53,6 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 
 	@Column(name="ZHRF_GRP_NBR", nullable=false, length=2)
 	private String legacyGroupNumber;
-
-	@Column(name="ZHRF_LEG_EMPL_ID", nullable=false, length=5)
-	private String legacyEmployeeId;
 
 	public CrossReferenceMultipleEmployeeId() {
 	}
@@ -317,36 +318,47 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		return null;
 	}
 
-	public CrossReferenceMultipleEmployeeId GetLegIdForSeqNum(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  get-LegID-for-seqnum
-//		! Desc:  This routine gets the Legacy ID from Alternate EID Table
-//		!----------------------------------------------------------------------
-//		Begin-Procedure get-LegID-for-seqnum
+
+	/**
+	 * ZHRI100A.Get-LegId-For-SeqNum
+	 * This routine gets the Legacy ID from Alternate EID Table
+	 */
+	public static String getLegIdForSeqNum(String employeeId, BigDecimal sequence) {
 //		!check if the multiple EID table has the EID!
-//		begin-select
+//		BEGIN-SELECT
 //		MULT.ZHRF_LEG_EMPL_ID
-//		    Let $PSOprid = Ltrim(Rtrim(&MULT.ZHRF_LEG_EMPL_ID,' '),' ')
-//		    if $PSOprid <> ''
-//		      Let $Found = 'Y'
-//		    end-if
-//		    show 'Mult $PSOprid: ' $PSOprid
-//		from PS_ZHRR_MULTPL_EID MULT
-//		where MULT.Emplid = $Wrk_Emplid  
-//		and MULT.Sequence = #indexNum      
-//		end-select
-//		show 'MULT $Found: ' $Found
-//		End-Procedure get-LegID-for-seqnum		
-		return null;
+//			LET $PSOprid = LTRIM(RTRIM(&MULT.ZHRF_LEG_EMPL_ID,' '),' ')
+//		    IF $PSOprid <> ''
+//		    	LET $Found = 'Y'
+//		    END-IF
+//		FROM PS_ZHRR_MULTPL_EID MULT
+//		WHERE MULT.Emplid = $Wrk_Emplid  
+//		AND MULT.Sequence = #indexNum      
+//		END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = em.createQuery("SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceEmployeeId c "
+	    			+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    			+ "AND sequence = :sequence", String.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("sequence", sequence)
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return null;	
 	}
 
-	public CrossReferenceMultipleEmployeeId UpdateOprId(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  Update-Oprid
-//		! Desc:  This routine will UPDATE table PS_ZHRR_MULTPL_EID for the
-//		!        Non Employees and Multiple EIDs if the employee has a record in HR036P
-//		!----------------------------------------------------------------------
-//		Begin-Procedure Update-Oprid
+	/**
+	 * Update-OprId from ZHRI100A.SQR
+	 * This routine will UPDATE table PS_ZHRR_MULTPL_EID for the Non Employees and Multiple EIDs if the employee has a record in HR036P
+	 */
+	public void zhri100AUpdateOprId(String employeeId, BigDecimal sequence, String legacyEmployeeId) {
 //		Let $Update-Error-Flag = 'N'
 //		!Update the PS_ZHRR_MULTPL_EID table for Multiple EIDs 
 //		Begin-SQL  On-Error= Update-Error
@@ -354,9 +366,27 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 //		SET ZHRF_LEG_EMPL_ID = $LegEmplid
 //		WHERE EMPLID = $Wrk_Emplid
 //		AND SEQUENCE = #indexNum
-//		End-Sql
-//		End-Procedure Update-Oprid
-		return null;
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<CrossReferenceMultipleEmployeeId> resultList = em.createQuery(
+	    			"SELECT c FROM CrossReferenceMultipleEmployeeId c "
+	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    					+ "AND sequence = :sequence", CrossReferenceMultipleEmployeeId.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("sequence", sequence)
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		CrossReferenceMultipleEmployeeId xrefEmployeeId = resultList.get(0);
+		    	xrefEmployeeId.setLegacyEmployeeId(legacyEmployeeId);
+		    	em.getTransaction().begin();
+		    	em.persist(xrefEmployeeId);
+		    	em.getTransaction().commit();
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
 	}
 
 }

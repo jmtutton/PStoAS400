@@ -30,8 +30,8 @@ public class TriggerNonPerson extends TriggerSuperclass {
 	public String toString() {
 		return "ENTITY_NAME: TriggerNonPerson\n" +
 				"SequenceNumber: " + getSequenceNumber() + "\n" +
-				"OperatorID: " + getOperatorID() + "\n" +
-				"EmployeeID: " + getEmployeeId() + "\n" +
+				"OperatorId: " + getOperatorId() + "\n" +
+				"EmployeeId: " + getEmployeeId() + "\n" +
 				"EffectiveDate: " + getEffectiveDate() + "\n" +
 				"EffectiveSequence: " + getEffectiveSequence() + "\n" +
 				"ProcessName: " + getProcessName() + "\n" +

@@ -91,15 +91,13 @@ public class PsVariable implements Serializable {
 	 * Gets the variables from PS_ZPTT_VARIABLES       
 	 */
 	public static String findVariableValueByProcessNameAndDbNameAndVariableName(String processName, String dbName, String variableName) {
-//		Begin-Select
-//		VAR.ZPTF_VARIABLE_VAL
-//		Move &VAR.ZPTF_VARIABLE_VAL to $PSZPTT_VARIABLE_VAL
-//		from  PS_ZPTT_VARIABLES VAR
-//		where VAR.PRCSNAME = 'ZHRI100A'
-//		and   VAR.DBNAME = (Select dbname
-//				      from PSDBOWNER)
-//		and   VAR.VARIABLE_NAME = $Variable_Needed
-//		End-Select
+//		BEGIN-SELECT
+//			VAR.ZPTF_VARIABLE_VAL
+//			MOVE &VAR.ZPTF_VARIABLE_VAL to $PSZPTT_VARIABLE_VAL
+//			FROM  PS_ZPTT_VARIABLES VAR WHERE VAR.PRCSNAME = 'ZHRI100A'
+//				AND VAR.DBNAME = (SELECT dbname FROM PSDBOWNER)
+//				AND VAR.VARIABLE_NAME = $Variable_Needed
+//		END-SELECT
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		
@@ -122,5 +120,4 @@ public class PsVariable implements Serializable {
 	    } 
 	    return null;	
 	}
-	
 }

@@ -34,10 +34,7 @@ public class PsJobTest {
 	public void testEmployeeIsContractor() {
 		//TODO: need a test case where EMPL_CLASS = 'R'
 		String employeeId = "524338";
-		BigDecimal employmentRecordNumber = new BigDecimal(0);
-		Date effectiveDate = PsJob.findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber(employeeId, employmentRecordNumber);
-		BigDecimal effectiveSequence = PsJob.findMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate(employeeId, employmentRecordNumber, effectiveDate);
-		boolean result = PsJob.employeeIsContractor(employeeId, effectiveDate, effectiveSequence);
+		boolean result = PsJob.employeeIsContractor(employeeId);
 		assertNotNull(result);
 //		assertTrue(result);
 		System.out.println("\nresult = " + result);

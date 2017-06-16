@@ -1,6 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
@@ -30,7 +31,7 @@ abstract class TriggerSuperclass implements Serializable {
 	protected Integer sequenceNumber;
 	   
 	@Column(name = "OPRID")
-	protected String operatorID;
+	protected String operatorId;
 
 	@Column(name = "EMPLID")
 	protected String employeeId;
@@ -39,7 +40,7 @@ abstract class TriggerSuperclass implements Serializable {
 	protected Date effectiveDate;
 	   
 	@Column(name = "EFFSEQ")
-	protected Integer effectiveSequence;
+	protected BigDecimal effectiveSequence;
 	   
 	@Column(name = "PROC_NAME")
 	protected String processName;  //TODO: make enum
@@ -47,9 +48,6 @@ abstract class TriggerSuperclass implements Serializable {
 	@Column(name = "TASK_FLAG")
 	protected String completionStatus;  //TODO: make enum with values 'P', 'C', 'E'
 
-	public void setSequenceNumber(Integer seqNum) {
-		this.sequenceNumber = seqNum;
-	}
 	public void setCompletionStatus(String status) {
 		this.completionStatus = status.trim();
 	}
@@ -59,8 +57,8 @@ abstract class TriggerSuperclass implements Serializable {
 	public String getCompletionStatus() {
 		return completionStatus.trim();
 	}
-	public String getOperatorID() {
-		return operatorID.trim();
+	public String getOperatorId() {
+		return operatorId.trim();
 	}
 	public String getEmployeeId() {
 		return employeeId.trim();
@@ -68,31 +66,49 @@ abstract class TriggerSuperclass implements Serializable {
 	public Date getEffectiveDate() {
 		return effectiveDate;
 	}
-	public Integer getEffectiveSequence() {
+	public BigDecimal getEffectiveSequence() {
 		return effectiveSequence;
 	}
 	public String getProcessName() {
 		return processName.trim();
 	}
 	
+	public void setSequenceNumber(Integer sequenceNumber) {
+		this.sequenceNumber = sequenceNumber;
+	}
+	public void setOperatorId(String operatorId) {
+		this.operatorId = operatorId;
+	}
+	public void setEmployeeId(String employeeId) {
+		this.employeeId = employeeId;
+	}
+	public void setEffectiveDate(Date effectiveDate) {
+		this.effectiveDate = effectiveDate;
+	}
+	public void setEffectiveSequence(BigDecimal effectiveSequence) {
+		this.effectiveSequence = effectiveSequence;
+	}
+	public void setProcessName(String processName) {
+		this.processName = processName;
+	}
+	
 	//long count()
-	//boolean exists(ID id)
+	//Boolean exists(ID id)
 	//Iterable<T> findAll()
 	//T findOne(ID id)
 	//<S extends T> S save(S entity)
-	
 	public static <T extends TriggerSuperclass> T findOne(Integer seqNum) {
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-		EntityManager em = emfactory.createEntityManager();
-	    try {
-	    	return (T) em.createQuery(
-	    		    "SELECT trigger FROM " + ENTITY_NAME + " trigger WHERE trigger.sequenceNumber = :seqNum")
-	    		    .setParameter("seqNum", seqNum)
-	    		    .getSingleResult();
-	    } 
-	    catch (Exception e) {
-	       e.printStackTrace();
-	    } 
+//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+//		EntityManager em = emfactory.createEntityManager();
+//	    try {
+//	    	return (T) em.createQuery(
+//	    		    "SELECT trigger FROM " + ENTITY_NAME + " trigger WHERE trigger.sequenceNumber = :seqNum")
+//	    		    .setParameter("seqNum", seqNum)
+//	    		    .getSingleResult();
+//	    } 
+//	    catch (Exception e) {
+//	       e.printStackTrace();
+//	    } 
 	    return null;	
 	}
 	
@@ -183,8 +199,8 @@ abstract class TriggerSuperclass implements Serializable {
 	public String toString() {
 		return "ENTITY_NAME: " + ENTITY_NAME + "\n" +
 				"SequenceNumber: " + getSequenceNumber() + "\n" +
-				"OperatorID: " + getOperatorID() + "\n" +
-				"EmployeeID: " + getEmployeeId() + "\n" +
+				"OperatorId: " + getOperatorId() + "\n" +
+				"EmployeeId: " + getEmployeeId() + "\n" +
 				"EffectiveDate: " + getEffectiveDate() + "\n" +
 				"EffectiveSequence: " + getEffectiveSequence() + "\n" +
 				"ProcessName: " + getProcessName() + "\n" +

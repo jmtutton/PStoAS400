@@ -17,10 +17,10 @@ public class CrossReferenceTerminationReason implements Serializable {
 
 	@Id
 	@Column(name="ACTION_REASON", nullable=false, length=3)
-	private String actionReasonCode;
+	private String actionReason;
 
 	@Column(name="\"ACTION\"", nullable=false, length=3)
-	private String actionCode;
+	private String action;
 
 	@Column(name="STATUS", nullable=false, length=1)
 	private String status;
@@ -34,20 +34,12 @@ public class CrossReferenceTerminationReason implements Serializable {
 	public CrossReferenceTerminationReason() {
 	}
 
-	public String getActionCode() {
-		return this.actionCode;
+	public String getAction() {
+		return this.action;
 	}
 
-	public void setActionCode(String actionCode) {
-		this.actionCode = actionCode;
-	}
-
-	public String getActionReasonCode() {
-		return this.actionReasonCode;
-	}
-
-	public void setActionReasonCode(String actionReasonCode) {
-		this.actionReasonCode = actionReasonCode;
+	public String getActionReason() {
+		return this.actionReason;
 	}
 
 	public String getStatus() {
@@ -113,21 +105,19 @@ public class CrossReferenceTerminationReason implements Serializable {
 	 * This routine will determine if a termination was voluntary or involuntary based on Action and Action Reason codes.
 	 * @see ZHRI102A.SQC
 	 */
-	public static List<CrossReferenceTerminationReason> findActionReason(String actionCode, String actionReasonCode) {
+	public static CrossReferenceTerminationReason findByActionAndActionReasonAndStatus(String action, String actionReason, String status) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<CrossReferenceTerminationReason> resultList = (List<CrossReferenceTerminationReason>) em.createQuery("SELECT p FROM CrossReferenceTerminationReason p "
-	    				+ "WHERE p.status = :status AND  p.actionCode = :actionCode AND  p.actionReasonCode = :actionReasonCode ", CrossReferenceTerminationReason.class)
-	    		    .setParameter("status", "A")
-	    		    .setParameter("actionCode", actionCode)
-	    		    .setParameter("actionReasonCode", actionReasonCode)
+	    				+ "WHERE UPPER(TRIM(p.status)) = :status AND  UPPER(TRIM(p.action)) = :action AND  UPPER(TRIM(p.actionReason)) = :actionReason ", CrossReferenceTerminationReason.class)
+	    		    .setParameter("action", action.toUpperCase().trim())
+	    		    .setParameter("actionReason", actionReason.toUpperCase().trim())
+	    		    .setParameter("status", status.toUpperCase().trim())
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
-	    		return resultList;
+	    		return resultList.get(0);
 	    	}
-	    	else 
-	    		return null;
 	    }
 	    catch (Exception e) {
 	       e.printStackTrace();

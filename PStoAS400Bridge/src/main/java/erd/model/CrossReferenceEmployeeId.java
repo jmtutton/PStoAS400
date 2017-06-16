@@ -1,6 +1,8 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.*;
 
 /**
@@ -23,6 +25,12 @@ public class CrossReferenceEmployeeId implements Serializable {
 	public CrossReferenceEmployeeId() {
 	}
 
+	public CrossReferenceEmployeeId(String employeeId, String legacyEmployeeId) {
+		super();
+		this.employeeId = employeeId;
+		this.legacyEmployeeId = legacyEmployeeId;
+	}
+
 	public String getEmployeeId() {
 		return this.employeeId;
 	}
@@ -39,12 +47,11 @@ public class CrossReferenceEmployeeId implements Serializable {
 		this.legacyEmployeeId = legacyEmployeeId;
 	}
 
-	public CrossReferenceEmployeeId findByEmployeeId(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR05-Get-Next-Opid
-//		! Desc:  This routine gets the operator id for the Recruiter.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR05-Get-Next-Opid
+	/**
+	 * HR05-Get-Next-OpId from ZHRI105A.SQC
+	 * This routine gets the operator id for the Recruiter.
+	 */
+	public CrossReferenceEmployeeId zhri105AGetNextOpId(String employeeId) {
 //		Let $Found = 'N'
 //		begin-select
 //		COD.ZHRF_LEG_EMPL_ID
@@ -64,69 +71,108 @@ public class CrossReferenceEmployeeId implements Serializable {
 //		     Let $Wrk_Emplid = $Hld_Wrk_Emplid
 //		     Let $LegEmplid = $Hld_LegEmplid
 //		 end-if         !Found = 'N'
-//		End-Procedure HR05-Get-Next-Opid
 		return null;
 	}
 
-	public CrossReferenceEmployeeId GetLegIdForSeq0(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  get-LegID-for-seq0
-//		! Desc:  This routine gets the Legacy ID from Employee CREF Table for 
-//		! Primary EIDs
-//		!----------------------------------------------------------------------
-//		Begin-Procedure get-LegID-for-seq0
-//		begin-select
+	/**
+	 * Get-LegId-For-Seq0 - from ZHRI100A.SQR
+	 * This routine gets the Legacy ID from Employee CREF Table for Primary EIDs
+	 */
+	public static String zhri100AGetLegIdForSeq0(String employeeId) {
+//		BEGIN-SELECT
 //		RPOD.ZHRF_LEG_EMPL_ID
-//		    Let $PSOprid = &RPOD.ZHRF_LEG_EMPL_ID
-//		    Let $Found = 'Y'
-//		    show 'CREF $PSOprid: ' $PSOprid
-//		from PS_ZHRT_EMPID_CREF RPOD
-//		where RPOD.Emplid = $Wrk_Emplid         
-//		end-select
-//		    show 'CREF $Found: ' $Found
-//		End-Procedure get-LegID-for-seq0		
-		return null;
+//		    LET $PSOprid = &RPOD.ZHRF_LEG_EMPL_ID
+//		    LET $Found = 'Y'
+//		FROM PS_ZHRT_EMPID_CREF RPOD
+//		WHERE RPOD.Emplid = $Wrk_Emplid         
+//		END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = em.createQuery(
+	    			"SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceEmployeeId c "
+	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId ", String.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return null;	
 	}
 
-	public CrossReferenceEmployeeId InsertOprId(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  Insert-Oprid
-//		! Desc:  This routine will insert a row into the PS_ZHRT_EMPID_CREF table for the
-//		!        employee if the employee has a record in HR006P
-//		!----------------------------------------------------------------------
-//		Begin-Procedure Insert-Oprid
-//		Let $Insert-Error-Flag = 'N'
+	/**
+	 * Insert-OprId from ZHRI100A.SQR
+	 * This routine will insert a row into the PS_ZHRT_EMPID_CREF table for the employee if the employee has a record in HR006P
+	 */
+	public void insert(String employeeId, String legacyEmployeeId) {
+//		LET $Insert-Error-Flag = 'N'
 //		!Add to the PS_ZHRT_EMPID_CREF table
-//		Begin-SQL  On-Error= Insert-Error
-//		INSERT INTO PS_ZHRT_EMPID_CREF (
-//		EMPLID,
-//		ZHRF_LEG_EMPL_ID)
-//		VALUES (
-//		$Wrk_Emplid,
-//		$LegEmplid
-//		)
+//		Begin-SQL On-Error = Insert-Error
+//			INSERT INTO PS_ZHRT_EMPID_CREF (EMPLID, ZHRF_LEG_EMPL_ID) VALUES ($Wrk_Emplid, $LegEmplId)
 //		End-Sql
-//		End-Procedure Insert-Oprid
-		return null;
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	CrossReferenceEmployeeId xrefEmployeeId = new CrossReferenceEmployeeId(employeeId, legacyEmployeeId);
+	    	em.getTransaction().begin();
+	    	em.persist(xrefEmployeeId);
+	    	em.getTransaction().commit();	   
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
 	}
 
-	public CrossReferenceEmployeeId ADGetLegSuperviorID(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  AD-Get-LegSuperviorID
-//		!----------------------------------------------------------------------
-//		Begin-Procedure AD-Get-LegSuperviorID
+	/**
+	 * AD-Get-LegSupervisorId from ZHRI100A.SQR
+	 * Gets ZHRF_LEG_EMPL_ID from PS_ZHRT_EMPID_CREF
+	 */
+	public static String zhri100AADGetLegSupervisorID(String employeeId) {
 //		begin-select
-//		RPOD1.ZHRF_LEG_EMPL_ID
-//		  Let $ADLegSupervisorID = &RPOD1.ZHRF_LEG_EMPL_ID
-//		from PS_ZHRT_EMPID_CREF RPOD1
-//		where RPOD1.Emplid = $ADSupervisorID
+//		PS_ZHRT_EMPID_CREF.ZHRF_LEG_EMPL_ID
+//		LET $ADLegSupervisorID = &PS_ZHRT_EMPID_CREF.ZHRF_LEG_EMPL_ID
+//		FROM PS_ZHRT_EMPID_CREF PS_ZHRT_EMPID_CREF
+//		WHERE PS_ZHRT_EMPID_CREF.Emplid = $ADSupervisorID
 //		end-select
-//		end-procedure AD-Get-LegSuperviorID		
-		return null;
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = em.createQuery(
+	    			"SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceEmployeeId c "
+	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId ", String.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return null;	
 	}
 	
 	public String findLegacyEmployeeIdByEmployeeId(String employeeId) {
-		return null;
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = em.createQuery(
+	    			"SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceEmployeeId c "
+	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId ", String.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return null;	
 	}
 
 }
