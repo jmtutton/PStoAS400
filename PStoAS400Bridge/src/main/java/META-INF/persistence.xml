@@ -44,9 +44,14 @@
         <class>erd.model.TriggerEmployee</class>
         <class>erd.model.TriggerNonPerson</class>
 		<properties>
-			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/>
-			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@ppddbl44.corp.erac.com:1521:PS90HRQA"/>
-			<property name="javax.persistence.jdbc.user" value="e859v1"/>
+<!-- 			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/> -->
+<!-- 			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@ppddbl44.corp.erac.com:1521:PS90HRQA"/> -->
+<!-- 			<property name="javax.persistence.jdbc.user" value="e859v1"/> -->
+<!-- 			<property name="javax.persistence.jdbc.password" value="Chang#m3"/> -->
+			
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://johnny.heliohost.org:3306/tutton_PS90HRQA"/>
+			<property name="javax.persistence.jdbc.user" value="tutton_e859v1"/>
 			<property name="javax.persistence.jdbc.password" value="Chang#m3"/>
 		</properties>
 	</persistence-unit>
