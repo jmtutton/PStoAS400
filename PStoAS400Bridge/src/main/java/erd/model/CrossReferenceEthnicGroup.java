@@ -7,12 +7,13 @@ import javax.persistence.*;
 
 /**
  * The persistent class for the PS_ZHRT_ETHCD_CREF database table.
+ * Cross-Reference of Ethnic Group to Legacy Ethic Code
  * @author	John Tutton john@tutton.net
  */
 @Entity
 @Table(name="PS_ZHRT_ETHCD_CREF")
-@NamedQuery(name="CrossReferenceEthnicCode.findAll", query="SELECT p FROM CrossReferenceEthnicCode p")
-public class CrossReferenceEthnicCode implements Serializable {
+@NamedQuery(name="CrossReferenceEthnicGroup.findAll", query="SELECT p FROM CrossReferenceEthnicGroup p")
+public class CrossReferenceEthnicGroup implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -25,7 +26,7 @@ public class CrossReferenceEthnicCode implements Serializable {
 	@Column(name="STATUS", nullable=false, length=1)
 	private String status;
 
-	public CrossReferenceEthnicCode() {
+	public CrossReferenceEthnicGroup() {
 	}
 
 	public String getEthnicGroup() {
@@ -52,7 +53,7 @@ public class CrossReferenceEthnicCode implements Serializable {
 		this.legacyEthnicCode = legacyEthnicCode;
 	}
 
-	public CrossReferenceEthnicCode HR01GetLegacyEthnicCode(String employeeId) {
+	public CrossReferenceEthnicGroup HR01GetLegacyEthnicCode(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR01-Get-Legacy-Ethnic-Code
 //		! Desc:  Gets the legacy ethnic code that corresponds to the PeopleSoft
@@ -83,12 +84,12 @@ public class CrossReferenceEthnicCode implements Serializable {
 	 * @see ZHRI101A.SQC
 	 * @see ZHRI105A.SQC
 	 */
-	public static List<CrossReferenceEthnicCode> findGetLegacyEthnicCode(String ethnicGroup) {
+	public static List<CrossReferenceEthnicGroup> findGetLegacyEthnicCode(String ethnicGroup) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<CrossReferenceEthnicCode> resultList = (List<CrossReferenceEthnicCode>) em.createQuery("SELECT p FROM CrossReferenceEthnicCode p "
-	    				+ "WHERE p.ethnicGroup = :ethnicGroup AND p.status = :status", CrossReferenceEthnicCode.class)
+	    	List<CrossReferenceEthnicGroup> resultList = (List<CrossReferenceEthnicGroup>) em.createQuery("SELECT p FROM CrossReferenceEthnicCode p "
+	    				+ "WHERE p.ethnicGroup = :ethnicGroup AND p.status = :status", CrossReferenceEthnicGroup.class)
 	    		    .setParameter("ethnicGroup", ethnicGroup)
 	    		    .setParameter("status", "A")
 	    		    .getResultList();
@@ -104,7 +105,7 @@ public class CrossReferenceEthnicCode implements Serializable {
 	    return null;	
 	}
 
-	public CrossReferenceEthnicCode HR05GetEthnicGroup(String employeeId) {
+	public CrossReferenceEthnicGroup HR05GetEthnicGroup(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR05-Get-Ethnic-Group
 //		! Desc:  This procedure gets the ethnic code from the cross reference

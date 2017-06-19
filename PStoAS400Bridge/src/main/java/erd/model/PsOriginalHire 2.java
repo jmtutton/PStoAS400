@@ -11,8 +11,8 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="PS_ORIG_HIR_EMP_VW")
-@NamedQuery(name="PsOrigHirEmpVw.findAll", query="SELECT p FROM PsOrigHirEmpVw p")
-public class PsOrigHirEmpVw implements Serializable {
+@NamedQuery(name="PsOriginalHire.findAll", query="SELECT p FROM PsOriginalHire p")
+public class PsOriginalHire implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -22,7 +22,7 @@ public class PsOrigHirEmpVw implements Serializable {
 	@Column(name="ORIG_HIRE_DT")
 	private Date originalHireDate;
 
-	public PsOrigHirEmpVw() {
+	public PsOriginalHire() {
 	}
 
 	public String getEmployeeId() {
@@ -41,7 +41,7 @@ public class PsOrigHirEmpVw implements Serializable {
 		this.originalHireDate = originalHireDate;
 	}
 
-	public PsOrigHirEmpVw findByEmployeeId(String employeeId) {
+	public PsOriginalHire findByEmployeeId(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR05-Get-Personal-Data
 //		! Desc:  This routine will get the Personal Data row for each of the

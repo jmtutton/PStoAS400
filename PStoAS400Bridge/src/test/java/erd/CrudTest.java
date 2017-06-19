@@ -25,14 +25,14 @@ import erd.model.PsEmployeeChecklist;
 import erd.model.PsEmployeeReview;
 import erd.model.PsEmployment;
 import erd.model.PsEthnicGroup;
-import erd.model.PsHrsSource;
+import erd.model.PsRecruitmentSource;
 import erd.model.PsJob;
 import erd.model.PsJobCode;
 import erd.model.PsLocation;
 import erd.model.PsName;
-import erd.model.PsOrigHirEmpVw;
-import erd.model.PsApplicantReferralSource;
-import erd.model.PsPersonalDataEffectiveDated;
+import erd.model.PsOriginalHire;
+import erd.model.PsReferralSource;
+import erd.model.PsEffectiveDatedPersonalData;
 import erd.model.PsPersonalNationalId;
 import erd.model.PsPerson;
 import erd.model.PsPersonalData;
@@ -40,13 +40,17 @@ import erd.model.PsPersonalPhone;
 import erd.model.CrossReferenceMultipleEmployeeId;
 import erd.model.CrossReferenceCompany;
 import erd.model.CrossReferenceEmployeeId;
-import erd.model.CrossReferenceEthnicCode;
+import erd.model.CrossReferenceEthnicGroup;
 import erd.model.CrossReferenceJobCode;
 import erd.model.CrossReferencePersonOfInterest;
 import erd.model.CrossReferenceReferralSource;
 import erd.model.CrossReferenceTerminationReason;
 import erd.model.PsVariable;
 
+/**
+ * Unit tests for findAll names query in all entity classes.
+ * @author John Tutton john@tutton.net
+ */
 public class CrudTest {
 	
 	int MAX_RESULTS = 10;
@@ -63,7 +67,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsActnReasonTbl() {
+	public void testPsActionReason() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<PsActionReason> query =
@@ -107,7 +111,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsCountryTbl() {
+	public void testPsCountry() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<PsCountry> query =
@@ -118,7 +122,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsDiversEthnic() {
+	public void testPsDiversityEthnicity() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<PsDiversityEthnicity> query =
@@ -129,7 +133,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsDriversLic() {
+	public void testPsDriversLicense() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<PsDriversLicense> query =
@@ -140,7 +144,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsEmergencyCntct() {
+	public void testPsEmergencyContact() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<PsEmergencyContact> query =
@@ -151,7 +155,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsEmplChecklist() {
+	public void testPsEmployeeChecklist() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<PsEmployeeChecklist> query =
@@ -184,7 +188,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsEthnicGrpTbl() {
+	public void testPsEthnicGroup() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<PsEthnicGroup> query =
@@ -195,13 +199,13 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsHrsSourceI() {
+	public void testPsRecruitmentSource() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
-		TypedQuery<PsHrsSource> query =
-				em.createNamedQuery("PsHrsSource.findAll", PsHrsSource.class);
+		TypedQuery<PsRecruitmentSource> query =
+				em.createNamedQuery("PsRecruitmentSource.findAll", PsRecruitmentSource.class);
 		query.setMaxResults(MAX_RESULTS);
-		List<PsHrsSource> results = query.getResultList();
+		List<PsRecruitmentSource> results = query.getResultList();
 		assertNotNull(results);
 	}
 	
@@ -217,7 +221,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsJobCodeTbl() {
+	public void testPsJobCode() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<PsJobCode> query =
@@ -228,7 +232,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsLocationTbl() {
+	public void testPsLocation() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<PsLocation> query =
@@ -250,40 +254,40 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsOrigHirEmpVw() {
+	public void testPsOriginalHire() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
-		TypedQuery<PsOrigHirEmpVw> query =
-				em.createNamedQuery("PsOrigHirEmpVw.findAll", PsOrigHirEmpVw.class);
+		TypedQuery<PsOriginalHire> query =
+				em.createNamedQuery("PsOriginalHire.findAll", PsOriginalHire.class);
 		query.setMaxResults(MAX_RESULTS);
-		List<PsOrigHirEmpVw> results = query.getResultList();
+		List<PsOriginalHire> results = query.getResultList();
 		assertNotNull(results);
 	}
 	
 	@Test
-	public void testPsPersApplRef() {
+	public void testPsPsReferralSource() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
-		TypedQuery<PsApplicantReferralSource> query =
-				em.createNamedQuery("PsApplicantReferralSource.findAll", PsApplicantReferralSource.class);
+		TypedQuery<PsReferralSource> query =
+				em.createNamedQuery("PsReferralSource.findAll", PsReferralSource.class);
 		query.setMaxResults(MAX_RESULTS);
-		List<PsApplicantReferralSource> results = query.getResultList();
+		List<PsReferralSource> results = query.getResultList();
 		assertNotNull(results);
 	}
 	
 	@Test
-	public void testPsPersDataEffdt() {
+	public void testPsEffectiveDatedPersonalData() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
-		TypedQuery<PsPersonalDataEffectiveDated> query =
-				em.createNamedQuery("PsPersonalDataEffectiveDated.findAll", PsPersonalDataEffectiveDated.class);
+		TypedQuery<PsEffectiveDatedPersonalData> query =
+				em.createNamedQuery("PsEffectiveDatedPersonalData.findAll", PsEffectiveDatedPersonalData.class);
 		query.setMaxResults(MAX_RESULTS);
-		List<PsPersonalDataEffectiveDated> results = query.getResultList();
+		List<PsEffectiveDatedPersonalData> results = query.getResultList();
 		assertNotNull(results);
 	}
 	
 	@Test
-	public void testPsPersNid() {
+	public void testPsPersonalNationalId() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<PsPersonalNationalId> query =
@@ -360,13 +364,13 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testCrossReferenceEthnicCode() {
+	public void testCrossReferenceEthnicGroup() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
-		TypedQuery<CrossReferenceEthnicCode> query =
-				em.createNamedQuery("CrossReferenceEthnicCode.findAll", CrossReferenceEthnicCode.class);
+		TypedQuery<CrossReferenceEthnicGroup> query =
+				em.createNamedQuery("CrossReferenceEthnicGroup.findAll", CrossReferenceEthnicGroup.class);
 		query.setMaxResults(MAX_RESULTS);
-		List<CrossReferenceEthnicCode> results = query.getResultList();
+		List<CrossReferenceEthnicGroup> results = query.getResultList();
 		assertNotNull(results);
 	}
 	
@@ -393,7 +397,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsZhrtRfSrcCref() {
+	public void testCrossReferenceReferralSource() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<CrossReferenceReferralSource> query =
@@ -404,7 +408,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsZhrtTrmrsCref() {
+	public void testCrossReferenceTerminationReason() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<CrossReferenceTerminationReason> query =

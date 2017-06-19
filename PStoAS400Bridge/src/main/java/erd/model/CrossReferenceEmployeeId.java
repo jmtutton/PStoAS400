@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 /**
  * The persistent class for the PS_ZHRT_EMPID_CREF database table.
+ * Cross-Reference of Employee ID to Legacy Employee ID
  * @author	John Tutton john@tutton.net
  */
 @Entity

@@ -15,7 +15,7 @@ import erd.model.PsJob;
 import erd.model.TriggerEmployee;
 
 /**
- * ZHRI102A – Termination
+ * ZHRI102A ï¿½ Termination
  * PeopleCode filename ZHRI102A.SQC
  * Update the Legacy files which where modified by the HR program ZHRI102A.  
  * Only specific fields will be updated, those which were changed on the AAHR02 screen.
@@ -39,7 +39,7 @@ public class EmployeeTermination {
 	}
 	
 	/**
-	 * ZHRI102A – Termination - Call to AS400
+	 * ZHRI102A ï¿½ Termination - Call to AS400
 	 * "Call " + AS400LibraryPath +  /HRZ102A + Parameters
 	 * PARAMETERS:
              Employee ID
@@ -111,8 +111,8 @@ public class EmployeeTermination {
 	//				HR02-Get-Job  //This routine will the Job Data row for each of the employee numbers entered in the trigger file.
 	//					HR02-Get-Action-Reason  //This routine will determine if a termination was voluntary or involuntary basedd on Action and Action Reason codes.
 	//						HR02-Get-Reason-Description  //This routine gets the description field from the Action Reason table when Action = Termination and Action Code equals Other.
-	//				ZHRI100A.Get-OprId
-	//				HR02-Process-Data  //This routine moves 'N' to change address parameter and calls the RPG program.
+	//					ZHRI100A.Get-OprId
+	//					HR02-Process-Data  //This routine moves 'N' to change address parameter and calls the RPG program.
 	//					HR02-Trim-Parameters  //This routine trims all leading and trailing blanks from the data.
 	//					ZHRI100A.Call-System
 	//		ZHRI100A.Update-Trigger-Row
@@ -208,29 +208,6 @@ public class EmployeeTermination {
 		psTerminationReason = psTerminationReason.replaceAll("[^a-zA-Z0-9]", "");
 //		DO HR02-Trim-Parameters     !Routine to trim the parameters to insure that there are not a larger number of blanks being passed
 		HR02TrimParameters();
-//		LET $Part2 = 'Parm('''         ||
-//        $PSEmpl             ||
-//        ''' '''         ||
-//        $PSTermMnth         ||
-//        ''' '''         ||
-//        $PsTermDay          ||
-//        ''' '''         ||
-//        $PSTermYr           ||
-//        ''' '''         ||
-//        $PSReHireMnth       ||
-//        ''' '''         ||
-//        $PSReHireDay        ||
-//        ''' '''         ||
-//        $PSReHireYr         ||
-//        ''' '''         ||
-//        $PSVolInvol         ||
-//        ''' '''         ||
-//        $PSTermCode         ||
-//        ''' '''         ||
-//        $PSAuditOperId      ||
-//        ''' '''         ||
-//        $PSTermReason       ||
-//        ''')" '
 		String part2 = "Parm('" + ZHRI100A.psEmpl + "' '"
 				+ psTerminationMonth + "' '"
         		+ psTerminationDay + "' '"

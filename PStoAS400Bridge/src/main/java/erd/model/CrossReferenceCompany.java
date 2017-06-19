@@ -5,6 +5,7 @@ import javax.persistence.*;
 
 /**
  * The persistent class for the PS_ZHRT_CMPNY_CREF database table.
+ * Cross-Reference of Company and Business Unit to Legacy Group and Legacy Region
  * @author	John Tutton john@tutton.net
  */
 @Entity

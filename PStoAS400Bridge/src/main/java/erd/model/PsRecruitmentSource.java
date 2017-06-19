@@ -4,61 +4,49 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;
-
+import java.util.List;
 
 /**
- * The persistent class for the PS_PERS_APPL_REF database table.
- * 
+ * The persistent class for the PS_HRS_SOURCE_I database table.
+ * @author	John Tutton john@tutton.net
  */
 @Entity
-@Table(name="PS_PERS_APPL_REF")
-@NamedQuery(name="PsApplicantReferralSource.findAll", query="SELECT p FROM PsApplicantReferralSource p")
-public class PsApplicantReferralSource implements Serializable {
+@Table(name="PS_HRS_SOURCE_I")
+@NamedQuery(name="PsRecruitmentSource.findAll", query="SELECT p FROM PsRecruitmentSource p")
+public class PsRecruitmentSource implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="EMPLID", nullable=false, length=11)
-	private String employeeId;
+	@Column(name="HRS_SOURCE_ID", nullable=false, precision=15)
+	private BigDecimal recruitmentSourceId;
 
-	@Column(name="APP_IS_FAMILY", nullable=false, length=1)
-	private String appIsFamily;
+	@Column(name="EFF_STATUS", length=1)
+	private String statusAsOfEffectiveDate;
 
 	@Column(name="EFFDT", nullable=false)
 	private Date effectiveDate;
 
-	@Column(name="EMPL_REFERRAL_ID", nullable=false, length=11)
-	private String emplReferralId;
+	@Column(name="HRS_SOURCE_DESCR", nullable=false, length=254)
+	private String recruitmentSourceDescription;
 
-	@Column(name="HRS_PERSON_ID", nullable=false, precision=15)
-	private BigDecimal hrsPersonId;
+	@Column(name="HRS_SOURCE_NAME", nullable=false, length=30)
+	private String recruitmentSourceNameCode;
 
-	@Column(name="HRS_PROFILE_SEQ", nullable=false, precision=38)
-	private BigDecimal hrsProfileSeq;
+	@Column(name="HRS_SOURCE_STATUS")
+	private Date recruitmentSourceStatusDate;
 
-	@Column(name="HRS_SOURCE_ID", nullable=false, precision=15)
-	private BigDecimal hrsSourceId;
+	@Column(name="HRS_SOURCE_TYPE", nullable=false, length=3)
+	private String recruitmentSourceTypeCode;
 
-	@Column(name="HRS_SUBSOURCE_ID", nullable=false, precision=15)
-	private BigDecimal hrsSubsourceId;
-
-	@Column(name="PREV_EMPL_BY_COMPY", nullable=false, length=1)
-	private String prevEmplByCompy;
-
-	@Column(name="RESUME_TEXT_FILE", nullable=false, length=64)
-	private String resumeTextFile;
-
-	@Column(name="SPECIFIC_REFER_SRC", nullable=false, length=50)
-	private String specificReferSrc;
-
-	public PsApplicantReferralSource() {
+	public PsRecruitmentSource() {
 	}
 
-	public String getAppIsFamily() {
-		return this.appIsFamily;
+	public String getStatusAsOfEffectiveDate() {
+		return this.statusAsOfEffectiveDate;
 	}
 
-	public void setAppIsFamily(String appIsFamily) {
-		this.appIsFamily = appIsFamily;
+	public void setStatusAsOfEffectiveDate(String statusAsOfEffectiveDate) {
+		this.statusAsOfEffectiveDate = statusAsOfEffectiveDate;
 	}
 
 	public Date getEffectiveDate() {
@@ -69,80 +57,47 @@ public class PsApplicantReferralSource implements Serializable {
 		this.effectiveDate = effectiveDate;
 	}
 
-	public String getEmplReferralId() {
-		return this.emplReferralId;
+	public String getHrsSourceDescription() {
+		return this.recruitmentSourceDescription;
 	}
 
-	public void setEmplReferralId(String emplReferralId) {
-		this.emplReferralId = emplReferralId;
+	public void setRecruitmentSourceDescription(String recruitmentSourceDescription) {
+		this.recruitmentSourceDescription = recruitmentSourceDescription;
 	}
 
-	public String getEmployeeId() {
-		return this.employeeId;
+	public BigDecimal getRecruitmentSourceId() {
+		return this.recruitmentSourceId;
 	}
 
-	public void setEmployeeId(String employeeId) {
-		this.employeeId = employeeId;
+	public void setRecruitmentSourceId(BigDecimal recruitmentSourceId) {
+		this.recruitmentSourceId = recruitmentSourceId;
 	}
 
-	public BigDecimal getHrsPersonId() {
-		return this.hrsPersonId;
+	public String getRecruitmentSourceNameCode() {
+		return this.recruitmentSourceNameCode;
 	}
 
-	public void setHrsPersonId(BigDecimal hrsPersonId) {
-		this.hrsPersonId = hrsPersonId;
+	public void setRecruitmentSourceNameCode(String recruitmentSourceNameCode) {
+		this.recruitmentSourceNameCode = recruitmentSourceNameCode;
 	}
 
-	public BigDecimal getHrsProfileSeq() {
-		return this.hrsProfileSeq;
+	public Date getRecruitmentSourceStatusDate() {
+		return this.recruitmentSourceStatusDate;
 	}
 
-	public void setHrsProfileSeq(BigDecimal hrsProfileSeq) {
-		this.hrsProfileSeq = hrsProfileSeq;
+	public void setRecruitmentSourceStatusDate(Date recruitmentSourceStatusDate) {
+		this.recruitmentSourceStatusDate = recruitmentSourceStatusDate;
 	}
 
-	public BigDecimal getHrsSourceId() {
-		return this.hrsSourceId;
+	public String getRecruitmentSourceTypeCode() {
+		return this.recruitmentSourceTypeCode;
 	}
 
-	public void setHrsSourceId(BigDecimal hrsSourceId) {
-		this.hrsSourceId = hrsSourceId;
+	public void setRecruitmentSourceTypeCode(String recruitmentSourceTypeCode) {
+		this.recruitmentSourceTypeCode = recruitmentSourceTypeCode;
 	}
 
-	public BigDecimal getHrsSubsourceId() {
-		return this.hrsSubsourceId;
-	}
-
-	public void setHrsSubsourceId(BigDecimal hrsSubsourceId) {
-		this.hrsSubsourceId = hrsSubsourceId;
-	}
-
-	public String getPrevEmplByCompy() {
-		return this.prevEmplByCompy;
-	}
-
-	public void setPrevEmplByCompy(String prevEmplByCompy) {
-		this.prevEmplByCompy = prevEmplByCompy;
-	}
-
-	public String getResumeTextFile() {
-		return this.resumeTextFile;
-	}
-
-	public void setResumeTextFile(String resumeTextFile) {
-		this.resumeTextFile = resumeTextFile;
-	}
-
-	public String getSpecificReferSrc() {
-		return this.specificReferSrc;
-	}
-
-	public void setSpecificReferSrc(String specificReferSrc) {
-		this.specificReferSrc = specificReferSrc;
-	}
-
-
-	public PsDiversityEthnicity GetPersonalData(String employeeId) {
+	public PsRecruitmentSource HR01GetPersonalData(String employeeId) {
 //	!----------------------------------------------------------------------
 //	! Procedure:  HR01-Get-Personal-Data
 //	! Desc:  Gets the employees data from the personal data effdt table that
@@ -268,10 +223,10 @@ public class PsApplicantReferralSource implements Serializable {
 //	                      AND   to_char(CAD2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
 //	End-Select
 //	End-Procedure HR01-Get-Personal-Data
-		return null;
-	}
+	return null;
+}
 
-	public PsDiversityEthnicity GetReferralSource(String employeeId) {
+	public PsRecruitmentSource HR05GetReferralSource(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR05-Get-Referral-Source
 //		! Desc:  This routine will get the referral source data for each of the
@@ -299,8 +254,25 @@ public class PsApplicantReferralSource implements Serializable {
 //		End-Procedure HR05-Get-Referral-Source
 		return null;
 	}
-	
-	
-	
-	
+
+	public PsRecruitmentSource findByRecruitmentSourceId(String recruitmentSourceId) {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		
+	    try {
+	    	List<PsRecruitmentSource> resultList = em.createQuery("SELECT p FROM PsRecruitmentSource p "
+	    				+ "WHERE UPPER(TRIM(p.recruitmentSourceId)) = :fieldName ",
+	    				PsRecruitmentSource.class)
+	    		    .setParameter("recruitmentSourceId", recruitmentSourceId.toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return null;	
+	}
+
 }

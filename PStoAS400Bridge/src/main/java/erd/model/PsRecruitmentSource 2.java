@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.List;
 
 /**
  * The persistent class for the PS_HRS_SOURCE_I database table.
@@ -11,13 +12,13 @@ import java.sql.Date;
  */
 @Entity
 @Table(name="PS_HRS_SOURCE_I")
-@NamedQuery(name="PsHrsSource.findAll", query="SELECT p FROM PsHrsSource p")
-public class PsHrsSource implements Serializable {
+@NamedQuery(name="PsRecruitmentSource.findAll", query="SELECT p FROM PsRecruitmentSource p")
+public class PsRecruitmentSource implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@Column(name="HRS_SOURCE_ID", nullable=false, precision=15)
-	private BigDecimal hrsSourceId;
+	private BigDecimal recruitmentSourceId;
 
 	@Column(name="EFF_STATUS", length=1)
 	private String statusAsOfEffectiveDate;
@@ -26,18 +27,18 @@ public class PsHrsSource implements Serializable {
 	private Date effectiveDate;
 
 	@Column(name="HRS_SOURCE_DESCR", nullable=false, length=254)
-	private String hrsSourceDescription;
+	private String recruitmentSourceDescription;
 
 	@Column(name="HRS_SOURCE_NAME", nullable=false, length=30)
-	private String hrsSourceNameCode;
+	private String recruitmentSourceNameCode;
 
 	@Column(name="HRS_SOURCE_STATUS")
-	private Date hrsSourceStatusDate;
+	private Date recruitmentSourceStatusDate;
 
 	@Column(name="HRS_SOURCE_TYPE", nullable=false, length=3)
-	private String hrsSourceTypeCode;
+	private String recruitmentSourceTypeCode;
 
-	public PsHrsSource() {
+	public PsRecruitmentSource() {
 	}
 
 	public String getStatusAsOfEffectiveDate() {
@@ -57,46 +58,46 @@ public class PsHrsSource implements Serializable {
 	}
 
 	public String getHrsSourceDescription() {
-		return this.hrsSourceDescription;
+		return this.recruitmentSourceDescription;
 	}
 
-	public void setHrsSourceDescription(String hrsSourceDescription) {
-		this.hrsSourceDescription = hrsSourceDescription;
+	public void setRecruitmentSourceDescription(String recruitmentSourceDescription) {
+		this.recruitmentSourceDescription = recruitmentSourceDescription;
 	}
 
-	public BigDecimal getHrsSourceId() {
-		return this.hrsSourceId;
+	public BigDecimal getRecruitmentSourceId() {
+		return this.recruitmentSourceId;
 	}
 
-	public void setHrsSourceId(BigDecimal hrsSourceId) {
-		this.hrsSourceId = hrsSourceId;
+	public void setRecruitmentSourceId(BigDecimal recruitmentSourceId) {
+		this.recruitmentSourceId = recruitmentSourceId;
 	}
 
-	public String getHrsSourceNameCode() {
-		return this.hrsSourceNameCode;
+	public String getRecruitmentSourceNameCode() {
+		return this.recruitmentSourceNameCode;
 	}
 
-	public void setHrsSourceNameCode(String hrsSourceNameCode) {
-		this.hrsSourceNameCode = hrsSourceNameCode;
+	public void setRecruitmentSourceNameCode(String recruitmentSourceNameCode) {
+		this.recruitmentSourceNameCode = recruitmentSourceNameCode;
 	}
 
-	public Date getHrsSourceStatusDate() {
-		return this.hrsSourceStatusDate;
+	public Date getRecruitmentSourceStatusDate() {
+		return this.recruitmentSourceStatusDate;
 	}
 
-	public void setHrsSourceStatusDate(Date hrsSourceStatusDate) {
-		this.hrsSourceStatusDate = hrsSourceStatusDate;
+	public void setRecruitmentSourceStatusDate(Date recruitmentSourceStatusDate) {
+		this.recruitmentSourceStatusDate = recruitmentSourceStatusDate;
 	}
 
-	public String getHrsSourceTypeCode() {
-		return this.hrsSourceTypeCode;
+	public String getRecruitmentSourceTypeCode() {
+		return this.recruitmentSourceTypeCode;
 	}
 
-	public void setHrsSourceTypeCode(String hrsSourceTypeCode) {
-		this.hrsSourceTypeCode = hrsSourceTypeCode;
+	public void setRecruitmentSourceTypeCode(String recruitmentSourceTypeCode) {
+		this.recruitmentSourceTypeCode = recruitmentSourceTypeCode;
 	}
 
-	public PsHrsSource HR01GetPersonalData(String employeeId) {
+	public PsRecruitmentSource HR01GetPersonalData(String employeeId) {
 //	!----------------------------------------------------------------------
 //	! Procedure:  HR01-Get-Personal-Data
 //	! Desc:  Gets the employees data from the personal data effdt table that
@@ -225,7 +226,7 @@ public class PsHrsSource implements Serializable {
 	return null;
 }
 
-	public PsHrsSource HR05GetReferralSource(String employeeId) {
+	public PsRecruitmentSource HR05GetReferralSource(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR05-Get-Referral-Source
 //		! Desc:  This routine will get the referral source data for each of the
@@ -252,6 +253,26 @@ public class PsHrsSource implements Serializable {
 //		end-select
 //		End-Procedure HR05-Get-Referral-Source
 		return null;
+	}
+
+	public PsRecruitmentSource findByRecruitmentSourceId(String recruitmentSourceId) {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		
+	    try {
+	    	List<PsRecruitmentSource> resultList = em.createQuery("SELECT p FROM PsRecruitmentSource p "
+	    				+ "WHERE UPPER(TRIM(p.recruitmentSourceId)) = :fieldName ",
+	    				PsRecruitmentSource.class)
+	    		    .setParameter("recruitmentSourceId", recruitmentSourceId.toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return null;	
 	}
 
 }

@@ -12,8 +12,8 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="PS_PERS_DATA_EFFDT")
-@NamedQuery(name="PsPersonalDataEffectiveDated.findAll", query="SELECT p FROM PsPersonalDataEffectiveDated p")
-public class PsPersonalDataEffectiveDated implements Serializable {
+@NamedQuery(name="PsEffectiveDatedPersonalData.findAll", query="SELECT p FROM PsEffectiveDatedPersonalData p")
+public class PsEffectiveDatedPersonalData implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -50,7 +50,7 @@ public class PsPersonalDataEffectiveDated implements Serializable {
 	@Column(name="SEX", nullable=false, length=1)
 	private String gender;
 
-	public PsPersonalDataEffectiveDated() {
+	public PsEffectiveDatedPersonalData() {
 	}
 
 	public String getAlternateEmployeeId() {
@@ -145,7 +145,7 @@ public class PsPersonalDataEffectiveDated implements Serializable {
 		return null;
 	}
 
-	public PsPersonalDataEffectiveDated GetPersonalData205(String employeeId) {
+	public PsEffectiveDatedPersonalData GetPersonalData205(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR205-Get-Personal-Data
 //		! Desc:  This routine will get the Personal Data row for each of the
@@ -184,7 +184,7 @@ public class PsPersonalDataEffectiveDated implements Serializable {
 		return null;
 	}
 
-	public PsPersonalDataEffectiveDated GetPersonalData201(String employeeId) {
+	public PsEffectiveDatedPersonalData GetPersonalData201(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR201-Get-Personal-Data
 //		! Desc:  Gets the employees data from the personal data effdt table that
@@ -224,7 +224,7 @@ public class PsPersonalDataEffectiveDated implements Serializable {
 		return null;
 	}
 
-	public PsPersonalDataEffectiveDated GetPersonalData01(String employeeId) {
+	public PsEffectiveDatedPersonalData GetPersonalData01(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR01-Get-Personal-Data
 //		! Desc:  Gets the employees data from the personal data effdt table that
@@ -353,7 +353,7 @@ public class PsPersonalDataEffectiveDated implements Serializable {
 		return null;
 	}
 
-	public PsPersonalDataEffectiveDated HR05GetInfo(String employeeId) {
+	public PsEffectiveDatedPersonalData HR05GetInfo(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR05-Get-Info
 //		! Desc:  This new routine will get the name/address/marital status info row for each of the
@@ -423,7 +423,7 @@ public class PsPersonalDataEffectiveDated implements Serializable {
 		return null;
 	}
 
-	public PsPersonalDataEffectiveDated CheckEffdtTransaction(String employeeId) {
+	public PsEffectiveDatedPersonalData CheckEffdtTransaction(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  Check-Effdt-Transaction
 //		!----------------------------------------------------------------------

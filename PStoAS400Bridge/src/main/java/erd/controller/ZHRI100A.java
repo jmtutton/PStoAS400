@@ -86,19 +86,19 @@ public class ZHRI100A {
 		adWrkFields.intializeAdWrkFields();
 		//HR02-Process-Main  //This is the main processing procedure
 		EmployeeTermination employeeTermination = new EmployeeTermination(trigger, adWrkFields);
-		//	HR02-Initialize-Fields  //Initialize the fields to ensure that that they all start out blank.
+		//HR02-Initialize-Fields  //Initialize the fields to ensure that that they all start out blank.
 		psAuditOperatorId = trigger.getOperatorId().trim().substring(1); //strips the 'E' off of the employee id
 		psEmpl = " "; //$PSEmpl = ' '
 		errorProgramParm = "HRZ102A";
 //		employeeTermination.hr02InitializeFields();
-		//	HR02-Get-Job  //This routine will the Job Data row for each of the employee numbers entered in the trigger file.
-		//	HR02-Get-Action-Reason  //This routine will determine if a termination was voluntary or involuntary basedd on Action and Action Reason codes.
-		//		HR02-Get-Reason-Description  //This routine gets the description field from the Action Reason table when Action = Termination and Action Code equals Other.
-		//	ZHRI100A.Get-OprId
+		//HR02-Get-Job  //This routine will the Job Data row for each of the employee numbers entered in the trigger file.
+		//HR02-Get-Action-Reason  //This routine will determine if a termination was voluntary or involuntary basedd on Action and Action Reason codes.
+		//HR02-Get-Reason-Description  //This routine gets the description field from the Action Reason table when Action = Termination and Action Code equals Other.
+		//ZHRI100A.Get-OprId
 //		psOprid = getOprId(psEmpl, indexNumber, poiFlag);
-		//	HR02-Process-Data  //This routine moves 'N' to change address parameter and calls the RPG program.
-		//		HR02-Trim-Parameters  //This routine trims all leading and trailing blanks from the data.
-		//		ZHRI100A.Call-System
+		//HR02-Process-Data  //This routine moves 'N' to change address parameter and calls the RPG program.
+		//HR02-Trim-Parameters  //This routine trims all leading and trailing blanks from the data.
+		//ZHRI100A.Call-System
 		//ZHRI100A.Update-Trigger-Row
 		//Call System Using $Command
 		//Reset.sqc

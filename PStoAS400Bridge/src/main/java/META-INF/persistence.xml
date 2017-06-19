@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+/**
+ * The persistence units are defined in this persistence.xml file.
+ * @author John Tutton john@tutton.net
+ */
+-->
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
@@ -6,17 +12,18 @@
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <class>erd.model.CrossReferenceCompany</class>
         <class>erd.model.CrossReferenceEmployeeId</class>
-        <class>erd.model.CrossReferenceEthnicCode</class>
+        <class>erd.model.CrossReferenceEthnicGroup</class>
         <class>erd.model.CrossReferenceJobCode</class>
         <class>erd.model.CrossReferenceMultipleEmployeeId</class>
         <class>erd.model.CrossReferencePersonOfInterest</class>
         <class>erd.model.CrossReferenceReferralSource</class>
         <class>erd.model.CrossReferenceTerminationReason</class>
+        <class>erd.model.HR006P</class>
         <class>erd.model.HR036P</class>
         <class>erd.model.PsAccomplishment</class>
         <class>erd.model.PsActionReason</class>
         <class>erd.model.PsAddress</class>
-        <class>erd.model.PsApplicantReferralSource</class>
+        <class>erd.model.PsReferralSource</class>
         <class>erd.model.PsCitizenship</class>
         <class>erd.model.PsContractData</class>
         <class>erd.model.PsCountry</class>
@@ -28,21 +35,22 @@
         <class>erd.model.PsEmployeeReview</class>
         <class>erd.model.PsEmployment</class>
         <class>erd.model.PsEthnicGroup</class>
-        <class>erd.model.PsHrsSource</class>
+        <class>erd.model.PsRecruitmentSource</class>
         <class>erd.model.PsJob</class>
         <class>erd.model.PsJobCode</class>
         <class>erd.model.PsLocation</class>
         <class>erd.model.PsName</class>
-        <class>erd.model.PsOrigHirEmpVw</class>
+        <class>erd.model.PsOriginalHire</class>
         <class>erd.model.PsPerson</class>
         <class>erd.model.PsPersonalData</class>
-        <class>erd.model.PsPersonalDataEffectiveDated</class>
+        <class>erd.model.PsEffectiveDatedPersonalData</class>
         <class>erd.model.PsPersonalNationalId</class>
         <class>erd.model.PsPersonalPhone</class>
         <class>erd.model.PsVariable</class>
         <class>erd.model.PsXlatItem</class>
         <class>erd.model.TriggerEmployee</class>
         <class>erd.model.TriggerNonPerson</class>
+        <class>erd.model.TriggerSuperclass</class>
 		<properties>
 <!-- 			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/> -->
 <!-- 			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@ppddbl44.corp.erac.com:1521:PS90HRQA"/> -->
