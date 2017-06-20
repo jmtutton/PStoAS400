@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry excluding="erd/" kind="src" path="src/test"/>
+	<classpathentry kind="src" path="src/main"/>
+	<classpathentry kind="src" path="src/test/erd"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/EclipseLink 2.5.2">
+		<attributes>
+			<attribute name="owner.project.facets" value="jpt.jpa"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="C:/sts-bundle/sts-3.8.1.RELEASE/libraries/ojdbc7_g.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/main/resources/mysql-connector-java-5.1.42-bin.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

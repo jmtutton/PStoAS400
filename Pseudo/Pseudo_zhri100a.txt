@@ -55,14 +55,14 @@ Intialize-AD-WrkFields              //initialized fields to default values
 Process-Main                        //the process control procedure!!
 
 *****************************************************************************
-!*  Tables Used:
-!*  TABLE              DESCRIPTION                            ACCESS
-!*  -----              -----------                            ------
-!*  JOB                PeopleSoft Employee Job Table          Select
-!*  ZHRT_INTTRIGGER    PeopleSoft to Legacy Interface Table   Update
-!*  PS_ZHRT_EMPID_CREF PeopleSoft Employee Cross Refer Table  Select/Insert
-!*  HR006P             Employee Master file (Legacy System)   Select
-!*  PSXLATITEM         Translate Table                        Select
+!*  TABLES USED:
+!*  TABLE                   DESCRIPTION                            ACCESS
+!*  -----                   -----------                            ------
+!*  JOB                     PeopleSoft Employee Job Table          Select
+!*  ZHRT_INTTRIGGER         PeopleSoft to Legacy Interface Table   Update
+!*  PS_ZHRT_EMPID_CREF      PeopleSoft Employee Cross Refer Table  Select/Insert
+!*  HR006P                  Employee Master file (Legacy System)   Select
+!*  PSXLATITEM              Translate Table                        Select
 !*
 !*  Input/Output Files:
 !*  FILE NAME         INPUT/OUTPUT        DESCRIPTION
@@ -70,18 +70,531 @@ Process-Main                        //the process control procedure!!
 !*
 !*****************************************************************************
 
+*****************************************************************************
+VARIABLES USED:
+PROCESS-MAIN
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+#run_flag                               1
+$AD_HOME                    WRITE       $PS_HOME || '/data/activedir/'    !Path for Active Directory
+$Command                    WRITE       'sleep 15'  !After interface run wait 15 seconds and DO it again  !sree**rehost        !ZHR_MOD_ZHRI100A_sleep
+$Command_Non                WRITE       'sleep 15'  !after the main trigger table wait for 15 secs
+$Library                                //library name on AS/400 WHERE programs reside
+$ORACLE_SID                 WRITE       getenv('ORACLE_SID')
+$PS_HOME                    WRITE       getenv('PS_HOME')
+$RMTNTADSVR
+$RMTSVR                                 //name of AS/400 machine for use in zbas002b.sh
+$RexecScript                WRITE       '/usr/local/barch/' || $ORACLE_SID || '/scripts/zbas002b.sh'
+$WrkCriticalFlag                        'N'
+$file_open                              'N'                       !ZHR_MOD_ZHRI100A_sleep
+
+FTP-FILE
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+#status                                 != 0            !error
+$ErrorMessageParm           WRITE       'Error occurred in shell script, contact HR PeopleSoft Oncall'
+$ErrorProgramParm           WRITE       'HRZ105A'
+$WrkCriticalFlag                        'Y'
+
+CHECK-INTERFACE-RUNFILE
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$ORACLE_SID
+#file_exists                WRITE       exists($RUN_FILEPATH)
+#run_flag                   WRITE       IF #file_exists = 0 #run_flag = 1; ELSE #run_flag = 0
+$RUN_FILEPATH               WRITE       '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'
+
+GET-TRIGGER-DATA
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+#PSEffSeq                   WRITE       &PS_ZHRT_INTTRIGGER.EFFSEQ
+#WrkSequence                WRITE       PS_ZHRT_INTTRIGGER.SEQ_NBR
+#Wrk_EmplID1                WRITE       $PSEmplid
+$AuditOprid                 WRITE       LTRIM(RTRIM(&PS_ZHRT_INTTRIGGER.OprId,' '),' ')
+$CompletionStatus           WRITE       'P' !Initialize the CompletionStatus field
+$Found                                  'N'     !Not a contractor
+$OK-To-Process
+$PSEffdt                    WRITE       TO_CHAR(PS_ZHRT_INTTRIGGER.EFFDT, 'YYYY-MM-DD')
+$PSEmplid                   WRITE       LTRIM(RTRIM(&PS_ZHRT_INTTRIGGER.EMPLID,' '),' ')
+$PoiFlag                    'N'
+$WrkProcess                 WRITE       LTRIM(RTRIM(&PS_ZHRT_INTTRIGGER.PROC_NAME,' '),' ')   !Remove leading and trailing blanks
+$Wrk_Emplid2                WRITE       EDIT(#Wrk_EmplID1,'099999999')
+
+CALL-PROGRAMS
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+#PSEffseq                   READ
+#Wrk_Sequence               READ
+$ADAction_Code                          'T', 'C', 'R', '', 'H'
+$AuditOprid                 READ
+$PSEffdt                    READ
+$PSEmplid                   READ
+$WrkProcess                 READ
+#WrkSeqNbr                  WRITE       #Wrk_Sequence
+#Wrk_Effseq                 WRITE       #PSEffseq
+$ADLegOprid                 WRITE       ''
+$CompletionStatus           WRITE       'C'
+$ErrorMessageParm           WRITE       'A row was deleted on the hire process'
+$ErrorProgramParm           WRITE       'HRZ101A'
+$PSAuditOperId              WRITE       $AuditOprid
+$PSDateIn                   WRITE       $PSEffdt
+$PSUserOprid                WRITE       $AuditOprid
+$PSemp                      WRITE       $AuditOprid
+$WrkCriticalFlag            WRITE       'Y'
+$Wrk_ADCountryCdBuild       WRITE       'Y'
+$Wrk_Effdt                  WRITE       $PSEffdt
+$Wrk_Emplid                 WRITE       $PSEmplid
+$Wrk_Inf_                   WRITE       ' '
+$Wrk_Oprid                  WRITE       $AuditOprid
+$Wrk_Process_Name           WRITE       $WrkProcess
+
+UPDATE-TRIGGER-ROW
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+#WRKSEQUENCE                WRITE       PS_ZHRT_INTTRIGGER.SEQ_NBR = #WRKSEQUENCE
+$CompletionStatus           WRITE       'P'
+
+GET-TRIGGER-DATA-NONEMP
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+&RZ                         READ
+$AsOfToday
+$NCompletionStatus                      'P', 'E'
+$PoiFlag                                'Y'
+#NPSEffSeq                  WRITE       &PS_ZHRT_ALTTRIGGER.EFFSEQ
+#NWrkSequence               WRITE       &PS_ZHRT_ALTTRIGGER.SEQ_NBR
+#NWrk_EmplID1               WRITE       $NPSEmplid
+#indexNum                   WRITE       &PS_ZHRT_ALTTRIGGER.SEQUENCE
+$AuditOprid                 WRITE       LTRIM(RTRIM(&RZ.OPRID,' '),' ')
+$NAuditOprid                WRITE       LTRIM(RTRIM(&PS_ZHRT_ALTTRIGGER.OPRID,' '),' ')
+$NPSEffdt                   WRITE       TO_CHAR(PS_ZHRT_ALTTRIGGER.EFFDT, 'YYYY-MM-DD')
+$NPSEmplid                  WRITE       LTRIM(RTRIM(&PS_ZHRT_ALTTRIGGER.EMPLID,' '),' ')
+$NWrkProcess                WRITE       LTRIM(RTRIM(&PS_ZHRT_ALTTRIGGER.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
+$NWrk_Emplid2               WRITE       EDIT(#NWrk_EmplID1,'099999999')
+
+CALL-PROGRAMS-NONEMP
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+#NPSEffseq                  READ
+#indexNum                   READ
+$NAuditOprid                READ
+$NAuditOprid                READ
+$NAuditOprid                READ
+$NPSEffdt                   READ
+$NPSEffdt                   READ
+$NPSEffdt                   READ
+$NPSEmplid                  READ
+$NWrkProcess                READ
+$NWrkProcess                READ
+#Wrk_Effseq                 WRITE       #NPSEffseq
+$CompletionStatus           WRITE       'E'     !update to an E to prevent looping and to mark the record in error
+
+UPDATE-TRIGGER-ROW_NONEMP
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+#NWrkSequence
+$NCompletionStatus
+
+CALL-SYSTEM
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+#Status                                 != 0
+$RMTSVR
+$RexecScript
+$SysDateTime
+#CommandLength              WRITE       LENGTH($Command)             !Get the length of the command
+#SubstrStartPos             WRITE       #SubstrStartPos + 100    !Increase the starting position by 100
+$Command                    WRITE       $RexecScript || ' ' || $Command || ' ' || $RMTSVR
+$ErrorMessageParm           WRITE       'Error executing Call System command, contact HR-PeopleSoft Oncall'
+$ErrorProgramParm           WRITE       'ZHRI100A'
+$PoiFlag                    WRITE       'N'
+$ShowCommand                WRITE       SUBSTR($Command,#SubstrStartPos,100)   !Substring 100 positions to show
+$WrkCriticalFlag            WRITE       'Y'
+
+PREPARE-ERROR-PARMS
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$AsOfToday                  READ
+$AuditOprid                 READ
+$Out                        READ
+$AddDateErrorParm           WRITE       DATETOSTR(STRTODATE($AsOfToday,'DD-MON-YYYY'),'YYYYMMDD')
+$AddTimeErrorParm           WRITE       SUBSTR($Out,10,2)    ||    SUBSTR($Out,13,2)    ||    SUBSTR($Out,16,2)
+$OpridErrorParm             WRITE       SUBSTR($AuditOprid,2,5)
+
+CALL-ERROR-ROUTINE
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$AddDateErrorParm
+$AddTimeErrorParm
+$Command                    WRITE       '"CALL '       ||
+$ErrorMessageParm           WRITE       SUBSTR($ErrorMessageParm,1,75)  !Make sure not more than 75 long
+$ErrorProgramParm
+$Library
+$OpridErrorParm
+$WrkCriticalFlag
+$Wrk_Emplid2
+
+CALL-ERROR-ROUTINE-NONEMP
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$AddDateErrorParm
+$AddTimeErrorParm
+$Command                    WRITE       '"CALL '       ||
+$ErrorMessageParm           WRITE       SUBSTR($ErrorMessageParm,1,75)  !Make sure not more than 75 long
+$ErrorProgramParm
+$Library
+$NWrk_Emplid2
+$OpridErrorParm
+$WrkCriticalFlag
+$Wrk_indexNum
+
+CHECK-IF-CONTRACTOR
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$AsOfToday
+$PSEmplid
+$Found                      WRITE       'N'
+'X'                         WRITE
+
+CHECK-IF-CORRECT102A
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$PSEffdt
+$PSEmplid
+$dt102
+$OK-To-Process              WRITE       'N'
+$WrkProcess                 WRITE       'ZHRI102A'
+'XX'                        WRITE
+
+BUILD-GROUP-WHERE-CLAUSE
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$Alias
+$SelectGroup
+$WhereClause                WRITE       LTRIM(RTRIM($WhereClause,' '),' ')  !Remove leading and trailing blanks
+
+BUILD-EMPLID-WHERE-CLAUSE
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$Alias
+$Run-Id
+$WhereClause                WRITE
+
+GET-OPRID
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+#indexNum
+$PoiFlag
+$LegEmplId
+$Found                      WRITE       'N'
+$PSOprid                    WRITE       ''
+
+GET-LEGID-FOR-SEQ0
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$Wrk_Emplid         
+$PSOprid                    WRITE       &PS_ZHRT_EMPID_CREF.ZHRF_LEG_EMPL_ID
+$Found                      WRITE       'Y'
+
+GET-LEGID-FOR-SEQNUM
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$Wrk_Emplid  
+#indexNum
+$PSOprid                    WRITE       LTRIM(RTRIM(&PS_ZHRR_MULTPL_EID.ZHRF_LEG_EMPL_ID,' '),' ')
+$Found                      WRITE       'Y'
+
+INSERT-OPRID
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$Wrk_Emplid
+$LegEmplId
+$Insert-Error-Flag          WRITE       'N'
+
+UPDATE-OPRID
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$Update-Error-Flag          WRITE       'N'
+$LegEmplId
+$Wrk_Emplid
+#indexNum
+
+INSERT-ERROR
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$Sql-Error                  READ
+$ErrorMessageParm           WRITE       $Sql-Error
+$Insert-Error-Flag          WRITE       'Y'
+
+UPDATE-ERROR
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$Sql-Error                  READ
+$ErrorMessageParm           WRITE       $Sql-Error
+$Update-Error-Flag          WRITE       'Y'
+
+FORMAT-EMPLOYEE-NAME
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$LegEmpName                 READ
+$PSEmp_Last_Name_Search     WRITE
+$PSEmp_First_Name_Search    WRITE
+$dummy                      WRITE       ! dummy is for the ending *
+$_work_a                    WRITE
+$PSEmpName                  WRITE
+
+CHECK-EFFDT-TRANSACTION
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$Wrkprocess
+$PSEffdt
+$PSEmplid
+$WrkADEffdt                 WRITE       ''
+$WrkADEffdt                 WRITE       $PSEffdt
+$AdFound                    WRITE       'N'
+
+
+BUILD-ACTIVE-DIR-OUTPUT-FILE
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$Wrkcreatefile              WRITE       'Y'
+$Wrk_AD_JobDataBuild
+$Wrk_AD_PersdataEffdtBuild
+$Wrk_AD_Getbusinessphone
+$Wrk_AD_PersDataBuild
+$Wrk_AD_CountryCdBuild
+$ADSupervisorID
+$Wrk_AD_NamesBuild
+$ADEmplid                   WRITE       $PSEmplid
+$ADFirstName                WRITE       $ADPSFirstName || ' ' || $ADPSMiddleName       !changed for v8.3
+$ADLastName                 WRITE       $ADPSLastName
+$ADLocation                 WRITE       $PSLocation
+$ADJobCd                    WRITE       $PSJobcode
+$ADJobDescr                 WRITE       $PSJobDescription
+$ADEmplStatus               WRITE       $PSEmplStatus
+$PSRehireDt
+$ADHireDt                   WRITE       $PSRehiredt
+$ADHireDt                   WRITE       $PSHiredt
+$PSAction
+$PSAction_Reason
+$WrkProcess
+$ADAction_Code              WRITE       'R'
+$ADCountry                  WRITE       $PSLoc_Country
+$ADFullPartTime             WRITE       $PSFullPartTime
+$ADEmplClass                WRITE       $PSEmplClass
+$ADDeptID                   WRITE       $PSDeptId
+$ADBusinessPhone            WRITE       $PSBusiness_Phone
+$ADLangCd                   WRITE       $PSLangCd
+$ADPrfName                  WRITE       $PSPrfName
+
+AD-GET-JOB-DATA
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$Wrk_Emplid
+$PSEffdt
+$PSLocation                 WRITE       ltrim(rtrim(&PS_JOB.LOCATION,' '),' ')
+$PSFullPartTime             WRITE       ltrim(rtrim(&PS_JOB.FULL_PART_TIME,' '),' ')
+$PSEmplClass                WRITE       ltrim(rtrim(&PS_JOB.EMPL_CLASS,' '),' ')
+$PSEmplStatus               WRITE       ltrim(rtrim(&PS_JOB.EMPL_STATUS,' '),' ')
+$PSDeptid                   WRITE       ltrim(rtrim(&PS_JOB.DEPTID,' '),' ')
+$PSJobcode                  WRITE       ltrim(rtrim(&PS_JOB.JOBCODE,' '),' ')
+
+AD-GET-JOB-DESCRIPTION
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$PSJobcode
+$PSJobDescription           WRITE       ltrim(rtrim(&PS_JOBCODE_TBL.DESCR,' '),' ')
+
+AD-GET-EMPLSTATUS-DESCRIPTION
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$ADEmplStatusDescr          WRITE       ltrim(rtrim(&PSXLATITEM.XLATLONGNAME,' '),' ')
+SYSDATE
+'EMPL_STATUS'
+$PSEmplstatus
+
+AD-GET-JOBSTART-DATE
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$Wrk_Emplid
+$PSJobcode
+$PSEffdt
+$ADJobStartYr               WRITE       substr(&PS_JOB.EFFDT,1,4)
+$ADJobStartMnth             WRITE       substr(&PS_JOB.EFFDT,6,2)
+$ADJobStartDay              WRITE       substr(&PS_JOB.EFFDT,9,2)
+$ADJobStartdt               WRITE       $ADJobStartYr || $ADJobStartMnth || $ADJobStartDay
+$PSJobStartdt               WRITE       &PS_JOB.EFFDT
+
+AD-GET-PERS-DATA-EFFDT
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$PSEmplid
+$PSEffdt
+$ADPSLastName               WRITE       RTRIM(LTRIM(&PS_NAMES.Last_Name,' '),' ')
+$ADPSFirstName              WRITE       RTRIM(LTRIM(&PS_NAMES.First_Name,' '),' ')
+$ADPSMiddleName             WRITE       RTRIM(LTRIM(&PS_NAMES.Middle_Name,' '),' ')
+$ADPSMiddleName             WRITE       SUBSTR($ADPSMiddleName,1,1)
+
+AD-GET-NAMESUFFIX
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$PSEmplid
+$PSEffdt
+$ADNameSuffix               WRITE       RTRIM(LTRIM(&PS_NAMES.Name_Suffix,' '),' ')
+$ADNameSuffix               WRITE       SUBSTR($ADNameSuffix,1,5)
+
+AD-GET-PERSONAL-DATA
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$PSEmplid
+$PSLangCd                   WRITE       ''
+$PSLangCd                   WRITE       RTRIM(LTRIM(&PS_Personal_Data.LANG_CD,' '),' ')
+
+AD-GET-COUNTRY-CODE
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$PSLOCATION
+$PSLoc_Country              WRITE       ltrim(rtrim(&PS_LOCATION_TBL.COUNTRY,' '),' ')         !Remove leading and trailing blanks
+
+AD-GET-BUSINESS-PHONE
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$PSEmplid
+'BUSN'
+$PSBusiness_Phone           WRITE       Remove-Non-Letters-Numbers (&PS_Personal_Phone.Phone, $PSBusiness_Phone)   !from ZRmvSpcChr.sqc
+
+AD-GET-EMPLOYEE-FAX
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$PSEmplid
+'FAX'
+$ADEmployeeFax              WRITE       Remove-Non-Letters-Numbers (&PS_Personal_Phone.Phone, $ADEmployeeFax)   !from ZRmvSpcChr.sqc
+
+AD-GET-LEGSUPERVIORID
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$ADSupervisorID
+$ADLegSupervisorID          WRITE       &PS_ZHRT_EMPID_CREF.ZHRF_LEG_EMPL_ID
+
+AD-GET-EMPLOYMENT-DATA
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$PSEmplid
+&ADEHire_Dt                 TO_CHAR(PS_Employment.HIRE_DT,'YYYY-MM-DD')       
+$PSHireYr                   WRITE       SUBSTR(&ADEHire_Dt,1,4)
+$PSHireMnth                 WRITE       SUBSTR(&ADEHire_Dt,6,2)
+$PSHireDay                  WRITE       SUBSTR(&ADEHire_Dt,9,2)
+$PSHiredt                   WRITE       $PSHireYr || $PSHireMnth || $PSHireDay
+&ADERehire_Dt               WRITE       TO_CHAR(PS_Employment.REHIRE_DT,'YYYY-MM-DD')
+$PSRehireYr                 WRITE       SUBSTR(&ADERehire_Dt,1,4)
+$PSRehireMnth               WRITE       SUBSTR(&ADERehire_Dt,6,2)
+$PSRehireDay                WRITE       SUBSTR(&ADERehire_Dt,9,2)
+$PSRehiredt                 WRITE       $PSRehireYr || $PSRehireMnth || $PSRehireDay
+&ADETermination_Dt          WRITE       TO_CHAR(PS_Employment.TERMINATION_DT,'YYYY-MM-DD')
+$PSTermYr                   WRITE       SUBSTR(&ADETermination_Dt,1,4)
+$PSTermMnth                 WRITE       SUBSTR(&ADETermination_Dt,6,2)
+$PSTermDay                  WRITE       SUBSTR(&ADETermination_Dt,9,2)
+$PSTerminationdt            WRITE       $PSTermYr || $PSTermMnth || $PSTermDay
+$ADSupervisorID             WRITE       &PS_Employment.SUPERVISOR_ID
+
+AD-GET-NAMES
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$PSEffdt
+$PSEmplid
+'PRF'
+$PSPrfName                  WRITE       RTRIM(LTRIM(&PS_Names.First_Name,' '),' ')
+
+WRITE-ACTIVE-DIR-OUTPUT-FILE
+------------------------------------------------------------------------
+VARIABLE                    READ/WRITE  DESCRIPTION
+--------                    ----------  -----------
+$ADAction_Code              READ        ! Action Code (H=Hire, C=Change, T=Termination)
+$ADLegOprid                 READ        ! Legacy Employee Id
+$ADEmplid                   READ        ! Employee Id
+$ADFirstName                READ        ! First Name
+$ADlastName                 READ        ! Last Name
+$ADPrfName                  READ        ! Preferred Name
+$ADNamesuffix:              READ        ! Name Suffix Text
+$ADLocation                 READ        ! HR Location
+$ADDeptID                   READ        ! Department ID
+$ADJobCd                    READ        ! Job Title Code
+$ADJobDescr                 READ        ! Job Title Description
+$ADEmplStatus               READ        ! Work Status
+$ADEmplStatusDescr          READ        ! Employee Status Description
+$ADHireDt                   READ        ! Hire Date / Rehire Date
+$ADTermDt                   READ        ! Termination Date
+$ADJobStartdt               READ        ! Current Job Start Date
+$ADFullPartTime             READ        ! Full/Part Time Flag (F OR P)
+$ADEmplClass                READ        ! Employee Class
+$ADBusinessPhone            READ        ! Business Phone Number
+$ADEmployeeFax              READ        ! Fax Number
+$ADSupervisorID             READ        ! Supervisor ID
+$ADLegSupervisorID          READ        ! Leg Supervisor ID
+$ADCountry                  READ        ! Country Code
+$ADLangCd                   READ        ! Language Preference
+
+
+
+
+
+*****************************************************************************
+
 #include 'setenv.sqc' !Set environment
 
 begin-program
-
-DO GET-CURRENT-DATETIME  !Gets the current date and time using curdttim.sqc
-DO Init-DateTime      !  Converts UNIX months to numeric     JHV  07/21/01
-DO Process-Main
-DO Reset          !Reset.sqc
+!#ifdef debugx
+!    show 'inside begin program'
+!#end-if !debugx
+Do GET-CURRENT-DATETIME  !Gets the current date and time using curdttim.sqc
+Do Init-DateTime      !  Converts UNIX months to numeric     JHV  07/21/01
+do Process-Main
+do Reset          !Reset.sqc
 
 end-program
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Process-Main
 ! Desc:  This is the process controling procedure.
 !----------------------------------------------------------------------
@@ -90,389 +603,455 @@ Begin-Procedure Process-Main
 
 ! This gets the oracle_sid
 LET $PS_HOME = getenv('PS_HOME')
-LET $AD_HOME = $PS_HOME || '/data/activedir/'    !Path for Active Directory
-LET $ORACLE_SID = getenv('ORACLE_SID')
-UPPERCASE $ORACLE_SID
+LET $AD_HOME = $PS_HOME || '/data/activedir/'                   !Path for Active Directory
+LET $ORACLE_SID = getenv('ORACLE_SID') !added for v8.3
+UPPERCASE $ORACLE_SID                  !added for v8.3
 
 !Returns name of AS/400 machine for use in zbas002b.sh
-LET $Variable_Needed = ' '
-LET $Variable_Needed = 'RMTSVR'
-DO  Get-Variable
-LET $RMTSVR = $PSZPTT_VARIABLE_VAL
-Show '$RMTSVR: ' $RMTSVR
+Let $Variable_Needed = ' '            !added for v8.3
+Let $Variable_Needed = 'RMTSVR'       !added for v8.3
+Do  Get-Variable                      !added for v8.3
+Let $RMTSVR = $PSZPTT_VARIABLE_VAL    !added for v8.3  
+Show '$RMTSVR: ' $RMTSVR                                                            ! ALS-10/08/2008
 
-! LET $RexecScript = $PS_HOME || '/custom_scripts/zbas002b.sh'                      ! Commented Out
-LET $RexecScript = '/usr/local/barch/' || $ORACLE_SID || '/scripts/zbas002b.sh'
-Show '$RexecScript: ' $RexecScript
+! Let $RexecScript = $PS_HOME || '/custom_scripts/zbas002b.sh'                      ! ALS-10/08/2008 - Commented Out
+Let $RexecScript = '/usr/local/barch/' || $ORACLE_SID || '/scripts/zbas002b.sh'     ! ALS-10/08/2008
+Show '$RexecScript: ' $RexecScript                                                  ! ALS-10/08/2008
 
-!Returns library name on AS/400 WHERE programs reside
-LET $Variable_Needed = ' '
-LET $Variable_Needed = 'AS400library'
-DO  Get-Variable
-LET $Library = $PSZPTT_VARIABLE_VAL
-Show '$Library: ' $Library
+!Returns library name on AS/400 where programs reside
+Let $Variable_Needed = ' '            !added for v8.3
+Let $Variable_Needed = 'AS400library' !added for v8.3
+Do  Get-Variable                      !added for v8.3
+Let $Library = $PSZPTT_VARIABLE_VAL   !added for v8.3
+Show '$Library: ' $Library                                                          ! ALS-10/08/2008
 
 !Returns IP address of NT server
-LET $Variable_Needed = ' '
-LET $Variable_Needed = 'RMTNTADSVR'
-DO Get-Variable
-LET $RMTNTADSVR = $PSZPTT_VARIABLE_VAL
-Show '$RMTNTADSVR: ' $RMTNTADSVR
+Let $Variable_Needed = ' '             !added for v8.3
+Let $Variable_Needed = 'RMTNTADSVR'    !added for v8.3
+Do Get-Variable                        !added for v8.3
+Let $RMTNTADSVR = $PSZPTT_VARIABLE_VAL !added for v8.3
+Show '$RMTNTADSVR: ' $RMTNTADSVR                                                    ! ALS-10/08/2008
 
-  LET $WrkCriticalFlag = 'N'
-  LET #run_flag = 1
+
+   ! Let $open_file1 = $AD_HOME || 'ZHRT100A'  10/14/2005  Jane Parks / ZHR_ZHRI100A_REMOVE_AD
+ !  OPEN ACTIVE DIRECTORY TRANSACTION FILE
+ ! open $open_file1 as 1 for-writing record=337
+ ! if #filestat != 0
+ !   !... error processing ...
+ ! Let $ErrorProgramParm = 'ZHRT100A'
+ ! Let $ErrorMessageParm = ' '
+ ! Let $ErrorMessageParm = 'Cannot open file ZHRT100A, contact HR PeopleSoft Oncall'
+ ! Let $WrkCriticalFlag = 'Y'
+ ! Do Prepare-Error-Parms
+ ! Do Call-Error-Routine
+ ! Let $WrkCriticalFlag = 'N'
+ ! else
+ !  let $file_open = 'Y'
+ ! end-if
+  Let $WrkCriticalFlag = 'N'
+  Let #run_flag = 1
   while #run_flag = 1        !Never ending loop
-   DO Check-interface-runfile
-   DO Get-Trigger-Data       !Process the interface requests
-   DO Commit-Transaction
-   LET $Command = 'sleep 15'  !After interface run wait 15 seconds and DO it again  !sree**rehost        !ZHR_MOD_ZHRI100A_sleep
+   do Check-interface-runfile
+   do Get-Trigger-Data       !Process the interface requests
+   do Commit-Transaction
+  ! If $Wrkcreatefile = 'Y'
+  !  do Format-DateTime($SysDateTime, $ADdatetime, {DEFCMP},'time','')
+  !   let $new_filename = $open_file1 || $ADdatetime || '.ad'
+  !  let $Command = 'mv' || ' ' || $open_file1 || ' ' || $new_filename
+  !   Call System Using $Command #status Wait
+  !   do FTP-File
+  !    End-If
+  !Let $Wrkcreatefile = 'N'
+  !#ifdef debugx
+  ! show 'before call system Sleep'
+  !#end-if !debugx
+   let $Command = 'sleep 15'  !After interface run wait 15 seconds and do it again  !sree**rehost        !ZHR_MOD_ZHRI100A_sleep
    Call System Using $Command #status Wait            !sree**rehost     !ZHR_MOD_ZHRI100A_sleep
   
-   DO Get-Trigger-Data-NonEmp  !calls the procesdure for POIs ad multiple EIDs
-   DO Commit-Transaction
-   LET $Command_non = 'sleep 15'  !after the main trigger table wait for 15 secs
-   Call System Using $Command_non #status Wait
-   IF $file_open = 'Y'                        !ZHR_MOD_ZHRI100A_sleep
+   do Get-Trigger-Data-NonEmp  !surya Added - 12/29 - calls the procesdure for POIs ad multiple EIDs
+   do Commit-Transaction !surya Added - 12/29
+   let $Command_non = 'sleep 15'  !Surya Added after the main trigger table wait for 15 secs
+   Call System Using $Command_non #status Wait !surya Added - 12/29
+  !#ifdef debugx
+  !    show 'after call system Sleep'
+  !#end-if !debugx
+   If $file_open = 'Y'                        !ZHR_MOD_ZHRI100A_sleep
     close 1                                   !ZHR_MOD_ZHRI100A_sleep
-   END-IF                                     !ZHR_MOD_ZHRI100A_sleep
-   LET $file_open = 'N'                       !ZHR_MOD_ZHRI100A_sleep
+   End-If                                     !ZHR_MOD_ZHRI100A_sleep
+   Let $file_open = 'N'                       !ZHR_MOD_ZHRI100A_sleep
   end-while   !1=1
-  LET $Command = 'mv' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.stop' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'
-  Show '$Command in Process-Main: ' $Command
+  !#ifdef debugx
+  !  show 'before call system - Move Stop to Run'
+  !#end-if !debugx
+!  let $Command = 'mv' || ' ' || $PS_HOME || '/data/triggers/hrinterface.stop' || ' ' || $PS_HOME || '/data/triggers/hrinterface.run'   ! ALS-10/08/2008 - Commented Out
+  let $Command = 'mv' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.stop' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'  ! ALS-10/08/2008
+  Show '$Command in Process-Main: ' $Command                                        ! ALS-10/08/2008
   Call System Using $Command #status Wait           !ZHR_MOD_ZHRI100A_sleep       
+  !#ifdef debugx
+  !   show 'after call system - Move Stop to Run'
+  !#end-if !debugx
 
 End-Procedure Process-Main
 
-!----------------------------------------------------------------------!                       
+!----------------------------------------------------------------------!                       !LJM-04/03/01-Rehost
 !   Procedure:    Get-Variable                                         !
 !   Description:  This new procedure will get the variables            !
-!                 from PS_ZPTT_VARIABLES                                  !                       
-!----------------------------------------------------------------------!                       
+!                 from ZPTT_VARIABLES                                  !                       !LJM-04/03/01-Rehost
+!----------------------------------------------------------------------!                       !LJM-04/03/01-Rehost
 
-Begin-Procedure Get-Variable
+Begin-Procedure Get-Variable    !added for v8.3           
 
 Begin-Select
 VAR.ZPTF_VARIABLE_VAL
 
-Move &VAR.ZPTF_VARIABLE_VAL to $PSZPTT_VARIABLE_VAL
+   Move &VAR.ZPTF_VARIABLE_VAL to $PSZPTT_VARIABLE_VAL
 
-FROM  PS_ZPTT_VARIABLES VAR
-WHERE VAR.PRCSNAME = 'ZHRI100A'
-and   VAR.DBNAME = (Select dbname
-		      FROM PSDBOWNER)
+from  PS_ZPTT_VARIABLES VAR
+where VAR.PRCSNAME = 'ZHRI100A'
+! and   VAR.DBNAME = $ORACLE_SID                                                    ! ALS-10/08/2008 - Commented Out
+and   VAR.DBNAME = (Select dbname                                                   ! ALS-10/08/2008
+		      from PSDBOWNER)                                               ! ALS-10/08/2008
 and   VAR.VARIABLE_NAME = $Variable_Needed
 
 End-Select
 
 End-Procedure Get-Variable
 
-!----------------------------------------------------------------------!                       
-!   Procedure:    FTP-File                                             !   
-!   Description:  This procedure will transfer the file from UNIX      !                       
-!                 to NT server                                         !                       
-!----------------------------------------------------------------------!                       
+!----------------------------------------------------------------------!                       !LJM-04/03/01-Rehost
+!   Procedure:    FTP-File                                             !   !LJM-04/03/01-Rehost
+!   Description:  This procedure will transfer the file from UNIX      !                       !LJM-04/03/01-Rehost
+!                 to NT server                                         !                       !LJM-04/03/01-Rehost
+!----------------------------------------------------------------------!                       !LJM-04/03/01-Rehost
 
-Begin-Procedure FTP-File                                                                       
+Begin-Procedure FTP-File                                                                       !LJM-04/03/01-Rehost
 
-IF #status != 0
+! Let $fullscriptpath = $PS_HOME || '/custom_scripts/' || 'zhrs002a.sh'             ! ALS-10/08/2008 - Commented Out
+
+!#ifdef debugx
+ !   Show 'before call zhrs002a.sh'
+!#end-if !debugx
+
+! Let $Command = $fullscriptpath|| ' ' || $RMTNTADSVR       !changed for v8.3
+! Call System Using $Command #Status Wait
+
+!#ifdef debugx
+  !  Show 'after call zhrs002a.sh'
+!#end-if !debugx
+
+If #status != 0
   !error
- ! LET $ErrorProgramParm = 'HRZ105A'
- ! LET $ErrorMessageParm = ' '
- ! LET $ErrorMessageParm = 'Error occurred in shell script, contact HR PeopleSoft Oncall'
- ! LET $WrkCriticalFlag = 'Y'
- ! DO Prepare-Error-Parms
-!  DO Call-Error-Routine
-!  LET $WrkCriticalFlag = 'N'
-END-IF
+ ! Let $ErrorProgramParm = 'HRZ105A'
+ ! Let $ErrorMessageParm = ' '
+ ! Let $ErrorMessageParm = 'Error occurred in shell script, contact HR PeopleSoft Oncall'
+ ! Let $WrkCriticalFlag = 'Y'
+ ! Do Prepare-Error-Parms
+!  Do Call-Error-Routine
+!  Let $WrkCriticalFlag = 'N'
+End-If
 
 End-Procedure
 
-!----------------------------------------------------------------------!                       
-!   Procedure:    Check-Interface-Runfile                              !                       
-!   Description:  This procedure will check the existance run file     !                       
-!----------------------------------------------------------------------!                       
+!----------------------------------------------------------------------!                       !LJM-04/03/01-Rehost
+!   Procedure:    Check-Interface-Runfile                              !                       !LJM-04/03/01-Rehost
+!   Description:  This procedure will check the existance run file     !                       !LJM-04/03/01-Rehost
+!----------------------------------------------------------------------!                       !LJM-04/03/01-Rehost
 
-Begin-Procedure Check-Interface-Runfile
-LET $RUN_FILEPATH = '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'
-Show '$RUN_FILEPATH: ' $RUN_FILEPATH
+Begin-Procedure Check-interface-runfile
+! let $RUN_FILEPATH = $PS_HOME || '/data/triggers/hrinterface.run'                  ! ALS-10/08/2008 - Commented Out
+let $RUN_FILEPATH = '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'   ! ALS-10/08/2008
+Show '$RUN_FILEPATH: ' $RUN_FILEPATH                                                ! ALS-10/08/2008
 
 LET #file_exists = exists($RUN_FILEPATH)
 
-IF #file_exists = 0
-   LET #run_flag = 1
-ELSE
-   LET #run_flag = 0
-END-IF
+If #file_exists = 0
+   Let #run_flag = 1
+Else
+   Let #run_flag = 0
+End-If
 
 End-Procedure Check-interface-runfile
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Get-Trigger-Data
 ! Desc:  This procedure will get the trigger data that needs to be interfaced
 !----------------------------------------------------------------------
 
 Begin-Procedure Get-Trigger-Data
 
-LET $CompletionStatus = 'P' !Initialize the CompletionStatus field
+Let $CompletionStatus = 'P'   !Initialize the CompletionStatus field
 
 Begin-Select loops=150
 
 RZ.SEQ_NBR
-MOVE &RZ.SEQ_NBR TO #WrkSequence
-RZ.OprId
-LET $AuditOprid = LTRIM(RTRIM(&RZ.OprId,' '),' ')
+    MOVE &RZ.SEQ_NBR TO #WrkSequence
+RZ.OPRID
+    LET $AuditOprid = Ltrim(Rtrim(&RZ.OPRID,' '),' ')
 RZ.EMPLID
-LET $PSEmplid = LTRIM(RTRIM(&RZ.EMPLID,' '),' ')
-MOVE $PSEmplid TO #Wrk_EmplID1
-LET $Wrk_Emplid2 = EDIT(#Wrk_EmplID1,'099999999')
-TO_CHAR(RZ.EFFDT, 'YYYY-MM-DD') &RZEFFDT
-LET $PSEffdt = &RZEFFDT
+    LET $PSEmplid = Ltrim(Rtrim(&RZ.EMPLID,' '),' ')
+    Move $PSEmplid to #Wrk_EmplID1
+    LET $Wrk_Emplid2 =  edit(#Wrk_EmplID1,'099999999')
+
+to_char(RZ.EFFDT, 'YYYY-MM-DD') &RZEFFDT
+    LET $PSEffdt = &RZEFFDT
 RZ.EFFSEQ
-MOVE &RZ.EFFSEQ TO #PSEffSeq
+    Move &RZ.EFFSEQ to #PSEffSeq
 RZ.PROC_NAME
-LET $WrkProcess = LTRIM(RTRIM(&RZ.PROC_NAME,' '),' ')   !Remove leading and trailing blanks
+    LET $WrkProcess = ltrim(rtrim(&RZ.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
 
-IF $file_open = 'N'
-    !OPEN $open_file1 as 1 for-append record=337
-    !LET $file_open = 'Y'
-END-IF
+ If $file_open = 'N'
+ !   open $open_file1 as 1 for-append record=337
+ !   let $file_open = 'Y'
+ End-If
 
-DO Check-If-Contractor
-LET $PoiFlag = 'N'
+    Do Check-If-Contractor
+    Let $PoiFlag = 'N'    !Surya Added
 
-IF $Found = 'N'     !Not a contractor
-        AND  $PSEmplid <> ''    !not a blank emplid   ZHR_MOD_ZHRI100A_110A
-    !CQ 103011 Added a check for 'ZHRI102A' - to see IF corresponding row on JOB 
-    IF $WrkProcess = 'ZHRI102A'
-        DO Check-If-Correct102A                
-        IF $OK-To-Process = 'Y'
-            DO Call-Programs
-        ELSE
-            LET $CompletionStatus = 'C'
-            DO Update-Trigger-Row
-        END-IF
-    ELSE
-        DO Call-Programs
-    END-IF
-ELSE
-    IF $Found = 'Y'
-        LET $CompletionStatus = 'C'
-    END-IF
-    IF  $PSEmplid = ''  !ZHR_MOD_ZHRI100A_110A
-        LET $CompletionStatus = 'E'
-    END-IF
-END-IF  !$Found = 'N'
+    If $Found = 'N'     !Not a contractor
+     and  $PSEmplid <> ''    ! not a blank emplid   ZHR_MOD_ZHRI100A_110A
+!CQ 103011 Added a check for 'ZHRI102A' - to see if corresponding row on JOB 
+       if $WrkProcess = 'ZHRI102A'                                       !CQ 103011
+          Do Check-If-Correct102A                                        !CQ 103011                 
+          if $OK-to-process = 'Y'                                        !CQ 103011
+             Do Call-Programs                                            !CQ 103011
+          else                                                           !CQ 103011
+             Let $CompletionStatus = 'C'                                 !CQ 103011
+             Do Update-Trigger-Row                                       !CQ 103011
+          end-if                                                         !CQ 103011
+       else
+          Do Call-Programs
+       end-if
+    Else
 
-IF $CompletionStatus <> 'P'
-    IF ($ADAction_Code <> '') AND ($ADLegOprid <> '')
-        !DO Check-Effdt-Transaction
-        IF $AdFound = 'N'
-            !DO Build-Active-Dir-Output-File    !ZHR_ZHRI100A_REMOVE_AD
-        END-IF
-    END-IF
-    DO Update-Trigger-Row
-END-IF    !$CompletionStatus <> 'P'
+       If $Found = 'Y'
+        Let $CompletionStatus = 'C'
+       End-if
+       IF  $PSEmplid = ''             !ZHR_MOD_ZHRI100A_110A
+       Let $CompletionStatus = 'E'
+       End-if
 
-FROM PS_ZHRT_INTTRIGGER RZ, PS_JOB JB
-WHERE RZ.TASK_FLAG = 'P'
+    End-If    !$Found = 'N'
+
+    If $CompletionStatus <> 'P'
+
+       If ($ADAction_Code <> '') AND ($ADLegOprid <> '')
+   !     DO Check-Effdt-transaction
+         IF $AdFound = 'N'
+  !          Do Build-Active-Dir-Output-File      10/14/2005  Jane Parks / ZHR_ZHRI100A_REMOVE_AD
+         End-If
+       End-If
+     Do Update-Trigger-Row
+    End-If    !$CompletionStatus <> 'P'
+
+from PS_ZHRT_INTTRIGGER RZ
+    ,PS_JOB JB
+where RZ.TASK_FLAG = 'P'
 
 !************************************************************************************
-! Start : ZHR_MOD_INTERFACE_PREHIRE
+! Start : ZHR_MOD_INTERFACE_PREHIRE    Modified  Sree 09/15/00
 !************************************************************************************
-AND (RZ.EFFDT <= $AsOfToday OR RZ.PROC_NAME='ZHRI101A' OR  RZ.PROC_NAME='ZHRI106A')
+  !and RZ.EFFDT <= $AsOfToday
+  and (RZ.EFFDT <= $AsOfToday or RZ.PROC_NAME='ZHRI101A' or  RZ.PROC_NAME='ZHRI106A')
+
 !************************************************************************************
-! End : ZHR_MOD_INTERFACE_PREHIRE
+! End : ZHR_MOD_INTERFACE_PREHIRE    Modified  Sree 09/15/00
 !************************************************************************************
 !************************************************************************************
-! PeopleCode 8.0 fires in different order than 8.3, need to insure the new hire and rehire
-! appear before the other changes even IF they don't show up first in the sequence.
+! Brent Martin 2/16/2009 - 
+!        PeopleCode 8.0 fires in different order than 8.3, need to insure the new hire and rehire
+!        appear before the other changes even if they don't show up first in the sequence.
 !************************************************************************************
-AND (CASE WHEN proc_name IN ('ZHRI101A', 'ZHRI106A') THEN SEQ_NBR ELSE SEQ_NBR*10 END) = 
-        (SELECT MIN(CASE WHEN proc_name IN ('ZHRI101A', 'ZHRI106A') THEN SEQ_NBR ELSE SEQ_NBR*10 END)  
-            FROM PS_ZHRT_INTTRIGGER RZ2
-                WHERE RZ2.EMPLID = RZ.EMPLID
-                    AND RZ2.TASK_FLAG = 'P'
-                    AND (RZ2.EFFDT <= SYSDATE OR RZ2.PROC_NAME='ZHRI101A' 
-                    OR RZ2.PROC_NAME='ZHRI106A'))
-!********************************************************************************** 
-! Join in JOB record to ensure that only employees that have a JOB record get processed.
-!**********************************************************************************
-AND JB.EMPLID = RZ.EMPLID
-AND JB.EFFDT = (SELECT MAX(JB2.EFFDT)
-    FROM PS_JOB JB2
-        WHERE JB2.EMPLID = JB.EMPLID
-            AND JB2.EMPL_RCD = JB.EMPL_RCD)
-            AND JB.EFFSEQ = 
-                (SELECT MAX(JB3.EFFSEQ)
-                    FROM PS_JOB JB3
-                        WHERE JB3.EMPLID = JB.EMPLID
-                            AND JB3.EMPL_RCD = JB.EMPL_RCD
-                            AND JB3.EFFDT = JB.EFFDT)
+  and (case when proc_name in ('ZHRI101A', 'ZHRI106A') then SEQ_NBR else SEQ_NBR*10 END) = 
+      (select min(case when proc_name in ('ZHRI101A', 'ZHRI106A') then SEQ_NBR else SEQ_NBR*10 END)  
+                 from  PS_ZHRT_INTTRIGGER RZ2
+                  where RZ2.EMPLID = RZ.EMPLID
+                    and RZ2.TASK_FLAG = 'P'                                         ! ALS-03/11/2009
+                    and (RZ2.EFFDT <= SYSDATE or RZ2.PROC_NAME='ZHRI101A' or        ! ALS-08/03/2009
+                         RZ2.PROC_NAME='ZHRI106A'))                                 ! ALS-08/03/2009
+!                    and RZ2.TASK_FLAG = 'P'                                        ! ALS-03/11/2009 - Commented Out
+!                    and RZ2.EFFDT <= trunc(sysdate))                               ! ALS-03/11/2009 - Commented Out
+!********************************************************************************** ! ALS-10/08/2008
+! Andy Lee-Sue  10/08/2008 - Join in JOB record to ensure that only employees that  ! ALS-10/08/2008
+!                            have a JOB record get processed.                       ! ALS-10/08/2008
+!********************************************************************************** ! ALS-10/08/2008
+  and JB.EMPLID = RZ.EMPLID                                                         ! ALS-10/08/2008
+  and JB.EFFDT = (SELECT MAX(JB2.EFFDT)                                             ! ALS-10/08/2008
+                    FROM  PS_JOB JB2                                                ! ALS-10/08/2008
+                   WHERE  JB2.EMPLID = JB.EMPLID                                    ! ALS-10/08/2008
+                     AND  JB2.EMPL_RCD = JB.EMPL_RCD)                               ! ALS-03/11/2009
+!                     AND  JB2.EMPL_RCD = JB.EMPL_RCD                                ! ALS-10/08/2008 ! ALS-03/11/2009 - Commented Out
+!                     AND  JB2.EFFDT <= $AsOfToday)                                  ! ALS-10/08/2008 ! ALS-03/11/2009 - Commented Out
+  and JB.EFFSEQ = (SELECT MAX(JB3.EFFSEQ)                                           ! ALS-10/08/2008
+                     FROM PS_JOB JB3                                                ! ALS-10/08/2008
+                    WHERE JB3.EMPLID = JB.EMPLID                                    ! ALS-10/08/2008
+                     AND  JB3.EMPL_RCD = JB.EMPL_RCD                                ! ALS-10/08/2008
+                     AND  JB3.EFFDT = JB.EFFDT)                                     ! ALS-10/08/2008
 End-Select
 
 End-Procedure Get-Trigger-Data
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Call-Programs
 ! Desc:  Subroutine will call appropriate programs
 !----------------------------------------------------------------------
 
 Begin-Procedure Call-Programs
 
-DO Intialize-AD-WrkFields
+do Intialize-AD-WrkFields
 
 evaluate $WrkProcess
 
     when = 'ZHRI101A'
         !Move fields to be used in the called SQC
-        LET $Wrk_Oprid = $AuditOprid
-        LET $Wrk_Emplid = $PSEmplid
-        LET $Wrk_Effdt = $PSEffdt
+        Let $Wrk_Oprid = $AuditOprid
+        Let $Wrk_Emplid = $PSEmplid
+        Let $Wrk_Effdt = $PSEffdt
         move #PSEffseq to #Wrk_Effseq
-        LET $Wrk_Process_Name = $WrkProcess
+        Let $Wrk_Process_Name = $WrkProcess
 
-        LET $Wrk_Inf_ = ' '
-        LET $ADAction_Code = 'H'
-        LET $ADLegOprid = ''
-        DO HR01-Process-Main    !ZHRI101A.SQC
+        Let $Wrk_Inf_ = ' '
+        Let $ADAction_Code = 'H'
+        Let $ADLegOprid = ''
+        Do HR01-Process-Main    !ZHRI101A.SQC
         break
 
     when = 'ZHRI102A'
         !Move fields to be used in the called SQC
         Move #Wrk_Sequence to #WrkSeqNbr
-        LET $PSAuditOperId = $AuditOprid
-        LET $PSDateIn = $PSEffdt
-        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
-        LET $ADAction_Code = 'T'
-        LET $ADLegOprid = ''
+        Let $PSAuditOperId = $AuditOprid
+        Let $PSDateIn = $PSEffdt
+        Let $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+        Let $ADAction_Code = 'T'
+        Let $ADLegOprid = ''
 
-        DO HR02-Process-Main    !ZHRI102A.SQC
+        Do HR02-Process-Main    !ZHRI102A.SQC
         break
 
     when = 'ZHRI104A'
         !Move fields to be used in the called SQC
-        LET $PSUserOprid = $AuditOprid
-        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+        Let $PSUserOprid = $AuditOprid
+        Let $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
         Move #PSEffseq to #WrkEffseq
-        LET $ADAction_Code = 'C'
-        LET $ADLegOprid = ''
+        Let $ADAction_Code = 'C'
+        Let $ADLegOprid = ''
 
-        DO HR04-Process-Main    !ZHRI104A.SQC
+        Do HR04-Process-Main    !ZHRI104A.SQC
         break
 
     when = 'ZHRI105A'
         !Move fields to be used in the called SQC
-        LET $PSemp = $AuditOprid
-        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
-        LET $ADAction_Code = 'C'
-        LET $ADLegOprid = ''
-        LET $Wrk_ADCountryCdBuild = 'Y'                 !sree-UAAMOD
+        Let $PSemp = $AuditOprid
+        Let $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+        Let $ADAction_Code = 'C'
+        Let $ADLegOprid = ''
+        Let $Wrk_ADCountryCdBuild = 'Y'                 !sree-UAAMOD
 
-        DO HR05-Process-Main    !ZHRI105A.SQC
+        Do HR05-Process-Main    !ZHRI105A.SQC
         break
 
     when = 'ZHRI106A'
         !Move fields to be used in the called SQC
-        LET $Wrk_Oprid = $AuditOprid
-        LET $Wrk_Emplid = $PSEmplid
-        LET $Wrk_Effdt = $PSEffdt
+        Let $Wrk_Oprid = $AuditOprid
+        Let $Wrk_Emplid = $PSEmplid
+        Let $Wrk_Effdt = $PSEffdt
         move #PSEffseq to #Wrk_Effseq
-        LET $Wrk_Process_Name = $WrkProcess
-        LET $ADAction_Code = 'R'
+        Let $Wrk_Process_Name = $WrkProcess
+        Let $ADAction_Code = 'R'
 
-        DO HR01-Process-Main       !ZHRI101A.SQC
+        Do HR01-Process-Main       !ZHRI101A.SQC
         break
 
     when = 'ZHRI107A'
-        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
-        LET $ADAction_Code = ''
-        LET $ADLegOprid = ''
-        DO HR07-Process-Main
+        Let $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+        Let $ADAction_Code = ''
+        Let $ADLegOprid = ''
+        Do HR07-Process-Main
         break
 
     when = 'ZHRI109A'
         !Move fields to be used in the called SQC
-        LET $PSUserOprid = $AuditOprid
-        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+        Let $PSUserOprid = $AuditOprid
+        Let $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
         Move #PSEffseq to #WrkEffseq
-        LET $ADAction_Code = 'C'
-        LET $ADLegOprid = ''
-        DO HR09-Process-Main        !ZHRI100A.SQC
+        Let $ADAction_Code = 'C'
+        Let $ADLegOprid = ''
+        Do HR09-Process-Main        !ZHRI100A.SQC
         break
 
     when = 'ZHRI101D'     !Row deleted on hire
-        LET $ErrorProgramParm = 'HRZ101A'
-        LET $ErrorMessageParm = 'A row was deleted on the hire process'
-        LET $WrkCriticalFlag = 'Y'
-        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-        DO Call-Error-Routine
-        LET $WrkCriticalFlag = 'N'
-        LET $CompletionStatus = 'C'
-        DO Update-Trigger-Row
+        Let $ErrorProgramParm = 'HRZ101A'
+        Let $ErrorMessageParm = 'A row was deleted on the hire process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
 
     when = 'ZHRI102D'     !Row deleted on term
-        LET $ErrorProgramParm = 'HRZ102A'
-        LET $ErrorMessageParm = 'A row was deleted on the termination process'
-        LET $WrkCriticalFlag = 'Y'
-        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-        DO Call-Error-Routine
-        LET $WrkCriticalFlag = 'N'
-        LET $CompletionStatus = 'C'
-        DO Update-Trigger-Row
+        Let $ErrorProgramParm = 'HRZ102A'
+        Let $ErrorMessageParm = 'A row was deleted on the termination process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
 
     when = 'ZHRI104D'     !Row deleted on jobstatus change
-        LET $ErrorProgramParm = 'HRZ104A'
-        LET $ErrorMessageParm = 'A row was deleted on the job-profile process'
-        LET $WrkCriticalFlag = 'Y'
-        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-        DO Call-Error-Routine
-        LET $WrkCriticalFlag = 'N'
-        LET $CompletionStatus = 'C'
-        DO Update-Trigger-Row
+        Let $ErrorProgramParm = 'HRZ104A'
+        Let $ErrorMessageParm = 'A row was deleted on the job-profile process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
 
     when = 'ZHRI105D'     !Row deleted on demographis change
-        LET $ErrorProgramParm = 'HRZ105A'
-        LET $ErrorMessageParm = 'A row was deleted on the demographics process'
-        LET $WrkCriticalFlag = 'Y'
-        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-        DO Call-Error-Routine
-        LET $WrkCriticalFlag = 'N'
-        LET $CompletionStatus = 'C'
-        DO Update-Trigger-Row
+        Let $ErrorProgramParm = 'HRZ105A'
+        Let $ErrorMessageParm = 'A row was deleted on the demographics process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
 
     when = 'ZHRI106D'     !Row deleted on rehire
-        LET $ErrorProgramParm = 'HRZ101A'
-        LET $ErrorMessageParm = 'A row was deleted on the re-hire process'
-        LET $WrkCriticalFlag = 'Y'
-        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-        DO Call-Error-Routine
-        LET $WrkCriticalFlag = 'N'
-        LET $CompletionStatus = 'C'
-        DO Update-Trigger-Row
+        Let $ErrorProgramParm = 'HRZ101A'
+        Let $ErrorMessageParm = 'A row was deleted on the re-hire process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
 
     when = 'ZHRI107D'     !Row deleted on
-        LET $ErrorProgramParm = 'HRZ107A'
-        LET $ErrorMessageParm = 'A row was deleted on the dates process'
-        LET $WrkCriticalFlag = 'Y'
-        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-        DO Call-Error-Routine
-        LET $WrkCriticalFlag = 'N'
-        LET $CompletionStatus = 'C'
-        DO Update-Trigger-Row
+        Let $ErrorProgramParm = 'HRZ107A'
+        Let $ErrorMessageParm = 'A row was deleted on the dates process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
 
     when = 'ZHRI109D'
-        LET $ErrorProgramParm = 'HRZ109A'
-        LET $ErrorMessageParm = 'A row was deleted on the group transfer process'
-        LET $WrkCriticalFlag = 'Y'
-        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-        DO Call-Error-Routine
-        LET $WrkCriticalFlag = 'N'
-        LET $CompletionStatus = 'C'
-        DO Update-Trigger-Row
+        Let $ErrorProgramParm = 'HRZ109A'
+        Let $ErrorMessageParm = 'A row was deleted on the group transfer process'
+        Let $WrkCriticalFlag = 'Y'
+        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+        Do Call-Error-Routine
+        Let $WrkCriticalFlag = 'N'
+        Let $CompletionStatus = 'C'
+        Do Update-Trigger-Row
 
     when-other
-        LET $CompletionStatus = 'E'     !update to an E to prevent looping and to mark the record in error
-        DO Update-Trigger-Row
+        Let $CompletionStatus = 'E'     !update to an E to prevent looping and to mark the record in error
+        Do Update-Trigger-Row
         break
 
 end-evaluate
@@ -480,25 +1059,33 @@ end-evaluate
 End-Procedure Call-Programs
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Update-Trigger-Row
 ! Desc:  This routine update the trigger file flag switch
 !----------------------------------------------------------------------
 
 Begin-Procedure Update-Trigger-Row
 
+!#ifdef debugx
+!    show 'inside update trigger row'
+!#end-if !debugx
+
 begin-sql
 
 Update PS_ZHRT_INTTRIGGER
      set Task_Flag = $CompletionStatus
-WHERE SEQ_NBR = #WRKSEQUENCE
+where SEQ_NBR = #WRKSEQUENCE
 
 end-sql
 
-LET $CompletionStatus = 'P'     !Reset the completion Status for next pass
+Let $CompletionStatus = 'P'     !Reset the completion Status for next pass
 
 End-Procedure Update-Trigger-Row
 
+!---------------------------------Surya Added----------------------------!
+
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Get-Trigger-Data-NonEmp
 ! Desc:  This procedure will get the trigger data for non employees and multiple 
 ! EIDs that needs to be interfaced
@@ -506,15 +1093,15 @@ End-Procedure Update-Trigger-Row
 
 Begin-Procedure Get-Trigger-Data-NonEmp
 
-LET $NCompletionStatus = 'P'   !Initialize the CompletionStatus field
+Let $NCompletionStatus = 'P'   !Initialize the CompletionStatus field
 
 Begin-Select loops=150
 
 RN.SEQ_NBR
     MOVE &RN.SEQ_NBR TO #NWrkSequence
-RN.OprId
-    LET $NAuditOprid = Ltrim(Rtrim(&RN.OprId,' '),' ')
-    LET $AuditOprid = Ltrim(Rtrim(&RZ.OprId,' '),' ')
+RN.OPRID
+    LET $NAuditOprid = Ltrim(Rtrim(&RN.OPRID,' '),' ')
+    LET $AuditOprid = Ltrim(Rtrim(&RZ.OPRID,' '),' ')
 RN.EMPLID
     LET $NPSEmplid = Ltrim(Rtrim(&RN.EMPLID,' '),' ')
     Move $NPSEmplid to #NWrk_EmplID1
@@ -532,21 +1119,21 @@ RN.SEQUENCE
    DO Call-Programs-NonEmp  
    
    IF  $NPSEmplid = ''             !ZHR_MOD_ZHRI100A_110A
-      LET $NCompletionStatus = 'E'
-   END-IF
-   LET $PoiFlag = 'Y'
+      Let $NCompletionStatus = 'E'
+   End-if
+   Let $PoiFlag = 'Y'
    
-   IF $NCompletionStatus <> 'P'
-     DO Update-Trigger-Row_NonEmp
-   END-IF  
+   If $NCompletionStatus <> 'P'
+     Do Update-Trigger-Row_NonEmp
+   End-If  
 
-FROM PS_ZHRT_ALTTRIGGER RN
-WHERE RN.TASK_FLAG = 'P'
+from PS_ZHRT_ALTTRIGGER RN
+where RN.TASK_FLAG = 'P'
 and (RN.EFFDT <= $AsOfToday or RN.PROC_NAME='ZHRI201A' or  RN.PROC_NAME='ZHRI206A')
-and (case when proc_name in ('ZHRI201A', 'ZHRI206A') then SEQ_NBR ELSE SEQ_NBR*10 END) = 
-      (select min(case when proc_name in ('ZHRI201A', 'ZHRI206A') then SEQ_NBR ELSE SEQ_NBR*10 END)  
-                 FROM  PS_ZHRT_ALTTRIGGER RN2
-                  WHERE RN2.EMPLID = RN.EMPLID
+and (case when proc_name in ('ZHRI201A', 'ZHRI206A') then SEQ_NBR else SEQ_NBR*10 END) = 
+      (select min(case when proc_name in ('ZHRI201A', 'ZHRI206A') then SEQ_NBR else SEQ_NBR*10 END)  
+                 from  PS_ZHRT_ALTTRIGGER RN2
+                  where RN2.EMPLID = RN.EMPLID
                     AND RN2.SEQUENCE = RN.SEQUENCE
                     AND RN2.PROC_NAME = RN.PROC_NAME 
                     and RN2.TASK_FLAG = 'P'                                         
@@ -559,6 +1146,7 @@ End-Procedure Get-Trigger-Data-NonEmp
 
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Call-Programs-NonEmp
 ! Desc:  Subroutine will call appropriate programs for Non Emp
 !----------------------------------------------------------------------
@@ -571,51 +1159,51 @@ evaluate $NWrkProcess
 
     when = 'ZHRI201A'
         !Move fields to be used in the called SQC
-        LET $Wrk_Oprid = $NAuditOprid
-        LET $Wrk_Emplid = $NPSEmplid
-        LET $Wrk_Effdt = $NPSEffdt
+        Let $Wrk_Oprid = $NAuditOprid
+        Let $Wrk_Emplid = $NPSEmplid
+        Let $Wrk_Effdt = $NPSEffdt
         move #NPSEffseq to #Wrk_Effseq
-        LET $Wrk_indexNum = to_char(#indexNum)
-        LET $Wrk_Process_Name = $NWrkProcess
+        let $Wrk_indexNum = to_char(#indexNum)
+        Let $Wrk_Process_Name = $NWrkProcess
 
-        DO HR201-Process-Main    !ZHRI201A.SQC
+        Do HR201-Process-Main    !ZHRI201A.SQC
         break
 
     when = 'ZHRI202A'
         !Move fields to be used in the called SQC
-        LET $PSAuditOperId = $NAuditOprid
-        LET $PSDateIn = $NPSEffdt
-        LET $Wrk_Emplid = $NPSEmplid 
-        LET $Wrk_indexNum = to_char(#indexNum)                   
+        Let $PSAuditOperId = $NAuditOprid
+        Let $PSDateIn = $NPSEffdt
+        Let $Wrk_Emplid = $NPSEmplid 
+        let $Wrk_indexNum = to_char(#indexNum)                   
 
-        DO HR202-Process-Main    !ZHRI202A.SQC
+        Do HR202-Process-Main    !ZHRI202A.SQC
         break
 
     when = 'ZHRI205A'
         !Move fields to be used in the called SQC
-        LET $PSAuditemp = $NAuditOprid
-        LET $Wrk_Emplid = $NPSEmplid                              
-        LET $Wrk_indexNum = to_char(#indexNum)
-        LET $PSEffdt =  $NPSEffdt     
-        DO HR205-Process-Main    !ZHRI105A.SQC
+        Let $PSAuditemp = $NAuditOprid
+        Let $Wrk_Emplid = $NPSEmplid                              
+        let $Wrk_indexNum = to_char(#indexNum)
+        Let $PSEffdt =  $NPSEffdt     
+        Do HR205-Process-Main    !ZHRI105A.SQC
         break
 
     when = 'ZHRI206A'
         !Move fields to be used in the called SQC
-        LET $Wrk_Oprid = $NAuditOprid
-        LET $Wrk_Emplid = $NPSEmplid
-        LET $Wrk_Effdt = $NPSEffdt
+        Let $Wrk_Oprid = $NAuditOprid
+        Let $Wrk_Emplid = $NPSEmplid
+        Let $Wrk_Effdt = $NPSEffdt
         move #NPSEffseq to #Wrk_Effseq
-        LET $Wrk_indexNum = to_char(#indexNum)
-        LET $Wrk_Process_Name = $NWrkProcess
+        let $Wrk_indexNum = to_char(#indexNum)
+        Let $Wrk_Process_Name = $NWrkProcess
 
-        DO HR201-Process-Main       !ZHRI201A.SQC
+        Do HR201-Process-Main       !ZHRI201A.SQC
         break
 
   
     when-other
-        LET $CompletionStatus = 'E'     !update to an E to prevent looping and to mark the record in error
-        DO Update-Trigger-Row_NonEmp  !Surya Added 
+        Let $CompletionStatus = 'E'     !update to an E to prevent looping and to mark the record in error
+        Do Update-Trigger-Row_NonEmp  !Surya Added 
         break
 
 end-evaluate
@@ -623,68 +1211,88 @@ end-evaluate
 End-Procedure Call-Programs-NonEmp
 
 
+
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Update-Trigger-Row_NonEmp
 ! Desc:  This routine update the trigger file flag switch for Non Emp
 !----------------------------------------------------------------------
 
 Begin-Procedure Update-Trigger-Row_NonEmp
 
+!#ifdef debugx
+!    show 'Inside Update-Trigger-Row_NonEmp'
+!#end-if !debugx
+
 begin-sql
 
 Update PS_ZHRT_ALTTRIGGER
      set Task_Flag = $NCompletionStatus
-WHERE SEQ_NBR = #NWrkSequence
+where SEQ_NBR = #NWrkSequence
 
 end-sql
 
-LET $NCompletionStatus = 'P'     !Reset the completion Status for next pass
+Let $NCompletionStatus = 'P'     !Reset the completion Status for next pass
 
 End-Procedure Update-Trigger-Row_NonEmp
 
+!---------------------------------Surya Added End-------------------------!
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Call-System
 ! Desc:  Executes a command line statement stored in the $Command Variable
 !----------------------------------------------------------------------
 
 Begin-Procedure Call-System
 
-LET #CommandLength = length($Command)             !Get the length of the command
-LET #SubstrStartPos = 1    !Initiate the starting positions to show the first 100 positions
+!#ifdef debugx
+!    show 'inside call system procedure'
+!#end-if !debugx
+
+Let #CommandLength = length($Command)             !Get the length of the command
+Let #SubstrStartPos = 1    !Initiate the starting positions to show the first 100 positions
 
 while #SubstrStartPos <= #CommandLength
-    LET $ShowCommand = substr($Command,#SubstrStartPos,100)   !Substring 100 positions to show
-    LET #SubstrStartPos = #SubstrStartPos + 100    !Increase the starting position by 100
+    Let $ShowCommand = substr($Command,#SubstrStartPos,100)   !Substring 100 positions to show
+    Let #SubstrStartPos = #SubstrStartPos + 100    !Increase the starting position by 100
     Show $ShowCommand        !ZHR_MOD_ZHRI100A_110B
 end-while   !#SubstrStartPos <= #CommandLength
 
-LET $Command = $RexecScript || ' ' || $Command || ' ' || $RMTSVR  !changed for v8.3
+!#ifdef debugx
+!    show 'before call system Rexec'
+!#end-if !debugx
+
+Let $Command = $RexecScript || ' ' || $Command || ' ' || $RMTSVR  !changed for v8.3
 show '$Command=> ' $Command
-DO GET-CURRENT-DATETIME  !Gets the current date and time using curdttim.sqc
+Do GET-CURRENT-DATETIME  !Gets the current date and time using curdttim.sqc
 show 'Calling Command at: ' $SysDateTime   !Surya added
 Call System Using $Command #Status Wait      !Execute the command that was built on the command waiting until completion
 
+!#ifdef debugx
+!    show 'after call system Rexec'
+!#end-if !debugx
 
-IF #status != 0
+If #status != 0
   !error
-  LET $ErrorProgramParm = 'ZHRI100A'
-  LET $ErrorMessageParm = ' '
-  LET $ErrorMessageParm = 'Error executing Call System command, contact HR-PeopleSoft Oncall'
-  LET $WrkCriticalFlag  = 'Y'
-  DO Prepare-Error-Parms
-  IF $PoiFlag = 'N'
-    DO Call-Error-Routine
-  ELSE
-    DO Call-Error-Routine-NonEmp
-  END-IF
-  LET $WrkCriticalFlag  = 'N'
-END-IF
+  Let $ErrorProgramParm = 'ZHRI100A'
+  Let $ErrorMessageParm = ' '
+  Let $ErrorMessageParm = 'Error executing Call System command, contact HR-PeopleSoft Oncall'
+  Let $WrkCriticalFlag  = 'Y'
+  Do Prepare-Error-Parms
+  if $PoiFlag = 'N'
+    Do Call-Error-Routine
+  else
+    Do Call-Error-Routine-NonEmp
+  end-if
+  Let $WrkCriticalFlag  = 'N'
+End-If
 
 End-Procedure Call-System
 
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Prepare-Error-Parms
 ! Desc:  Makes sure that the parms are the correct length for the error
 !        routine RPG program to recieve them
@@ -692,29 +1300,36 @@ End-Procedure Call-System
 
 Begin-Procedure Prepare-Error-Parms
 
+!#ifdef debugx
+!    show 'inside prepare error parms'
+!#end-if !debugx
 
 !Prepare the date and time parms
-DO Get-Current-DateTime                                 !Get the current date and time
+Do Get-Current-DateTime                                 !Get the current date and time
 
-LET $AddDateErrorParm = datetostr(strtodate($AsOfToday,'DD-MON-YYYY'),'YYYYMMDD') !sree**rehost
-LET $AddTimeErrorParm =    substr($Out,10,2)    ||    substr($Out,13,2)    ||    substr($Out,16,2)
-LET $OpridErrorParm   =    Substr($AuditOprid,2,5)
+Let $AddDateErrorParm = datetostr(strtodate($AsOfToday,'DD-MON-YYYY'),'YYYYMMDD') !sree**rehost
+Let $AddTimeErrorParm =    substr($Out,10,2)    ||    substr($Out,13,2)    ||    substr($Out,16,2)
+Let $OpridErrorParm   =    Substr($AuditOprid,2,5)
 
 End-Procedure Prepare-Error-Parms
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Call-Error-Routine
 ! Desc:  Builds the command and calls the error routine
 !----------------------------------------------------------------------
 
 Begin-Procedure Call-Error-Routine
 
+!#ifdef debugx
+!    show 'inside call error routine'
+!#end-if !debugx
 
 !Make Sure that the ErrorMessageParm is always 75 Characters long
-LET $ErrorMessageParm = Substr($ErrorMessageParm,1,75)  !Make sure not more than 75 long
-LET $ErrorMessageParm = Rpad($ErrorMessageParm,75,' ')  !Make sure not less than 75 long
+Let $ErrorMessageParm = Substr($ErrorMessageParm,1,75)  !Make sure not more than 75 long
+let $ErrorMessageParm = Rpad($ErrorMessageParm,75,' ')  !Make sure not less than 75 long
 
-LET $Command =   '"CALL '       ||
+Let $Command =   '"CALL '       ||
                  $Library                     ||
                  '/HRZ110A '                  ||
                  'PARM('''                    ||
@@ -737,22 +1352,27 @@ LET $Command =   '"CALL '       ||
                  'Y'                          ||
                  ''')" '
 
-DO Call-System                                              
+Do Call-System                                              
 
 End-Procedure Call-Error-Routine
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Call-Error-Routine-NonEmp
 ! Desc:  Builds the command and calls the error routine
 !----------------------------------------------------------------------
 
 Begin-Procedure Call-Error-Routine-NonEmp
 
-!Make Sure that the ErrorMessageParm is always 75 Characters long
-LET $ErrorMessageParm = Substr($ErrorMessageParm,1,75)  !Make sure not more than 75 long
-LET $ErrorMessageParm = Rpad($ErrorMessageParm,75,' ')  !Make sure not less than 75 long
+!#ifdef debugx
+!    show 'inside call error routine NonEmp'
+!#end-if !debugx
 
-LET $Command =   '"CALL '       ||
+!Make Sure that the ErrorMessageParm is always 75 Characters long
+Let $ErrorMessageParm = Substr($ErrorMessageParm,1,75)  !Make sure not more than 75 long
+let $ErrorMessageParm = Rpad($ErrorMessageParm,75,' ')  !Make sure not less than 75 long
+
+Let $Command =   '"CALL '       ||
                  $Library                     ||
                  '/HRZ210A '                  ||
                  'PARM('''                    ||
@@ -777,37 +1397,42 @@ LET $Command =   '"CALL '       ||
                  'Y'                          ||
                  ''')" '
 
-DO Call-System                                              
+Do Call-System                                              
 
 End-Procedure Call-Error-Routine-NonEmp
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Check-If-Contractor
-! Desc:  Checks to see IF the employee is a contractor
+! Desc:  Checks to see if the employee is a contractor
 !----------------------------------------------------------------------
 
 Begin-Procedure Check-If-Contractor
 
-LET $Found = 'N'
+!#ifdef debugx
+!    show 'inside check if contractor'
+!#end-if !debugx
+
+Let $Found = 'N'
 
 Begin-Select
 
 'X'
-    LET $Found = 'Y'
+    Let $Found = 'Y'
 
-FROM PS_JOB RJ
-WHERE RJ.EMPLID = $PSEmplid
+From PS_JOB RJ
+where RJ.EMPLID = $PSEmplid
   and RJ.EMPL_CLASS = 'R'
   and RJ.EFFDT = (SELECT MAX(EFFDT)
                     FROM  PS_JOB RJ2
                    WHERE  RJ2.EMPLID = RJ.EMPLID
-                     AND  RJ2.EMPL_RCD = RJ.EMPL_RCD
+                     AND  RJ2.EMPL_RCD = RJ.EMPL_RCD   !changed for v8.3
                      AND  RJ2.EFFDT <= $AsOfToday)
 
   and RJ.EFFSEQ = (SELECT MAX(EFFSEQ)
                      FROM PS_JOB RJ3
                     WHERE RJ3.EMPLID = RJ.EMPLID
-                     AND  RJ3.EMPL_RCD = RJ.EMPL_RCD
+                     AND  RJ3.EMPL_RCD = RJ.EMPL_RCD   !changed for v8.3
                       AND RJ3.EFFDT = RJ.EFFDT)
 
 End-Select
@@ -816,24 +1441,27 @@ End-Procedure Check-If-Contractor
 
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Check-If-Correct102A
-! Desc:  Checks to see IF 102A process has JOB row
+! Desc:  Checks to see if 102A process has JOB row
 !----------------------------------------------------------------------
 
 Begin-Procedure Check-If-Correct102A                         !CQ 103011
 
-LET $OK-To-Process = 'N'
-IF $WrkProcess = 'ZHRI102A'
- DO dtu-add-days($PSEffdt,1,$dt102)
-END-IF
+Let $OK-to-process = 'N'
+if $WrkProcess = 'ZHRI102A'
+ do dtu-add-days($PSEffdt,1,$dt102)
+!else
+! let $dt102 = $PSEffdt 
+end-if
 
 Begin-Select
 
 'XX'
-    LET $OK-To-Process = 'Y'
+    Let $OK-to-process = 'Y'
 
-FROM PS_JOB RD
-WHERE RD.EMPLID = $PSEmplid
+From PS_JOB RD
+where RD.EMPLID = $PSEmplid
   and to_char(RD.EFFDT, 'YYYY-MM-DD') = $dt102
 
 End-Select
@@ -842,218 +1470,303 @@ End-Procedure Check-If-Correct102A
 
 
 !----------------------------------------------------------------------
-! Procedure:  Build-Group-WHERE-Clause
-! Desc:  This routine will build the WHERE clause that will select the
+! ERAC
+! Procedure:  Build-Group-Where-Clause
+! Desc:  This routine will build the where clause that will select the
 !        correct Run-ID to use.
 !----------------------------------------------------------------------
 
-Begin-Procedure Build-Group-WHERE-Clause
+Begin-Procedure Build-Group-Where-Clause
 
-LET $WhereClause = ltrim(rtrim($WhereClause,' '),' ')  !Remove leading and trailing blanks
+!#ifdef debugx
+ !   show 'inside build group where clause'
+!#end-if !debugx
+
+let $WhereClause = ltrim(rtrim($WhereClause,' '),' ')  !Remove leading and trailing blanks
 
 
-IF ($WhereClause = '')  !IF the WHERE clause is empty
-    LET $WhereClause = 'WHERE ((' || $Alias || '.HMRGP = ' || '''' || $SelectGroup || ''''  !Add the first statement to the WHERE clause
+if ($WhereClause = '')  !If the where clause is empty
+    let $WhereClause = 'Where ((' || $Alias || '.HMRGP = ' || '''' || $SelectGroup || ''''  !Add the first statement to the where clause
 
-ELSE  !The WHERE clause is not empty
-    LET $WhereClause = $WhereClause || ' or ' || $Alias || '.HMRGP = ' || '''' ||$SelectGroup || ''''!append a condition to the WHERE clause
+else  !The where clause is not empty
+    let $WhereClause = $WhereClause || ' or ' || $Alias || '.HMRGP = ' || '''' ||$SelectGroup || ''''!append a condition to the where clause
 
-END-IF      !$WhereClause = ''
+end-if      !$WhereClause = ''
 
-End-Procedure   Build-Group-WHERE-Clause
-
-!----------------------------------------------------------------------
-! Procedure:  Build-Emplid-WHERE-Clause
-! Desc:  Builds a WHERE clause based on an employee id entered by the user
-!----------------------------------------------------------------------
-
-Begin-Procedure Build-Emplid-WHERE-Clause
-
-    LET $WhereClause = 'WHERE ((' || $Alias || '.HMREMP = ' || '''' || $Run-Id || ''''  !Create the WHERE clause
-
-End-Procedure Build-Emplid-WHERE-Clause
-
+End-Procedure   Build-Group-Where-Clause
 
 !----------------------------------------------------------------------
-! Procedure:  Get-OprId
+! ERAC
+! Procedure:  Build-Emplid-Where-Clause
+! Desc:  Builds a where clause based on an employee id entered by the user
+!----------------------------------------------------------------------
+
+Begin-Procedure Build-Emplid-Where-Clause
+!#ifdef debugx
+ !   show 'inside build emplid where clause'
+!#end-if !debugx
+
+    let $WhereClause = 'Where ((' || $Alias || '.HMREMP = ' || '''' || $Run-Id || ''''  !Create the where clause
+
+End-Procedure Build-Emplid-Where-Clause
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Get-Oprid
 ! Desc:  This routine gets the operator id from the operator definition
 !        table
 !----------------------------------------------------------------------
 
-Begin-Procedure Get-OprId
+!Begin-Procedure Get-Oprid
+!#ifdef debugx
+!    show 'inside get oprid'
+!#end-if !debugx
 
-LET $Found = 'N'
-LET $PSOprid = ''
+!Let $Found = 'N'
+!Let $PSOprid = ''
 
-IF (#indexNum = 0 and $PoiFlag = 'Y')  or $PoiFlag = 'N'
-    DO Get-LegId-For-Seq0
-ELSE 
-  IF (#indexNum <> 0 and $PoiFlag = 'Y')
-    DO Get-LegId-For-SeqNum
-  END-IF
-END-IF
+!begin-select
+!RPOD.ZHRF_LEG_EMPL_ID
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!IF an OprId does not exist for the employee, create one
-IF ($Found = 'N')
-     DO Get-Legacy-OprId
-     LET $PSOprid = $LegEmplId
-END-IF    !$Found = 'N'
+!    Let $PSOprid = &RPOD.ZHRF_LEG_EMPL_ID
+!    Let $Found = 'Y'
 
-End-Procedure Get-OprId
+!from PS_ZHRT_EMPID_CREF RPOD
+!where RPOD.Emplid = $Wrk_Emplid         !$PSEmployeeNumber   ***sree**10/04/01
+
+!end-select
+
+!If an oprid does not exist for the employee, create one
+!If ($Found = 'N')
+!    do Get-Legacy-Oprid                  !sree**10/04/01
+!   Let $PSOprid = $LegEmplid
+!End-if    !$Found = 'N'
+
+!End-Procedure Get-Oprid
+
+!-----------Surya Commented the above proc and added below----------------!
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Get-Oprid
+! Desc:  This routine gets the operator id from the operator definition
+!        table
+!----------------------------------------------------------------------
+
+Begin-Procedure Get-Oprid
+!#ifdef debugx
+!    show 'inside get oprid'
+!#end-if !debugx
+
+Let $Found = 'N'
+Let $PSOprid = ''
+
+if (#indexNum = 0 and $PoiFlag = 'Y')  or $PoiFlag = 'N'
+    do get-LegID-for-seq0
+else 
+  if (#indexNum <> 0 and $PoiFlag = 'Y')
+    do get-LegID-for-seqnum
+  end-if
+end-if
+
+
+!If an oprid does not exist for the employee, create one
+If ($Found = 'N')
+     do Get-Legacy-Oprid                  !sree**10/04/01
+     Let $PSOprid = $LegEmplid
+End-if    !$Found = 'N'
+
+End-Procedure Get-Oprid
 
 !----------------------------------------------------------------------
-! Procedure:  Get-LegId-For-Seq0
+! ERAC
+! Procedure:  get-LegID-for-seq0
 ! Desc:  This routine gets the Legacy ID from Employee CREF Table for 
 ! Primary EIDs
 !----------------------------------------------------------------------
 
-Begin-Procedure Get-LegId-For-Seq0
+Begin-Procedure get-LegID-for-seq0
 
 begin-select
 RPOD.ZHRF_LEG_EMPL_ID
           
-    LET $PSOprid = &RPOD.ZHRF_LEG_EMPL_ID
-    LET $Found = 'Y'
+    Let $PSOprid = &RPOD.ZHRF_LEG_EMPL_ID
+    Let $Found = 'Y'
     show 'CREF $PSOprid: ' $PSOprid
           
-FROM PS_ZHRT_EMPID_CREF RPOD
-WHERE RPOD.Emplid = $Wrk_Emplid         
+from PS_ZHRT_EMPID_CREF RPOD
+where RPOD.Emplid = $Wrk_Emplid         
           
 end-select
     show 'CREF $Found: ' $Found
-End-Procedure Get-LegId-For-Seq0
+End-Procedure get-LegID-for-seq0
 
 !----------------------------------------------------------------------
-! Procedure:  Get-LegId-For-SeqNum
+! ERAC
+! Procedure:  get-LegID-for-seqnum
 ! Desc:  This routine gets the Legacy ID from Alternate EID Table
 !----------------------------------------------------------------------
 
-Begin-Procedure Get-LegId-For-SeqNum
+Begin-Procedure get-LegID-for-seqnum
 
-!check IF the multiple EID table has the EID!
+!check if the multiple EID table has the EID!
 
 begin-select
 MULT.ZHRF_LEG_EMPL_ID
 
-    LET $PSOprid = Ltrim(Rtrim(&MULT.ZHRF_LEG_EMPL_ID,' '),' ')
-    IF $PSOprid <> ''
-      LET $Found = 'Y'
-    END-IF
+    Let $PSOprid = Ltrim(Rtrim(&MULT.ZHRF_LEG_EMPL_ID,' '),' ')
+    if $PSOprid <> ''
+      Let $Found = 'Y'
+    end-if
     show 'Mult $PSOprid: ' $PSOprid
 
-FROM PS_ZHRR_MULTPL_EID MULT
-WHERE MULT.Emplid = $Wrk_Emplid  
+from PS_ZHRR_MULTPL_EID MULT
+where MULT.Emplid = $Wrk_Emplid  
 and MULT.Sequence = #indexNum      
 
 end-select
 
 show 'MULT $Found: ' $Found
-End-Procedure Get-LegId-For-SeqNum
+End-Procedure get-LegID-for-seqnum
 
 
 !----------------------------------------------------------------------
-! Procedure:  Get-Legacy-OprId
-! Desc:  Gets the new OprId from the legacy system
+! ERAC
+! Procedure:  Get-Legacy-Oprid
+! Desc:  Gets the new oprid from the legacy system
 !----------------------------------------------------------------------
 
-Begin-Procedure Get-Legacy-OprId
+Begin-Procedure Get-Legacy-Oprid                !sree**10/04/01
+!#ifdef debugx
+!    show 'inside get legacy oprid'
+!#end-if !debugx
 
-//		LET $LegEmplId = ''
-//		MOVE $Wrk_Emplid to #wrk_emplid
-//		IF $PoiFlag = 'N'
-//			MOVE 0 to #indexNum
-//		LET $LegEmplId = ''
-//		Begin-Select
-//			HR036P.H36NAM
-//			HR036P.H36EMP
-//			HR036P.H36EM#
-//			  !This IF statement and OR part of Select is a workaround to some problem in v8
-//			  ! (gateway and new version of SQR).  The Select was hanging if it couldn't find a
-//			  ! match in HR036P, so the Select assures that the Select always finds a match.
-//			  LET #WRK_CHR36_H36EM_NUM = &HR036P.H36EM#   !sm 07/12/02
-//			  IF #WRK_CHR36_H36EM_NUM = #wrk_emplid
-//			    LET $LegEmpName = &HR036P.H36NAM
-//			    DO Format-Employee-Name
-//			    LET $LegEmplId = &HR036P.H36EMP
-//			    LET $LegEmplId = substr($LegEmplId,1,5)
-//			    IF (#indexNum = 0 and $PoiFlag = 'Y') OR $PoiFlag = 'N'
-//			    	DO Insert-OprId
-//			    ELSE
-//			    	IF (#indexNum <> 0 AND $PoiFlag = 'Y')
-//			        	DO Update-OprId
-//			      	END-IF
-//			    END-IF  
-//			END-IF    !#WRK_CHR36_H36EM_NUM = #wrk_emplid
-//			FROM HR036P
-//			WHERE HR036P.H36EM# = #wrk_emplid
-//			AND HR036P.H36INX = #indexNum 
-//			UNION
-//			SELECT
-//			' ',
-//			' ' ,
-//			9999999999
-//			FROM DUAL
-//		End-Select
+Let $LegEmplid = ''
+Move $Wrk_Emplid to #wrk_emplid                 !sree***10/04/01
+!Surya Added
+if $PoiFlag = 'N'
+  move 0 to #indexNum
+end-if
+!Surya Added 
 
-End-Procedure Get-Legacy-OprId
+Begin-Select
+CHR36.H36NAM                                               !Rakesh***08/02/2004
+CHR36.H36EMP                                               !Rakesh***08/02/2004
+CHR36.H36EM#                                               !Rakesh***08/02/2004
+
+  show '&CHR36.H36EM#: ' &CHR36.H36EM#
+  show '#wrk_emplid : ' #wrk_emplid 
+  ! This IF statement and OR part of Select is a workaround to some problem in v8
+  !(gateway and new version of SQR).  The Select was hanging if it couldn't find a
+  ! match in HR036P, so the Select assures that the Select always finds a match.
+  LET #WRK_CHR36_H36EM_NUM = &CHR36.H36EM#   !sm 07/12/02  !Rakesh***08/02/2004
+  IF #WRK_CHR36_H36EM_NUM = #wrk_emplid                    !Rakesh***08/02/2004
+    let $LegEmpName = &CHR36.H36NAM                        !Rakesh***08/02/2004
+    Do Format-Employee-Name
+    let $LegEmplid = &CHR36.H36EMP                         !Rakesh***08/02/2004
+    let $LegEmplid = substr($LegEmplid,1,5)
+    !DO Insert-Oprid  !Surya Commented
+    !Surya Added
+    show '#indexNum: ' #indexNum
+    show '$PoiFlag : ' $PoiFlag 
+    If (#indexNum = 0 and $PoiFlag = 'Y')  or $PoiFlag = 'N'
+      show 'Insert-Oprid'
+      DO Insert-Oprid
+    else
+      if (#indexNum <> 0 and $PoiFlag = 'Y')
+        show 'Update-Oprid'
+        DO Update-Oprid
+      end-if
+    end-if  
+    !Surya Added
+  End-if    !#WRK_CHR36_H36EM_NUM = #wrk_emplid            !Rakesh***08/02/2004
+
+from HR036P CHR36                                          !Rakesh***08/02/2004
+where CHR36.H36EM# = #wrk_emplid                           !Rakesh***08/02/2004
+and CHR36.H36INX = #indexNum 
+UNION
+SELECT
+' ',
+' ' ,
+9999999999
+FROM DUAL
+
+End-Select
+
+End-Procedure Get-Legacy-Oprid
 
 !----------------------------------------------------------------------
-! Procedure:  Insert-OprId
+! ERAC
+! Procedure:  Insert-Oprid
 ! Desc:  This routine will insert a row into the PS_ZHRT_EMPID_CREF table for the
-!        employee IF the employee has a record in HR006P
+!        employee if the employee has a record in HR006P
 !----------------------------------------------------------------------
-Begin-Procedure Insert-OprId
+Begin-Procedure Insert-Oprid
+!#ifdef debugx
+!    show 'inside get insert oprid'
+!#end-if !debugx
 
-LET $Insert-Error-Flag = 'N'
+Let $Insert-Error-Flag = 'N'
 !Add to the PS_ZHRT_EMPID_CREF table
-Begin-SQL On-Error = Insert-Error
-    INSERT INTO PS_ZHRT_EMPID_CREF (EMPLID, ZHRF_LEG_EMPL_ID) VALUES ($Wrk_Emplid, $LegEmplId)
+
+Begin-SQL  On-Error= Insert-Error
+INSERT INTO PS_ZHRT_EMPID_CREF (
+EMPLID,
+ZHRF_LEG_EMPL_ID)
+VALUES (
+$Wrk_Emplid,
+$LegEmplid
+)
+
 End-Sql
 
-End-Procedure Insert-OprId
+End-Procedure Insert-Oprid
 
+!Surya Added
 !----------------------------------------------------------------------
-! Procedure:  Update-OprId
+! ERAC
+! Procedure:  Update-Oprid
 ! Desc:  This routine will UPDATE table PS_ZHRR_MULTPL_EID for the
-!        Non Employees and Multiple EIDs IF the employee has a record in HR036P
+!        Non Employees and Multiple EIDs if the employee has a record in HR036P
 !----------------------------------------------------------------------
-Begin-Procedure Update-OprId
+Begin-Procedure Update-Oprid
 !#ifdef debugx
-!    show 'inside get Update OprId'
-!#END-IF !debugx
+!    show 'inside get Update oprid'
+!#end-if !debugx
 
-LET $Update-Error-Flag = 'N'
+Let $Update-Error-Flag = 'N'
 !Update the PS_ZHRR_MULTPL_EID table for Multiple EIDs 
 
 Begin-SQL  On-Error= Update-Error
 UPDATE PS_ZHRR_MULTPL_EID
-SET ZHRF_LEG_EMPL_ID = $LegEmplId
+SET ZHRF_LEG_EMPL_ID = $LegEmplid
 WHERE EMPLID = $Wrk_Emplid
 AND SEQUENCE = #indexNum
 
 End-Sql
 
-End-Procedure Update-OprId
+End-Procedure Update-Oprid
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Insert-Error
-! Desc:  This is an error routine to keep the program from aending when
+! Desc:  This is an error routine to keep the program from abending when
 !        an insert fails
 !----------------------------------------------------------------------
 
 Begin-Procedure Insert-Error
 !#ifdef debugx
 !    show 'inside get insert error'
-!#END-IF !debugx
+!#end-if !debugx
 
-LET $ErrorMessageParm = $Sql-error
-DO Call-Error-Routine
-LET $Insert-Error-Flag = 'Y'
+Let $ErrorMessageParm = $Sql-error
+Do Call-Error-Routine
+Let $Insert-Error-Flag = 'Y'
 
 End-Procedure Insert-Error
 
+!Surya Added
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Update-Error
 ! Desc:  This is an error routine to keep the program from abending when
 !        an insert fails
@@ -1062,57 +1775,66 @@ End-Procedure Insert-Error
 Begin-Procedure Update-Error
 !#ifdef debugx
 !    show 'inside get upadte error'
-!#END-IF !debugx
+!#end-if !debugx
 
-LET $ErrorMessageParm = $Sql-error
-DO Call-Error-Routine
-LET $Update-Error-Flag = 'Y'
+Let $ErrorMessageParm = $Sql-error
+Do Call-Error-Routine
+Let $Update-Error-Flag = 'Y'
 
 End-Procedure Update-Error
 
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Format-Employee-Name
 ! Desc:  This routine will change the format of the employee's name
 ! from Last*First MI* (legacy system) to Last, First MI (PeopleSoft Format)
 !----------------------------------------------------------------------
 
 Begin-Procedure Format-Employee-Name
+!#ifdef debugx
+!    show 'inside format employee name'
+!#end-if !debugx
+
 
 ! Break apart the legacy system name field at the *
 Unstring $LegEmpName by '*' into $PSEmp_Last_Name_Search $PSEmp_First_Name_Search $dummy   ! dummy is for the ending *
 
 !Concatenate the Last name and the first name (separated by a comma(,) that were retrieved from the legacy system, and
 !Unstringed above, into a work variable ($work_a) that will be used as input by the Convert Case routine
-LET $_work_a = $PSEmp_Last_Name_Search || ',' || $PSEmp_First_Name_Search
+Let $_work_a = $PSEmp_Last_Name_Search || ',' || $PSEmp_First_Name_Search
 
 !Execute a routine that will change the case of the $work_a variable to mixed case and return the result
 !in another variable $New
 DO M800-Convert-Case   !ZCvtCaseM.sqc
 !Move the result from the convert-case routine to the PeopleSoft Employee Name field that will be inserted
-LET $PSEmpName = $_New
+let $PSEmpName = $_New
 
 End-Procedure  Format-Employee-Name
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Check-Effdt-Transaction
 !----------------------------------------------------------------------
 
 Begin-Procedure Check-Effdt-Transaction
+!#ifdef debugx
+ !   show 'inside Check-Effdt-Transaction'
+!#end-if !debugx
 
-LET $WrkADEffdt = ''
+Let $WrkADEffdt = ''
 
 IF $Wrkprocess = 'ZHRI102A'
   DO dtu-add-days($PSEffdt,1,$WrkADEffdt)
  ELSE
-  LET $WrkADEffdt = $PSEffdt
+  Let $WrkADEffdt = $PSEffdt
 END-IF
 
-LET $AdFound = 'N'
+Let $AdFound = 'N'
 
 BEGIN-SELECT
 'XA'
-   LET $AdFound = 'Y'
+   Let $AdFound = 'Y'
 
 FROM  PS_JOB AD01
 WHERE AD01.EMPLID = $PSEmplid
@@ -1124,7 +1846,7 @@ END-SELECT
 
 BEGIN-SELECT
 'XB'
-   LET $AdFound = 'Y'
+   Let $AdFound = 'Y'
 
 FROM  PS_PERS_DATA_EFFDT AD02
 WHERE AD02.EMPLID = $PSEmplid
@@ -1135,103 +1857,115 @@ END-SELECT
 End-Procedure Check-Effdt-Transaction
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Build-Active-Dir-Output-File
 !----------------------------------------------------------------------
 
 Begin-Procedure Build-Active-Dir-Output-File
+!#ifdef debugx
+!    show 'inside build active dir output file'
+!#end-if !debugx
 
-LET $Wrkcreatefile = 'Y'
-IF $Wrk_AD_JobDataBuild = 'N'
-   DO AD-Get-Job-Data
-END-IF
+Let $Wrkcreatefile = 'Y'
+If $Wrk_AD_JobDataBuild = 'N'
+   do AD-Get-Job-Data
+End-If
 
-DO AD-Get-Job-Description
-DO AD-Get-EmplStatus-Description
+do AD-Get-Job-Description
+do AD-Get-EmplStatus-Description
 
-IF $Wrk_AD_PersdataEffdtBuild = 'N'
- DO AD-Get-Pers-Data-Effdt
-END-IF
+If $Wrk_AD_PersdataEffdtBuild = 'N'
+ do AD-Get-Pers-Data-Effdt
+End-If
 
-IF $Wrk_AD_Getbusinessphone = 'N'
- DO AD-Get-Business-Phone
-END-IF
+If $Wrk_AD_Getbusinessphone = 'N'
+ do AD-Get-Business-Phone
+End-If
 
-IF $Wrk_AD_PersDataBuild = 'N'
- DO AD-Get-Personal-Data
-END-IF
+If $Wrk_AD_PersDataBuild = 'N'
+ do AD-Get-Personal-Data
+End-If
 
-IF $Wrk_AD_CountryCdBuild = 'N'
- DO AD-Get-Country-Code
-END-IF
+If $Wrk_AD_CountryCdBuild = 'N'
+ do AD-Get-Country-Code
+End-If
 
-DO AD-Get-Employee-Fax
-DO AD-Get-Namesuffix
-DO AD-Get-JobStart-Date
-DO AD-Get-Employment-Data
+do AD-Get-Employee-Fax
+do AD-Get-Namesuffix
+do AD-Get-JobStart-Date
+do AD-Get-Employment-Data
 
-IF $ADSupervisorID <> ''
-DO AD-Get-LegSuperviorID
-END-IF
+If $ADSupervisorID <> ''
+do AD-Get-LegSuperviorID
+End-If
 
-IF $Wrk_AD_NamesBuild = 'N'
- DO AD-Get-Names
-END-IF
+If $Wrk_AD_NamesBuild = 'N'
+ do AD-Get-Names
+End-If
 
-LET $ADEmplid = $PSEmplid
+Let $ADEmplid = $PSEmplid
 
-LET $ADFirstName = $ADPSFirstName || ' ' || $ADPSMiddleName       !changed for v8.3
-LET $ADLastName = $ADPSLastName
+Let $ADFirstName = $ADPSFirstName || ' ' || $ADPSMiddleName       !changed for v8.3
+Let $ADLastName = $ADPSLastName
 
-LET $ADLocation = $PSLocation
-LET $ADJobCd  = $PSJobcode
-LET $ADJobDescr = $PSJobDescription
-LET $ADEmplStatus = $PSEmplStatus
-  IF $PSRehireDt <> ''
-    LET $ADHireDt = $PSRehiredt
-  ELSE
-    LET $ADHireDt = $PSHiredt
-  END-IF
-IF ($PSAction = 'REH')
+Let $ADLocation = $PSLocation
+Let $ADJobCd  = $PSJobcode
+Let $ADJobDescr = $PSJobDescription
+Let $ADEmplStatus = $PSEmplStatus
+  If $PSRehireDt <> ''
+    Let $ADHireDt = $PSRehiredt
+  else
+    Let $ADHireDt = $PSHiredt
+  End-If
+If ($PSAction = 'REH')
 and ($PSAction_Reason = 'REH')
 and ($WrkProcess = 'ZHRI102A')
- LET $ADAction_Code = 'R'
-END-IF
+ Let $ADAction_Code = 'R'
+End-If
 
-LET $ADCountry = $PSLoc_Country
-LET $ADFullPartTime = $PSFullPartTime
-LET $ADEmplClass = $PSEmplClass
-LET $ADDeptID  = $PSDeptId
-LET $ADBusinessPhone = $PSBusiness_Phone
-LET $ADLangCd = $PSLangCd
-LET $ADPrfName = $PSPrfName
+!  If $ADAction_Code = 'T'
+    Let $ADTermDt = $PSTerminationdt
+!  End-If
 
-DO Write-Active-Dir-Output-File
+Let $ADCountry = $PSLoc_Country
+Let $ADFullPartTime = $PSFullPartTime
+Let $ADEmplClass = $PSEmplClass
+Let $ADDeptID  = $PSDeptId
+Let $ADBusinessPhone = $PSBusiness_Phone
+Let $ADLangCd = $PSLangCd
+Let $ADPrfName = $PSPrfName
+
+do Write-Active-Dir-Output-File
 End-Procedure Build-Active-Dir-Output-File
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  AD-Get-Job-Data
 ! Desc:  Gets the Job data from the job table.
 !----------------------------------------------------------------------
 
 Begin-Procedure AD-Get-Job-Data
+!#ifdef debugx
+!    show 'inside ad get job data'
+!#end-if !debugx
 
 Begin-Select
 
 AD.LOCATION
-    LET $PSLocation = ltrim(rtrim(&AD.LOCATION,' '),' ')            !Remove leading and trailing blanks
+    let $PSLocation = ltrim(rtrim(&AD.LOCATION,' '),' ')            !Remove leading and trailing blanks
 AD.FULL_PART_TIME
-    LET $PSFullPartTime = ltrim(rtrim(&AD.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
+    let $PSFullPartTime = ltrim(rtrim(&AD.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
 AD.EMPL_CLASS
-    LET $PSEmplClass = ltrim(rtrim(&AD.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
+    let $PSEmplClass = ltrim(rtrim(&AD.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
 AD.EMPL_STATUS
-    LET $PSEmplStatus = ltrim(rtrim(&AD.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
+    let $PSEmplStatus = ltrim(rtrim(&AD.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
 AD.DEPTID
-    LET $PSDeptid = ltrim(rtrim(&AD.DEPTID,' '),' ')                !Remove leading and trailing blanks
+    let $PSDeptid = ltrim(rtrim(&AD.DEPTID,' '),' ')                !Remove leading and trailing blanks
 AD.JOBCODE
-    LET $PSJobcode = ltrim(rtrim(&AD.JOBCODE,' '),' ')              !Remove leading and trailing blanks
+    let $PSJobcode = ltrim(rtrim(&AD.JOBCODE,' '),' ')              !Remove leading and trailing blanks
 
-FROM PS_JOB AD
-WHERE AD.EMPLID = $Wrk_Emplid
+from PS_JOB AD
+where AD.EMPLID = $Wrk_Emplid
   and AD.EFFDT = (SELECT MAX(EFFDT)
                     FROM  PS_JOB AD1
                    WHERE  AD1.EMPLID = AD.EMPLID
@@ -1249,71 +1983,87 @@ End-Select
 End-Procedure AD-Get-Job-Data
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure: AD-Get-Job-Description
 ! Desc:  This routine will get the Job description for Active Directory File Build
 !----------------------------------------------------------------------
 
 Begin-Procedure AD-Get-Job-Description
+!#ifdef debugx
+ !   show 'inside ad get job description'
+!#end-if !debugx
 
-LET $PSJobDescription = ''
+let $PSJobDescription = ''
 Begin-Select
 
 AD9.JOBCODE
 AD9.DESCR
 
- LET $PSJobDescription = ltrim(rtrim(&AD9.DESCR,' '),' ')
+ let $PSJobDescription = ltrim(rtrim(&AD9.DESCR,' '),' ')
 
-FROM PS_JOBCODE_TBL AD9
-WHERE AD9.JOBCODE = $PSJobcode
+from PS_JOBCODE_TBL AD9
+where AD9.JOBCODE = $PSJobcode
 
 End-select
 
 End-Procedure AD-Get-Job-Description
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure: AD-Get-EmplStatus-Description
 ! Desc:  This routine will get the Employee Status description for Active Directory File Build
 !----------------------------------------------------------------------
 
 Begin-Procedure AD-Get-EmplStatus-Description
+!#ifdef debugx
+!    show 'inside ad get emplstatus description'
+!#end-if !debugx
 
 Begin-Select
 
 AD10.XLATLONGNAME
 
- LET $ADEmplStatusDescr = ltrim(rtrim(&AD10.XLATLONGNAME,' '),' ')
+ let $ADEmplStatusDescr = ltrim(rtrim(&AD10.XLATLONGNAME,' '),' ')
 
-FROM PSXLATITEM AD10
+! from XLATTABLE AD10                                                               ! ALS-10/08/2008 - Commented Out
+from PSXLATITEM AD10                                                                ! ALS-10/08/2008
 
-WHERE AD10.FIELDNAME = 'EMPL_STATUS'
+where AD10.FIELDNAME = 'EMPL_STATUS'
 and AD10.FIELDVALUE = $PSEmplstatus
-and AD10.EFFDT = (Select max(AD11.EFFDT) FROM PSXLATITEM AD11
-                  WHERE AD10.FIELDNAME = AD11.FIELDNAME
+! and AD10.LANGUAGE_CD = 'ENG'                                                      ! ALS-10/08/2008 - Commented Out
+! and AD10.EFFDT = (Select max(AD11.EFFDT) from XLATTABLE AD11                      ! ALS-10/08/2008 - Commented Out
+and AD10.EFFDT = (Select max(AD11.EFFDT) from PSXLATITEM AD11                       ! ALS-10/08/2008
+                  where AD10.FIELDNAME = AD11.FIELDNAME
                   and AD10.FIELDVALUE = AD11.FIELDVALUE
-                  and AD11.EFFDT <= SYSDATE
+!                  and AD10.LANGUAGE_CD = AD11.LANGUAGE_CD                          ! ALS-10/08/2008 - Commented Out
+                  and AD11.EFFDT <= SYSDATE                                         ! ALS-10/08/2008
                                   )
 End-Select
 End-Procedure AD-Get-EmplStatus-Description
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  AD-Get-JobStart-Date
 ! Desc:  Gets the Job Start date from the job table.
 !----------------------------------------------------------------------
 
 Begin-Procedure AD-Get-JobStart-Date
+!#ifdef debugx
+ !   show 'inside ad get job start date'
+!#end-if !debugx
 
 Begin-Select
 
 to_char(AD4.EFFDT,'YYYY-MM-DD') &AD4.EFFDT
 
-  LET $ADJobStartYr   = substr(&AD4.EFFDT,1,4)
-  LET $ADJobStartMnth = substr(&AD4.EFFDT,6,2)
-  LET $ADJobStartDay  = substr(&AD4.EFFDT,9,2)
-  LET $ADJobStartdt   = $ADJobStartYr || $ADJobStartMnth || $ADJobStartDay
+  Let $ADJobStartYr   = substr(&AD4.EFFDT,1,4)
+  Let $ADJobStartMnth = substr(&AD4.EFFDT,6,2)
+  Let $ADJobStartDay  = substr(&AD4.EFFDT,9,2)
+  Let $ADJobStartdt   = $ADJobStartYr || $ADJobStartMnth || $ADJobStartDay
 
-    LET $PSJobStartdt = &AD4.EFFDT
-FROM PS_JOB AD4
-WHERE AD4.EMPLID = $Wrk_Emplid
+    let $PSJobStartdt = &AD4.EFFDT
+from PS_JOB AD4
+where AD4.EMPLID = $Wrk_Emplid
   and AD4.JOBCODE = $PSJobcode
   and AD4.EFFDT = (SELECT MIN(EFFDT)
                     FROM  PS_JOB AD5
@@ -1334,13 +2084,17 @@ end-select
 End-Procedure AD-Get-JobStart-Date
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  AD-Get-Pers-Data-Effdt
 ! Desc:  This routine will get the Personal Data row for each of the
 !        employee numbers entered in the trigger file.  Pers_Data_Effdt table
 !        no longer has name info, so are using Names table.
 !----------------------------------------------------------------------
 
-Begin-Procedure Ad-Get-Pers-Data-Effdt
+Begin-Procedure AD-Get-Pers-Data-effdt
+!#ifdef debugx
+ !   show 'inside ad get pers data effdt'
+!#end-if !debugx
 
 begin-select
 
@@ -1348,16 +2102,16 @@ ADPDE2A.First_Name
 ADPDE2A.Last_Name
 ADPDE2A.Middle_Name    !added for v8.3
 
-  LET $ADPSLastName   = RTRIM(LTRIM(&ADPDE2A.Last_Name,' '),' ')
-  LET $ADPSFirstName  = RTRIM(LTRIM(&ADPDE2A.First_Name,' '),' ')
-  LET $ADPSMiddleName = RTRIM(LTRIM(&ADPDE2A.Middle_Name,' '),' ')
-  LET $ADPSMiddleName = SUBSTR($ADPSMiddleName,1,1)
+  Let $ADPSLastName   = RTRIM(LTRIM(&ADPDE2A.Last_Name,' '),' ')
+  Let $ADPSFirstName  = RTRIM(LTRIM(&ADPDE2A.First_Name,' '),' ')
+  Let $ADPSMiddleName = RTRIM(LTRIM(&ADPDE2A.Middle_Name,' '),' ')
+  Let $ADPSMiddleName = SUBSTR($ADPSMiddleName,1,1)
 
-FROM PS_NAMES ADPDE2A     !Changed for v8.3
-WHERE ADPDE2A.Emplid = $PSEmplid
+from PS_NAMES ADPDE2A     !Changed for v8.3
+where ADPDE2A.Emplid = $PSEmplid
   and ADPDE2A.NAME_TYPE = 'PRI'                                    !added for v8.3
-  and ADPDE2A.Effdt = (select max(ADPDE2B.effdt) FROM  PS_NAMES ADPDE2B  !Changed for v8.3
-                       WHERE ADPDE2B.emplid    = ADPDE2A.emplid
+  and ADPDE2A.Effdt = (select max(ADPDE2B.effdt) from  PS_NAMES ADPDE2B  !Changed for v8.3
+                       where ADPDE2B.emplid    = ADPDE2A.emplid
                        and   ADPDE2B.NAME_TYPE = ADPDE2A.NAME_TYPE
                        and   to_char(ADPDE2B.EFFDT,'YYYY-MM-DD') <= $PSEffdt) !added for v8.3
 
@@ -1366,25 +2120,29 @@ end-select
 end-procedure AD-Get-Pers_Data-Effdt
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  AD-Get-NameSuffix
 ! Desc:  This routine will get the Name Suffix row for each of the
 !        employee numbers entered in the trigger file.
 !----------------------------------------------------------------------
 
 Begin-Procedure AD-Get-NameSuffix
+!#ifdef debugx
+ !   show 'inside ad get name suffix'
+!#end-if !debugx
 
 begin-select
 
 ANAME.Name_Suffix
 
-  LET $ADNameSuffix  = RTRIM(LTRIM(&ANAME.Name_Suffix,' '),' ')
-  LET $ADNameSuffix  = SUBSTR($ADNameSuffix,1,5)
+  Let $ADNameSuffix  = RTRIM(LTRIM(&ANAME.Name_Suffix,' '),' ')
+  Let $ADNameSuffix  = SUBSTR($ADNameSuffix,1,5)
 
-FROM PS_NAMES ANAME     !Changed for v8.3
-WHERE ANAME.Emplid = $PSEmplid
+from PS_NAMES ANAME     !Changed for v8.3
+where ANAME.Emplid = $PSEmplid
   and ANAME.NAME_TYPE = 'PRI'                                    !added for v8.3
-  and ANAME.Effdt = (select max(ANAME2.effdt) FROM  PS_NAMES ANAME2  !Changed for v8.3
-                       WHERE ANAME2.emplid     = ANAME.emplid
+  and ANAME.Effdt = (select max(ANAME2.effdt) from  PS_NAMES ANAME2  !Changed for v8.3
+                       where ANAME2.emplid     = ANAME.emplid
                        and   ANAME2.NAME_TYPE  = ANAME.NAME_TYPE
                        and   to_char(ANAME2.EFFDT,'YYYY-MM-DD') <= $PSEffdt) !added for v8.3
 
@@ -1393,65 +2151,77 @@ end-select
 end-procedure AD-Get-NameSuffix
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  AD-Get-Personal-Data
 ! Desc:  This routine will get the Personal Data row for each of the
 !        employee numbers entered in the trigger file.
 !----------------------------------------------------------------------
 
 Begin-Procedure AD-Get-Personal-Data
+!#ifdef debugx
+ !   show 'inside ad get personal data '
+!#end-if !debugx
 
-LET $PSLangCd = ''
+Let $PSLangCd = ''
 
 begin-select
 
 ADPD.LANG_CD
 
-  LET $PSLangCd = RTRIM(LTRIM(&ADPD.LANG_CD,' '),' ')
+  Let $PSLangCd = RTRIM(LTRIM(&ADPD.LANG_CD,' '),' ')
 
-FROM PS_Personal_Data ADPD
-WHERE ADPD.Emplid = $PSEmplid
+from PS_Personal_Data ADPD
+where ADPD.Emplid = $PSEmplid
 
 end-select
 
 end-procedure AD-Get-Personal-Data
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure: AD-Get-Country-Code
 ! Desc:  This routine will get the Country Code for Active Directory File Build
 !----------------------------------------------------------------------
 
 Begin-Procedure AD-Get-Country-Code
+!#ifdef debugx
+ !   show 'inside ad get country code '
+!#end-if !debugx
 
-LET $PSLoc_Country = ''
+Let $PSLoc_Country = ''
 
 Begin-Select
 
 ADL2.COUNTRY
-    LET $PSLoc_Country = ltrim(rtrim(&ADL2.COUNTRY,' '),' ')         !Remove leading and trailing blanks
+    let $PSLoc_Country = ltrim(rtrim(&ADL2.COUNTRY,' '),' ')         !Remove leading and trailing blanks
 
-FROM PS_LOCATION_TBL ADL2
-WHERE ADL2.LOCATION = $PSLOCATION
+from PS_LOCATION_TBL ADL2
+where ADL2.LOCATION = $PSLOCATION
 
 end-select
 
 End-Procedure AD-Get-Country-Code
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  AD-Get-Business-Phone
 ! Desc:  This routine gets the business phone number from the Peoplesoft
 !        tables.
 !----------------------------------------------------------------------
 
 Begin-Procedure AD-Get-Business-Phone
+!#ifdef debugx
+ !   show 'inside ad get business phone '
+!#end-if !debugx
 
-LET $PSBusiness_Phone = ''
+Let $PSBusiness_Phone = ''
 begin-select
 ADPP2.Phone
 
- DO Remove-Non-Letters-Numbers (&ADPP2.Phone, $PSBusiness_Phone)   !from ZRmvSpcChr.sqc
+ do Remove-Non-Letters-Numbers (&ADPP2.Phone, $PSBusiness_Phone)   !From ZRmvSpcChr.sqc
 
-FROM PS_Personal_Phone ADPP2
-WHERE ADPP2.Phone_Type = 'BUSN'
+from PS_Personal_Phone ADPP2
+where ADPP2.Phone_Type = 'BUSN'
   and ADPP2.Emplid = $PSEmplid
 
 end-select
@@ -1459,19 +2229,23 @@ end-select
 end-procedure AD-Get-Business-Phone
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  AD-Get-Employee-Fax
 ! Desc:  This routine gets the business phone number from the Peoplesoft
 !        tables.
 !----------------------------------------------------------------------
 
 Begin-Procedure AD-Get-Employee-Fax
+!#ifdef debugx
+ !   show 'inside ad get employee fax'
+!#end-if !debugx
 
 begin-select
 ADPP3.Phone
- DO Remove-Non-Letters-Numbers (&ADPP3.Phone, $ADEmployeeFax)   !from ZRmvSpcChr.sqc
+ do Remove-Non-Letters-Numbers (&ADPP3.Phone, $ADEmployeeFax)   !From ZRmvSpcChr.sqc
 
-FROM PS_Personal_Phone ADPP3
-WHERE ADPP3.Phone_Type = 'FAX'
+from PS_Personal_Phone ADPP3
+where ADPP3.Phone_Type = 'FAX'
   and ADPP3.Emplid = $PSEmplid
 
 end-select
@@ -1479,80 +2253,91 @@ end-select
 end-procedure AD-Get-Employee-Fax
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  AD-Get-LegSuperviorID
 !----------------------------------------------------------------------
 
 Begin-Procedure AD-Get-LegSuperviorID
+!#ifdef debugx
+ !   show 'inside ad get leg supervisor id '
+!#end-if !debugx
 
 begin-select
 RPOD1.ZHRF_LEG_EMPL_ID
 
-  LET $ADLegSupervisorID = &RPOD1.ZHRF_LEG_EMPL_ID
+  Let $ADLegSupervisorID = &RPOD1.ZHRF_LEG_EMPL_ID
 
-FROM PS_ZHRT_EMPID_CREF RPOD1
-WHERE RPOD1.Emplid = $ADSupervisorID
+from PS_ZHRT_EMPID_CREF RPOD1
+where RPOD1.Emplid = $ADSupervisorID
 
 end-select
 
 end-procedure AD-Get-LegSuperviorID
 
 !---------------------------------------------------------------------------------------
+! ERAC
 ! Procedure:  AD-Get-Employment-Data
 ! Desc:  This routine will get the Termination Data row for Active Directory File Build
 !---------------------------------------------------------------------------------------
 
 Begin-Procedure AD-Get-Employment-Data
+!#ifdef debugx
+ !   show 'inside ad get employee data '
+!#end-if !debugx
 
-LET $PSHiredt = ' '
-LET $PSRehiredt = ' '
-LET $PSTerminationdt = ' '
-LET $ADSupervisorID = ' '
+Let $PSHiredt = ' '
+Let $PSRehiredt = ' '
+Let $PSTerminationdt = ' '
+Let $ADSupervisorID = ' '
 
 begin-select
 
 to_char(ADE.HIRE_DT,'YYYY-MM-DD')       &ADEHire_Dt
-  LET $PSHireYr = substr(&ADEHire_Dt,1,4)
-  LET $PSHireMnth = substr(&ADEHire_Dt,6,2)
-  LET $PSHireDay = substr(&ADEHire_Dt,9,2)
-  LET $PSHiredt = $PSHireYr || $PSHireMnth || $PSHireDay
+  Let $PSHireYr = substr(&ADEHire_Dt,1,4)
+  Let $PSHireMnth = substr(&ADEHire_Dt,6,2)
+  Let $PSHireDay = substr(&ADEHire_Dt,9,2)
+  Let $PSHiredt = $PSHireYr || $PSHireMnth || $PSHireDay
 
 to_char(ADE.REHIRE_DT,'YYYY-MM-DD')       &ADERehire_Dt
-  LET $PSRehireYr = substr(&ADERehire_Dt,1,4)
-  LET $PSRehireMnth = substr(&ADERehire_Dt,6,2)
-  LET $PSRehireDay = substr(&ADERehire_Dt,9,2)
-  LET $PSRehiredt = $PSRehireYr || $PSRehireMnth || $PSRehireDay
+  Let $PSRehireYr = substr(&ADERehire_Dt,1,4)
+  Let $PSRehireMnth = substr(&ADERehire_Dt,6,2)
+  Let $PSRehireDay = substr(&ADERehire_Dt,9,2)
+  Let $PSRehiredt = $PSRehireYr || $PSRehireMnth || $PSRehireDay
 
 to_char(ADE.TERMINATION_DT,'YYYY-MM-DD')  &ADETermination_Dt
-  LET $PSTermYr = substr(&ADETermination_Dt,1,4)
-  LET $PSTermMnth = substr(&ADETermination_Dt,6,2)
-  LET $PSTermDay = substr(&ADETermination_Dt,9,2)
-  LET $PSTerminationdt =  $PSTermYr || $PSTermMnth || $PSTermDay
+  Let $PSTermYr = substr(&ADETermination_Dt,1,4)
+  Let $PSTermMnth = substr(&ADETermination_Dt,6,2)
+  Let $PSTermDay = substr(&ADETermination_Dt,9,2)
+  Let $PSTerminationdt =  $PSTermYr || $PSTermMnth || $PSTermDay
 ADE.SUPERVISOR_ID
-  LET $ADSupervisorID = &ADE.SUPERVISOR_ID
+  Let $ADSupervisorID = &ADE.SUPERVISOR_ID
 
-FROM PS_Employment ADE
-WHERE ADE.Emplid = $PSEmplid
+from PS_Employment ADE
+where ADE.Emplid = $PSEmplid
 
 end-select
 
 end-procedure AD-Get-Employment-Data
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  AD-Get-Names
 ! Desc:  This routine gets the Preferred Name from PS_Names for Active Directory File Build
 !----------------------------------------------------------------------
 
 Begin-Procedure AD-Get-Names
-
-LET $PSPrfName = ''
+!#ifdef debugx
+ !   show 'inside ad get names '
+!#end-if !debugx
+Let $PSPrfName = ''
 
 begin-select
 ADN.First_Name   !changed for v8.3 and defect 993
 
-  LET $PSPrfName = RTRIM(LTRIM(&ADN.First_Name,' '),' ')
+  Let $PSPrfName = RTRIM(LTRIM(&ADN.First_Name,' '),' ')
 
-FROM PS_Names ADN
-WHERE ADN.Emplid = $PSEmplid
+from PS_Names ADN
+where ADN.Emplid = $PSEmplid
   and ADN.NAME_TYPE = 'PRF'
   and ADN.EFFDT     = (SELECT MAX(EFFDT) FROM PS_Names ADN2   !added for v8.3
                       WHERE ADN2.EMPLID   = ADN.EMPLID        !added for v8.3
@@ -1564,12 +2349,16 @@ end-select
 end-procedure AD-Get-Names
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Write-Active-Dir-Output-File
 !----------------------------------------------------------------------
 
 Begin-Procedure Write-Active-Dir-Output-File
+!#ifdef debugx
+ !   show 'inside write active dir output file '
+!#end-if !debugx
 
- Write 1 FROM
+    Write 1 from
  $ADAction_Code:1          ! Action Code (H=Hire, C=Change, T=Termination)
  '|':1
  $ADLegOprid:5             ! Legacy Employee Id
@@ -1621,45 +2410,49 @@ Begin-Procedure Write-Active-Dir-Output-File
 End-Procedure Write-Active-Dir-Output-File
 
 !----------------------------------------------------------------------
+! ERAC
 ! Procedure:  Intialize-AD-WrkFields
 !----------------------------------------------------------------------
 Begin-Procedure Intialize-AD-WrkFields
+!#ifdef debugx
+ !   show 'inside initialize ad wrk fields '
+!#end-if !debugx
 
-LET $Wrk_AD_NamesBuild = 'N'
-LET $Wrk_AD_PersDataBuild = 'N'
-LET $Wrk_AD_PersDataEffdtBuild = 'N'
-LET $Wrk_AD_JobDataBuild = 'N'
-LET $Wrk_AD_CountryCdBuild = 'N'
-LET $Wrk_AD_Getbusinessphone = 'N'
-LET $ADAction_Code = ''
-LET $ADLegOprid = ''
-LET $ADEmplid = ''
-LET $ADFirstName = ''
-LET $ADLastName = ''
-LET $ADLocation = ''
-LET $ADJobCd  = ''
-LET $ADJobDescr = ''
-LET $ADEmplStatus = ''
-LET $ADEmplStatusDescr = ''
-LET $ADHireDt = 0
-LET $ADTermDt = 0
-LET $ADNamesuffix = ''
-LET $ADCountry = ''
-LET $ADJobStartDt = 0
-LET $ADJobStartYr = 0
-LET $ADJobStartMnth = 0
-LET $ADJobStartDay = 0
-LET $ADPrfName = ''
-LET $ADFullPartTime = ''
-LET $ADEmplClass = ''
-LET $ADDeptID  = ''
-LET $ADBusinessPhone = ''
-LET $ADEmployeeFax = ''
-LET $ADSupervisorID = ''
-LET $ADLegSupervisorID = ''
-LET $ADLangCd = ''
-LET $Wrkcreatefile = 'N'
-LET $WrkADEffdt = ''
+Let $Wrk_AD_NamesBuild = 'N'
+Let $Wrk_AD_PersDataBuild = 'N'
+Let $Wrk_AD_PersDataEffdtBuild = 'N'
+Let $Wrk_AD_JobDataBuild = 'N'
+Let $Wrk_AD_CountryCdBuild = 'N'
+Let $Wrk_AD_Getbusinessphone = 'N'
+Let $ADAction_Code = ''
+Let $ADLegOprid = ''
+Let $ADEmplid = ''
+Let $ADFirstName = ''
+Let $ADLastName = ''
+Let $ADLocation = ''
+Let $ADJobCd  = ''
+Let $ADJobDescr = ''
+Let $ADEmplStatus = ''
+Let $ADEmplStatusDescr = ''
+Let $ADHireDt = 0
+Let $ADTermDt = 0
+Let $ADNamesuffix = ''
+Let $ADCountry = ''
+Let $ADJobStartDt = 0
+Let $ADJobStartYr = 0
+Let $ADJobStartMnth = 0
+Let $ADJobStartDay = 0
+Let $ADPrfName = ''
+Let $ADFullPartTime = ''
+Let $ADEmplClass = ''
+Let $ADDeptID  = ''
+Let $ADBusinessPhone = ''
+Let $ADEmployeeFax = ''
+Let $ADSupervisorID = ''
+Let $ADLegSupervisorID = ''
+Let $ADLangCd = ''
+Let $Wrkcreatefile = 'N'
+Let $WrkADEffdt = ''
 End-Procedure Intialize-AD-WrkFields
 
 !**********************************************************************
@@ -1672,7 +2465,7 @@ End-Procedure Intialize-AD-WrkFields
 #Include 'number.sqc'    !Routines to format numbers
 #Include 'readxlat.sqc'  !Read Translate Table
 #Include 'reset.sqc'     !End of Program
-#Include 'stdapi.sqc'    !STANDARD PROGRAM INTERFACE
+#INCLUDE 'stdapi.sqc'    !STANDARD PROGRAM INTERFACE
 #Include 'zcvtcasem.sqc' !Routine to convert a fields case to mixed case.
 #Include 'zrmvspcchr.sqc'!Routine to format text strings
 #Include 'tranctrl.sqc'  !Common transaction control procedures

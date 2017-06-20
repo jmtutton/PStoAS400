@@ -136,7 +136,35 @@ Do Call-System             !From ZHRI100A.SQR
 
 if (#Status = 0)
     let $NCompletionStatus = 'C'   !Completed Normally
+    if $Wrk_indexNum = '0'           !Insert only if it is a POI term
+      do HR202-Insert-Timestamp
+    end-if
 end-if    !#Status = 0
 
 
 End-Procedure HR202-Call-System
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  HR202-Insert-Timestamp
+! Desc:  Inserts the EMP and Timestamp for the POI Term
+!----------------------------------------------------------------------
+
+Begin-Procedure HR202-Insert-Timestamp
+
+Do GET-CURRENT-DATETIME  !Gets the current date and time using curdttim.sqc
+
+Begin-SQL  
+INSERT INTO PS_ZHRT_POI_TERM (
+EMPLID,
+PROC_NAME,
+UPDATED_DATETIME )
+VALUES (
+$Wrk_Emplid,
+'TERM',
+$SysDateTime 
+)
+
+End-Sql
+
+End-Procedure HR202-Insert-Timestamp

@@ -237,10 +237,13 @@ Show '$RMTNTADSVR: ' $RMTNTADSVR                                                
  ! else
  !  let $file_open = 'Y'
  ! end-if
+
   Let $WrkCriticalFlag = 'N'
   Let #run_flag = 1
   while #run_flag = 1        !Never ending loop
    do Check-interface-runfile
+   do Built-Where-Clause-Delay    !Surya Added - TEMPMAST 
+   show '$WHERE1 for delay: ' $WHERE1 !Surya Added - TEMPMAST 
    do Get-Trigger-Data       !Process the interface requests
    do Commit-Transaction
   ! If $Wrkcreatefile = 'Y'
@@ -256,14 +259,20 @@ Show '$RMTNTADSVR: ' $RMTNTADSVR                                                
   !#end-if !debugx
    let $Command = 'sleep 15'  !After interface run wait 15 seconds and do it again  !sree**rehost        !ZHR_MOD_ZHRI100A_sleep
    Call System Using $Command #status Wait            !sree**rehost     !ZHR_MOD_ZHRI100A_sleep
-  
-   do Get-Trigger-Data-NonEmp  !surya Added - 12/29 - calls the procesdure for POIs ad multiple EIDs
-   do Commit-Transaction !surya Added - 12/29
-   let $Command_non = 'sleep 15'  !Surya Added after the main trigger table wait for 15 secs
-   Call System Using $Command_non #status Wait !surya Added - 12/29
+   
+   do Get-Trigger-Data-NonEmp  !Surya Added - TEMPMAST - 12/29 - calls the procedure for POIs ad multiple EIDs 
+   do Commit-Transaction !Surya Added - TEMPMAST  - 12/29
+   let $Command_non = 'sleep 15'  !Surya Added - TEMPMAST  after the main trigger table wait for 15 secs
+   Call System Using $Command_non #status Wait !Surya Added - TEMPMAST - 12/29
   !#ifdef debugx
   !    show 'after call system Sleep'
   !#end-if !debugx
+  
+   do Get-Trigger-Data-POI-EMP-Convert  !Surya Added - TEMPMAST  - 03/16- calls the procesdure for POI to EMP Hires after a delay
+   do Commit-Transaction !Surya Added - TEMPMAST - 03/16
+   let $Command_W = 'sleep 15'  !Surya Added - TEMPMAST  after the main trigger table wait for 15 secs
+   Call System Using $Command_W #status Wait !Surya Added - TEMPMAST  - 03/16
+  
    If $file_open = 'Y'                        !ZHR_MOD_ZHRI100A_sleep
     close 1                                   !ZHR_MOD_ZHRI100A_sleep
    End-If                                     !ZHR_MOD_ZHRI100A_sleep
@@ -369,6 +378,16 @@ End-Procedure Check-interface-runfile
 Begin-Procedure Get-Trigger-Data
 
 Let $CompletionStatus = 'P'   !Initialize the CompletionStatus field
+Let $PoiFlag = ''  !Initialize the POIFlag -- Surya Added - TEMPMAST 
+Let #WrkSequence = 0
+LET $AuditOprid = ''
+LET $PSEmplid = ''
+let #Wrk_EmplID1 = 0
+let $Wrk_Emplid2 = ''
+let $PSEffdt = ''
+let #PSEffSeq = 0
+let $WrkProcess= ''
+let $WrkTaskFlag = ''
 
 Begin-Select loops=150
 
@@ -380,21 +399,22 @@ RZ.EMPLID
     LET $PSEmplid = Ltrim(Rtrim(&RZ.EMPLID,' '),' ')
     Move $PSEmplid to #Wrk_EmplID1
     LET $Wrk_Emplid2 =  edit(#Wrk_EmplID1,'099999999')
-
 to_char(RZ.EFFDT, 'YYYY-MM-DD') &RZEFFDT
     LET $PSEffdt = &RZEFFDT
 RZ.EFFSEQ
     Move &RZ.EFFSEQ to #PSEffSeq
 RZ.PROC_NAME
     LET $WrkProcess = ltrim(rtrim(&RZ.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
+RZ.TASK_FLAG                                                        !Surya Added - TEMPMAST 
+    LET $WrkTaskFlag = ltrim(rtrim(&RZ.TASK_FLAG,' '),' ')          !Surya Added - TEMPMAST 
 
- If $file_open = 'N'
- !   open $open_file1 as 1 for-append record=337
- !   let $file_open = 'Y'
- End-If
+    If $file_open = 'N'
+        !   open $open_file1 as 1 for-append record=337
+        !   let $file_open = 'Y'
+    End-If
 
+    Let $PoiFlag = 'N'    !Surya Added - TEMPMAST 
     Do Check-If-Contractor
-    Let $PoiFlag = 'N'    !Surya Added
 
     If $Found = 'N'     !Not a contractor
      and  $PSEmplid <> ''    ! not a blank emplid   ZHR_MOD_ZHRI100A_110A
@@ -408,15 +428,28 @@ RZ.PROC_NAME
              Do Update-Trigger-Row                                       !CQ 103011
           end-if                                                         !CQ 103011
        else
-          Do Call-Programs
+          !Do Call-Programs        !Surya  - TEMPMAST  commented
+          !Surya Added - TEMPMAST - Start
+          if $WrkProcess = 'ZHRI101A' 
+            do Check-if-POI-Termed
+            if ($taskflag = 'C' OR $taskflag ='P')
+              Let $CompletionStatus = 'W'
+              Do Update-Trigger-Row
+            else 
+              Do Call-Programs                              
+            end-if 
+          else 
+              Do Call-Programs               
+          end-if
+          !Surya Added - TEMPMAST - End
        end-if
     Else
 
        If $Found = 'Y'
-        Let $CompletionStatus = 'C'
+          Let $CompletionStatus = 'C'
        End-if
        IF  $PSEmplid = ''             !ZHR_MOD_ZHRI100A_110A
-       Let $CompletionStatus = 'E'
+          Let $CompletionStatus = 'E'
        End-if
 
     End-If    !$Found = 'N'
@@ -459,10 +492,12 @@ where RZ.TASK_FLAG = 'P'
                          RZ2.PROC_NAME='ZHRI106A'))                                 ! ALS-08/03/2009
 !                    and RZ2.TASK_FLAG = 'P'                                        ! ALS-03/11/2009 - Commented Out
 !                    and RZ2.EFFDT <= trunc(sysdate))                               ! ALS-03/11/2009 - Commented Out
+!Surya  - TEMPMAST  Added the below NOT IN to restrict the rows other than 101 to process when there is a delay
+ and RZ.EMPLID NOT IN (SELECT I.EMPLID FROM PS_ZHRT_INTTRIGGER I WHERE I.EMPLID = RZ.EMPLID AND I.TASK_FLAG = 'W') 
 !********************************************************************************** ! ALS-10/08/2008
 ! Andy Lee-Sue  10/08/2008 - Join in JOB record to ensure that only employees that  ! ALS-10/08/2008
 !                            have a JOB record get processed.                       ! ALS-10/08/2008
-!********************************************************************************** ! ALS-10/08/2008
+!********************************************************************************** ! ALS-10/08/2008                                                
   and JB.EMPLID = RZ.EMPLID                                                         ! ALS-10/08/2008
   and JB.EFFDT = (SELECT MAX(JB2.EFFDT)                                             ! ALS-10/08/2008
                     FROM  PS_JOB JB2                                                ! ALS-10/08/2008
@@ -488,17 +523,20 @@ End-Procedure Get-Trigger-Data
 Begin-Procedure Call-Programs
 
 do Intialize-AD-WrkFields
+let $TrigTaskFlag = ''
 
 evaluate $WrkProcess
 
     when = 'ZHRI101A'
         !Move fields to be used in the called SQC
+
         Let $Wrk_Oprid = $AuditOprid
         Let $Wrk_Emplid = $PSEmplid
         Let $Wrk_Effdt = $PSEffdt
         move #PSEffseq to #Wrk_Effseq
         Let $Wrk_Process_Name = $WrkProcess
-
+        Let $TrigTaskFlag = $WrkTaskFlag      !Surya Added - TEMPMAST 
+        
         Let $Wrk_Inf_ = ' '
         Let $ADAction_Code = 'H'
         Let $ADLegOprid = ''
@@ -671,7 +709,37 @@ Let $CompletionStatus = 'P'     !Reset the completion Status for next pass
 
 End-Procedure Update-Trigger-Row
 
-!---------------------------------Surya Added----------------------------!
+!----------------------Surya Added - TEMPMAST Start --------------------!
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Check-if-POI-Termed
+! Desc:  This routine checks if it is a POI to EMP transfer
+!        If it is then the the flag is changed to W and wait for Hire
+!----------------------------------------------------------------------
+
+Begin-Procedure Check-if-POI-Termed
+
+Let $taskflag = ' '
+
+begin-select
+SEC.TASK_FLAG
+
+    Let $taskflag = Ltrim(Rtrim(&SEC.TASK_FLAG,' '),' ')
+
+from PS_ZHRT_ALTTRIGGER SEC
+WHERE SEC.PROC_NAME = 'ZHRI202A'
+AND SEC.EMPLID = $PSEmplid
+AND SEC.SEQUENCE = 0
+AND SEC.SEQ_NBR = (SELECT MAX(SEC1.SEQ_NBR) 
+                   FROM PS_ZHRT_ALTTRIGGER SEC1
+                   WHERE SEC1.PROC_NAME = 'ZHRI202A'
+                   AND SEC1.EMPLID = $PSEmplid
+                   AND SEC1.SEQUENCE = 0)     
+
+end-select
+
+End-Procedure Check-if-POI-Termed
 
 !----------------------------------------------------------------------
 ! ERAC
@@ -683,6 +751,7 @@ End-Procedure Update-Trigger-Row
 Begin-Procedure Get-Trigger-Data-NonEmp
 
 Let $NCompletionStatus = 'P'   !Initialize the CompletionStatus field
+Let $PoiFlag = ''  !Initialize the POIFlag -- Surya Added - TEMPMAST 
 
 Begin-Select loops=150
 
@@ -690,7 +759,6 @@ RN.SEQ_NBR
     MOVE &RN.SEQ_NBR TO #NWrkSequence
 RN.OPRID
     LET $NAuditOprid = Ltrim(Rtrim(&RN.OPRID,' '),' ')
-    LET $AuditOprid = Ltrim(Rtrim(&RZ.OPRID,' '),' ')
 RN.EMPLID
     LET $NPSEmplid = Ltrim(Rtrim(&RN.EMPLID,' '),' ')
     Move $NPSEmplid to #NWrk_EmplID1
@@ -704,16 +772,16 @@ RN.PROC_NAME
     LET $NWrkProcess = ltrim(rtrim(&RN.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
 RN.SEQUENCE 
     move &RN.SEQUENCE TO #indexNum 
-
+   
+   Let $PoiFlag = 'Y'
    DO Call-Programs-NonEmp  
    
-   IF  $NPSEmplid = ''             !ZHR_MOD_ZHRI100A_110A
+   IF  $NPSEmplid = ''             
       Let $NCompletionStatus = 'E'
    End-if
-   Let $PoiFlag = 'Y'
    
    If $NCompletionStatus <> 'P'
-     Do Update-Trigger-Row_NonEmp
+     Do Update-Trigger-Row-NonEmp
    End-If  
 
 from PS_ZHRT_ALTTRIGGER RN
@@ -792,7 +860,7 @@ evaluate $NWrkProcess
   
     when-other
         Let $CompletionStatus = 'E'     !update to an E to prevent looping and to mark the record in error
-        Do Update-Trigger-Row_NonEmp  !Surya Added 
+        Do Update-Trigger-Row-NonEmp  !Surya Added - TEMPMAST 
         break
 
 end-evaluate
@@ -803,14 +871,14 @@ End-Procedure Call-Programs-NonEmp
 
 !----------------------------------------------------------------------
 ! ERAC
-! Procedure:  Update-Trigger-Row_NonEmp
+! Procedure:  Update-Trigger-Row-NonEmp
 ! Desc:  This routine update the trigger file flag switch for Non Emp
 !----------------------------------------------------------------------
 
-Begin-Procedure Update-Trigger-Row_NonEmp
+Begin-Procedure Update-Trigger-Row-NonEmp
 
 !#ifdef debugx
-!    show 'Inside Update-Trigger-Row_NonEmp'
+!    show 'Inside Update-Trigger-Row-NonEmp'
 !#end-if !debugx
 
 begin-sql
@@ -823,9 +891,99 @@ end-sql
 
 Let $NCompletionStatus = 'P'     !Reset the completion Status for next pass
 
-End-Procedure Update-Trigger-Row_NonEmp
+End-Procedure Update-Trigger-Row-NonEmp
 
-!---------------------------------Surya Added End-------------------------!
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Built-Where-Clause-Delay
+! Desc:  Get the WHERE Clause for the delay hours in POI to EMP Transfer 
+!----------------------------------------------------------------------
+
+Begin-Procedure Built-Where-Clause-Delay
+
+let $XWHERE = ''
+
+begin-select
+XWER.ZPTF_OUTPUT_01
+          
+    Let $XWHERE = Ltrim(Rtrim(&XWER.ZPTF_OUTPUT_01,' '),' ')
+    Let $WHERE1 = 'AND SYSTIMESTAMP  >= TR.UPDATED_DATETIME + INTERVAL '|| '''' || $XWHERE || '''' || '  HOUR'
+              
+from PS_ZPTT_XLAT_TBL XWER
+where XWER.ZPTF_INPUT_01 = 'TEMPMAST'
+and XWER.ZPTF_INPUT_02 = 'LEGACY-DELAY-HRS'       
+          
+end-select
+    
+End-Procedure Built-Where-Clause-Delay
+
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Get-Trigger-Data-POI-EMP-Convert
+! Desc:  This procedure will get the trigger data that needs to be interfaced
+!----------------------------------------------------------------------
+
+Begin-Procedure Get-Trigger-Data-POI-EMP-Convert
+
+Let $CompletionStatus = 'W'   !Initialize the CompletionStatus field
+Let $PoiFlag = ''  !Initialize the POIFlag -- Surya Added - TEMPMAST 
+Let #WrkSequence = 0
+LET $AuditOprid = ''
+LET $PSEmplid = ''
+let #Wrk_EmplID1 = 0
+let $Wrk_Emplid2 = ''
+let $PSEffdt = ''
+let #PSEffSeq = 0
+let $WrkProcess= ''
+let $WrkTaskFlag = ''
+
+Begin-Select loops=150
+
+RA.SEQ_NBR
+    MOVE &RA.SEQ_NBR TO #WrkSequence
+RA.OPRID
+    LET $AuditOprid = Ltrim(Rtrim(&RA.OPRID,' '),' ')
+Ra.EMPLID
+    LET $PSEmplid = Ltrim(Rtrim(&RA.EMPLID,' '),' ')
+    Move $PSEmplid to #Wrk_EmplID1
+    LET $Wrk_Emplid2 =  edit(#Wrk_EmplID1,'099999999')
+to_char(RA.EFFDT, 'YYYY-MM-DD') &RAEFFDT
+    LET $PSEffdt = &RAEFFDT
+RA.EFFSEQ
+    Move &RA.EFFSEQ to #PSEffSeq
+RA.PROC_NAME
+    LET $WrkProcess = ltrim(rtrim(&RA.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
+RA.TASK_FLAG
+    LET $WrkTaskFlag = ltrim(rtrim(&RA.TASK_FLAG,' '),' ')
+    
+   Let $PoiFlag = 'N'       
+   IF  $PSEmplid = ''             
+      Let $CompletionStatus = 'E'
+   End-if
+   Do Call-Programs 
+   
+   If $CompletionStatus <> 'W'
+      Do Update-Trigger-Row
+   End-If       
+
+FROM PS_ZHRT_INTTRIGGER RA,
+     PS_ZHRT_POI_TERM TR
+WHERE RA.TASK_FLAG = 'W'
+AND RA.EMPLID = TR.EMPLID
+AND RA.PROC_NAME='ZHRI101A' 
+AND TR.PROC_NAME = 'TERM'
+[$WHERE1]
+AND TR.UPDATED_DATETIME = (SELECT MAX(T.UPDATED_DATETIME) FROM PS_ZHRT_POI_TERM T
+                      WHERE T.EMPLID = TR.EMPLID AND T.PROC_NAME = 'TERM' ) 
+
+
+End-Select
+
+End-Procedure Get-Trigger-Data-POI-EMP-Convert
+
+!------------Surya Added - TEMPMAST END-------------------------!
 
 !----------------------------------------------------------------------
 ! ERAC
@@ -855,7 +1013,7 @@ end-while   !#SubstrStartPos <= #CommandLength
 Let $Command = $RexecScript || ' ' || $Command || ' ' || $RMTSVR  !changed for v8.3
 show '$Command=> ' $Command
 Do GET-CURRENT-DATETIME  !Gets the current date and time using curdttim.sqc
-show 'Calling Command at: ' $SysDateTime   !Surya added
+show 'Calling Command at: ' $SysDateTime   !Surya Added - TEMPMAST 
 Call System Using $Command #Status Wait      !Execute the command that was built on the command waiting until completion
 
 !#ifdef debugx
@@ -1133,7 +1291,7 @@ End-Procedure Build-Emplid-Where-Clause
 
 !End-Procedure Get-Oprid
 
-!-----------Surya Commented the above proc and added below----------------!
+!-----Surya TEMPMAST Commented the above proc and added below-------------!
 !----------------------------------------------------------------------
 ! ERAC
 ! Procedure:  Get-Oprid
@@ -1149,12 +1307,14 @@ Begin-Procedure Get-Oprid
 Let $Found = 'N'
 Let $PSOprid = ''
 
-if (#indexNum = 0 and $PoiFlag = 'Y')  or $PoiFlag = 'N'
+if $PoiFlag = 'N'
+  move 0 to #indexNum
+end-if
+
+if #indexNum = 0
     do get-LegID-for-seq0
 else 
-  if (#indexNum <> 0 and $PoiFlag = 'Y')
     do get-LegID-for-seqnum
-  end-if
 end-if
 
 
@@ -1180,13 +1340,12 @@ RPOD.ZHRF_LEG_EMPL_ID
           
     Let $PSOprid = &RPOD.ZHRF_LEG_EMPL_ID
     Let $Found = 'Y'
-    show 'CREF $PSOprid: ' $PSOprid
           
 from PS_ZHRT_EMPID_CREF RPOD
 where RPOD.Emplid = $Wrk_Emplid         
           
 end-select
-    show 'CREF $Found: ' $Found
+
 End-Procedure get-LegID-for-seq0
 
 !----------------------------------------------------------------------
@@ -1206,7 +1365,6 @@ MULT.ZHRF_LEG_EMPL_ID
     if $PSOprid <> ''
       Let $Found = 'Y'
     end-if
-    show 'Mult $PSOprid: ' $PSOprid
 
 from PS_ZHRR_MULTPL_EID MULT
 where MULT.Emplid = $Wrk_Emplid  
@@ -1214,7 +1372,6 @@ and MULT.Sequence = #indexNum
 
 end-select
 
-show 'MULT $Found: ' $Found
 End-Procedure get-LegID-for-seqnum
 
 
@@ -1226,24 +1383,22 @@ End-Procedure get-LegID-for-seqnum
 
 Begin-Procedure Get-Legacy-Oprid                !sree**10/04/01
 !#ifdef debugx
-!    show 'inside get legacy oprid'
+!    show 'inside Get-Legacy-Oprid'
 !#end-if !debugx
 
 Let $LegEmplid = ''
 Move $Wrk_Emplid to #wrk_emplid                 !sree***10/04/01
-!Surya Added
+!Surya Added - TEMPMAST Start
 if $PoiFlag = 'N'
   move 0 to #indexNum
 end-if
-!Surya Added 
+!Surya Added - TEMPMAST End
 
 Begin-Select
 CHR36.H36NAM                                               !Rakesh***08/02/2004
 CHR36.H36EMP                                               !Rakesh***08/02/2004
 CHR36.H36EM#                                               !Rakesh***08/02/2004
 
-  show '&CHR36.H36EM#: ' &CHR36.H36EM#
-  show '#wrk_emplid : ' #wrk_emplid 
   ! This IF statement and OR part of Select is a workaround to some problem in v8
   !(gateway and new version of SQR).  The Select was hanging if it couldn't find a
   ! match in HR036P, so the Select assures that the Select always finds a match.
@@ -1253,20 +1408,14 @@ CHR36.H36EM#                                               !Rakesh***08/02/2004
     Do Format-Employee-Name
     let $LegEmplid = &CHR36.H36EMP                         !Rakesh***08/02/2004
     let $LegEmplid = substr($LegEmplid,1,5)
-    !DO Insert-Oprid  !Surya Commented
-    !Surya Added
-    show '#indexNum: ' #indexNum
-    show '$PoiFlag : ' $PoiFlag 
-    If (#indexNum = 0 and $PoiFlag = 'Y')  or $PoiFlag = 'N'
-      show 'Insert-Oprid'
+    !DO Insert-Oprid  !Surya Added - TEMPMAST 
+    !Surya Added - TEMPMAST Start
+    If #indexNum = 0
       DO Insert-Oprid
     else
-      if (#indexNum <> 0 and $PoiFlag = 'Y')
-        show 'Update-Oprid'
-        DO Update-Oprid
-      end-if
+      DO Update-Oprid
     end-if  
-    !Surya Added
+    !Surya Added - TEMPMAST End
   End-if    !#WRK_CHR36_H36EM_NUM = #wrk_emplid            !Rakesh***08/02/2004
 
 from HR036P CHR36                                          !Rakesh***08/02/2004
@@ -1291,7 +1440,7 @@ End-Procedure Get-Legacy-Oprid
 !----------------------------------------------------------------------
 Begin-Procedure Insert-Oprid
 !#ifdef debugx
-!    show 'inside get insert oprid'
+!    show 'inside  Insert-Oprid
 !#end-if !debugx
 
 Let $Insert-Error-Flag = 'N'
@@ -1310,7 +1459,7 @@ End-Sql
 
 End-Procedure Insert-Oprid
 
-!Surya Added
+!Surya Added the below procesdure- TEMPMAST 
 !----------------------------------------------------------------------
 ! ERAC
 ! Procedure:  Update-Oprid
@@ -1319,7 +1468,7 @@ End-Procedure Insert-Oprid
 !----------------------------------------------------------------------
 Begin-Procedure Update-Oprid
 !#ifdef debugx
-!    show 'inside get Update oprid'
+!    show 'inside Update-Oprid'
 !#end-if !debugx
 
 Let $Update-Error-Flag = 'N'
@@ -1344,7 +1493,7 @@ End-Procedure Update-Oprid
 
 Begin-Procedure Insert-Error
 !#ifdef debugx
-!    show 'inside get insert error'
+!    show 'inside Insert-Error'
 !#end-if !debugx
 
 Let $ErrorMessageParm = $Sql-error
@@ -1353,7 +1502,7 @@ Let $Insert-Error-Flag = 'Y'
 
 End-Procedure Insert-Error
 
-!Surya Added
+!Surya Added the below procedure- TEMPMAST 
 !----------------------------------------------------------------------
 ! ERAC
 ! Procedure:  Update-Error
@@ -1363,7 +1512,7 @@ End-Procedure Insert-Error
 
 Begin-Procedure Update-Error
 !#ifdef debugx
-!    show 'inside get upadte error'
+!    show 'inside Update-Error'
 !#end-if !debugx
 
 Let $ErrorMessageParm = $Sql-error

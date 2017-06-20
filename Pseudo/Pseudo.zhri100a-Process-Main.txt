@@ -9,36 +9,36 @@ get name of AS/400 machine for use in zbas002b.sh
 	$RMTSVR = $PSZPTT_VARIABLE_VAL
 get script
 	$RexecScript = $PS_HOME || '/custom_scripts/zbas002b.sh'                      
-	Let $RexecScript = '/usr/local/barch/' || $ORACLE_SID || '/scripts/zbas002b.sh'  
+	LET $RexecScript = '/usr/local/barch/' || $ORACLE_SID || '/scripts/zbas002b.sh'  
 get library name on AS/400 where programs reside   
-	Let 'AS400library' = $PSZPTT_VARIABLE_VAL
+	LET 'AS400library' = $PSZPTT_VARIABLE_VAL
 get IP address of NT server
 	$RMTNTADSVR = $PSZPTT_VARIABLE_VAL 
 
-  Let $WrkCriticalFlag = 'N'
-  Let #run_flag = 1
+  LET $WrkCriticalFlag = 'N'
+  LET #run_flag = 1
   while #run_flag = 1        !Never ending loop
 //check the existance of the run file   
-   do Check-interface-runfile    
+   DO Check-Interface-Runfile    
 //get the trigger data AND call the call-programs procedure
-   do Get-Trigger-Data       !Process the interface requests  
-   do Commit-Transaction  //internal / built-in command?
+   DO Get-Trigger-Data       !Process the interface requests  
+   DO Commit-Transaction  //internal / built-in command?
 //sleep 15 seconds
-   let $Command = 'sleep 15'  !After interface run wait 15 seconds and do it again  !sree**rehost        
+   LET $Command = 'sleep 15'  !After interface run wait 15 seconds and do it again  !sree**rehost        
    Call System Using $Command #status Wait            !sree**rehost     !ZHR_MOD_ZHRI100A_sleep
   
 //get the trigger data for non employees and multiple EIDs AND call Call-Programs-NonEmp
-   do Get-Trigger-Data-NonEmp  !surya Added - 12/29 - calls the procesdure for POIs ad multiple EIDs
-   do Commit-Transaction !surya Added - 12/29
-   let $Command_non = 'sleep 15'  !Surya Added after the main trigger table wait for 15 secs
+   DO Get-Trigger-Data-NonEmp  !surya Added - 12/29 - calls the procesdure for POIs ad multiple EIDs
+   DO Commit-Transaction !surya Added - 12/29
+   LET $Command_non = 'sleep 15'  !Surya Added after the main trigger table wait for 15 secs
    Call System Using $Command_non #status Wait !surya Added - 12/29
-   If $file_open = 'Y'                        !ZHR_MOD_ZHRI100A_sleep
+   IF $file_open = 'Y'                        !ZHR_MOD_ZHRI100A_sleep
     close 1                                   !ZHR_MOD_ZHRI100A_sleep
-   End-If                                     !ZHR_MOD_ZHRI100A_sleep
-   Let $file_open = 'N'                       !ZHR_MOD_ZHRI100A_sleep
+   END-IF                                     !ZHR_MOD_ZHRI100A_sleep
+   LET $file_open = 'N'                       !ZHR_MOD_ZHRI100A_sleep
   end-while   !1=1
 
-  let $Command = 'mv' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.stop' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'  ! ALS-10/08/2008
+  LET $Command = 'mv' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.stop' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'  ! ALS-10/08/2008
   Show '$Command in Process-Main: ' $Command                                        ! ALS-10/08/2008
   Call System Using $Command #status Wait           !ZHR_MOD_ZHRI100A_sleep       
 End-Procedure Process-Main

@@ -170,6 +170,10 @@
 ! Louisa Bartell 05/18/2015    CQ230619 Remove SSN - blank out the field
 !                              Search on CQ230619
 !*************************************************************************************
+! Surya Sobha  03/16/2017    Added the proc HR01-Insert-Timestamp for TEMPMAST Proj
+!                            Proc to be called from a successful Hire for 'W' records
+!                            This data will be used in ERD CCEI Process
+!*************************************************************************************
 ! ERAC
 ! Procedure:  HR01-Initialize-Fields
 ! Desc:  Initialize the fields to ensure that that they all start out blank.
@@ -539,6 +543,9 @@ Do Call-System
 
 If (#Status = 0)      !If ended normally
     Let $CompletionStatus = 'C'     !Status of Completed normally
+    if $TrigTaskFlag = 'W'          !Surya Added 03/16
+      do HR01-Insert-Timestamp      !Surya Added 03/16  
+    end-if                          !Surya Added 03/16  
 End-If    !#Status = 0
 
 End-Procedure HR01-Build-Call-Statement
@@ -1104,3 +1111,29 @@ WHERE CTRY.country=$PS_REG_REGION
 
 END-SELECT
 END-PROCEDURE
+
+!----------------------------------------------------------------------
+! ERAC Surya Added 03/16 
+! Procedure:  HR01-Insert-Timestamp
+! Desc:  Inserts the EMP and Timestamp for the Hire 
+!        if the Emp is converted from a POI, this data is used in ERD process
+!----------------------------------------------------------------------
+
+Begin-Procedure HR01-Insert-Timestamp
+
+Do GET-CURRENT-DATETIME  !Gets the current date and time using curdttim.sqc
+
+Begin-SQL  
+INSERT INTO PS_ZHRT_POI_TERM (
+EMPLID,
+PROC_NAME,
+UPDATED_DATETIME )
+VALUES (
+$Wrk_Emplid,
+'HIRE',
+$SysDateTime 
+)
+
+End-Sql
+
+End-Procedure HR01-Insert-Timestamp

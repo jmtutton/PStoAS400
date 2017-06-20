@@ -65,8 +65,10 @@ Let $PSJobCode = ' '
 Let $PSFullPartTime = ' '
 Let $ErrorProgramParm = 'HRZ201A'
 let $PSPoi = 'N'
-let $PrefLastname = ' '
+let $PrefLastname = ''
 let $POICat = ' '
+Let $POIAffCd = ' '
+Let $AffMailbox = ' '
 
 End-Procedure HR201-Initialize-Fields
 
@@ -77,8 +79,7 @@ End-Procedure HR201-Initialize-Fields
 !----------------------------------------------------------------------
 
 Begin-Procedure HR201-Process-Main 
-
-       
+   
 !show '$Wrk_Oprid: '  $Wrk_Oprid
 !show '$Wrk_Emplid: ' $Wrk_Emplid
 !show '$Wrk_Effdt: '  $Wrk_Effdt
@@ -139,12 +140,12 @@ Uppercase $LegBranch    !Be sure in all CAPS
 Let $PSLastName = $PrefLastname || $PSLastName
 Let $LegLastName = $PSLastName
 Uppercase $LegLastName  !Be sure in all CAPS
-!Do Replace-Character($LegLastName,'''','''''',$LegLastName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+Do Replace-Character($LegLastName,'''','''''',$LegLastName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
 
 !Format the employee first name
 Let $LegFirstName = $PSFirstName
 Uppercase $LegFirstName !Be sure in all CAPS
-!Do Replace-Character($LegFirstName,'''','''''',$LegFirstName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
+Do Replace-Character($LegFirstName,'''','''''',$LegFirstName) !Replace all single apostrophe with four apostrophes ZRmvSpcChr.sqc
 
 !Format the employee middle initial
 Let $LegMiddleInit = substr($PSMiddleName,1,1)
@@ -220,7 +221,8 @@ End-Procedure HR201-Get-Personal-Data
 Begin-Procedure HR201-Get-POI-data
 
 Begin-Select
-POI.ZHRF_POI_CATEGORY
+POI.ZHRF_POI_CATEGORY,
+POI.Z_POI_AFFIL_CD,
 POI.ZHRF_GRP_NBR,
 POI.ZHRF_BRANCH,
 POI.EXPECTED_END_DATE,
@@ -229,6 +231,7 @@ POI.ZHRF_PWORD_1,
 POI.ZHRF_PWORD_2 
 
     let $POICat = ltrim(rtrim(&POI.ZHRF_POI_CATEGORY,' '),' ') 
+    let $POIAffCd = ltrim(rtrim(&POI.Z_POI_AFFIL_CD ,' '),' ')
     let $LegGroup = ltrim(rtrim(&POI.ZHRF_GRP_NBR,' '),' ') 
     let $LegBranch = ltrim(rtrim(&POI.ZHRF_BRANCH,' '),' ') 
     let $LegNickName = ltrim(rtrim(&POI.EXPECTED_END_DATE,' '),' ') 
@@ -328,13 +331,15 @@ End-Procedure HR201-GET-EMP-POI
 Begin-Procedure HR201-Get-primEid-POIdata
 
 Begin-Select
-PED.ZHRF_POI_CATEGORY
+PED.ZHRF_POI_CATEGORY,
+PED.Z_POI_AFFIL_CD,
 PED.EXPECTED_END_DATE,
 PED.MANAGER_ID, 
 PED.ZHRF_PWORD_1,
 PED.ZHRF_PWORD_2 
 
-    let $POICat = ltrim(rtrim(&PED.ZHRF_POI_CATEGORY,' '),' ') 
+    let $POICat = ltrim(rtrim(&PED.ZHRF_POI_CATEGORY,' '),' ')
+    let $POIAffCd = ltrim(rtrim(&PED.Z_POI_AFFIL_CD ,' '),' ') 
     let $LegNickName = ltrim(rtrim(&PED.EXPECTED_END_DATE,' '),' ') 
     let $LegReferralSource  = ltrim(rtrim(&PED.MANAGER_ID,' '),' ') 
     let $LegAddress1 =  ltrim(rtrim(&PED.ZHRF_PWORD_1,' '),' ')                      
@@ -365,12 +370,19 @@ Begin-Procedure HR201-Get-POI-LegPosNo
 
 Begin-Select
 Z.ZPTF_OUTPUT_01,
-Z.ZPTF_OUTPUT_02
+Z.ZPTF_OUTPUT_02,
+Z.ZPTF_OUTPUT_03,
+Z.ZPTF_OUTPUT_04
 
     let $LegPosition = ltrim(rtrim(&Z.ZPTF_OUTPUT_01,' '),' ')
     let $PrefLastname = ltrim(rtrim(&Z.ZPTF_OUTPUT_02,' '),' ')
     if $PrefLastname <> ''
       let $PrefLastname = $PrefLastname || ' '
+    end-if
+    
+    let $AffMailbox = ltrim(rtrim(&Z.ZPTF_OUTPUT_03,' '),' ')
+    if $POICat = 'OTH' and $AffMailbox = $POIAffCd
+      let $LegPosition = ltrim(rtrim(&Z.ZPTF_OUTPUT_04,' '),' ')   !for OTH and MailBox, Leg Position will be different
     end-if
 
 FROM PS_ZPTT_XLAT_TBL Z
