@@ -1,2 +1,8 @@
 tutton
 @tutton.net
+uppercase
+ltrim
+rtrim
+strtodate
+datetostr
+oprid

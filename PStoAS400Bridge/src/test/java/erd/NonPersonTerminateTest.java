@@ -1,7 +1,5 @@
 package erd;
 
-import static org.junit.Assert.*;
-
 import java.sql.Date;
 
 import org.junit.Test;

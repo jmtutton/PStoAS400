@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import erd.model.PsActionReason;
 import erd.model.PsCitizenship;
 
 public class PsCitizenshipTest {

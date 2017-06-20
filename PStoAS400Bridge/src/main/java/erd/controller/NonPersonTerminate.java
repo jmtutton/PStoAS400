@@ -27,7 +27,7 @@ public class NonPersonTerminate {
 	 */
 	public static void hr202ProcessMain(String psAuditOperId, Integer indexNum, Date psDateIn) {
 		Boolean poiFlag = true;
-		String errorProgramParm = "HRZ202A";
+//		String errorProgramParm = "HRZ202A";
 //		!show '$PSAuditOperId: ' $PSAuditOperId
 //		!show '$PSDateIn: '  $PSDateIn
 //		!show '#indexNum: ' #indexNum

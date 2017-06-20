@@ -12,7 +12,7 @@ import erd.model.AdWrkFields;
 import erd.model.CrossReferenceTerminationReason;
 import erd.model.PsActionReason;
 import erd.model.PsJob;
-import erd.model.TriggerEmployee;
+import erd.model.PszTriggerEmployee;
 import erd.model.Zhri100aFields;
 
 /**
@@ -29,13 +29,13 @@ import erd.model.Zhri100aFields;
 
 public class EmployeeTermination {
 	
-	TriggerEmployee trigger;
+	PszTriggerEmployee trigger;
 	AdWrkFields adWrkFields;
 	PsJob psJob;
 	AS400Package as400Package;
 	Zhri100aFields zhri100aFields;
 	
-	public EmployeeTermination(TriggerEmployee trigger, AdWrkFields adWrkFields, Zhri100aFields zhri100aFields) {
+	public EmployeeTermination(PszTriggerEmployee trigger, AdWrkFields adWrkFields, Zhri100aFields zhri100aFields) {
 		this.trigger = trigger;
 		this.adWrkFields = adWrkFields;
 		this.zhri100aFields = zhri100aFields;

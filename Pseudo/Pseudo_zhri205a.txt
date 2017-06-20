@@ -21,8 +21,8 @@ HR205-Get-Personal-Data
 HR205-Get-Emp-Poi
 HR205-Get-Poi-Data
 HR205-Get-Emp-Data
-HR205-Get-Primeid-Poidata
-HR205-Get-Poi-Legposno
+HR205-Get-PrimeId-PoiData
+HR205-Get-Poi-LegPosNo
 HR205-Get-Alternate_Type
 HR205-Massage-Data
 HR205-Call-Rpg-Program

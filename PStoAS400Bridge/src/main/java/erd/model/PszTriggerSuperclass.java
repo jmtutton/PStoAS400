@@ -21,7 +21,7 @@ import javax.persistence.InheritanceType;
  */
 @MappedSuperclass
 @Inheritance(strategy  = InheritanceType.TABLE_PER_CLASS)
-abstract class TriggerSuperclass implements Serializable {
+abstract class PszTriggerSuperclass implements Serializable {
 	public static final long serialVersionUID = 1L;
 	
 	protected static String ENTITY_NAME = "";
@@ -97,7 +97,7 @@ abstract class TriggerSuperclass implements Serializable {
 	//Iterable<T> findAll()
 	//T findOne(ID id)
 	//<S extends T> S save(S entity)
-	public static <T extends TriggerSuperclass> T findOne(Integer seqNum) {
+	public static <T extends PszTriggerSuperclass> T findOne(Integer seqNum) {
 //		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 //		EntityManager em = emfactory.createEntityManager();
 //	    try {
@@ -161,7 +161,7 @@ abstract class TriggerSuperclass implements Serializable {
 		EntityManager em = emfactory.createEntityManager();
 		
 	    try {
-	    	return em.createQuery("SELECT trigger FROM " + ENTITY_NAME + " trigger ORDER BY trigger.sequenceNumber")
+	    	return em.createQuery("SELECT trigger FROM " + ENTITY_NAME + " trigger ORDER BY trigger.sequenceNumber", PszTriggerSuperclass.class)
 	    		    .getResultList();
 	    }
 	    catch (Exception e) {

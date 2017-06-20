@@ -12,8 +12,8 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="PS_ZPTT_VARIABLES")
-@NamedQuery(name="PsVariable.findAll", query="SELECT p FROM PsVariable p")
-public class PsVariable implements Serializable {
+@NamedQuery(name="PszVariable.findAll", query="SELECT p FROM PszVariable p")
+public class PszVariable implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -35,7 +35,7 @@ public class PsVariable implements Serializable {
 	@Column(name="ZPTF_VARIABLE_VAL", nullable=false, length=100)
 	private String variableValue;
 
-	public PsVariable() {
+	public PszVariable() {
 	}
 
 	public String getDbName() {
@@ -102,7 +102,7 @@ public class PsVariable implements Serializable {
 		EntityManager em = emfactory.createEntityManager();
 		
 	    try {
-	    	List<String> resultList = em.createQuery("SELECT p.variableValue FROM PsVariable p "
+	    	List<String> resultList = em.createQuery("SELECT p.variableValue FROM PszVariable p "
 	    				+ "WHERE UPPER(TRIM(p.processName)) = :processName "
 	    				+ "AND UPPER(TRIM(p.dbName)) = :dbName "
 	    				+ "AND UPPER(TRIM(p.variableName)) = :variableName ",

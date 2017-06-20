@@ -46,11 +46,11 @@
         <class>erd.model.PsEffectiveDatedPersonalData</class>
         <class>erd.model.PsPersonalNationalId</class>
         <class>erd.model.PsPersonalPhone</class>
-        <class>erd.model.PsVariable</class>
+        <class>erd.model.PszVariable</class>
         <class>erd.model.PsXlatItem</class>
-        <class>erd.model.TriggerEmployee</class>
-        <class>erd.model.TriggerNonPerson</class>
-        <class>erd.model.TriggerSuperclass</class>
+        <class>erd.model.PszTriggerEmployee</class>
+        <class>erd.model.PszTriggerNonPerson</class>
+        <class>erd.model.PszTriggerSuperclass</class>
 		<properties>
 <!-- 			<property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/> -->
 <!-- 			<property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@ppddbl44.corp.erac.com:1521:PS90HRQA"/> -->

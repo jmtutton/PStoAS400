@@ -15,20 +15,20 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "PS_ZHRT_INTTRIGGER")
-public class TriggerEmployee extends TriggerSuperclass {
+public class PszTriggerEmployee extends PszTriggerSuperclass {
 	private static final long serialVersionUID = 1L;
 	   
-	public TriggerEmployee() {
+	public PszTriggerEmployee() {
 		super();
-		ENTITY_NAME = "TriggerEmployee";
+		ENTITY_NAME = "PszTriggerEmployee";
 	}
 
-	public static TriggerEmployee findBySequenceNumber(Integer sequenceNumber) {
+	public static PszTriggerEmployee findBySequenceNumber(Integer sequenceNumber) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<TriggerEmployee> resultList = em.createQuery(
-	    		    "SELECT t FROM TriggerEmployee t WHERE t.sequenceNumber = :sequenceNumber", TriggerEmployee.class)
+	    	List<PszTriggerEmployee> resultList = em.createQuery(
+	    		    "SELECT t FROM PszTriggerEmployee t WHERE t.sequenceNumber = :sequenceNumber", PszTriggerEmployee.class)
 	    		    .setParameter("sequenceNumber", sequenceNumber)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
@@ -41,12 +41,12 @@ public class TriggerEmployee extends TriggerSuperclass {
 	    return null;	
 	}
 	
-	public static List<TriggerEmployee> findByCompletionStatusOrderBySequenceNumber(String completionStatus) {
+	public static List<PszTriggerEmployee> findByCompletionStatusOrderBySequenceNumber(String completionStatus) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	return em.createQuery(
-	    		    "SELECT t FROM TriggerEmployee t WHERE TRIM(UPPER(t.completionStatus)) = :completionStatus ORDER BY t.sequenceNumber", TriggerEmployee.class)
+	    		    "SELECT t FROM PszTriggerEmployee t WHERE TRIM(UPPER(t.completionStatus)) = :completionStatus ORDER BY t.sequenceNumber", PszTriggerEmployee.class)
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .getResultList();
 	    }
@@ -56,14 +56,14 @@ public class TriggerEmployee extends TriggerSuperclass {
 	    return null;	
     }
 	
-	public static List<TriggerEmployee> findByCompletionStatusAndProcessName(String completionStatus, String processName) {
+	public static List<PszTriggerEmployee> findByCompletionStatusAndProcessName(String completionStatus, String processName) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	return em.createQuery(
-	    		    "SELECT t FROM TriggerEmployee t WHERE TRIM(UPPER(t.completionStatus)) = :completionStatus "
+	    		    "SELECT t FROM PszTriggerEmployee t WHERE TRIM(UPPER(t.completionStatus)) = :completionStatus "
 	    		    		+ "AND TRIM(UPPER(t.processName)) = :processName "
-	    		    		+ "ORDER BY t.sequenceNumber", TriggerEmployee.class)
+	    		    		+ "ORDER BY t.sequenceNumber", PszTriggerEmployee.class)
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .setParameter("processName", processName.toUpperCase().trim())
 	    		    .getResultList();
@@ -84,7 +84,7 @@ public class TriggerEmployee extends TriggerSuperclass {
 		int numberOfRecordsUpdated = 0;
 	    try {
 	    	em.getTransaction().begin();
-	    	numberOfRecordsUpdated = em.createQuery("UPDATE TriggerEmployee t SET t.completionStatus = :completionStatus "
+	    	numberOfRecordsUpdated = em.createQuery("UPDATE PszTriggerEmployee t SET t.completionStatus = :completionStatus "
 	    				+ "WHERE t.sequenceNumber = :sequenceNumber")
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .setParameter("sequenceNumber", sequenceNumber)
@@ -97,7 +97,7 @@ public class TriggerEmployee extends TriggerSuperclass {
 	    return numberOfRecordsUpdated;
 	}
 	
-	public static TriggerEmployee createMockTriggerForEmployeeTermination() {
+	public static PszTriggerEmployee createMockTriggerForEmployeeTermination() {
 		String completionStatus = "P";
 		String processName = "ZHRI102A";
 		String employeeId = "347940";
@@ -106,7 +106,7 @@ public class TriggerEmployee extends TriggerSuperclass {
 		Integer sequenceNumber = 90727260;
 		java.util.Date effectiveDate = new java.util.Date();
 		java.sql.Date sqlDate = new java.sql.Date(effectiveDate.getTime());
-		TriggerEmployee trigger = new TriggerEmployee();
+		PszTriggerEmployee trigger = new PszTriggerEmployee();
 		trigger.setCompletionStatus(completionStatus);
 		trigger.setEffectiveDate(sqlDate);
 		trigger.setEffectiveSequence(effectiveSequence);

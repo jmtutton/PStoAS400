@@ -5,8 +5,6 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import erd.StringUtil;
-
 /**
  * Entity implementation class for Entity: HR036P
  * @author John Tutton john@tutton.net
@@ -53,7 +51,7 @@ public class HR006P implements Serializable {
 	 */
 	public static HR006P zhri100AGetLegacyOprId(String employeeId, Boolean isPoi, Integer indexNumber) {
 //		LET $LegEmplId = ''
-		String legacyEmployeeId = "";
+//		String legacyEmployeeId = "";
 //		MOVE $Wrk_Emplid to #wrk_emplid
 //		IF $PoiFlag = 'N'
 		if(!isPoi) {
@@ -68,7 +66,7 @@ public class HR006P implements Serializable {
 //	  	!This IF statement and OR part of Select is a workaround to some problem in v8 (gateway and new version of SQR). 
 //		!The Select was hanging if it couldn't find a match in HR036P, so the Select assures that the Select always finds a match.
 //	  	LET #WRK_CHR36_H36EM_NUM = &HR036P.H36EM#
-		Integer WRK_CHR36_H36EM_NUM;
+//		Integer WRK_CHR36_H36EM_NUM;
 //	  	IF #WRK_CHR36_H36EM_NUM = #wrk_emplid
 //	    	LET $LegEmpName = &HR036P.H36NAM
 //	    	DO Format-Employee-Name

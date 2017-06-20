@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import erd.model.TriggerEmployee;
+import erd.model.PszTriggerEmployee;
 
 public class EmployeeTerminationTest {
 
@@ -15,7 +15,7 @@ public class EmployeeTerminationTest {
 	public void testBeginProgram() {
 		String completionStatus = "P";
 		String processName = "ZHRI102A";
-		List<TriggerEmployee> triggerList = TriggerEmployee.findByCompletionStatusAndProcessName(completionStatus, processName);
+		List<PszTriggerEmployee> triggerList = PszTriggerEmployee.findByCompletionStatusAndProcessName(completionStatus, processName);
 		assertNotNull(triggerList);
 		if(triggerList != null && !triggerList.isEmpty()) {
 //			TriggerEmployee trigger = triggerList.get(0);
@@ -29,7 +29,7 @@ public class EmployeeTerminationTest {
 			String employeeId = "347940";
 			String operatorId = "OPSHR";
 			Integer sequenceNumber = 90727260;
-			TriggerEmployee trigger = new TriggerEmployee();
+			PszTriggerEmployee trigger = new PszTriggerEmployee();
 			trigger.setCompletionStatus(completionStatus);
 			trigger.setEffectiveDate(sqlDate);
 			trigger.setEffectiveSequence(effectiveSequence);

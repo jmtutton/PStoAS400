@@ -10,7 +10,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "PS_ZHRT_ALTTRIGGER")
-public class TriggerNonPerson extends TriggerSuperclass {
+public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	private static final long serialVersionUID = 1L;
 	
 	//same properties as TriggerEmployee, with just this one extra field.  	   
@@ -21,14 +21,14 @@ public class TriggerNonPerson extends TriggerSuperclass {
 		return eidIndexNumber;
 	}
 	   
-	public TriggerNonPerson() {
+	public PszTriggerNonPerson() {
 		super();
-		TriggerSuperclass.ENTITY_NAME = "TriggerNonPerson";
+		PszTriggerNonPerson.ENTITY_NAME = "PszTriggerNonPerson";
 	}
 	
 	@Override
 	public String toString() {
-		return "ENTITY_NAME: TriggerNonPerson\n" +
+		return "ENTITY_NAME: PszTriggerNonPerson\n" +
 				"SequenceNumber: " + getSequenceNumber() + "\n" +
 				"OperatorId: " + getOperatorId() + "\n" +
 				"EmployeeId: " + getEmployeeId() + "\n" +
@@ -39,12 +39,12 @@ public class TriggerNonPerson extends TriggerSuperclass {
 				"EidIndexNumber: " + getEidIndexNumber();
 	}
 	
-	public static TriggerNonPerson findBySequenceNumber(Integer seqNum) {
+	public static PszTriggerNonPerson findBySequenceNumber(Integer seqNum) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<TriggerNonPerson> resultList = em.createQuery(
-	    		    "SELECT t FROM TriggerNonPerson t WHERE t.sequenceNumber = :seqNum", TriggerNonPerson.class)
+	    	List<PszTriggerNonPerson> resultList = em.createQuery(
+	    		    "SELECT t FROM PszTriggerNonPerson t WHERE t.sequenceNumber = :seqNum", PszTriggerNonPerson.class)
 	    		    .setParameter("seqNum", seqNum)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
@@ -57,12 +57,12 @@ public class TriggerNonPerson extends TriggerSuperclass {
 	    return null;	
 	}
 	
-	public static List<TriggerNonPerson> findByCompletionStatusOrderBySequenceNumber(String completionStatus) {
+	public static List<PszTriggerNonPerson> findByCompletionStatusOrderBySequenceNumber(String completionStatus) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	return em.createQuery(
-	    		    "SELECT t FROM TriggerNonPerson t WHERE TRIM(UPPER(t.completionStatus)) = :completionStatus ORDER BY t.sequenceNumber", TriggerNonPerson.class)
+	    		    "SELECT t FROM PszTriggerNonPerson t WHERE TRIM(UPPER(t.completionStatus)) = :completionStatus ORDER BY t.sequenceNumber", PszTriggerNonPerson.class)
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .getResultList();
 	    }
@@ -82,7 +82,7 @@ public class TriggerNonPerson extends TriggerSuperclass {
 		int numberOfRecordsUpdated = 0;
 	    try {
 	    	em.getTransaction().begin();
-	    	numberOfRecordsUpdated = em.createQuery("UPDATE TriggerNonPerson t SET t.completionStatus = :completionStatus "
+	    	numberOfRecordsUpdated = em.createQuery("UPDATE PszTriggerNonPerson t SET t.completionStatus = :completionStatus "
 	    				+ "WHERE t.sequenceNumber = :sequenceNumber")
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .setParameter("sequenceNumber", sequenceNumber)

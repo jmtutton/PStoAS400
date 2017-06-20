@@ -3,7 +3,6 @@ package erd;
 import static org.junit.Assert.*;
 
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 
 import org.junit.Test;
 
@@ -15,13 +14,13 @@ public class PsXlatItemTest {
 	public void testFindMaxEffectiveDateByFieldNameAndFieldValue() {
 		String fieldName = "EMPL_STATUS";
 		String fieldValue = "W";
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
-		Date effectiveDate;
-		try {
-			effectiveDate = (Date) simpleDateFormat.parse("01/01/2000");
-		}
-		catch(Exception name) {
-		}
+//		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+//		Date effectiveDate;
+//		try {
+//			effectiveDate = (Date) simpleDateFormat.parse("01/01/2000");
+//		}
+//		catch(Exception name) {
+//		}
 		Date result = PsXlatItem.findMaxEffectiveDateByFieldNameAndFieldValue(fieldName, fieldValue);
 		assertNotNull(result);
 		System.out.println(result);

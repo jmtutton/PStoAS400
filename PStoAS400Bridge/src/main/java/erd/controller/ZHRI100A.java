@@ -12,8 +12,8 @@ import erd.model.CrossReferenceMultipleEmployeeId;
 import erd.model.HR036P;
 import erd.model.PsDbOwner;
 import erd.model.PsJob;
-import erd.model.PsVariable;
-import erd.model.TriggerEmployee;
+import erd.model.PszVariable;
+import erd.model.PszTriggerEmployee;
 import erd.model.Zhri100aFields;
 
 public class ZHRI100A {
@@ -67,7 +67,7 @@ public class ZHRI100A {
 	
 	public static void main() {
 		Zhri100aFields zhri100aFields = new Zhri100aFields();
-		TriggerEmployee trigger;
+		PszTriggerEmployee trigger;
 		//begin-program
 		//Get-Current-DateTime  //queries the database to get the current time. It also initializes a slew of string variables ($AsOfToday, $AsOfNow, $CurrentCentury, $ReportDate
 		//Init-DateTime  //sets a collection of variables that can be used by the other procedures in datetime.sqc that format dates or do date arithmetic
@@ -78,7 +78,7 @@ public class ZHRI100A {
 		initializeMainProperties(zhri100aFields);
 		//ZHRI100A.Check-Interface-Runfile
 		//ZHRI100A.Get-Trigger-Data
-		trigger = TriggerEmployee.createMockTriggerForEmployeeTermination();
+		trigger = PszTriggerEmployee.createMockTriggerForEmployeeTermination();
 //		initializeLocalTriggerProperties(trigger);
 		//ZHRI100A.Check-If-Contractor
 		Boolean isContractor = checkIfContractor();
@@ -122,10 +122,10 @@ public class ZHRI100A {
 		if(zhri100aFields.oracleSystemId != null) {
 			zhri100aFields.oracleSystemId = zhri100aFields.oracleSystemId.toUpperCase();
 		}
-		zhri100aFields.remoteServerName = PsVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "RMTSVR"); //TODO: where is this used???
+		zhri100aFields.remoteServerName = PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "RMTSVR"); //TODO: where is this used???
 		zhri100aFields.remoteExecScript = "/usr/local/barch/" + zhri100aFields.oracleSystemId + "/scripts/zbas002b.sh"; //TODO: where is this used???
-		zhri100aFields.as400Library = PsVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "AS400library");
-		zhri100aFields.remoteAdServerName = PsVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "RMTNTADSVR"); //TODO: where is this used???
+		zhri100aFields.as400Library = PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "AS400library");
+		zhri100aFields.remoteAdServerName = PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "RMTNTADSVR"); //TODO: where is this used???
 		zhri100aFields.wrkCriticalFlag = false;
 //		zhri100aFields.runFlag = true;
 	}
@@ -155,7 +155,7 @@ public class ZHRI100A {
 	 * ZHRI100A.Process-Main
 	 * This is the process controlling procedure.
 	 */
-	public void processMain(TriggerEmployee trigger, Boolean poiFlag, Boolean isOkToProcess, String completionStatus, Zhri100aFields zhri100aFields) {
+	public void processMain(PszTriggerEmployee trigger, Boolean poiFlag, Boolean isOkToProcess, String completionStatus, Zhri100aFields zhri100aFields) {
 		String commandNonPerson; //$Command_non
 		Boolean fileIsOpen = false; //$file_open  //TODO: where should this get set???
 		String command; //$Command
@@ -273,7 +273,7 @@ public class ZHRI100A {
 	 * Call-Programs - from ZHRI100A.SQR
 	 * Subroutine will call appropriate programs
 	 */
-	public static void callPrograms(TriggerEmployee trigger) {
+	public static void callPrograms(PszTriggerEmployee trigger) {
 		//WHEN = 'ZHRI102A'
 		//!Move fields to be used in the called SQC
 		//MOVE #Wrk_Sequence to #WrkSeqNbr
@@ -534,7 +534,7 @@ public class ZHRI100A {
 	 * Get-Trigger-Data - from ZHRI100A.SQR
 	 * This procedure will get the trigger data that needs to be interfaced
 	 */
-	public void getTriggerData(TriggerEmployee trigger, String adLegacyOperatorId, String adActionCode, Boolean poiFlag, Boolean isOkToProcess, String completionStatus) {
+	public void getTriggerData(PszTriggerEmployee trigger, String adLegacyOperatorId, String adActionCode, Boolean poiFlag, Boolean isOkToProcess, String completionStatus) {
 		Boolean adFound = false; //$AdFound  //TODO: where should this be set???
 //		LET $CompletionStatus = 'P'	!Initialize the CompletionStatus field
 //	    MOVE &PS_ZHRT_INTTRIGGER.SEQ_NBR TO #WrkSequence

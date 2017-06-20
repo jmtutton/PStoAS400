@@ -4,7 +4,7 @@ import java.io.File;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 
-import erd.model.PsVariable;
+import erd.model.PszVariable;
 
 /**
  * Replaces ZHRI100A.SQR
@@ -91,7 +91,7 @@ public class Main {
 //		Let $Variable_Needed = 'RMTSVR'
 //		Do  Get-Variable
 //		Let $RMTSVR = $PSZPTT_VARIABLE_VAL
-		remoteServerName = PsVariable.findVariableValueByProcessNameAndDbNameAndVariableName("ZHRI100A", dbName, "RMTSVR");
+		remoteServerName = PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName("ZHRI100A", dbName, "RMTSVR");
 //
 //		Let $RexecScript = '/usr/local/barch/' || $ORACLE_SID || '/scripts/zbas002b.sh'
 		rexecScript = "/usr/local/barch/" + oracleSid + "/scripts/zbas002b.sh";
@@ -102,7 +102,7 @@ public class Main {
 //		Do  Get-Variable
 //		Let $Library = $PSZPTT_VARIABLE_VAL
 //		Show '$Library: ' $Library
-		remoteLibraryName = PsVariable.findVariableValueByProcessNameAndDbNameAndVariableName("ZHRI100A", dbName, "AS400library");
+		remoteLibraryName = PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName("ZHRI100A", dbName, "AS400library");
 //
 //		//Returns IP address of NT server
 //		Let $Variable_Needed = ' '
@@ -110,7 +110,7 @@ public class Main {
 //		Do Get-Variable
 //		Let $RMTNTADSVR = $PSZPTT_VARIABLE_VAL
 //		Show '$RMTNTADSVR: ' $RMTNTADSVR
-		remoteNtServerIpAddress = PsVariable.findVariableValueByProcessNameAndDbNameAndVariableName("ZHRI100A", dbName, "RMTNTADSVR");
+		remoteNtServerIpAddress = PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName("ZHRI100A", dbName, "RMTNTADSVR");
 //
 //		  Let $WrkCriticalFlag = 'N'
 		wrkCriticalFlag = "N";

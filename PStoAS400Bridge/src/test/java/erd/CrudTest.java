@@ -45,7 +45,7 @@ import erd.model.CrossReferenceJobCode;
 import erd.model.CrossReferencePersonOfInterest;
 import erd.model.CrossReferenceReferralSource;
 import erd.model.CrossReferenceTerminationReason;
-import erd.model.PsVariable;
+import erd.model.PszVariable;
 
 /**
  * Unit tests for findAll names query in all entity classes.
@@ -422,9 +422,9 @@ public class CrudTest {
 	public void testPsVariable() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
-		TypedQuery<PsVariable> query = em.createNamedQuery("PsVariable.findAll", PsVariable.class);
+		TypedQuery<PszVariable> query = em.createNamedQuery("PszVariable.findAll", PszVariable.class);
 		query.setMaxResults(MAX_RESULTS);
-		List<PsVariable> results = query.getResultList();
+		List<PszVariable> results = query.getResultList();
 		assertNotNull(results);
 	}
 	

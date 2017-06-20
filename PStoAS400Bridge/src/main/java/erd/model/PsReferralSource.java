@@ -90,7 +90,7 @@ public class PsReferralSource implements Serializable {
 	}
 
 	public void setRecruitmentPersonId(BigDecimal recruitmentPersonId) {
-		recruitmentPersonId = recruitmentPersonId;
+		this.recruitmentPersonId = recruitmentPersonId;
 	}
 
 	public BigDecimal getRecruitmentProfileSeq() {

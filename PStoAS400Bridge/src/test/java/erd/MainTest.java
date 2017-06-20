@@ -1,11 +1,8 @@
 package erd;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 import erd.controller.Main;
-import erd.model.PsDiversityEthnicity;
 
 public class MainTest {
 
