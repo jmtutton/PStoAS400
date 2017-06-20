@@ -14,55 +14,60 @@ import erd.model.PsDbOwner;
 import erd.model.PsJob;
 import erd.model.PsVariable;
 import erd.model.TriggerEmployee;
+import erd.model.Zhri100aFields;
 
 public class ZHRI100A {
 	
-	private static TriggerEmployee trigger;
 	public AdWrkFields adWrkFields;
 	
-	private static String activeDirectoryHomePath; //$AD_HOME 
-	private static String adActionCode; //$ADAction_Code
-	private Boolean adFound; //$AdFound
-	private static String as400Library; //$Library
-	private String commandNonPerson; //$Command_non
-	private static String dbName;
-	private Boolean fileIsOpen; //$file_open
-	public static Integer indexNumber;
-	private Boolean isOkToProcess; //$OK-To-Process
-	private static String oracleSystemId; //$ORACLE_SID
-	private static String peopleSoftHomePath; //$PS_HOME
-	public static Boolean poiFlag;  //$PoiFlag  //Person of Interest
-	private static String remoteAdServerName; //$RMTNTADSVR
-	private static String remoteExecScript; //$RexecScript
-	private static String remoteServerName; //$RMTSVR
-	private String runFilePath; //$RUN_FILEPATH
-	private static Boolean runFlag; //#run_flag
-	private static Boolean wrkCriticalFlag; //$WrkCriticalFlag
-	private static String wrkEmployeeId; //$Wrk_Emplid
-	private static String wrkProcessName;  //$WrkProcess
-	private static Integer wrkSeqNbr; //#WrkSeqNbr
+//	private static String adActionCode; //$ADAction_Code
+//	private Boolean adFound; //$AdFound
+//	private Boolean fileIsOpen; //$file_open
+//	public static Integer indexNumber;
+//	private Boolean isOkToProcess; //$OK-To-Process
+//	public static Boolean poiFlag;  //$PoiFlag  //Person of Interest
+//	private static String wrkProcessName;  //$WrkProcess
 
-	public static String adLegacyOperatorId; //$ADLegOprid
-	public static String command; //$Command
-	public static String completionStatus; //$CompletionStatus
-	public static String errorMessageParm; //$ErrorMessageParm
-	public static Date psDateIn; //$PSDateIn
-	public static int status; //#Status
+//	public static String adLegacyOperatorId; //$ADLegOprid
+//	public static String command; //$Command
+//	public static String completionStatus; //$CompletionStatus
+//	public static String errorMessageParm; //$ErrorMessageParm
+//	public static Date psDateIn; //$PSDateIn
+//	public static int status; //#Status
 
+//	private static Boolean wrkCriticalFlag; //$WrkCriticalFlag
+//	private static Boolean runFlag; //#run_flag
+//	private static String remoteExecScript; //$RexecScript
+//	private static String remoteAdServerName; //$RMTNTADSVR
+//	private static String activeDirectoryHomePath; //$AD_HOME 
+//	private static String remoteServerName; //$RMTSVR
+//	private String runFilePath; //$RUN_FILEPATH
+//	private static String oracleSystemId; //$ORACLE_SID
+//	private static String peopleSoftHomePath; //$PS_HOME
+//	private static String dbName;
+//	private static String as400Library; //$Library
+	
+	
 	public static String psEmpl; //$PSEmpl
-	private static String psEmplId; //$PSEmplId
+//	private static String psEmplId; //$PSEmplId
 	public static String psOprid; //$PSOprid
 
 	public static String errorProgramParm = "HRZ102A"; //$ErrorProgramParm = 'HRZ102A'
-	private static Integer wrkSequence; //#Wrk_Sequence
-	public static String psAuditOperatorId; //$PSAuditOperId
-	private static String wrkEmployeeId1; //#Wrk_EmplId1
-	private static String wrkEmployeeId2; //#Wrk_EmplID2
-	private static Date psEffectiveDate; //$PSEffDt
-	public static BigDecimal psEffectiveSequence; //$PSEffSeq
+//	public static String psAuditOperatorId; //$PSAuditOperId
+//	private static String wrkEmployeeId1; //#Wrk_EmplId1
+//	private static String wrkEmployeeId2; //#Wrk_EmplID2
+//	private static Date psEffectiveDate; //$PSEffDt
+//	public static BigDecimal psEffectiveSequence; //$PSEffSeq
 	
+//	private String commandNonPerson; //$Command_non
+
+//	private static Integer wrkSequence; //#Wrk_Sequence
+//	private static Integer wrkSeqNbr; //#WrkSeqNbr
+//	private static String wrkEmployeeId; //$Wrk_Emplid
 	
 	public static void main() {
+		Zhri100aFields zhri100aFields = new Zhri100aFields();
+		TriggerEmployee trigger;
 		//begin-program
 		//Get-Current-DateTime  //queries the database to get the current time. It also initializes a slew of string variables ($AsOfToday, $AsOfNow, $CurrentCentury, $ReportDate
 		//Init-DateTime  //sets a collection of variables that can be used by the other procedures in datetime.sqc that format dates or do date arithmetic
@@ -70,24 +75,25 @@ public class ZHRI100A {
 		//ZHRI100A.Get-Variable(RMTSVR)
 		//ZHRI100A.Get-Variable(AS400library)
 		//ZHRI100A.Get-Variable(RMTNTADSVR)
-		initializeMainProperties();
+		initializeMainProperties(zhri100aFields);
 		//ZHRI100A.Check-Interface-Runfile
 		//ZHRI100A.Get-Trigger-Data
 		trigger = TriggerEmployee.createMockTriggerForEmployeeTermination();
-		initializeLocalTriggerProperties();
+//		initializeLocalTriggerProperties(trigger);
 		//ZHRI100A.Check-If-Contractor
 		Boolean isContractor = checkIfContractor();
 		//ZHRI100A.Check-If-Correct102A
-		Boolean isCorrect102A = checkIfCorrect102A(psEmplId, psEffectiveDate);
+//		Boolean isCorrect102A = checkIfCorrect102A(trigger.getEmployeeId().trim(), trigger.getEffectiveDate(), trigger.getProcessName().trim());
+		Boolean isOkToProcess = checkIfCorrect102A(trigger.getEmployeeId().trim(), trigger.getEffectiveDate(), trigger.getProcessName().trim());
 		//ZHRI100A.Call-Programs
-		callPrograms();
+		callPrograms(trigger);
 		//ZHRI100A.Intialize-AD-WrkFields
 		AdWrkFields adWrkFields = new AdWrkFields();
 		adWrkFields.intializeAdWrkFields();
 		//HR02-Process-Main  //This is the main processing procedure
-		EmployeeTermination employeeTermination = new EmployeeTermination(trigger, adWrkFields);
+		EmployeeTermination employeeTermination = new EmployeeTermination(trigger, adWrkFields, zhri100aFields);
 		//HR02-Initialize-Fields  //Initialize the fields to ensure that that they all start out blank.
-		psAuditOperatorId = trigger.getOperatorId().trim().substring(1); //strips the 'E' off of the employee id
+//		psAuditOperatorId = trigger.getOperatorId().trim().substring(1); //strips the 'E' off of the employee id
 		psEmpl = " "; //$PSEmpl = ' '
 		errorProgramParm = "HRZ102A";
 //		employeeTermination.hr02InitializeFields();
@@ -95,7 +101,9 @@ public class ZHRI100A {
 		//HR02-Get-Action-Reason  //This routine will determine if a termination was voluntary or involuntary basedd on Action and Action Reason codes.
 		//HR02-Get-Reason-Description  //This routine gets the description field from the Action Reason table when Action = Termination and Action Code equals Other.
 		//ZHRI100A.Get-OprId
-//		psOprid = getOprId(psEmpl, indexNumber, poiFlag);
+		
+//		psOprid = getOprId(psEmpl, indexNumber, poiFlag); //TODO:
+
 		//HR02-Process-Data  //This routine moves 'N' to change address parameter and calls the RPG program.
 		//HR02-Trim-Parameters  //This routine trims all leading and trailing blanks from the data.
 		//ZHRI100A.Call-System
@@ -105,48 +113,53 @@ public class ZHRI100A {
 		//end-program
 	}
 	
-	private static void initializeMainProperties() {
-		dbName = PsDbOwner.findDbName();
-		wrkProcessName = "ZHRI100A";
-		peopleSoftHomePath = System.getenv("PS_HOME");
-		activeDirectoryHomePath = peopleSoftHomePath + "/data/activedir/"; //TODO: where is this used???
-		oracleSystemId = System.getenv("ORACLE_SID");
-		if(oracleSystemId != null) {
-			oracleSystemId = oracleSystemId.toUpperCase();
+	private static void initializeMainProperties(Zhri100aFields zhri100aFields) {
+		zhri100aFields.dbName = PsDbOwner.findDbName();
+		String wrkProcessName = "ZHRI100A";
+		zhri100aFields.peopleSoftHomePath = System.getenv("PS_HOME");
+		zhri100aFields.activeDirectoryHomePath = zhri100aFields.peopleSoftHomePath + "/data/activedir/"; //TODO: where is this used???
+		zhri100aFields.oracleSystemId = System.getenv("ORACLE_SID");
+		if(zhri100aFields.oracleSystemId != null) {
+			zhri100aFields.oracleSystemId = zhri100aFields.oracleSystemId.toUpperCase();
 		}
-		remoteServerName = PsVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, dbName, "RMTSVR"); //TODO: where is this used???
-		remoteExecScript = "/usr/local/barch/" + oracleSystemId + "/scripts/zbas002b.sh"; //TODO: where is this used???
-		as400Library = PsVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, dbName, "AS400library");
-		remoteAdServerName = PsVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, dbName, "RMTNTADSVR"); //TODO: where is this used???
-		wrkCriticalFlag = false;
-		runFlag = true;
+		zhri100aFields.remoteServerName = PsVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "RMTSVR"); //TODO: where is this used???
+		zhri100aFields.remoteExecScript = "/usr/local/barch/" + zhri100aFields.oracleSystemId + "/scripts/zbas002b.sh"; //TODO: where is this used???
+		zhri100aFields.as400Library = PsVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "AS400library");
+		zhri100aFields.remoteAdServerName = PsVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "RMTNTADSVR"); //TODO: where is this used???
+		zhri100aFields.wrkCriticalFlag = false;
+//		zhri100aFields.runFlag = true;
 	}
 	
-	private static void initializeLocalTriggerProperties() {
+//	private static void initializeLocalTriggerProperties(TriggerEmployee trigger) {
 //		LET $CompletionStatus = 'P'	!Initialize the CompletionStatus field
 //	    MOVE &PS_ZHRT_INTTRIGGER.SEQ_NBR TO #WrkSequence
-		wrkSequence = trigger.getSequenceNumber();
+//		wrkSequence = trigger.getSequenceNumber();
 //	    LET $AuditOprId = LTRIM(RTRIM(&PS_ZHRT_INTTRIGGER.OPRID,' '),' ')
-		psAuditOperatorId = trigger.getOperatorId().trim();
+//		psAuditOperatorId = trigger.getOperatorId().trim();
 //		LET $PSEmplId = LTRIM(RTRIM(&PS_ZHRT_INTTRIGGER.EMPLID,' '),' ')
-		psEmplId = trigger.getEmployeeId().trim();
+//		psEmplId = trigger.getEmployeeId().trim();
 //		MOVE $PSEmplId TO #Wrk_EmplId1
-		wrkEmployeeId1 = psEmplId;
+//		wrkEmployeeId1 = psEmplId;
+//		wrkEmployeeId1 = trigger.getEmployeeId().trim();
 //		LET $Wrk_EmplId2 = EDIT(#Wrk_EmplId1,'099999999') //this value is used as a parameter in the error routine call //a 9-digit number left padded with zeros.
-		wrkEmployeeId2 = String.format("%9s", wrkEmployeeId1).replace(' ', '0'); //TODO: where is this used???
+//		wrkEmployeeId2 = String.format("%9s", wrkEmployeeId1).replace(' ', '0'); //TODO: where is this used???
 //		LET $PSEffDt = &PS_ZHRT_INTTRIGGEREFFDT
-		psEffectiveDate = trigger.getEffectiveDate();
+//		psEffectiveDate = trigger.getEffectiveDate();
 //		MOVE &PS_ZHRT_INTTRIGGER.EFFSEQ TO #PSEffSeq
-		psEffectiveSequence = trigger.getEffectiveSequence();
+//		psEffectiveSequence = trigger.getEffectiveSequence();
 //		LET $WrkProcess = LTRIM(RTRIM(&PS_ZHRT_INTTRIGGER.PROC_NAME,' '),' ')	!Remove leading and trailing blanks
-		wrkProcessName = trigger.getProcessName().trim();
-	}
+//		wrkProcessName = trigger.getProcessName().trim();
+//	}
 
 	/**
 	 * ZHRI100A.Process-Main
 	 * This is the process controlling procedure.
 	 */
-	public void processMain() {
+	public void processMain(TriggerEmployee trigger, Boolean poiFlag, Boolean isOkToProcess, String completionStatus, Zhri100aFields zhri100aFields) {
+		String commandNonPerson; //$Command_non
+		Boolean fileIsOpen = false; //$file_open  //TODO: where should this get set???
+		String command; //$Command
+		Boolean runFlag = true; //#run_flag
 //		dbName = PsDbOwner.findDbName();
 //		wrkProcessName = "ZHRI100A";
 //		! This gets the oracle_sid
@@ -175,9 +188,11 @@ public class ZHRI100A {
 		while(runFlag == true) {
 //		WHILE #run_flag = 1        !Never ending loop
 //		   	DO ZHRI100A.Check-Interface-Runfile
-			runFlag = checkInterfaceRunfile();
+			runFlag = checkInterfaceRunfile(zhri100aFields);
 //		   	DO ZHRI100A.Get-Trigger-Data       !Process the interface requests
-			getTriggerData();
+			String adLegacyOperatorId = "";
+			String adActionCode = "T";
+			getTriggerData(trigger, adLegacyOperatorId, adActionCode, poiFlag, isOkToProcess, completionStatus);
 //		   	DO ZHRI100A.Commit-Transaction  //TODO: what's going on here??
 //		   	LET $Command = 'sleep 15'  !After interface run wait 15 seconds and do it again  !sree**rehost        !ZHR_MOD_ZHRI100A_sleep
 			command = "sleep 15";
@@ -198,7 +213,7 @@ public class ZHRI100A {
 //		END-WHILE   !1=1
 		}
 //		LET $Command = 'mv' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.stop' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'
-		command = "mv" + " " + "/usr/local/barch/" + oracleSystemId + "/work/hrinterface.stop" + " " + "/usr/local/barch/" + oracleSystemId + "/work/hrinterface.run";
+		command = "mv" + " " + "/usr/local/barch/" + zhri100aFields.oracleSystemId + "/work/hrinterface.stop" + " " + "/usr/local/barch/" + zhri100aFields.oracleSystemId + "/work/hrinterface.run";
 //		CALL System Using $Command #status Wait           !ZHR_MOD_ZHRI100A_sleep
 //		ZHRI100A.callSystem(command);
 	}
@@ -207,10 +222,14 @@ public class ZHRI100A {
 	 * ZHRI100A.Call-Error-Routine
 	 * Builds the command and calls the error routine
 	 */
-	public static void callErrorRoutine() {
+	public static void callErrorRoutine(String employeeId, String errorMessageParm, Zhri100aFields zhri100aFields) {
+//		LET $Wrk_EmplId2 = EDIT(#Wrk_EmplId1,'099999999') //this value is used as a parameter in the error routine call //a 9-digit number left padded with zeros.
+//		String wrkEmployeeId2 = String.format("%9s", employeeId.trim()).replace(' ', '0');
+		employeeId = String.format("%9s", employeeId.trim()).replace(' ', '0');
 		String addDateErrorParm = "";
 		String addTimeErrorParm = "";
 		String opridErrorParm = "";
+		String command; //$Command
 		//!Make Sure that the ErrorMessageParm is always 75 Characters long
 //		LET $ErrorMessageParm = Substr($ErrorMessageParm,1,75)  !Make sure not more than 75 long
 //		LET $ErrorMessageParm = Rpad($ErrorMessageParm,75,' ')  !Make sure not less than 75 long
@@ -237,11 +256,12 @@ public class ZHRI100A {
 //		                 ''' '''                      ||
 //		                 'Y'                          ||
 //		                 ''')" '
-		command = "CALL '" + as400Library + "/HRZ110A PARM('"
+		command = "CALL '" + zhri100aFields.as400Library + "/HRZ110A PARM('"
 				+ errorProgramParm + "' '"
-        		+ wrkEmployeeId2 + "' ' ' '"
+//        		+ wrkEmployeeId2 + "' ' ' '"
+        		+ employeeId + "' ' ' '"
         		+ errorMessageParm + "' '"
-        		+ wrkCriticalFlag + "' '"
+        		+ zhri100aFields.wrkCriticalFlag + "' '"
         		+ addDateErrorParm + "' '"
         		+ addTimeErrorParm + "' '"
         		+ opridErrorParm + "' '"
@@ -253,21 +273,22 @@ public class ZHRI100A {
 	 * Call-Programs - from ZHRI100A.SQR
 	 * Subroutine will call appropriate programs
 	 */
-	public static void callPrograms() {
+	public static void callPrograms(TriggerEmployee trigger) {
 		//WHEN = 'ZHRI102A'
 		//!Move fields to be used in the called SQC
 		//MOVE #Wrk_Sequence to #WrkSeqNbr
-		wrkSeqNbr = wrkSequence;  //TODO: find where #Wrk_Sequence is set
+//		wrkSeqNbr = wrkSequence;  //TODO: find where #Wrk_Sequence is set
+//		wrkSeqNbr = trigger.getSequenceNumber();  //TODO: find where #Wrk_Sequence is set
 		//LET $PSAuditOperId = $AuditOprId
-		psAuditOperatorId = trigger.getOperatorId();
+//		psAuditOperatorId = trigger.getOperatorId();
         //LET $PSDateIn = $PSEffDt
-		psDateIn = trigger.getEffectiveDate();
+//		psDateIn = trigger.getEffectiveDate();
         //LET $Wrk_Emplid = $PSEmplId
-		wrkEmployeeId = trigger.getEmployeeId();
+//		wrkEmployeeId = trigger.getEmployeeId();
         //LET $ADAction_Code = 'T'
-		adActionCode = "T";
+//		adActionCode = "T";
         //LET $ADLegOprid = ''
-		adLegacyOperatorId = "";
+//		adLegacyOperatorId = "";
         //DO HR02-Process-Main    !ZHRI102A.SQC
 //		HR02ProcessMain();
 	}
@@ -276,7 +297,8 @@ public class ZHRI100A {
 	 * ZHRI100A.Call-System
 	 * Executes a command line statement stored in the $Command Variable
 	 */
-	public int callSystem(String command) {
+	public static Integer callSystem(String employeeId, String command, Boolean poiFlag, Zhri100aFields zhri100aFields) {
+		int status; //#Status
 		String showCommand;
 //		LET #CommandLength = length($Command)             !Get the length of the command
 		int commandLength = command.length();
@@ -291,7 +313,7 @@ public class ZHRI100A {
 //		END-WHILE   !#SubstrStartPos <= #CommandLength
 		}
 //		LET $Command = $RexecScript || ' ' || $Command || ' ' || $RMTSVR  !changed for v8.3
-		command = remoteExecScript + " " +  command + " " + remoteServerName;
+		command = zhri100aFields.remoteExecScript + " " +  command + " " + zhri100aFields.remoteServerName;
 //		DO GET-CURRENT-DATETIME  !Gets the current date and time using curdttim.sqc
 		java.util.Date currentDate = new java.util.Date();
 //		CALL System Using $Command #Status Wait      !Execute the command that was built on the command waiting until completion
@@ -303,27 +325,34 @@ public class ZHRI100A {
 			errorProgramParm = "ZHRI100A";
 //		  	LET $ErrorMessageParm = ' '
 //		  	LET $ErrorMessageParm = 'Error executing Call System command, contact HR-PeopleSoft Oncall'
-			errorMessageParm = "Error executing Call System command, contact HR-PeopleSoft Oncall";
+			String errorMessageParm = "Error executing Call System command, contact HR-PeopleSoft Oncall";
 //		  	LET $WrkCriticalFlag  = 'Y'
-			wrkCriticalFlag = true;
+			zhri100aFields.wrkCriticalFlag = true;
 //		  	DO Prepare-Error-Parms
 //		  	IF $PoiFlag = 'N'
 			if(!poiFlag) {
 //		  		DO Call-Error-Routine
+				callErrorRoutine(employeeId, errorMessageParm, zhri100aFields);
 //		  	ELSE
 			}
 			else {
 //		    	DO Call-Error-Routine-NonEmp
+				callErrorRoutineNonEmp(errorMessageParm);
 //		  	END-IF
 			}
 //		  	LET $WrkCriticalFlag  = 'N'
-			wrkCriticalFlag = false;
+			zhri100aFields.wrkCriticalFlag = false;
 //		END-IF
 		}
 		return status;
 	}
 	
-	public int callSystemUsingCommand() {
+	private static void callErrorRoutineNonEmp(String errorMessageParm) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static int callSystemUsingCommand() {
 		return 0;
 	}
 	
@@ -352,22 +381,22 @@ public class ZHRI100A {
 	 * ZHRI100A.Check-If-Correct102A
 	 * Checks to see if 102A process has JOB row
 	 */
-	public static Boolean checkIfCorrect102A(String psEmplId, Date psEffectiveDate) {
-		Date psEffectiveDate2 = psEffectiveDate;
+	public static Boolean checkIfCorrect102A(String psEmplId, Date psEffectiveDate, String processName) {
 //		LET $OK-To-Process = 'N'
 		Boolean isOkToProcess = false;
 //		IF $WrkProcess = 'ZHRI102A'
-		if("ZHRI102A".equalsIgnoreCase(wrkProcessName)) {
+//		if("ZHRI102A".equalsIgnoreCase(wrkProcessName)) {
+		if("ZHRI102A".equalsIgnoreCase(processName)) {
 //			DO DTU-ADD-DAYS($PSEffDt, 1, $Dt102)
 			//add a day to current effective date
-			psEffectiveDate2 = DateUtil.addDays(psEffectiveDate, 1);
+			psEffectiveDate = DateUtil.addDays(psEffectiveDate, 1);
 //		END-IF
 		}
 //		BEGIN-SELECT
 //		'XX'
 //		LET $OK-To-Process = 'Y'
 //		FROM PS_JOB PS_JOB WHERE PS_JOB.EMPLID = $PSEmplId AND TO_CHAR(PS_JOB.EFFDT, 'YYYY-MM-DD') = $Dt102
-		List<PsJob> psJobList = PsJob.findByEmployeeIdAndEffectiveDate(psEmplId, psEffectiveDate2);
+		List<PsJob> psJobList = PsJob.findByEmployeeIdAndEffectiveDate(psEmplId, psEffectiveDate);
     	if(psJobList != null && !psJobList.isEmpty()) {
     		isOkToProcess = true;
     	}
@@ -379,10 +408,11 @@ public class ZHRI100A {
 	 * ZHRI100A.Check-Interface-Runfile
 	 * This procedure will check the existence run file
 	 */
-	public Boolean checkInterfaceRunfile() {
+	public Boolean checkInterfaceRunfile(Zhri100aFields zhri100aFields) {
 		Boolean runFlag = false;
+		String runFilePath;
 //		LET $RUN_FILEPATH = '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'  //concatenate
-		runFilePath = "/usr/local/barch/" + oracleSystemId + "/work/hrinterface.run";
+		runFilePath = "/usr/local/barch/" + zhri100aFields.oracleSystemId + "/work/hrinterface.run";
 //		LET #file_exists = exists($RUN_FILEPATH)
 		Boolean fileExists = (new File(runFilePath)).exists();
 //		IF #file_exists = 0
@@ -455,8 +485,9 @@ public class ZHRI100A {
 //        			DO Update-OprId
 //      			END-IF
 //    		END-IF  
+			return hr036P.getEmployeeId();
 		}
-		return hr036P.getEmployeeId();
+    	return null;
 	}
 
 	/**
@@ -503,39 +534,43 @@ public class ZHRI100A {
 	 * Get-Trigger-Data - from ZHRI100A.SQR
 	 * This procedure will get the trigger data that needs to be interfaced
 	 */
-	public void getTriggerData() {
+	public void getTriggerData(TriggerEmployee trigger, String adLegacyOperatorId, String adActionCode, Boolean poiFlag, Boolean isOkToProcess, String completionStatus) {
+		Boolean adFound = false; //$AdFound  //TODO: where should this be set???
 //		LET $CompletionStatus = 'P'	!Initialize the CompletionStatus field
 //	    MOVE &PS_ZHRT_INTTRIGGER.SEQ_NBR TO #WrkSequence
-		wrkSequence = trigger.getSequenceNumber();
+//		wrkSequence = trigger.getSequenceNumber();
 //	    LET $AuditOprId = LTRIM(RTRIM(&PS_ZHRT_INTTRIGGER.OPRID,' '),' ')
-		psAuditOperatorId = trigger.getOperatorId().trim();
+//		psAuditOperatorId = trigger.getOperatorId().trim();
 //		LET $PSEmplId = LTRIM(RTRIM(&PS_ZHRT_INTTRIGGER.EMPLID,' '),' ')
-		psEmplId = trigger.getEmployeeId().trim();
+//		psEmplId = trigger.getEmployeeId().trim();
 //		MOVE $PSEmplId TO #Wrk_EmplId1
-		wrkEmployeeId1 = psEmplId;
+//		wrkEmployeeId1 = psEmplId;
+//		wrkEmployeeId1 = trigger.getEmployeeId().trim();
 //		LET $Wrk_EmplId2 = EDIT(#Wrk_EmplId1,'099999999') //this value is used as a parameter in the error routine call //a 9-digit number left padded with zeros.
-		wrkEmployeeId2 = String.format("%9s", wrkEmployeeId1).replace(' ', '0'); //TODO: where is this used???
+//		wrkEmployeeId2 = String.format("%9s", trigger.getEmployeeId().trim()).replace(' ', '0'); //TODO: where is this used???
 //		LET $PSEffDt = &PS_ZHRT_INTTRIGGEREFFDT
-		psEffectiveDate = trigger.getEffectiveDate();
+//		psEffectiveDate = trigger.getEffectiveDate();
 //		MOVE &PS_ZHRT_INTTRIGGER.EFFSEQ TO #PSEffSeq
-		psEffectiveSequence = trigger.getEffectiveSequence();
+//		psEffectiveSequence = trigger.getEffectiveSequence();
 //		LET $WrkProcess = LTRIM(RTRIM(&PS_ZHRT_INTTRIGGER.PROC_NAME,' '),' ')	!Remove leading and trailing blanks
-		wrkProcessName = trigger.getProcessName().trim();
+//		wrkProcessName = trigger.getProcessName().trim();
 //		DO Check-If-Contractor
-		Boolean isContractor = PsJob.employeeIsContractor(psEmplId); //TODO: where is this used???
+//		Boolean isContractor = PsJob.employeeIsContractor(psEmplId);
+		Boolean isContractor = PsJob.employeeIsContractor(trigger.getEmployeeId().trim());
 //		LET $PoiFlag = 'N'
 		poiFlag = false;
 //		IF $Found = 'N'     !Not a contractor
 //		        AND  $PSEmplId <> ''	!not a blank emplid		!ZHR_MOD_ZHRI100A_110A
-		if(!isContractor && psEmplId != null && !psEmplId.isEmpty()) {
+//		if(!isContractor && psEmplId != null && !psEmplId.isEmpty()) {
+		if(!isContractor && trigger.getEmployeeId().trim() != null && !trigger.getEmployeeId().trim().isEmpty()) {
 //		    !CQ 103011 Added a check for 'ZHRI102A' - to see IF corresponding row on JOB 
 //		    IF $WrkProcess = 'ZHRI102A'
-			if("ZHRI102A".equalsIgnoreCase(wrkProcessName)) {
+			if("ZHRI102A".equalsIgnoreCase(trigger.getProcessName().trim())) {
 // 	        	DO Check-If-Correct102A                
 // 	          	IF $OK-To-Process = 'Y'
 				if(isOkToProcess) {
 // 	             	DO Call-Programs
-					callPrograms();
+					callPrograms(trigger);
 				}
 //	 	        ELSE
 				else {
@@ -548,7 +583,7 @@ public class ZHRI100A {
 // 	       	ELSE
 			else {
 // 	          	DO Call-Programs
-				callPrograms();
+				callPrograms(trigger);
 // 	       	END-IF
 			}
 		}
@@ -561,7 +596,8 @@ public class ZHRI100A {
 //			END-IF
 			}
 //	       	IF  $PSEmplId = ''	!ZHR_MOD_ZHRI100A_110A //Error Routine
-			if(psEmplId ==  null || psEmplId.isEmpty()) {
+//			if(psEmplId ==  null || psEmplId.isEmpty()) {
+			if(trigger.getEmployeeId().trim() ==  null || trigger.getEmployeeId().trim().isEmpty()) {
 //	       		LET $CompletionStatus = 'E'
 				completionStatus = "E";
 //	       	END-IF

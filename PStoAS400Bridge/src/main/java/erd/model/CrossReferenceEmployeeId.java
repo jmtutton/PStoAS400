@@ -12,7 +12,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="PS_ZHRT_EMPID_CREF")
-@NamedQuery(name="CrossReferenceEmployeeId.findAll", query="SELECT p FROM CrossReferenceEmployeeId p")
+@NamedQuery(name="CrossReferenceEmployeeId.findAll", query="SELECT c FROM CrossReferenceEmployeeId c")
 public class CrossReferenceEmployeeId implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -92,7 +92,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	    try {
 	    	List<String> resultList = em.createQuery(
 	    			"SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceEmployeeId c "
-	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId ", String.class)
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId ", String.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
@@ -144,7 +144,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	    try {
 	    	List<String> resultList = em.createQuery(
 	    			"SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceEmployeeId c "
-	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId ", String.class)
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId ", String.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
@@ -163,7 +163,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	    try {
 	    	List<String> resultList = em.createQuery(
 	    			"SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceEmployeeId c "
-	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId ", String.class)
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId ", String.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {

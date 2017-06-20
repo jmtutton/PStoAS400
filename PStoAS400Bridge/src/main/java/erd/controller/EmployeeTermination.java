@@ -13,6 +13,7 @@ import erd.model.CrossReferenceTerminationReason;
 import erd.model.PsActionReason;
 import erd.model.PsJob;
 import erd.model.TriggerEmployee;
+import erd.model.Zhri100aFields;
 
 /**
  * ZHRI102A � Termination
@@ -32,10 +33,12 @@ public class EmployeeTermination {
 	AdWrkFields adWrkFields;
 	PsJob psJob;
 	AS400Package as400Package;
+	Zhri100aFields zhri100aFields;
 	
-	public EmployeeTermination(TriggerEmployee trigger, AdWrkFields adWrkFields) {
+	public EmployeeTermination(TriggerEmployee trigger, AdWrkFields adWrkFields, Zhri100aFields zhri100aFields) {
 		this.trigger = trigger;
 		this.adWrkFields = adWrkFields;
+		this.zhri100aFields = zhri100aFields;
 	}
 	
 	/**
@@ -124,42 +127,44 @@ public class EmployeeTermination {
 	 * HR02-Initialize-Fields - from ZHRI102A.SQC
 	 * Initialize the fields to ensure that that they all start out blank.
 	 */
-	private void hr02InitializeFields() {
-//		zhri100A.psEmpl = " "; //$PSEmpl = ' '
-		psTerminationMonth = " "; //$PSTermMnth = ' '
-		psTerminationDay = " "; //$PsTermDay = ' '
-		psTerminationYear = " "; //$PSTermYr = ' '
-		psRehireMonth = " "; //$PSReHireMnth = ' '
-		psRehireDay = " "; //$PSReHireDay = ' '
-		psRehireYear = " "; //$PSReHireYr = ' '
-		psVoluntaryOrInvoluntary = " "; //$PSVolInvol = ' '
-		psTerminationCode = " "; //$PSTermCode = ' '
-		psTerminationReason = " "; //$PSTermReason = ' '
-		psActionReason = " "; //$PSAction_Reason = ' '
-		//$PSAuditOperId = substr($PSAuditOperId,2,5)
-//		zhri100A.psAuditOperatorId = trigger.getOperatorId().trim().substring(1); //strips the 'E' off of the employee id
-		//$ErrorProgramParm = 'HRZ102A'
-//		zhri100A.errorProgramParm = "HRZ102A";
-	}
+//	private void hr02InitializeFields() {
+////		zhri100A.psEmpl = " "; //$PSEmpl = ' '
+//		psTerminationMonth = " "; //$PSTermMnth = ' '
+//		psTerminationDay = " "; //$PsTermDay = ' '
+//		psTerminationYear = " "; //$PSTermYr = ' '
+//		psRehireMonth = " "; //$PSReHireMnth = ' '
+//		psRehireDay = " "; //$PSReHireDay = ' '
+//		psRehireYear = " "; //$PSReHireYr = ' '
+//		psVoluntaryOrInvoluntary = " "; //$PSVolInvol = ' '
+//		psTerminationCode = " "; //$PSTermCode = ' '
+//		psTerminationReason = " "; //$PSTermReason = ' '
+//		psActionReason = " "; //$PSAction_Reason = ' '
+//		//$PSAuditOperId = substr($PSAuditOperId,2,5)
+////		zhri100A.psAuditOperatorId = trigger.getOperatorId().trim().substring(1); //strips the 'E' off of the employee id
+//		//$ErrorProgramParm = 'HRZ102A'
+////		zhri100A.errorProgramParm = "HRZ102A";
+//	}
 
 	/**
 	 * HR02-Process-Main - from ZHRI102A.SQC
 	 * This is the main processing procedure
 	 */
 	public void hr02ProcessMain() {
+		Boolean poiFlag = false;
 		psDate = trigger.getEffectiveDate();
 //		DO HR02-Initialize-Fields
-		hr02InitializeFields();
+//		hr02InitializeFields();
 //		MOVE 1 to #NumberOfDays   !Set the number of days to add to the passed date
 		Integer numberOfDays = 1;
 //		DO dtu-add-days($PSDateIn, #NumberOfDays, $PSDate)    !Add one day to the date using DateMath.sqc
 //		psDate = (java.sql.Date) DateUtil.addDays(zhri100A.psDateIn, numberOfDays);
-		psDate = (java.sql.Date) erd.DateUtil.addDays(trigger.getEffectiveDate(), numberOfDays);
+//		psDate = (java.sql.Date) erd.DateUtil.addDays(trigger.getEffectiveDate(), numberOfDays);
+		psDate = (java.sql.Date) erd.DateUtil.addDays(trigger.getEffectiveDate(), 1);
 //		DO HR02-Get-Job
 //		hr02GetJob(zhri100A.psEmplId, psDate, zhri100A.psEffectiveSequence);
-		hr02GetJob(trigger.getEmployeeId().trim(), psDate, trigger.getEffectiveSequence());
+		PsJob psJob = hr02GetJob(trigger.getEmployeeId().trim(), psDate, trigger.getEffectiveSequence());
 //		DO ZHRI100A.Get-OprId
-		String psOprid = ZHRI100A.getOprId(ZHRI100A.psEmpl, ZHRI100A.indexNumber, ZHRI100A.poiFlag);
+		String psOprid = ZHRI100A.getOprId(ZHRI100A.psEmpl, zhri100aFields.indexNumber, zhri100aFields.poiFlag);
 		ZHRI100A.psOprid = psOprid;
 //		LET $ADLegOprid = $PSOprid
 		adWrkFields.adLegOprId = psOprid;
@@ -170,7 +175,7 @@ public class EmployeeTermination {
 //		    LET $PSDate = $PSDateIn    !Move the original date back to psdate.
 			psDate = trigger.getEffectiveDate();
 // 			DO HR02-Process-Data
-			HR02ProcessData();
+			HR02ProcessData(trigger.getEmployeeId(), poiFlag);
 //		END-IF    !$PSEmpl <> '' and $PSEmpl <> ' '
 		}
 	}
@@ -179,7 +184,7 @@ public class EmployeeTermination {
 	 * HR02-Process-Data - from ZHRI102A.SQC
 	 * This routine moves 'N' to change address parameter and calls the RPG program.
 	 */
-	private void HR02ProcessData() {
+	private void HR02ProcessData(String employeeId, Boolean poiFlag) {
 //		LET $PSChange = 'N'
 //		Boolean psChange = false; //TODO: where is this used???
 		//Rehire
@@ -217,18 +222,18 @@ public class EmployeeTermination {
         		+ psRehireYear + "' '"
         		+ psVoluntaryOrInvoluntary + "' '"
         		+ psTerminationCode + "' '"
-        		+ ZHRI100A.psAuditOperatorId + "' '"
+        		+ zhri100aFields.psAuditOperatorId + "' '"
         		+ psTerminationReason + "'";
 //		LET $Part1 = '"CALL ' || $Library ||'/HRZ102A '
 		String part1 = "\"CALL " + library + "/HRZ102A ";
 //		LET $Command = $Part1||$Part2
-		ZHRI100A.command = part1 + part2;
+		String command = part1 + part2;
 //		DO Call-System             !From ZHRI100A.SQR
-//		status = ZHRI100A.callSystem(command);
+		Integer status = ZHRI100A.callSystem(employeeId, command, poiFlag, zhri100aFields);
 //		IF (#Status = 0)
-		if(ZHRI100A.status == 0) {
+		if(status == 0) { //TODO: ???
 //			LET $CompletionStatus = 'C'   !Completed Normally
-			ZHRI100A.completionStatus = "C";
+//			completionStatus = "C"; //TODO: ???
 //		END-IF    !#Status = 0
 		}
 	}
@@ -259,41 +264,43 @@ public class EmployeeTermination {
 	 * HR02-Get-Job - from ZHRI102A.SQC
 	 * This routine will the Job Data row for each of the employee numbers entered in the trigger file.
 	 */
-	private void hr02GetJob(String employeeId, Date effectiveDate, BigDecimal effectiveSequence) {
+	private PsJob hr02GetJob(String employeeId, Date effectiveDate, BigDecimal effectiveSequence) {
 		PsJob psJob = PsJob.hr02GetJob(employeeId, new java.sql.Date(effectiveDate.getTime()), effectiveSequence);
 //		LET $PSAction = &PS_Job.ACTION
-		psAction = psJob.getAction();
+//		psAction = psJob.getAction();
 //	   	LET $PSAction_Reason = &PS_Job.ACTION_REASON
-		psActionReason = psJob.getActionReason();
+//		psActionReason = psJob.getActionReason();
 //	   	LET $PSLocation = &PS_Job.Location
-		psLocation = psJob.getLocation();
+//		psLocation = psJob.getLocation();
 //	   	LET $PSCompany = &PS_Job.Company
-		psCompany = psJob.getCompany();
+//		psCompany = psJob.getCompany();
 //	   	LET $PSBusinessUnit = &PS_Job.Business_Unit
-		psBusinessUnit = psJob.getBusinessUnit();
+//		psBusinessUnit = psJob.getBusinessUnit();
 //	   	LET $PSEmplClass = &PS_Job.Empl_Class
-		psEmplClass = psJob.getEmplClass();
+//		psEmplClass = psJob.getEmplClass();
 //	   	LET $PSEmplStatus = &PS_Job.Empl_Status
-		psEmplStatus = psJob.getEmplStatus();
+//		psEmplStatus = psJob.getEmplStatus();
 //	   	LET $PSDeptId = &PS_Job.DeptId
-		psDeptId = psJob.getDeptId();
+//		psDeptId = psJob.getDeptId();
 //	   	LET $PSJobCode = &PS_Job.JobCode
-		psJobCode = psJob.getJobCode();
+//		psJobCode = psJob.getJobCode();
 //	   	LET $Wrk_AD_JobDataBuild = 'Y'
-		wrkAdJobDataBuild = true;
+//		wrkAdJobDataBuild = true;
 //	   	IF $PSAction <> 'REH'
-		if(!"REH".equalsIgnoreCase(psAction)) {
+		if(!"REH".equalsIgnoreCase(psJob.getAction())) {
 //	        DO HR02-Get-Action-Reason
-			HR02GetActionReason(psAction, psActionReason);
+			psJob.setActionReason(HR02GetActionReason(employeeId, psJob.getAction(), psJob.getActionReason()));
 //	   	END-IF    !$PSAction <> 'REH'
 		}
+		return psJob;
 	}
 
 	/**
 	 * HR02-Get-Action-Reason - from ZHRI102A.SQC
 	 * This routine will determine if a termination was voluntary or involuntary based on Action and Action Reason codes.
+	 * @return 
 	 */
-	private void HR02GetActionReason(String psAction, String psActionReason) {
+	private String HR02GetActionReason(String employeeId, String psAction, String psActionReason) {
 //		LET $Found = 'N'   !Initialize the record found variable
 		Boolean found = false;
 //		BEGIN-SELECT
@@ -322,9 +329,9 @@ public class EmployeeTermination {
 //		IF $Found = 'N'
 		if(!found) {
 //			LET $ErrorMessageParm = 'Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF'
-			ZHRI100A.errorMessageParm = "Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF";
+			String errorMessageParm = "Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF";
 //			DO Call-Error-Routine       !From ZHRI100A.SQR
-			ZHRI100A.callErrorRoutine();
+			ZHRI100A.callErrorRoutine(employeeId, errorMessageParm, zhri100aFields);
 //			!Default the Action and reason in the legacy system
 //			LET $PSVolInvol = 'V'
 			psVoluntaryOrInvoluntary = "V";
@@ -334,6 +341,7 @@ public class EmployeeTermination {
 			psTerminationReason = "ACTION REASON NOT SELECTED IN PS";
 //		END-IF    !$Found = 'N'
 		}
+		return psActionReason;
 	}
 	
 	/**
@@ -361,15 +369,14 @@ public class EmployeeTermination {
 	
 	/**
 	 */
-	private void makeAS400PackageForErrorProcess() {
-		String processName = "HRZ110A";		
+	private void makeAS400PackageForErrorProcess(String processName, String employeeId, String errorMessageParm) {
 		List<String> parameterList = new ArrayList<String>();
 		HashMap<String, String> parameterMap = new HashMap<String, String>();
-		ZHRI100A.callErrorRoutine();
+		ZHRI100A.callErrorRoutine(employeeId, errorMessageParm, zhri100aFields);
 		String errorProgramParm = "";
 		String wrkEmployeeId2 = "";
 		String blankSpaceParm = "";
-		String errorMessageParm = "Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF";
+//		String errorMessageParm = "Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF";
 		String wrkCriticalFlag = "";
 		String addDateErrorParm = "";
 		String addTimeErrorParm = "";

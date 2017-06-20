@@ -390,4 +390,9 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    } 
 	}
 
+	public static Date findEffectiveDateByEmployeeIdAndSequence(String wrkEmplId, BigDecimal wrkIndexNum, Date date) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -507,4 +507,9 @@ public class CrossReferencePersonOfInterest implements Serializable {
 		return null;
 	}
 
+	public static Date findEffectiveDateByEmployeeId(String wrkEmplId, Date date) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -544,6 +544,10 @@ public class PsJob implements Serializable {
 		return this.actionReason.trim();
 	}
 
+	public void setActionReason(String actionReason) {
+		this.actionReason = actionReason.trim();
+	}
+
 	public String getAddsToFteActual() {
 		return this.addsToFteActual.trim();
 	}
