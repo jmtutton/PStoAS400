@@ -590,7 +590,6 @@ do Reset          !Reset.sqc
 end-program
 
 !----------------------------------------------------------------------
-! ERAC
 ! Procedure:  Process-Main
 ! Desc:  This is the process controling procedure.
 !----------------------------------------------------------------------
