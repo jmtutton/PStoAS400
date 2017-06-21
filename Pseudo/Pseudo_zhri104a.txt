@@ -31,7 +31,6 @@ HR04-Get-Group
 !----------------------------------------------------------------------
 
 Begin-Procedure HR04-Initialize-Fields
-
 Let $LegEmplid = ' '
 Let $LegUserEmplid = ' '
 Let $LegBranch = ' '
@@ -56,13 +55,8 @@ Let $WrkSrchLoc = ' '
 Let $WrkSrchDep = ' '
 Let $PSCompany =  ' '
 Let $CallRpg = 'Y'
-
 Let $ErrorProgramParm = 'HRZ104A'
-
-
 End-Procedure HR04-Initialize-Fields
-
-
 
 !----------------------------------------------------------------------
 ! ERAC
@@ -75,16 +69,16 @@ Begin-Procedure HR04-Process-Main
 Do HR04-Initialize-Fields
 Do HR04-Get-Job-Data
 Do Get-Oprid                                     !From ZHRI100A.SQR
+//PSOprid = Get-Oprid ()
 Let $ADLegOprid = $PSOprid
 Let $NewEmpOprid = $PSOprid
 If $NewEmpOprid <> '' and $NewEmpOprid <> ' '    !New Oprid not blank or null
-Do HR04-Massage-Data
-If $CallRpg = 'Y'
-        Do HR04-Call-RPG
-Else
-    Let $CompletionStatus = 'C'
-End-iF
-
+	Do HR04-Massage-Data
+	If $CallRpg = 'Y'
+		Do HR04-Call-RPG
+	Else
+    	Let $CompletionStatus = 'C'
+	End-iF
 End-if    !$NewEmpOprid <> '' and $NewEmpOprid <> ' '
 
 End-Procedure HR04-Process-Main
@@ -96,49 +90,48 @@ End-Procedure HR04-Process-Main
 ! Desc:  Gets the employees data from the job table that needs to be
 !        interfaced to the legacy system
 !----------------------------------------------------------------------
+//PS_JOB.findByEMPLIDAndEFFDT()
+//Wrk_Emplid
+//PSEffdt
 
 Begin-Procedure HR04-Get-job-data
 
 Begin-Select
 
 CJ6.COMPANY
-    let $PSCompany = ltrim(rtrim(&CJ6.COMPANY,' '),' ')              !Remove leading and trailing blanks
+let $PSCompany = ltrim(rtrim(&CJ6.COMPANY,' '),' ')              !Remove leading and trailing blanks
 CJ6.BUSINESS_UNIT
-    let $PSBusinessUnit = ltrim(rtrim(&CJ6.BUSINESS_UNIT,' '),' ')   !Remove leading and trailing blanks
+let $PSBusinessUnit = ltrim(rtrim(&CJ6.BUSINESS_UNIT,' '),' ')   !Remove leading and trailing blanks
 CJ6.LOCATION
-    let $PSLocation = ltrim(rtrim(&CJ6.LOCATION,' '),' ')            !Remove leading and trailing blanks
+let $PSLocation = ltrim(rtrim(&CJ6.LOCATION,' '),' ')            !Remove leading and trailing blanks
 CJ6.SETID_JOBCODE
-    let $PSSetID = ltrim(rtrim(&CJ6.SETID_JOBCODE,' '),' ')          !Remove leading and trailing blanks
+let $PSSetID = ltrim(rtrim(&CJ6.SETID_JOBCODE,' '),' ')          !Remove leading and trailing blanks
 CJ6.EMPL_STATUS
-    let $PSEmplStatus = ltrim(rtrim(&CJ6.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
+let $PSEmplStatus = ltrim(rtrim(&CJ6.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
 CJ6.ACTION
-    let $PSAction = ltrim(rtrim(&CJ6.ACTION,' '),' ')                !Remove leading and trailing blanks
+let $PSAction = ltrim(rtrim(&CJ6.ACTION,' '),' ')                !Remove leading and trailing blanks
 CJ6.REG_TEMP
-    let $PSRegTemp = ltrim(rtrim(&CJ6.REG_TEMP,' '),' ')             !Remove leading and trailing blanks
+let $PSRegTemp = ltrim(rtrim(&CJ6.REG_TEMP,' '),' ')             !Remove leading and trailing blanks
 CJ6.FULL_PART_TIME
-    let $PSFullPartTime = ltrim(rtrim(&CJ6.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
+let $PSFullPartTime = ltrim(rtrim(&CJ6.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
 CJ6.EMPL_CLASS
-    let $PSEmplClass = ltrim(rtrim(&CJ6.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
+let $PSEmplClass = ltrim(rtrim(&CJ6.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
 CJ6.FLSA_STATUS
-    let $PSFlsaStatus = ltrim(rtrim(&CJ6.FLSA_STATUS,' '),' ')       !Remove leading and trailing blanks
+let $PSFlsaStatus = ltrim(rtrim(&CJ6.FLSA_STATUS,' '),' ')       !Remove leading and trailing blanks
 CJ6.DEPTID
-    let $PSDeptid = ltrim(rtrim(&CJ6.DEPTID,' '),' ')                !Remove leading and trailing blanks
+let $PSDeptid = ltrim(rtrim(&CJ6.DEPTID,' '),' ')                !Remove leading and trailing blanks
 CJ6.JOBCODE
-    let $PSJobcode = ltrim(rtrim(&CJ6.JOBCODE,' '),' ')              !Remove leading and trailing blanks
-
- let $Wrk_AD_JobDataBuild = 'Y'                 !sree-UAAMOD
-
+let $PSJobcode = ltrim(rtrim(&CJ6.JOBCODE,' '),' ')              !Remove leading and trailing blanks
+let $Wrk_AD_JobDataBuild = 'Y'
 from PS_JOB CJ6
-where CJ6.EMPLID = $Wrk_Emplid                  !sree**10/04/01
-and to_char(CJ6.EFFDT, 'YYYY-MM-DD') =    $PSEffdt
-!AND CJ6.EFFSEQ =   #WrkEffseq                   !CQ 86984
-AND CJ6.EFFSEQ =                                 !CQ 86984
-         (SELECT MAX(CJ6B.EFFSEQ)                !CQ 86984
-          FROM  PS_JOB CJ6B                      !CQ 86984
-          WHERE CJ6B.EMPLID   = CJ6.EMPLID       !CQ 86984
-            AND CJ6B.EMPL_RCD = CJ6.EMPL_RCD     !CQ 86984
-            AND CJ6B.EFFDT    = CJ6.EFFDT)       !CQ 86984
-and CJ6.EMPL_RCD = 0                             !changed for v8.3
+where CJ6.EMPLID = $Wrk_Emplid
+	and to_char(CJ6.EFFDT, 'YYYY-MM-DD') = $PSEffdt
+	AND CJ6.EFFSEQ =
+		(SELECT MAX(CJ6B.EFFSEQ) FROM  PS_JOB CJ6B
+      		WHERE CJ6B.EMPLID   = CJ6.EMPLID
+            	AND CJ6B.EMPL_RCD = CJ6.EMPL_RCD
+            	AND CJ6B.EFFDT    = CJ6.EFFDT)
+	and CJ6.EMPL_RCD = 0
 
 End-Select
 
@@ -157,57 +150,17 @@ Begin-Procedure HR04-Massage-Data
 !Format the legacy employee ID from the PeopleSoft Oprid
 let $LegEmplid = ltrim($NewEmpOprid,'E')  !Remove the leading 'E' from the employee ID
 Uppercase $LegEmplid    !Be sure in all CAPS
-
 !Format the legacy employee ID from the PeopleSoft Oprid
 let $LegUserEmplid = ltrim($PSUserOprid,'E')  !Remove the leading 'E' from the employee ID
 Uppercase $LegUserEmplid    !Be sure in all CAPS
-
 !Format the Group number that the employee is assigned to from the Company Field
 Do HR04-Get-Group
 Uppercase $LegGroup     !Be sure in all CAPS
-
 !Format the Branch code that the employee is assigned to from the Location Field
 Do HR04-Get-Branch
 Uppercase $LegBranch    !Be sure in all CAPS
-
-!Format Work Status using the Empl_Status and Action_Reason fields from PeopleSoft
-!evaluate $PSAction
-
-!    when = 'TER'
-!    when = 'RET'
-!    when = 'TWB'
-!    when = 'TWP'
-!        let $LegWorkStatus = 'T'
-!        break    !exit evaluate statement
-
-!    when = 'LOA'
-!    when = 'PLA'
-!        let $LegWorkStatus = 'L'
-!        break    !exit evaluate statement
-
-!    when = 'LTD'
-!    when = 'LTO'
-!        let $LegWorkStatus = 'D'
-!        break    !exit evaluate statement
-
-!    when = 'ASG'
-!    when = 'HIR'
-!    when = 'REC'
-!    when = 'REH'
-!    when = 'RFD'
-!    when = 'RFL'
-!        let $LegWorkStatus = 'A'
-!        break    !exit evaluate statement
-
-!    when-other
-!        let $LegWorkStatus = ' '
-!        break    !exit evaluate statement
-
-!end-evaluate   !$PSRegTemp
-
 !Format Work Status using the Empl_Status ONLY from PeopleSoft !CQ 86984 - removed code above based on Action
 evaluate $PSEmplStatus
-
     when = 'D'
     when = 'Q'
     when = 'R'
@@ -217,51 +170,40 @@ evaluate $PSEmplStatus
     when = 'X'
         let $LegWorkStatus = 'T'
         break    !exit evaluate statement
-
     when = 'P'
     when = 'L'
         let $LegWorkStatus = 'L'
         break    !exit evaluate statement
-
     when = 'A'
     when = 'S'
         let $LegWorkStatus = 'A'
         break    !exit evaluate statement
-
     when-other
         let $LegWorkStatus = ' '
         break    !exit evaluate statement
-
 end-evaluate   !$PSRegTemp 
-
 !Format Union Flag
 If ($PSEmplClass = 'O')
     let $LegUnionFlag = 'Y'
 else
     let $LegUnionFlag = 'N'
 End-If    !$PSEmplClass = 'O'
-
 !Format Time Card Flag
 If ($PSFlsaStatus = 'N')
     let $LegTimeCardFlag = 'Y'
 else
     let $LegTimeCardFlag = 'N'
 End-If    !$PSFlsaStatus = 'N'
-
 !Format national id
 let $LegNid = $PSNid
 Uppercase $LegNid
-
-
 !Format Position and Department
 Do HR04-Get-Position
 Uppercase $LegPosition
 Uppercase $LegDepartment
-
 !Format the Effective Date
 Unstring $PSEffdt by '-' into $WrkYear $WrkMonth $WrkDay             !E2774K **Rehost**11/10/2000
 Let $LegEffdt = $WrkMonth || $WrkDay || $WrkYear
-
 End-Procedure HR04-Massage-Data
 
 
@@ -272,8 +214,6 @@ End-Procedure HR04-Massage-Data
 !----------------------------------------------------------------------
 
 Begin-Procedure HR04-Call-RPG
-
-
 Let $Command =   '"CALL '       ||
                  $Library                      ||
                  '/HRZ104A '                   ||
@@ -300,15 +240,10 @@ Let $Command =   '"CALL '       ||
                  ''' '''                   ||
                  $LegEffdt                     ||
                  ''')"'
-
 Do Call-System               !From ZHRI100A.SQR
-
 if (#STATUS = 0)
     Let $CompletionStatus = 'C'
 end-if      !  #STATUS = 0
-
-
-
 End-Procedure HR04-Call-RPG
 
 
@@ -320,31 +255,34 @@ End-Procedure HR04-Call-RPG
 !        jobcode setid, jobcode, empl_class, full_part_time, reg_temp,
 !        and deptid from PeopleSoft
 !----------------------------------------------------------------------
+//PS_ZHRT_JOBCD_CREF.findBySETID_JOBCODEAndJOBCODEAndEMPL_CLASSAndFULL_PART_TIMEAndREG_TEMPAndDEPARTMENTAndSTATUS()
+//PSSetID
+//PSJobCode
+//PSEmplClass
+//PSFullPartTime
+//PSRegTemp
+//PSDeptid
+//STATUS = 'A'
 
 Begin-Procedure HR04-Get-Position
-
 Let $Found = 'N'
-
 Begin-Select
-
 CPT3.ZHRF_LEGPOSITIONCD                                        !sree**rehost
-    let $LegPosition = &CPT3.ZHRF_LEGPOSITIONCD                !sree**rehost
+let $LegPosition = &CPT3.ZHRF_LEGPOSITIONCD                !sree**rehost
 CPT3.ZHRF_LEGDEPTCD                                            !sree**rehost
-    Let $LegDepartment = &CPT3.ZHRF_LEGDEPTCD                  !sree**rehost
+Let $LegDepartment = &CPT3.ZHRF_LEGDEPTCD                  !sree**rehost
 CPT3.ZHRF_LEGJOBSTSCD                                          !sree**rehost
-    Let $LegJobStatus = &CPT3.ZHRF_LEGJOBSTSCD                 !sree**rehost
-
-
-    Let $Found = 'Y'
-
+Let $LegJobStatus = &CPT3.ZHRF_LEGJOBSTSCD                 !sree**rehost
+Let $Found = 'Y'
 from PS_ZHRT_JOBCD_CREF CPT3                                                          !sree**rehost
-where CPT3.SETID_JOBCODE = $PSSetID     and CPT3.JOBCODE = $PSJobCode                 !sree**rehost
-  and CPT3.EMPL_CLASS = $PSEmplClass and CPT3.FULL_PART_TIME = $PSFullPartTime        !sree**rehost
-  and CPT3.REG_TEMP = $PSRegTemp   and CPT3.DEPARTMENT = $PSDeptid                    !sree**rehost
-  and CPT3.STATUS = 'A'                                                               !sree**rehost
-
+where CPT3.SETID_JOBCODE = $PSSetID
+	and CPT3.JOBCODE = $PSJobCode                 !sree**rehost
+  	and CPT3.EMPL_CLASS = $PSEmplClass 
+  	and CPT3.FULL_PART_TIME = $PSFullPartTime        !sree**rehost
+  	and CPT3.REG_TEMP = $PSRegTemp
+  	and CPT3.DEPARTMENT = $PSDeptid                    !sree**rehost
+  	and CPT3.STATUS = 'A'                                                               !sree**rehost
 End-Select
-
 If $Found = 'N'
    ! Let $ErrorMessageParm = 'Setid,Jobcode,EmplClass,F/P Time,R/T,Deptid not in XRef PS_ZHRT_JOBCD_CREF'
    ! Let $WrkCriticalFlag = 'Y'    !sree*09/12/02
@@ -352,19 +290,19 @@ If $Found = 'N'
    ! Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
    ! Do Call-Error-Routine         !From ZHRI100A.SQR
 End-If    !$Found = 'N'
-
-
 End-Procedure HR04-Get-Position
-
 
 !----------------------------------------------------------------------
 ! ERAC
 ! Procedure:  HR04-Get-Branch
 ! Desc:  Gets the branch from the cross reference file using Location
 !----------------------------------------------------------------------
+//ZPS_ZGLT_PT12P_CREF.findZGLF_PT2OBRByZGLF_PT2OGPAndZGLF_PT2DPTAndZGLF_PT2STS()
+//LegGroup
+//PSLocation
+//ZGLF_PT2STS = "A"
 
 Begin-Procedure HR04-Get-Branch
-
 
 Let $Where = 'Where CPT24.ZGLF_PT2OGP = '''               !Build $Where
                   || $LegGroup
@@ -372,28 +310,20 @@ Let $Where = 'Where CPT24.ZGLF_PT2OGP = '''               !Build $Where
                   || $PSLocation
                   || ''' and CPT24.ZGLF_PT2STS = '''
                   || 'A'''
-
-
 Let $Found = 'N'
-
 Begin-Select
-
 CPT24.ZGLF_PT2OBR
-    let $LegBranch = ltrim(rtrim(&CPT24.ZGLF_PT2OBR,' '),' ')     !Remove leading and trailing blanks
-
-    Let $Found = 'Y'
-
+let $LegBranch = ltrim(rtrim(&CPT24.ZGLF_PT2OBR,' '),' ')     !Remove leading and trailing blanks
+Let $Found = 'Y'
 from ZPS_ZGLT_PT12P_CREF CPT24
 [$Where]
 End-Select
-
 If $Found = 'N'
-     Let $ErrorMessageParm = 'Company, Location, Department combo ' ||
-                             'not found in XRef table'
-     Let $WrkCriticalFlag = 'Y'    !sree*09/12/02
-     Let $CallRpg = 'N'
-     Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-     Do Call-Error-Routine      !From ZHRI100A.SQR
+	Let $ErrorMessageParm = 'Company, Location, Department combo ' || 'not found in XRef table'
+	Let $WrkCriticalFlag = 'Y'    !sree*09/12/02
+	Let $CallRpg = 'N'
+	Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+	Do Call-Error-Routine      !From ZHRI100A.SQR
 End-If    !$Found = 'N'
 
 End-Procedure HR04-Get-Branch
@@ -404,30 +334,27 @@ End-Procedure HR04-Get-Branch
 ! Procedure:  HR04-Get-Group
 ! Desc:  Gets the group from the cross reference file using Company
 !----------------------------------------------------------------------
+//PS_ZHRT_CMPNY_CREF.findZHRF_LEGGROUPByCOMPANYAndSTATUS()
+//PSCompany
+//STATUS = 'A' 
 
 Begin-Procedure HR04-Get-Group
-
 Let $Found = 'N'
-
 Begin-Select
-
 CPT52.ZHRF_LEGGROUP                                                                                    !sree**rehost
-    let $LegGroup = ltrim(rtrim(&CPT52.ZHRF_LEGGROUP,' '),' ')   !Remove leading and trailing blanks       !sree**rehost
-
-    Let $Found = 'Y'
-
+let $LegGroup = ltrim(rtrim(&CPT52.ZHRF_LEGGROUP,' '),' ')   !Remove leading and trailing blanks       !sree**rehost
+Let $Found = 'Y'
 from PS_ZHRT_CMPNY_CREF CPT52                                     !sree**rehost
 where CPT52.COMPANY = $PSCompany                                  !sree**rehost
-and CPT52.STATUS = 'A'                                            !sree**rehost
-
+	and CPT52.STATUS = 'A'                                            !sree**rehost
 End-Select
 
 If $Found = 'N'
-     Let $ErrorMessageParm = 'Company not found in XRef Table PS_ZHRT_CMPNY_CREF'
-     Let $WrkCriticalFlag = 'Y'    !sree*09/12/02
- Let $CallRpg = 'N'
-Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-     Do Call-Error-Routine     !From ZHRI100A.SQR
+  	Let $ErrorMessageParm = 'Company not found in XRef Table PS_ZHRT_CMPNY_CREF'
+   	Let $WrkCriticalFlag = 'Y'    !sree*09/12/02
+	Let $CallRpg = 'N'
+	Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+  	Do Call-Error-Routine     !From ZHRI100A.SQR
 End-If    !$Found = 'N'
 
 End-Procedure HR04-Get-Group
