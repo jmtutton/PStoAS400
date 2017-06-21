@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.Timestamp;
 
 /**
@@ -84,6 +84,7 @@ public class PsPersonalData implements Serializable {
 	private String birthCountry;
 
 	@Column(name="BIRTHDATE")
+	@Temporal(TemporalType.DATE)
 	private Date birthDate;
 
 	@Column(name="BIRTHPLACE", nullable=false, length=30)
@@ -141,12 +142,15 @@ public class PsPersonalData implements Serializable {
 	private String disabledVet;
 
 	@Column(name="DT_OF_DEATH")
+	@Temporal(TemporalType.DATE)
 	private Date dateOfDeath;
 
 	@Column(name="ENTRY_DT_FRA")
+	@Temporal(TemporalType.DATE)
 	private Date entryDtFra;
 
 	@Column(name="EXPCTD_MILITARY_DT")
+	@Temporal(TemporalType.DATE)
 	private Date expctdMilitaryDt;
 
 	@Column(name="EXTENSION", nullable=false, length=6)
@@ -207,9 +211,11 @@ public class PsPersonalData implements Serializable {
 	private String gvtMilSepRet;
 
 	@Column(name="GVT_MIL_SVCE_END")
+	@Temporal(TemporalType.DATE)
 	private Date gvtMilSvceEnd;
 
 	@Column(name="GVT_MIL_SVCE_START")
+	@Temporal(TemporalType.DATE)
 	private Date gvtMilSvceStart;
 
 	@Column(name="GVT_MIL_VERIFY", nullable=false, length=1)
@@ -231,6 +237,7 @@ public class PsPersonalData implements Serializable {
 	private String gvtPrevFedEmpl;
 
 	@Column(name="GVT_SEP_INCENT_DT")
+	@Temporal(TemporalType.DATE)
 	private Date gvtSepIncentDt;
 
 	@Column(name="GVT_SEP_INCENTIVE", nullable=false, length=1)
@@ -249,6 +256,7 @@ public class PsPersonalData implements Serializable {
 	private String gvtVetPrefRif;
 
 	@Column(name="GVT_YR_ATTAINED")
+	@Temporal(TemporalType.DATE)
 	private Date gvtYrAttained;
 
 	@Column(name="HEALTH_CARE_NBR", nullable=false, length=12)
@@ -297,9 +305,11 @@ public class PsPersonalData implements Serializable {
 	private String maritalStatus;
 
 	@Column(name="MAR_STATUS_DT")
+	@Temporal(TemporalType.DATE)
 	private Date maritalStatusDate;
 
 	@Column(name="MEDICARE_ENTLD_DT")
+	@Temporal(TemporalType.DATE)
 	private Date medicareEntldDt;
 
 	@Column(name="MIDDLE_NAME", nullable=false, length=30)
@@ -312,6 +322,7 @@ public class PsPersonalData implements Serializable {
 	private String militSituatnFra;
 
 	@Column(name="MILITARY_END_ITA")
+	@Temporal(TemporalType.DATE)
 	private Date militaryEndIta;
 
 	@Column(name="MILITARY_RANK_ITA", nullable=false, length=50)
@@ -408,9 +419,11 @@ public class PsPersonalData implements Serializable {
 	private String smoker;
 
 	@Column(name="SMOKER_DT")
+	@Temporal(TemporalType.DATE)
 	private Date smokerDt;
 
 	@Column(name="SOC_SEC_AFF_DT")
+	@Temporal(TemporalType.DATE)
 	private Date socSecAffDt;
 
 	@Column(name="\"STATE\"", nullable=false, length=6)

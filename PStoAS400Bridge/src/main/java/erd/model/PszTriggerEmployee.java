@@ -1,6 +1,7 @@
 package erd.model;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -8,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Table;
+import javax.persistence.TemporalType;
 
 /**
  * Entity implementation class for PS_ZHRT_INTTRIGGER PeopleSoft employee event triggers table 
@@ -104,11 +106,10 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 		String operatorId = "OPSHR";
 		BigDecimal effectiveSequence = new BigDecimal(0);
 		Integer sequenceNumber = 90727260;
-		java.util.Date effectiveDate = new java.util.Date();
-		java.sql.Date sqlDate = new java.sql.Date(effectiveDate.getTime());
+		Date effectiveDate = new Date();
 		PszTriggerEmployee trigger = new PszTriggerEmployee();
 		trigger.setCompletionStatus(completionStatus);
-		trigger.setEffectiveDate(sqlDate);
+		trigger.setEffectiveDate(effectiveDate);
 		trigger.setEffectiveSequence(effectiveSequence);
 		trigger.setEmployeeId(employeeId);
 		trigger.setOperatorId(operatorId);
@@ -116,4 +117,97 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 		trigger.setSequenceNumber(sequenceNumber);
 		return trigger;
 	}
+	
+	//TODO: fix query
+	public static List<PszTriggerEmployee> findTriggerDataList() {
+		Date asOfToday = new Date();
+		Date sysDate = new Date();
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	//FROM PS_ZHRT_INTTRIGGER RZ, PS_JOB JB
+			//WHERE RZ.TASK_FLAG = 'P'
+			//		AND (RZ.EFFDT <= $AsOfToday 
+			//		OR RZ.PROC_NAME='ZHRI101A' 
+			//		OR RZ.PROC_NAME='ZHRI106A')
+			//  	AND (CASE WHEN PROC_NAME IN ('ZHRI101A', 'ZHRI106A') THEN SEQ_NBR ELSE SEQ_NBR*10 END) = 
+			//    		(SELECT MIN(CASE WHEN PROC_NAME IN ('ZHRI101A', 'ZHRI106A') THEN SEQ_NBR ELSE SEQ_NBR*10 END)  
+			//      		FROM  PS_ZHRT_INTTRIGGER RZ2
+			//            	WHERE RZ2.EMPLID = RZ.EMPLID
+			//           		AND RZ2.TASK_FLAG = 'P'
+			//               	AND (RZ2.EFFDT <= SYSDATE 
+			//						OR RZ2.PROC_NAME='ZHRI101A' 
+			//						OR RZ2.PROC_NAME='ZHRI106A'))
+	  	  	// 		AND RZ.EMPLID NOT IN (SELECT I.EMPLID FROM PS_ZHRT_INTTRIGGER I WHERE I.EMPLID = RZ.EMPLID AND I.TASK_FLAG = 'W') 
+			//  	AND JB.EMPLID = RZ.EMPLID
+			//		AND JB.EFFDT = 
+			//			(SELECT MAX(JB2.EFFDT) FROM  PS_JOB JB2
+			//     			WHERE JB2.EMPLID = JB.EMPLID
+			//         			AND JB2.EMPL_RCD = JB.EMPL_RCD)
+			//  	AND JB.EFFSEQ = 
+			//			(SELECT MAX(JB3.EFFSEQ) FROM PS_JOB JB3
+			//       		WHERE JB3.EMPLID = JB.EMPLID
+			//                	AND JB3.EMPL_RCD = JB.EMPL_RCD
+			//                	AND JB3.EFFDT = JB.EFFDT)
+	    	List<PszTriggerEmployee> resultList = em.createQuery(
+	    		    "SELECT pe FROM PszTriggerEmployee pe, PsJob pj "
+	    		    		+ "WHERE pe.completionStatus = :completionStatus "
+	    		    		+ "		AND (pe.effectiveDate <= :asOfToday OR pe.processName = 'ZHRI101A' OR pe.processName = 'ZHRI106A') "	
+//	    		    		+ "		AND (CASE WHEN processName IN ('ZHRI101A', 'ZHRI106A') THEN sequenceNumber ELSE sequenceNumber*10 END) = "
+//	    		    		+ "			(SELECT MIN(CASE WHEN processName IN ('ZHRI101A', 'ZHRI106A') THEN sequenceNumber ELSE sequenceNumber*10 END) "
+//	    		    		+ "				FROM PszTriggerEmployee pe2 "
+//	    		    		+ "				WHERE pe2.employeeId = pe.employeeId "
+//	    		    		+ "					AND pe2.completionStatus = :completionStatus "
+//	    		    		+ "					AND (pe2.effectiveDate <= :sysDate "
+//	    		    		+ "						OR pe2.processName = 'ZHRI101A' "
+//	    		    		+ "						OR pe2.processName = 'ZHRI106A')) "
+	    		    		+ "		AND pe.employeeId NOT IN (SELECT pe3.employeeId FROM PszTriggerEmployee pe3 WHERE pe3.employeeId = pe.employeeId AND pe3.completionStatus = 'W') " 
+	    		    		+ "		AND pj.employeeId = pe.employeeId "
+	    					+ "		AND pj.effectiveDate = "
+	    		    		+ "			(SELECT MAX(pj2.effectiveDate) FROM PsJob pj2 "
+	    		    		+ "				WHERE pj2.employeeId = pj.employeeId "
+	    		    		+ "					AND pj2.employmentRecordNumber = pj.employmentRecordNumber) "
+	    		    		+ "		AND pj.effectiveSequence = "
+	    		    		+ "			(SELECT MAX(pj3.effectiveSequence) FROM PsJob pj3 "
+	    		    		+ "				WHERE pj3.employeeId = pj.employeeId "
+	    		    		+ "					AND pj3.employmentRecordNumber = pj.employmentRecordNumber "
+	    		    		+ "					AND pj3.effectiveDate = pj.effectiveDate) "
+	    			, PszTriggerEmployee.class)
+	    		    .setParameter("asOfToday", asOfToday, TemporalType.DATE)
+//	    		    .setParameter("sysDate", sysDate, TemporalType.DATE)
+//	    		    .setParameter("completionStatus", "P")
+	    		    .setParameter("completionStatus", "C")
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		return resultList;
+	    	}
+	    } 
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+		return null;
+	}
+
+	public static List<BigDecimal> caseTest() {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<BigDecimal> resultList = em.createQuery(""
+//	    			+ "SELECT "
+//	    			+ "(CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END) "
+//					+ "((CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END) = "
+					+ "SELECT pe.sequenceNumber FROM PszTriggerEmployee pe WHERE (MIN(CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END) = "
+	    			+ "(CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END)) "
+//					+ "SELECT MIN(CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END) "
+//	    		    + "FROM PszTriggerEmployee pe"
+	    			, BigDecimal.class)
+	    		    .getResultList();
+	    	return resultList;
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return null;
+	}
+
 }

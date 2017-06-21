@@ -3,7 +3,8 @@ package erd;
 import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
+import java.util.Calendar;
 
 import org.junit.Test;
 
@@ -37,6 +38,29 @@ public class PsJobTest {
 		boolean result = PsJob.employeeIsContractor(employeeId);
 		assertNotNull(result);
 //		assertTrue(result);
+		System.out.println("\nresult = " + result);
+	}
+
+	@Test
+	public void testHr04GetJobData() {
+		String employeeId = "524338";
+		Date effectiveDate = new java.util.Date();
+		PsJob result = PsJob.hr04GetJobData(employeeId, effectiveDate);
+		assertNotNull(result);
+		System.out.println("\nresult = " + result);
+	}
+
+	@Test
+	public void testHr02GetJob() {
+		String employeeId = "36735";
+		Calendar cal = Calendar.getInstance();
+		cal.set(2017, 9, 1);
+		Date effectiveDate = cal.getTime();
+		System.out.println("\neffectiveDate = " + effectiveDate);
+		BigDecimal effectiveSequence = new BigDecimal(0);
+//		PsJob result = PsJob.hr02GetJob(employeeId, new java.util.Date(effectiveDate.getTime()), effectiveSequence);
+		PsJob result = PsJob.hr02GetJob(employeeId, effectiveDate, effectiveSequence);
+		assertNotNull(result);
 		System.out.println("\nresult = " + result);
 	}
 

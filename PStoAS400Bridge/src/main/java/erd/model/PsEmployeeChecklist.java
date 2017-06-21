@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * The persistent class for the PS_EMPL_CHECKLIST database table.
@@ -23,6 +23,7 @@ public class PsEmployeeChecklist implements Serializable {
 	private String checklistCode;
 
 	@Column(name="CHECKLIST_DT", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date checklistDate;
 
 	@Lob

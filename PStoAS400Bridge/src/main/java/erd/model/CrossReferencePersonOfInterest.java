@@ -1,7 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.Timestamp;
 
 import javax.persistence.*;
@@ -37,9 +37,11 @@ public class CrossReferencePersonOfInterest implements Serializable {
 	private String statusAsOfEffectiveDate;
 
 	@Column(name="EFFDT",nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 
 	@Column(name="EXPECTED_END_DATE")
+	@Temporal(TemporalType.DATE)
 	private Date expectedEndDate;
 
 	@Column(name="JOBTITLE", nullable=false, length=30)

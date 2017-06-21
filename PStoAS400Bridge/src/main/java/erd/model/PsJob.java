@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -38,6 +38,7 @@ public class PsJob implements Serializable {
 	private String action;
 
 	@Column(name="ACTION_DT")
+	@Temporal(TemporalType.DATE)
 	private Date actionDt;
 
 	@Column(name="ACTION_REASON", nullable=false, length=3)
@@ -56,9 +57,11 @@ public class PsJob implements Serializable {
 	private String apptType;
 
 	@Column(name="ASGN_END_DT")
+	@Temporal(TemporalType.DATE)
 	private Date asgnEndDt;
 
 	@Column(name="ASGN_START_DT")
+	@Temporal(TemporalType.DATE)
 	private Date asgnStartDt;
 
 	@Column(name="AUTO_END_FLG", nullable=false, length=1)
@@ -125,6 +128,7 @@ public class PsJob implements Serializable {
 	private BigDecimal dailyRt;
 
 	@Column(name="DEPT_ENTRY_DT")
+	@Temporal(TemporalType.DATE)
 	private Date deptEntryDt;
 
 	@Column(name="DEPTID", nullable=false, length=10)
@@ -140,6 +144,7 @@ public class PsJob implements Serializable {
 	private String eeoClass;
 
 	@Column(name="EFFDT", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 
 	@Column(name="EFFSEQ", nullable=false, precision=38)
@@ -194,6 +199,7 @@ public class PsJob implements Serializable {
 	private String encumbOverride;
 
 	@Column(name="ENTRY_DATE")
+	@Temporal(TemporalType.DATE)
 	private Date entryDate;
 
 	@Column(name="ESTABID", nullable=false, length=12)
@@ -206,9 +212,11 @@ public class PsJob implements Serializable {
 	private String exemptJobLbr;
 
 	@Column(name="EXPECTED_END_DATE")
+	@Temporal(TemporalType.DATE)
 	private Date expectedEndDate;
 
 	@Column(name="EXPECTED_RETURN_DT")
+	@Temporal(TemporalType.DATE)
 	private Date expectedReturnDt;
 
 	@Column(name="FICA_STATUS_EE", nullable=false, length=1)
@@ -218,6 +226,7 @@ public class PsJob implements Serializable {
 	private String flsaStatus;
 
 	@Column(name="FORCE_PUBLISH")
+	@Temporal(TemporalType.DATE)
 	private Date forcePublish;
 
 	@Column(name="FTE", nullable=false, precision=7, scale=6)
@@ -254,9 +263,11 @@ public class PsJob implements Serializable {
 	private String grade;
 
 	@Column(name="GRADE_ENTRY_DT")
+	@Temporal(TemporalType.DATE)
 	private Date gradeEntryDt;
 
 	@Column(name="HIRE_DT")
+	@Temporal(TemporalType.DATE)
 	private Date hireDt;
 
 	@Column(name="HOLIDAY_SCHEDULE", nullable=false, length=6)
@@ -278,6 +289,7 @@ public class PsJob implements Serializable {
 	private String jobDataSrcCd;
 
 	@Column(name="JOB_ENTRY_DT")
+	@Temporal(TemporalType.DATE)
 	private Date jobEntryDt;
 
 	@Column(name="JOB_INDICATOR", nullable=false, length=1)
@@ -296,9 +308,11 @@ public class PsJob implements Serializable {
 	private String laborTypeGer;
 
 	@Column(name="LAST_DATE_WORKED")
+	@Temporal(TemporalType.DATE)
 	private Date lastDateWorked;
 
 	@Column(name="LAST_HIRE_DT")
+	@Temporal(TemporalType.DATE)
 	private Date lastHireDt;
 
 	@Column(name="LASTUPDDTTM")
@@ -314,6 +328,7 @@ public class PsJob implements Serializable {
 	private String layoffExemptRsn;
 
 	@Column(name="LBR_FAC_ENTRY_DT")
+	@Temporal(TemporalType.DATE)
 	private Date lbrFacEntryDt;
 
 	@Column(name="LDW_OVR", nullable=false, length=1)
@@ -323,6 +338,7 @@ public class PsJob implements Serializable {
 	private String location;
 
 	@Column(name="LST_ASGN_START_DT")
+	@Temporal(TemporalType.DATE)
 	private Date lstAsgnStartDt;
 
 	@Column(name="LUMP_SUM_PAY", nullable=false, length=1)
@@ -368,6 +384,7 @@ public class PsJob implements Serializable {
 	private String poiType;
 
 	@Column(name="POSITION_ENTRY_DT")
+	@Temporal(TemporalType.DATE)
 	private Date positionEntryDt;
 
 	@Column(name="POSITION_NBR", nullable=false, length=8)
@@ -437,6 +454,7 @@ public class PsJob implements Serializable {
 	private BigDecimal step;
 
 	@Column(name="STEP_ENTRY_DT")
+	@Temporal(TemporalType.DATE)
 	private Date stepEntryDt;
 
 	@Column(name="SUPERVISOR_ID", nullable=false, length=11)
@@ -455,6 +473,7 @@ public class PsJob implements Serializable {
 	private String taxLocationCd;
 
 	@Column(name="TERMINATION_DT")
+	@Temporal(TemporalType.DATE)
 	private Date terminationDt;
 
 	@Column(name="UNION_CD", nullable=false, length=3)
@@ -464,9 +483,11 @@ public class PsJob implements Serializable {
 	private BigDecimal unionFeeAmount;
 
 	@Column(name="UNION_FEE_END_DT")
+	@Temporal(TemporalType.DATE)
 	private Date unionFeeEndDt;
 
 	@Column(name="UNION_FEE_START_DT")
+	@Temporal(TemporalType.DATE)
 	private Date unionFeeStartDt;
 
 	@Column(name="UNION_FULL_PART", nullable=false, length=1)
@@ -476,6 +497,7 @@ public class PsJob implements Serializable {
 	private String unionPos;
 
 	@Column(name="UNION_SENIORITY_DT")
+	@Temporal(TemporalType.DATE)
 	private Date unionSeniorityDt;
 
 	@Column(name="VALUE_1_FRA", nullable=false, length=5)
@@ -509,7 +531,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getAbsenceSystemCd() {
-		return this.absenceSystemCd;
+		return this.absenceSystemCd.trim();
 	}
 
 	public void setAbsenceSystemCd(String absenceSystemCd) {
@@ -517,7 +539,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getAccdntCdFra() {
-		return this.accdntCdFra;
+		return this.accdntCdFra.trim();
 	}
 
 	public void setAccdntCdFra(String accdntCdFra) {
@@ -525,7 +547,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getAcctCd() {
-		return this.acctCd;
+		return this.acctCd.trim();
 	}
 
 	public void setAcctCd(String acctCd) {
@@ -725,15 +747,15 @@ public class PsJob implements Serializable {
 	}
 
 	public String getEmplCtg() {
-		return this.emplCtg;
+		return this.emplCtg.trim();
 	}
 
 	public String getEmplCtgL1() {
-		return this.emplCtgL1;
+		return this.emplCtgL1.trim();
 	}
 
 	public String getEmplCtgL2() {
-		return this.emplCtgL2;
+		return this.emplCtgL2.trim();
 	}
 
 	public BigDecimal getEmploymentRecordNumber() {
@@ -741,19 +763,19 @@ public class PsJob implements Serializable {
 	}
 
 	public String getEmplStatus() {
-		return this.emplStatus;
+		return this.emplStatus.trim();
 	}
 
 	public String getEmplType() {
-		return this.emplType;
+		return this.emplType.trim();
 	}
 
 	public String getEmployeeId() {
-		return this.employeeId;
+		return this.employeeId.trim();
 	}
 
 	public String getEncumbOverride() {
-		return this.encumbOverride;
+		return this.encumbOverride.trim();
 	}
 
 	public Date getEntryDate() {
@@ -761,7 +783,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getEstabid() {
-		return this.estabid;
+		return this.estabid.trim();
 	}
 
 	public BigDecimal getExemptHoursMonth() {
@@ -769,7 +791,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getExemptJobLbr() {
-		return this.exemptJobLbr;
+		return this.exemptJobLbr.trim();
 	}
 
 	public Date getExpectedEndDate() {
@@ -781,11 +803,11 @@ public class PsJob implements Serializable {
 	}
 
 	public String getFicaStatusEe() {
-		return this.ficaStatusEe;
+		return this.ficaStatusEe.trim();
 	}
 
 	public String getFlsaStatus() {
-		return this.flsaStatus;
+		return this.flsaStatus.trim();
 	}
 
 	public Date getForcePublish() {
@@ -797,43 +819,43 @@ public class PsJob implements Serializable {
 	}
 
 	public String getFullPartTime() {
-		return this.fullOrPartTime;
+		return this.fullOrPartTime.trim();
 	}
 
 	public String getFunctionCd() {
-		return this.functionCd;
+		return this.functionCd.trim();
 	}
 
 	public String getGlPayType() {
-		return this.glPayType;
+		return this.glPayType.trim();
 	}
 
 	public String getGpAsofDtExgRt() {
-		return this.gpAsofDtExgRt;
+		return this.gpAsofDtExgRt.trim();
 	}
 
 	public String getGpDfltCurrttyp() {
-		return this.gpDfltCurrttyp;
+		return this.gpDfltCurrttyp.trim();
 	}
 
 	public String getGpDfltEligGrp() {
-		return this.gpDfltEligGrp;
+		return this.gpDfltEligGrp.trim();
 	}
 
 	public String getGpDfltExrtdt() {
-		return this.gpDfltExrtdt;
+		return this.gpDfltExrtdt.trim();
 	}
 
 	public String getGpEligGrp() {
-		return this.gpEligGrp;
+		return this.gpEligGrp.trim();
 	}
 
 	public String getGpPaygroup() {
-		return this.gpPaygroup;
+		return this.gpPaygroup.trim();
 	}
 
 	public String getGrade() {
-		return this.grade;
+		return this.grade.trim();
 	}
 
 	public Date getGradeEntryDt() {
@@ -845,7 +867,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getHolidaySchedule() {
-		return this.holidaySchedule;
+		return this.holidaySchedule.trim();
 	}
 
 	public BigDecimal getHourlyRt() {
@@ -853,19 +875,19 @@ public class PsJob implements Serializable {
 	}
 
 	public String getHourlyRtFra() {
-		return this.hourlyRtFra;
+		return this.hourlyRtFra.trim();
 	}
 
 	public String getHrStatus() {
-		return this.hrStatus;
+		return this.hrStatus.trim();
 	}
 
 	public String getInterctrWrksCncl() {
-		return this.interctrWrksCncl;
+		return this.interctrWrksCncl.trim();
 	}
 
 	public String getJobDataSrcCd() {
-		return this.jobDataSrcCd;
+		return this.jobDataSrcCd.trim();
 	}
 
 	public Date getJobEntryDt() {
@@ -873,7 +895,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getJobIndicator() {
-		return this.jobIndicator;
+		return this.jobIndicator.trim();
 	}
 
 	public String getJobCode() {
@@ -881,15 +903,15 @@ public class PsJob implements Serializable {
 	}
 
 	public String getLaborAgreement() {
-		return this.laborAgreement;
+		return this.laborAgreement.trim();
 	}
 
 	public String getLaborFacilityId() {
-		return this.laborFacilityId;
+		return this.laborFacilityId.trim();
 	}
 
 	public String getLaborTypeGer() {
-		return this.laborTypeGer;
+		return this.laborTypeGer.trim();
 	}
 
 	public Date getLastDateWorked() {
@@ -905,15 +927,15 @@ public class PsJob implements Serializable {
 	}
 
 	public String getLastUpdatedUserId() {
-		return this.lastUpdatedUserId;
+		return this.lastUpdatedUserId.trim();
 	}
 
 	public String getLayoffExemptFlag() {
-		return this.layoffExemptFlag;
+		return this.layoffExemptFlag.trim();
 	}
 
 	public String getLayoffExemptRsn() {
-		return this.layoffExemptRsn;
+		return this.layoffExemptRsn.trim();
 	}
 
 	public Date getLbrFacEntryDt() {
@@ -921,7 +943,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getLdwOvr() {
-		return this.ldwOvr;
+		return this.ldwOvr.trim();
 	}
 
 	public void setLdwOvr(String ldwOvr) {
@@ -945,7 +967,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getLumpSumPay() {
-		return this.lumpSumPay;
+		return this.lumpSumPay.trim();
 	}
 
 	public void setLumpSumPay(String lumpSumPay) {
@@ -977,7 +999,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getOfficerCd() {
-		return this.officerCd;
+		return this.officerCd.trim();
 	}
 
 	public void setOfficerCd(String officerCd) {
@@ -1001,7 +1023,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPaidHrsFrequency() {
-		return this.paidHrsFrequency;
+		return this.paidHrsFrequency.trim();
 	}
 
 	public void setPaidHrsFrequency(String paidHrsFrequency) {
@@ -1009,7 +1031,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPaySystemFlg() {
-		return this.paySystemFlg;
+		return this.paySystemFlg.trim();
 	}
 
 	public void setPaySystemFlg(String paySystemFlg) {
@@ -1017,7 +1039,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPayUnionFee() {
-		return this.payUnionFee;
+		return this.payUnionFee.trim();
 	}
 
 	public void setPayUnionFee(String payUnionFee) {
@@ -1025,7 +1047,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPaygroup() {
-		return this.paygroup;
+		return this.paygroup.trim();
 	}
 
 	public void setPaygroup(String paygroup) {
@@ -1033,7 +1055,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPerOrg() {
-		return this.perOrg;
+		return this.perOrg.trim();
 	}
 
 	public void setPerOrg(String perOrg) {
@@ -1041,7 +1063,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPerformGroupGer() {
-		return this.performGroupGer;
+		return this.performGroupGer.trim();
 	}
 
 	public void setPerformGroupGer(String performGroupGer) {
@@ -1049,7 +1071,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPoiType() {
-		return this.poiType;
+		return this.poiType.trim();
 	}
 
 	public void setPoiType(String poiType) {
@@ -1065,7 +1087,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPositionNbr() {
-		return this.positionNbr;
+		return this.positionNbr.trim();
 	}
 
 	public void setPositionNbr(String positionNbr) {
@@ -1073,7 +1095,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPositionOverride() {
-		return this.positionOverride;
+		return this.positionOverride.trim();
 	}
 
 	public void setPositionOverride(String positionOverride) {
@@ -1081,7 +1103,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPosnChangeRecord() {
-		return this.posnChangeRecord;
+		return this.posnChangeRecord.trim();
 	}
 
 	public void setPosnChangeRecord(String posnChangeRecord) {
@@ -1089,7 +1111,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getProrateCntAmt() {
-		return this.prorateCntAmt;
+		return this.prorateCntAmt.trim();
 	}
 
 	public void setProrateCntAmt(String prorateCntAmt) {
@@ -1097,7 +1119,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getRegulatoryRegion() {
-		return this.regulatoryRegion;
+		return this.regulatoryRegion.trim();
 	}
 
 	public void setRegulatoryRegion(String regulatoryRegion) {
@@ -1105,7 +1127,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getRegTemp() {
-		return this.regularOrTemporary;
+		return this.regularOrTemporary.trim();
 	}
 
 	public void setRegTemp(String regularOrTemporary) {
@@ -1113,7 +1135,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getReportsTo() {
-		return this.reportsTo;
+		return this.reportsTo.trim();
 	}
 
 	public void setReportsTo(String reportsTo) {
@@ -1121,7 +1143,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSalAdminPlan() {
-		return this.salAdminPlan;
+		return this.salAdminPlan.trim();
 	}
 
 	public void setSalAdminPlan(String salAdminPlan) {
@@ -1129,7 +1151,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSetIdDept() {
-		return this.setIdDept;
+		return this.setIdDept.trim();
 	}
 
 	public void setSetIdDept(String setIdDept) {
@@ -1137,7 +1159,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSetIdJobCode() {
-		return this.setIdJobCode;
+		return this.setIdJobCode.trim();
 	}
 
 	public void setSetidJobCode(String setIdJobCode) {
@@ -1145,7 +1167,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSetIdLbrAgrmnt() {
-		return this.setidLbrAgrmnt;
+		return this.setidLbrAgrmnt.trim();
 	}
 
 	public void setSetidLbrAgrmnt(String setidLbrAgrmnt) {
@@ -1153,7 +1175,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSetidLocation() {
-		return this.setidLocation;
+		return this.setidLocation.trim();
 	}
 
 	public void setSetidLocation(String setidLocation) {
@@ -1161,7 +1183,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSetIdSalary() {
-		return this.setIdSalary;
+		return this.setIdSalary.trim();
 	}
 
 	public void setSetIdSalary(String setIdSalary) {
@@ -1169,7 +1191,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSetIdSupvLvl() {
-		return this.setIdSupvLvl;
+		return this.setIdSupvLvl.trim();
 	}
 
 	public void setSetIdSupvLvl(String setIdSupvLvl) {
@@ -1177,7 +1199,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getShift() {
-		return this.shift;
+		return this.shift.trim();
 	}
 
 	public void setShift(String shift) {
@@ -1201,7 +1223,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSocSecRiskCode() {
-		return this.socSecRiskCode;
+		return this.socSecRiskCode.trim();
 	}
 
 	public void setSocSecRiskCode(String socSecRiskCode) {
@@ -1209,7 +1231,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSpkCommIdGer() {
-		return this.spkCommIdGer;
+		return this.spkCommIdGer.trim();
 	}
 
 	public void setSpkCommIdGer(String spkCommIdGer) {
@@ -1225,7 +1247,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getStdHrsFrequency() {
-		return this.stdHrsFrequency;
+		return this.stdHrsFrequency.trim();
 	}
 
 	public void setStdHrsFrequency(String stdHrsFrequency) {
@@ -1249,7 +1271,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSupervisorId() {
-		return this.supervisorId;
+		return this.supervisorId.trim();
 	}
 
 	public void setSupervisorId(String supervisorId) {
@@ -1257,7 +1279,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSupvLvlId() {
-		return this.supvLvlId;
+		return this.supvLvlId.trim();
 	}
 
 	public void setSupvLvlId(String supvLvlId) {
@@ -1265,7 +1287,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getTariffAreaGer() {
-		return this.tariffAreaGer;
+		return this.tariffAreaGer.trim();
 	}
 
 	public void setTariffAreaGer(String tariffAreaGer) {
@@ -1273,7 +1295,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getTariffGer() {
-		return this.tariffGer;
+		return this.tariffGer.trim();
 	}
 
 	public void setTariffGer(String tariffGer) {
@@ -1281,7 +1303,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getTaxLocationCd() {
-		return this.taxLocationCd;
+		return this.taxLocationCd.trim();
 	}
 
 	public void setTaxLocationCd(String taxLocationCd) {
@@ -1297,7 +1319,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getUnionCd() {
-		return this.unionCd;
+		return this.unionCd.trim();
 	}
 
 	public void setUnionCd(String unionCd) {
@@ -1329,7 +1351,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getUnionFullPart() {
-		return this.unionFullPart;
+		return this.unionFullPart.trim();
 	}
 
 	public void setUnionFullPart(String unionFullPart) {
@@ -1337,7 +1359,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getUnionPos() {
-		return this.unionPos;
+		return this.unionPos.trim();
 	}
 
 	public void setUnionPos(String unionPos) {
@@ -1353,7 +1375,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getValue1Fra() {
-		return this.value1Fra;
+		return this.value1Fra.trim();
 	}
 
 	public void setValue1Fra(String value1Fra) {
@@ -1361,7 +1383,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getValue2Fra() {
-		return this.value2Fra;
+		return this.value2Fra.trim();
 	}
 
 	public void setValue2Fra(String value2Fra) {
@@ -1369,7 +1391,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getValue3Fra() {
-		return this.value3Fra;
+		return this.value3Fra.trim();
 	}
 
 	public void setValue3Fra(String value3Fra) {
@@ -1377,7 +1399,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getValue4Fra() {
-		return this.value4Fra;
+		return this.value4Fra.trim();
 	}
 
 	public void setValue4Fra(String value4Fra) {
@@ -1385,7 +1407,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getValue5Fra() {
-		return this.value5Fra;
+		return this.value5Fra.trim();
 	}
 
 	public void setValue5Fra(String value5Fra) {
@@ -1401,7 +1423,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getWppStopFlag() {
-		return this.wppStopFlag;
+		return this.wppStopFlag.trim();
 	}
 
 	public void setWppStopFlag(String wppStopFlag) {
@@ -1409,7 +1431,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getWrksCnclFunction() {
-		return this.wrksCnclFunction;
+		return this.wrksCnclFunction.trim();
 	}
 
 	public void setWrksCnclFunction(String wrksCnclFunction) {
@@ -1417,7 +1439,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getWrksCnclRoleChe() {
-		return this.wrksCnclRoleChe;
+		return this.wrksCnclRoleChe.trim();
 	}
 
 	public void setWrksCnclRoleChe(String wrksCnclRoleChe) {
@@ -1502,12 +1524,12 @@ public class PsJob implements Serializable {
 	    try {
 	    	List<PsJob> resultList = em.createQuery("SELECT p FROM PsJob p "
 	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-	    				+ "AND p.effectiveDate = :effectiveDate "
 	    				+ "AND p.effectiveSequence = :effectiveSequence "
-	    				+ "AND p.employmentRecordNumber = 0 ",
-	    				PsJob.class)
+	    				+ "AND p.employmentRecordNumber = 0 "
+	    				+ "AND p.effectiveDate = :effectiveDate "
+	    				, PsJob.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-	    		    .setParameter("effectiveDate", effectiveDate)
+	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .setParameter("effectiveSequence", effectiveSequence)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
@@ -1524,7 +1546,7 @@ public class PsJob implements Serializable {
 	 * HR04-Get-Job-Data
 	 * Gets the employees data from the job table that needs to be interfaced to the legacy system
 	 */
-	public PsJob hr04GetJobData(String employeeId) {
+	public static PsJob hr04GetJobData(String employeeId, Date effectiveDate) {
 //		Begin-Select
 //		CJ6.COMPANY
 //		    let $PSCompany = ltrim(rtrim(&CJ6.COMPANY,' '),' ')              !Remove leading and trailing blanks
@@ -1554,7 +1576,6 @@ public class PsJob implements Serializable {
 //		from PS_JOB CJ6
 //		where CJ6.EMPLID = $Wrk_Emplid
 //		and to_char(CJ6.EFFDT, 'YYYY-MM-DD') =    $PSEffdt
-//		!AND CJ6.EFFSEQ =   #WrkEffseq
 //		AND CJ6.EFFSEQ =
 //		         (SELECT MAX(CJ6B.EFFSEQ)
 //		          FROM  PS_JOB CJ6B
@@ -1563,6 +1584,29 @@ public class PsJob implements Serializable {
 //		            AND CJ6B.EFFDT    = CJ6.EFFDT)
 //		and CJ6.EMPL_RCD = 0
 //		End-Select
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<PsJob> resultList = em.createQuery(
+	    		    "SELECT pj FROM PsJob pj "
+	    		    		+ "WHERE UPPER(TRIM(pj.employeeId)) = :employeeId "
+	    		    		+ "		AND pj.effectiveDate = :effectiveDate "	
+	    		    		+ "		AND pj.effectiveSequence = (SELECT MAX(pj2.effectiveSequence) FROM PsJob pj2 "
+	    		    		+ "				WHERE pj2.employeeId = pj.employeeId "
+	    		    		+ "					AND pj2.employmentRecordNumber = pj.employmentRecordNumber "
+	    		    		+ "					AND pj2.effectiveDate = pj.effectiveDate) "
+	    		    		+ "		AND pj.employmentRecordNumber = 0"
+	    			, PsJob.class)
+	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		return resultList.get(0);
+	    	}
+	    } 
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
 		return null;
 	}
 
@@ -1652,9 +1696,9 @@ public class PsJob implements Serializable {
 	    	List<Date> resultList = em.createQuery("SELECT p FROM PsJob p WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
 	    			+ "AND p.employeeClass = :employeeClass "
     				+ "AND p.effectiveDate = (SELECT MAX(p2.effectiveDate) FROM PsJob p2 WHERE p2.employeeId = p.employeeId "
-    				+ "		AND p2.employmentRecordNumber = p.employmentRecordNumber AND p2.effectiveDate <= CURRENT_DATE ) "
+    				+ "		AND p2.employmentRecordNumber = p.employmentRecordNumber AND p2.effectiveDate <= CURRENT_DATE) "
     				+ "AND p.effectiveSequence = (SELECT MAX(p3.effectiveSequence) FROM PsJob p3 WHERE p3.employeeId = p.employeeId "
-    				+ "		AND p3.employmentRecordNumber = p.employmentRecordNumber AND p3.effectiveDate = p.effectiveDate ) ",
+    				+ "		AND p3.employmentRecordNumber = p.employmentRecordNumber AND p3.effectiveDate = p.effectiveDate) ",
 	    				Date.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .setParameter("employeeClass", "R".toUpperCase())
@@ -1702,7 +1746,7 @@ public class PsJob implements Serializable {
 	    				+ "AND p.employeeClass = :employeeClass ",
 	    				Date.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-	    		    .setParameter("effectiveDate", effectiveDate)
+	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .setParameter("effectiveSequence", effectiveSequence)
 	    		    .setParameter("employeeClass", "R".toUpperCase())
 	    		    .getResultList();
@@ -1734,7 +1778,7 @@ public class PsJob implements Serializable {
 	    				BigDecimal.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .setParameter("employmentRecordNumber", employmentRecordNumber)
-	    		    .setParameter("effectiveDate", effectiveDate)
+	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
@@ -1784,7 +1828,7 @@ public class PsJob implements Serializable {
 	    				+ "AND p.effectiveDate = :effectiveDate ",
 	    				PsJob.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-	    		    .setParameter("effectiveDate", effectiveDate)
+	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList;

@@ -1,7 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.*;
 
@@ -23,6 +23,7 @@ public class PsPerson implements Serializable {
 	private String birthCountry;
 
 	@Column(name="BIRTHDATE", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date birthDate;
 
 	@Column(name="BIRTHPLACE", nullable=false, length=30)
@@ -32,9 +33,11 @@ public class PsPerson implements Serializable {
 	private String birthState;
 
 	@Column(name="DT_OF_DEATH")
+	@Temporal(TemporalType.DATE)
 	private Date dateOfDeath;
 
 	@Column(name="LAST_CHILD_UPDDTM")
+	@Temporal(TemporalType.DATE)
 	private Date lastChildDataObjectUpdateDate;
 
 	public PsPerson() {

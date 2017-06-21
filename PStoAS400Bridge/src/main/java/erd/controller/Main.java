@@ -1,7 +1,7 @@
 package erd.controller;
 
 import java.io.File;
-import java.sql.Date;
+import java.util.Date;
 import java.text.SimpleDateFormat;
 
 import erd.model.PszVariable;

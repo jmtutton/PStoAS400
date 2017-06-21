@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import java.lang.Integer;
 import java.lang.String;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -31,6 +31,7 @@ public class PsXlatItem implements Serializable {
 	private String fieldValue;
 	
 	@Column(name="EFFDT")
+	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 	
 	@Column(name="EFF_STATUS", nullable=false, length=1)

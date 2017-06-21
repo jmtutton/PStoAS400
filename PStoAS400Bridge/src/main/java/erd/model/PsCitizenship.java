@@ -1,7 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
@@ -33,6 +33,7 @@ public class PsCitizenship implements Serializable {
 	private String dependentId;
 
 	@Column(name="PERM_STATUS_DT_SGP")
+	@Temporal(TemporalType.DATE)
 	private Date permStatusDtSgp;
 
 	@Column(name="WORKER_TYPE_SGP", nullable=false, length=1)

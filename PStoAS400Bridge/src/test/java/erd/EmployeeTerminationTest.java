@@ -24,7 +24,7 @@ public class EmployeeTerminationTest {
 		else {
 			System.out.println("triggerList either null or empty");
 			java.util.Date effectiveDate = new java.util.Date();
-			java.sql.Date sqlDate = new java.sql.Date(effectiveDate.getTime());
+			java.util.Date sqlDate = new java.util.Date(effectiveDate.getTime());
 			BigDecimal effectiveSequence = new BigDecimal(0);
 			String employeeId = "347940";
 			String operatorId = "OPSHR";

@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +39,7 @@ public class PsAccomplishment implements Serializable {
 	private BigDecimal bonusAmountFra;
 
 	@Column(name="BONUS_DT_FRA")
+	@Temporal(TemporalType.DATE)
 	private Date bonusDtFra;
 
 	@Column(name="COUNTRY", nullable=false, length=3)
@@ -51,6 +52,7 @@ public class PsAccomplishment implements Serializable {
 	private String description;
 
 	@Column(name="DT_ISSUED")
+	@Temporal(TemporalType.DATE)
 	private Date dateIssued;
 
 	@Column(name="EDUC_LVL_AUS", nullable=false, length=1)
@@ -60,12 +62,15 @@ public class PsAccomplishment implements Serializable {
 	private String educator;
 
 	@Column(name="END_DATE")
+	@Temporal(TemporalType.DATE)
 	private Date endDate;
 
 	@Column(name="EVALUATION_DT")
+	@Temporal(TemporalType.DATE)
 	private Date evaluationDt;
 
 	@Column(name="EXPIRATN_DT")
+	@Temporal(TemporalType.DATE)
 	private Date expirationDate;
 
 	@Column(name="FACULTY_CODE", nullable=false, length=10)
@@ -114,9 +119,11 @@ public class PsAccomplishment implements Serializable {
 	private String mandate;
 
 	@Column(name="MANDATE_BEGIN_DATE")
+	@Temporal(TemporalType.DATE)
 	private Date mandateBeginDate;
 
 	@Column(name="MANDATE_END_DATE")
+	@Temporal(TemporalType.DATE)
 	private Date mandateEndDate;
 
 	@Column(name="MANDATE_FUNCTION", length=15)
@@ -126,18 +133,22 @@ public class PsAccomplishment implements Serializable {
 	private String nativeLanguage;
 
 	@Column(name="NVQ_CAND_DT")
+	@Temporal(TemporalType.DATE)
 	private Date nvqCandDt;
 
 	@Column(name="NVQ_CAND_NBR", length=16)
 	private String nvqCandNbr;
 
 	@Column(name="NVQ_CERT_DT")
+	@Temporal(TemporalType.DATE)
 	private Date nvqCertDt;
 
 	@Column(name="NVQ_COMP_DT")
+	@Temporal(TemporalType.DATE)
 	private Date nvqCompDt;
 
 	@Column(name="NVQ_START_DT")
+	@Temporal(TemporalType.DATE)
 	private Date nvqStartDt;
 
 	@Column(name="NVQ_STATUS", nullable=false, length=1)

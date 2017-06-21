@@ -2,7 +2,7 @@ package erd;
 
 import static org.junit.Assert.*;
 
-import java.sql.Date;
+import java.util.Date;
 
 import org.junit.Test;
 

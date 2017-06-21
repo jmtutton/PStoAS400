@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,6 +24,7 @@ public class PsRecruitmentSource implements Serializable {
 	private String statusAsOfEffectiveDate;
 
 	@Column(name="EFFDT", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 
 	@Column(name="HRS_SOURCE_DESCR", nullable=false, length=254)
@@ -33,6 +34,7 @@ public class PsRecruitmentSource implements Serializable {
 	private String recruitmentSourceNameCode;
 
 	@Column(name="HRS_SOURCE_STATUS")
+	@Temporal(TemporalType.DATE)
 	private Date recruitmentSourceStatusDate;
 
 	@Column(name="HRS_SOURCE_TYPE", nullable=false, length=3)

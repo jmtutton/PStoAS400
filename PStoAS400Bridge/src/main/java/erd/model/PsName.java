@@ -1,7 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.Timestamp;
 
 import javax.persistence.*;
@@ -27,6 +27,7 @@ public class PsName implements Serializable {
 	private String statusAsOfEffectiveDate;
 
 	@Column(name="EFFDT", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 
 	@Column(name="FIRST_NAME", nullable=false, length=30)

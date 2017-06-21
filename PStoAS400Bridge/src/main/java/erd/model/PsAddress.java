@@ -1,7 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.Timestamp;
 
 import javax.persistence.*;
@@ -69,6 +69,7 @@ public class PsAddress implements Serializable {
 	private String statusAsOfEffectiveDate;
 
 	@Column(name="EFFDT",nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 
 	@Column(name="GEO_CODE", nullable=false, length=11)

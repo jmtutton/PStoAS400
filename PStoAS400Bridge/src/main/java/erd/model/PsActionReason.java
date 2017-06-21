@@ -1,7 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -34,6 +34,7 @@ public class PsActionReason implements Serializable {
 	private String statusAsOfEffectiveDate; //status as of the effective date
 
 	@Column(name="EFFDT", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 
 	@Column(name="LASTUPDDTTM")

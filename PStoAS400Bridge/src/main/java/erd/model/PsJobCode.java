@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -93,6 +93,7 @@ public class PsJobCode implements Serializable {
 	private String statusAsOfEffectiveDate;
 
 	@Column(name="EFFDT", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 
 	@Column(name="EG_ACADEMIC_RANK", nullable=false, length=3)
@@ -168,6 +169,7 @@ public class PsJobCode implements Serializable {
 	private String gvtClsStandard;
 
 	@Column(name="GVT_DT_CLASSIFIED")
+	@Temporal(TemporalType.DATE)
 	private Date gvtDtClassified;
 
 	@Column(name="GVT_EMP_FIN_INT", nullable=false, length=1)
@@ -300,6 +302,7 @@ public class PsJobCode implements Serializable {
 	private String laborAgreement;
 
 	@Column(name="LAST_UPDATE_DATE")
+	@Temporal(TemporalType.DATE)
 	private Date lastUpdateDate;
 
 	@Column(name="LASTUPDDTTM")

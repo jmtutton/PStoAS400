@@ -1,7 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.*;
 
@@ -29,6 +29,7 @@ public class PsEthnicGroup implements Serializable {
 	private String statusAsOfEffectiveDate;
 
 	@Column(name="EFFDT", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 
 	@Column(name="ETHNIC_CATEGORY", nullable=false, length=1)

@@ -30,7 +30,6 @@ HR02-Get-Reason-Description         This routine gets the description field from
 !----------------------------------------------------------------------
 
 Begin-Procedure HR02-Initialize-Fields
-
 LET $PSEmpl = ' '
 LET $PSTermMnth = ' '
 LET $PsTermDay = ' '
@@ -42,10 +41,8 @@ LET $PSVolInvol = ' '
 LET $PSTermCode = ' '
 LET $PSTermReason = ' '
 Let $PSAction_Reason = ' '
-
 Let $PSAuditOperId = substr($PSAuditOperId,2,5)
 Let $ErrorProgramParm = 'HRZ102A'
-
 End-Procedure HR02-Initialize-Fields
 
 !----------------------------------------------------------------------
@@ -55,14 +52,12 @@ End-Procedure HR02-Initialize-Fields
 !----------------------------------------------------------------------
 
 Begin-Procedure HR02-Process-Main
-
 Do HR02-Initialize-Fields   !Execute a routine that will move blanks to all of the parms on the SBMRMTCMD
-
 Move 1 to #NumberOfDays   !Set the number of days to add to the passed date
 //numberOfDays = 1
 Do dtu-add-days($PSDateIn, #NumberOfDays, $PSDate)    !Add one day to the date using //PSDate = PSDateIn + 1
 DateMath.sqc
-do HR02-Get-Job            !From ZHRI100A.SQR
+do HR02-Get-Job            !FROM ZHRI100A.SQR
 do Get-Oprid
 //PSOprId = getOprId()
 Let $ADLegOprid = $PSOprid
@@ -75,9 +70,7 @@ If $PSEmpl <> '' and $PSEmpl <> ' '  !If the new oprid is not blank and it is no
 	//PSDate = PSDateIn
 	do HR02-Process-Data
 End-if    !$PSEmpl <> '' and $PSEmpl <> ' '
-
 End-Procedure HR02-Process-Main
-
 
 !----------------------------------------------------------------------
 ! ERAC
@@ -88,7 +81,6 @@ End-Procedure HR02-Process-Main
 //PS_Job.findByEmplIdAndEffDtAndEffSeq()
 
 Begin-Procedure HR02-Get-Job
-
 begin-select
 CJ5.ACTION
 CJ5.ACTION_REASON
@@ -112,21 +104,17 @@ Let $PSJobCode = &CJ5.JobCode
 Let $Wrk_AD_JobDataBuild = 'Y'                 !sree-UAAMOD
 Let $PSAction = rtrim($PSAction,' ')                                             ! ALS-08/03/2009
 Let $PSAction_Reason = rtrim($PSAction_Reason,' ')                               ! ALS-08/03/2009
-
 If $PSAction <> 'REH'
 	do HR02-Get-Action-Reason
 End-If    !$PSAction <> 'REH'
-
-from PS_Job CJ5
+FROM PS_Job CJ5
 where CJ5.Emplid = $PSEmplid
 	and TO_CHAR(CJ5.EFFDT, 'YYYY-MM-DD') = $PSDate
   	and CJ5.EFFSEQ = #PSEFFSEQ
   	and CJ5.EMPL_RCD = 0             ! changed for v8.3
 
 end-select
-
 End-Procedure HR02-Get-Job
-
 
 !----------------------------------------------------------------------
 ! ERAC
@@ -146,7 +134,6 @@ End-Procedure HR02-Get-Job
 //return CompletionStatus
 
 Begin-Procedure HR02-Process-Data
-
 Let $PSChange = 'N'
 //PSChange = false
 if ($PSAction = 'REH') and ($PSAction_Reason = 'REH')
@@ -155,7 +142,6 @@ if ($PSAction = 'REH') and ($PSAction_Reason = 'REH')
   	Let $PSRehireMnth = substr($PSDate,6,2)
   	Let $PSRehireDay = substr($PSDate,9,2)
 end-if    !$PSAction = 'REH' and $PSAction_Reason = 'REH'
-
 if ($psAction = 'TER' or $psAction = 'RET' or $psAction = 'TWP' or $psAction = 'TWB')
 //if("TER" == psAction || "RET" == psAction || "TWP" == psAction || "TWB" == psAction) {
   	Let $PSTermYr = substr($PSDate,1,4)
@@ -190,20 +176,19 @@ Let $Part2 = 'Parm('''         ||
 Let $Part1 = '"CALL ' || $Library ||'/HRZ102A '
 Let $Command = $Part1||$Part2
 //command = Part1 + Part2
-Do Call-System             !From ZHRI100A.SQR
+Do Call-System             !FROM ZHRI100A.SQR
 //callSystem()
 if (#Status = 0)
 //if(status == 0) {
 	let $CompletionStatus = 'C'   !Completed Normally
 	//return completionStatus = "C"
 end-if    !#Status = 0
-
 End-Procedure HR02-Process-Data
 
 !----------------------------------------------------------------------
 ! ERAC
 ! Procedure:  HR02-Trim-Parameters
-! Desc:  This routine trims all leading and trailing blanks from the
+! Desc:  This routine trims all leading and trailing blanks FROM the
 !        data.
 !----------------------------------------------------------------------
 
@@ -246,30 +231,28 @@ If $PSTermCode = 'O' and $PSAction = 'TER'
 	Do HR02-Get-Reason-Description
 End-If    !$PSTermCode = 'O'
 Let $Found = 'Y'     !Mark that a record was found
-from PS_ZHRT_TRMRS_CREF CPT16
+FROM PS_ZHRT_TRMRS_CREF CPT16
 where CPT16.STATUS = 'A'
 	and CPT16.ACTION = $PSAction
   	and CPT16.ACTION_REASON = $PSAction_Reason
 End-Select
-
 If $Found = 'N'
      Let $ErrorMessageParm = 'Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF'
-     Do Call-Error-Routine       !From ZHRI100A.SQR
-
+     Do Call-Error-Routine       !FROM ZHRI100A.SQR
+     //soft error
+     //doesn't stop processing!!!
 
      !Default the Action and reason in the legacy system
      Let $PSVolInvol = 'V'
      Let $PSTermCode = 'O'
      Let $PSTermReason = 'ACTION REASON NOT SELECTED IN PS'
 End-If    !$Found = 'N'
-
 End-Procedure HR02-Get-Action-Reason
-
 
 !----------------------------------------------------------------------
 ! ERAC
 ! Procedure:  HR02-Get-Reason-Description
-! Desc:  This routine gets the description field from the Action
+! Desc:  This routine gets the description field FROM the Action
 !        Reason table when Action = Termination and Action Code equals
 !        Other.
 !----------------------------------------------------------------------
@@ -284,7 +267,7 @@ CART.Action_Reason
 CART.Descr
 Let $PSTermReason = &CART.Descr
 Uppercase $PSTermReason
-from PS_Actn_Reason_Tbl CART
+FROM PS_Actn_Reason_Tbl CART
 where CART.Action = $PSAction
 	and CART.Action_Reason = $PSAction_Reason
 END-SELECT

@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -32,6 +32,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	private String statusAsOfEffectiveDate;
 
 	@Column(name="EFFDT", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 
 	@Column(name="EFFSEQ", nullable=false, precision=38)

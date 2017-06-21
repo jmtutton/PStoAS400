@@ -2,6 +2,7 @@ package erd;
 
 import static org.junit.Assert.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.Test;
@@ -76,7 +77,21 @@ public class PszTriggerTest {
 		int numUpdated = 0;
 		numUpdated = PszTriggerEmployee.setCompletionStatusBySequenceNumber(STATUS, SEQ_NUM);
 		assert(numUpdated > 0);
+	}
 
+	@Test 
+	public void testfindTriggerEmployeeList() {
+		List<PszTriggerEmployee> resultList = PszTriggerEmployee.findTriggerDataList();
+		assertNotNull(resultList);
+	}
+
+	@Test 
+	public void testCaseTest() {
+		List<BigDecimal> resultList = PszTriggerEmployee.caseTest();
+		assertNotNull(resultList);
+		for(BigDecimal result : resultList) {
+			System.out.println("SequenceNumber: " + result);
+		}
 	}
 
 }

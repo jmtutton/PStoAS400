@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * The persistent class for the PS_EMPLOYEE_REVIEW database table.
@@ -20,6 +20,7 @@ public class PsEmployeeReview implements Serializable {
 	private String employeeId;
 
 	@Column(name="EFFDT", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 
 	@Column(name="EMPL_RCD", nullable=false, precision=38)
@@ -41,12 +42,14 @@ public class PsEmployeeReview implements Serializable {
 	private String gvtOpmRating;
 
 	@Column(name="LAST_UPDATE_DATE")
+	@Temporal(TemporalType.DATE)
 	private Date lastUpdateDate;
 
 	@Column(name="LOADED_TO_JOB", nullable=false, length=1)
 	private String loadedToJob;
 
 	@Column(name="NEXT_REVIEW_DT", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date nextReviewDate;
 
 	@Column(name="RATING_SCALE", nullable=false, length=4)
@@ -56,12 +59,14 @@ public class PsEmployeeReview implements Serializable {
 	private String resRvwBandCd;
 
 	@Column(name="REVIEW_FROM_DT")
+	@Temporal(TemporalType.DATE)
 	private Date reviewFromDt;
 
 	@Column(name="REVIEW_RATING", nullable=false, length=1)
 	private String reviewRating;
 
 	@Column(name="REVIEW_THRU_DT")
+	@Temporal(TemporalType.DATE)
 	private Date reviewThruDt;
 
 	@Column(name="REVIEW_TYPE", nullable=false, length=1)

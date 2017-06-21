@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * The persistent class for the PS_DRIVERS_LIC database table.
@@ -30,6 +30,7 @@ public class PsDriversLicense implements Serializable {
 	private String driversLicenseNumber;
 
 	@Column(name="EXPIRATN_DT")
+	@Temporal(TemporalType.DATE)
 	private Date expirationDate;
 
 	@Column(name="ISSUE_DEST_FRA", nullable=false, length=20)
@@ -48,6 +49,7 @@ public class PsDriversLicense implements Serializable {
 	private String state;
 
 	@Column(name="VALID_FROM_DT", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date validFromDate;
 
 	@Column(name="VIOLATIONS", nullable=false, precision=38)

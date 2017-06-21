@@ -1,6 +1,6 @@
 package erd;
 
-import java.sql.Date;
+import java.util.Date;
 
 import org.junit.Test;
 

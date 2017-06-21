@@ -1,7 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.Timestamp;
 
 import javax.persistence.*;
@@ -24,6 +24,7 @@ public class PsEffectiveDatedPersonalData implements Serializable {
 	private String alternateEmployeeId;
 
 	@Column(name="EFFDT", nullable=false)
+	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 
 	@Column(name="FT_STUDENT", nullable=false, length=1)
@@ -45,6 +46,7 @@ public class PsEffectiveDatedPersonalData implements Serializable {
 	private String maritalStatus;
 
 	@Column(name="MAR_STATUS_DT")
+	@Temporal(TemporalType.DATE)
 	private Date maritalStatusDate;
 
 	@Column(name="SEX", nullable=false, length=1)

@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * The persistent class for the PS_CONTRACT_DATA database table.
@@ -50,9 +50,11 @@ public class PsContractData implements Serializable {
 	private String compRateDescr;
 
 	@Column(name="CONTRACT_BEGIN_DT")
+	@Temporal(TemporalType.DATE)
 	private Date contractBeginDate;
 
 	@Column(name="CONTRACT_END_DT")
+	@Temporal(TemporalType.DATE)
 	private Date contractEndDate;
 
 	@Column(name="CONTRACT_NUM", nullable=false, length=25)
@@ -62,6 +64,7 @@ public class PsContractData implements Serializable {
 	private String contractStatus;
 
 	@Column(name="CONTRCT_EXP_END_DT")
+	@Temporal(TemporalType.DATE)
 	private Date contrctExpEndDt;
 
 	@Column(name="CONTRIB_ID_ESP", nullable=false, length=5)
@@ -86,9 +89,11 @@ public class PsContractData implements Serializable {
 	private String redChrgCatBel;
 
 	@Column(name="REDCH_ENDDT_BEL")
+	@Temporal(TemporalType.DATE)
 	private Date redchEnddtBel;
 
 	@Column(name="REDCH_STARTDT_BEL")
+	@Temporal(TemporalType.DATE)
 	private Date redchStartdtBel;
 
 	@Column(name="REG_REGION", nullable=false, length=5)
@@ -101,6 +106,7 @@ public class PsContractData implements Serializable {
 	private String schemeIdEsp;
 
 	@Column(name="SIGNATURE_DT")
+	@Temporal(TemporalType.DATE)
 	private Date signatureDt;
 
 	@Column(name="SOCIAL_BALANCE_BEL", nullable=false, length=3)

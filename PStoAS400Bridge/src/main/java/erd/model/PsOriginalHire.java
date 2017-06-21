@@ -1,7 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 
 import javax.persistence.*;
 
@@ -20,6 +20,7 @@ public class PsOriginalHire implements Serializable {
 	private String employeeId;
 
 	@Column(name="ORIG_HIRE_DT")
+	@Temporal(TemporalType.DATE)
 	private Date originalHireDate;
 
 	public PsOriginalHire() {

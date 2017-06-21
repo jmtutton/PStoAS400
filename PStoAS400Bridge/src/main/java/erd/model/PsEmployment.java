@@ -3,7 +3,9 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * The persistent class for the PS_EMPLOYMENT database table.
@@ -26,27 +28,33 @@ public class PsEmployment implements Serializable {
 	private String businessTitle;
 
 	@Column(name="CMPNY_SENIORITY_DT")
+	@Temporal(TemporalType.DATE)
 	private Date cmpnySeniorityDt;
 
 	@Column(name="EMPL_RCD", nullable=false, precision=38)
 	private BigDecimal employmentRecordNumber;
 
 	@Column(name="EXPECTED_RETURN_DT")
+	@Temporal(TemporalType.DATE)
 	private Date expectedReturnDt;
 
 	@Column(name="HIRE_DT")
+	@Temporal(TemporalType.DATE)
 	private Date hireDt;
 
 	@Column(name="HOME_HOST_CLASS", nullable=false, length=1)
 	private String homeHostClass;
 
 	@Column(name="LAST_DATE_WORKED")
+	@Temporal(TemporalType.DATE)
 	private Date lastDateWorked;
 
 	@Column(name="LAST_INCREASE_DT")
+	@Temporal(TemporalType.DATE)
 	private Date lastIncreaseDt;
 
 	@Column(name="LAST_VERIFICATN_DT")
+	@Temporal(TemporalType.DATE)
 	private Date lastVerificatnDt;
 
 	@Column(name="NEE_PROVIDER_ID", nullable=false, length=10)
@@ -62,28 +70,41 @@ public class PsEmployment implements Serializable {
 	private String positionPhone;
 
 	@Column(name="PROBATION_DT")
+	@Temporal(TemporalType.DATE)
 	private Date probationDt;
 
 	@Column(name="PROF_EXPERIENCE_DT")
+	@Temporal(TemporalType.DATE)
 	private Date profExperienceDt;
 
 	@Column(name="REHIRE_DT")
+	@Temporal(TemporalType.DATE)
 	private Date rehireDt;
 
 	@Column(name="REPORTS_TO", nullable=false, length=8)
 	private String reportsTo;
 
 	@Column(name="SENIORITY_PAY_DT")
+	@Temporal(TemporalType.DATE)
 	private Date seniorityPayDt;
 
 	@Column(name="SERVICE_DT")
+	@Temporal(TemporalType.DATE)
 	private Date serviceDt;
 
 	@Column(name="SUPERVISOR_ID", nullable=false, length=11)
 	private String supervisorId;
 
 	@Column(name="TERMINATION_DT")
+	@Temporal(TemporalType.DATE)
 	private Date terminationDt;
+	
+	@Transient
+	private String strHiredDt;
+	@Transient
+	private String strRehiredDt;
+	@Transient
+	private String strTerminationDtStr;
 
 	public PsEmployment() {
 	}
@@ -272,15 +293,14 @@ public class PsEmployment implements Serializable {
 		this.terminationDt = terminationDt;
 	}
 
+	/**
+	 * AD-Get-Employment-Data from ZHRI100A.SQR
+	 * This routine will get the Termination Data row for Active Directory File Build
+	 * and convert it hiredt, rehiredt, terminationdt to YYYYMMDD format
+	 * @param employeeId
+	 * @return
+	 */
 	public PsEmployment findByEmployeeId(String employeeId) {
-//		!---------------------------------------------------------------------------------------
-//		! Procedure:  AD-Get-Employment-Data
-//		! Desc:  This routine will get the Termination Data row for Active Directory File Build
-//		!---------------------------------------------------------------------------------------
-//		Begin-Procedure AD-Get-Employment-Data
-//		!#ifdef debugx
-//		 !   show 'inside ad get employee data '
-//		!#end-if !debugx
 //		Let $PSHiredt = ' '
 //		Let $PSRehiredt = ' '
 //		Let $PSTerminationdt = ' '
@@ -307,6 +327,25 @@ public class PsEmployment implements Serializable {
 //		where ADE.Emplid = $PSEmplid
 //		end-select
 //		end-procedure AD-Get-Employment-Data
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<PsEmployment> resultList = em.createQuery(
+	    		    "SELECT p FROM PsEmployment p WHERE p.employeeId = :employeeId ", PsEmployment.class)
+	    		    .setParameter("employeeId", employeeId)
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		PsEmployment result = resultList.get(0);
+	    		SimpleDateFormat sdf = new SimpleDateFormat("yyyyymmdd"); 
+	    		result.strHiredDt = sdf.format(result.getHireDt());
+	    		result.strRehiredDt = sdf.format(result.getRehireDt());
+	    		result.strTerminationDtStr = sdf.format(result.getTerminationDt());
+	    		return result;
+	    	}
+	    } 
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
 		return null;
 	}
 

@@ -1,7 +1,7 @@
 package erd.controller;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 import erd.model.CrossReferenceMultipleEmployeeId;
 import erd.model.CrossReferencePersonOfInterest;
@@ -53,13 +53,13 @@ public class NonPersonTerminate {
 //		do Get-Oprid
 		String psEmpl = "?";
 		BigDecimal eidIndexNumber = new BigDecimal(0);
-		String psOprId = ZHRI100A.getOprId(psEmpl, indexNum, poiFlag, eidIndexNumber);
+//		String psOprId = ZHRI100A.getOprId(psEmpl, indexNum, poiFlag, eidIndexNumber);
 //		Let $PSEmpl = $PSOprid
-		psEmpl = psOprId;
+//		psEmpl = psOprId;
 //		If $PSEmpl <> '' and $PSEmpl <> ' '  !If the new oprid is not blank and it is not null on return
 		if(psEmpl != null && !psEmpl.isEmpty() && !" ".equalsIgnoreCase(psEmpl)) {
 //		    do HR202-Call-System
-			hr202CallSystem(psAuditEmpl, psOprId, psTermDate);
+//			hr202CallSystem(psAuditEmpl, psOprId, psTermDate);
 //		End-if    !$PSEmpl <> '' and $PSEmpl <> ' '
 		}
 	}

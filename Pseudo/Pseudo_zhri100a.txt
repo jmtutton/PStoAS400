@@ -1407,7 +1407,6 @@ End-Procedure Prepare-Error-Parms
 //oprIdErrorParm
 
 Begin-Procedure Call-Error-Routine
-
 !Make Sure that the ErrorMessageParm is always 75 Characters long
 LET $ErrorMessageParm = Substr($ErrorMessageParm,1,75)  !Make sure not more than 75 long
 LET $ErrorMessageParm = Rpad($ErrorMessageParm,75,' ')  !Make sure not less than 75 long
@@ -1434,7 +1433,6 @@ LET $Command =   '"CALL '       ||
                  'Y'                          ||
                  ''')" '
 Do Call-System                                              
-
 End-Procedure Call-Error-Routine
 
 !----------------------------------------------------------------------
@@ -1454,7 +1452,6 @@ End-Procedure Call-Error-Routine
 //oprIdErrorParm
 
 Begin-Procedure Call-Error-Routine-NonEmp
-
 !Make Sure that the ErrorMessageParm is always 75 Characters long
 LET $ErrorMessageParm = Substr($ErrorMessageParm,1,75)  !Make sure not more than 75 long
 LET $ErrorMessageParm = Rpad($ErrorMessageParm,75,' ')  !Make sure not less than 75 long
@@ -1483,7 +1480,6 @@ LET $Command =   '"CALL '       ||
                  'Y'                          ||
                  ''')" '
 Do Call-System                                              
-
 End-Procedure Call-Error-Routine-NonEmp
 
 !----------------------------------------------------------------------
@@ -1497,7 +1493,6 @@ End-Procedure Call-Error-Routine-NonEmp
 //return found
 
 Begin-Procedure Check-If-Contractor
-
 LET $Found = 'N'
 Begin-Select
 'X'
@@ -1516,9 +1511,7 @@ where RJ.EMPLID = $PSEmplId
                      		AND  RJ3.EMPL_RCD = RJ.EMPL_RCD
                       		AND RJ3.EFFDT = RJ.EFFDT)
 End-Select
-
 End-Procedure Check-If-Contractor
-
 
 !----------------------------------------------------------------------
 ! ERAC
@@ -1543,7 +1536,6 @@ where RD.EMPLID = $PSEmplId
 	and to_char(RD.EFFDT, 'YYYY-MM-DD') = $dt102
 End-Select
 End-Procedure Check-If-Correct102A
-
 
 !----------------------------------------------------------------------
 ! ERAC
@@ -1570,7 +1562,6 @@ End-Procedure   Build-Group-Where-Clause
 ! Procedure:  Build-Emplid-Where-Clause
 ! Desc:  Builds a where clause based on an employee id entered by the user
 !----------------------------------------------------------------------
-
 Begin-Procedure Build-Emplid-Where-Clause
 LET $WhereClause = 'Where ((' || $Alias || '.HMREMP = ' || '''' || $Run-Id || ''''  !Create the where clause
 End-Procedure Build-Emplid-Where-Clause
@@ -1621,7 +1612,6 @@ LET $Found = 'Y'
 from PS_ZHRT_EMPID_CREF RPOD
 where RPOD.Emplid = $Wrk_EmplId         
 end-select
-
 End-Procedure get-LegID-for-seq0
 
 !----------------------------------------------------------------------
@@ -1648,7 +1638,6 @@ where MULT.Emplid = $Wrk_EmplId
 end-select
 End-Procedure get-LegID-for-seqnum
 
-
 !----------------------------------------------------------------------
 ! ERAC
 ! Procedure:  Get-Legacy-OprId
@@ -1659,7 +1648,6 @@ End-Procedure get-LegID-for-seqnum
 //indexNum
 
 Begin-Procedure Get-Legacy-OprId
-
 LET $LegEmplId = ''
 Move $Wrk_EmplId to #wrk_emplid
 if $PoiFlag = 'N'
@@ -1698,7 +1686,6 @@ SELECT
 9999999999
 FROM DUAL
 End-Select
-
 End-Procedure Get-Legacy-OprId
 
 !----------------------------------------------------------------------
@@ -1711,7 +1698,6 @@ End-Procedure Get-Legacy-OprId
 //legEmplId
 
 Begin-Procedure Insert-Oprid
-
 LET $Insert-Error-Flag = 'N'
 //insertErrorFlag = false
 !Add to the PS_ZHRT_EMPID_CREF table
@@ -1735,7 +1721,6 @@ End-Procedure Insert-Oprid
 Begin-Procedure Update-OprId
 LET $Update-Error-Flag = 'N'
 //updateErrorFlag = false
-
 !Update the PS_ZHRR_MULTPL_EID table for Multiple EIDs 
 Begin-SQL  On-Error = Update-Error
 UPDATE PS_ZHRR_MULTPL_EID

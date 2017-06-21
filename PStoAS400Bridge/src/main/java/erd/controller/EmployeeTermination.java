@@ -157,19 +157,18 @@ public class EmployeeTermination {
 //		MOVE 1 to #NumberOfDays   !Set the number of days to add to the passed date
 		Integer numberOfDays = 1;
 //		DO dtu-add-days($PSDateIn, #NumberOfDays, $PSDate)    !Add one day to the date using DateMath.sqc
-//		psDate = (java.sql.Date) DateUtil.addDays(zhri100A.psDateIn, numberOfDays);
-//		psDate = (java.sql.Date) erd.DateUtil.addDays(trigger.getEffectiveDate(), numberOfDays);
-		psDate = (java.sql.Date) erd.DateUtil.addDays(trigger.getEffectiveDate(), 1);
+//		psDate = (java.util.Date) DateUtil.addDays(zhri100A.psDateIn, numberOfDays);
+		psDate = (java.util.Date) erd.DateUtil.addDays(trigger.getEffectiveDate(), numberOfDays);
 //		DO HR02-Get-Job
 //		hr02GetJob(zhri100A.psEmplId, psDate, zhri100A.psEffectiveSequence);
 		PsJob psJob = hr02GetJob(trigger.getEmployeeId().trim(), psDate, trigger.getEffectiveSequence());
 //		DO ZHRI100A.Get-OprId
-		String psOprid = ZHRI100A.getOprId(ZHRI100A.psEmpl, zhri100aFields.indexNumber, zhri100aFields.poiFlag);
-		ZHRI100A.psOprid = psOprid;
+//		String psOprid = ZHRI100A.getOprId(ZHRI100A.psEmpl, zhri100aFields.indexNumber, zhri100aFields.poiFlag);
+//		ZHRI100A.psOprid = psOprid;
 //		LET $ADLegOprid = $PSOprid
-		adWrkFields.adLegOprId = psOprid;
+//		adWrkFields.adLegOprId = psOprid;
 //		LET $PSEmpl = $PSOprid
-		ZHRI100A.psEmpl = psOprid;
+//		ZHRI100A.psEmpl = psOprid;
 //		IF $PSEmpl <> '' AND $PSEmpl <> ' '  !If the new oprid is not blank and it is not null on return
 		if(ZHRI100A.psEmpl != null && !(ZHRI100A.psEmpl.trim()).isEmpty()) {
 //		    LET $PSDate = $PSDateIn    !Move the original date back to psdate.
@@ -229,13 +228,13 @@ public class EmployeeTermination {
 //		LET $Command = $Part1||$Part2
 		String command = part1 + part2;
 //		DO Call-System             !From ZHRI100A.SQR
-		Integer status = ZHRI100A.callSystem(employeeId, command, poiFlag, zhri100aFields);
+//		Integer status = ZHRI100A.callSystem(employeeId, command, poiFlag, zhri100aFields);
 //		IF (#Status = 0)
-		if(status == 0) { //TODO: ???
+//		if(status == 0) { //TODO: ???
 //			LET $CompletionStatus = 'C'   !Completed Normally
 //			completionStatus = "C"; //TODO: ???
 //		END-IF    !#Status = 0
-		}
+//		}
 	}
 	
 	/**
@@ -265,7 +264,7 @@ public class EmployeeTermination {
 	 * This routine will the Job Data row for each of the employee numbers entered in the trigger file.
 	 */
 	private PsJob hr02GetJob(String employeeId, Date effectiveDate, BigDecimal effectiveSequence) {
-		PsJob psJob = PsJob.hr02GetJob(employeeId, new java.sql.Date(effectiveDate.getTime()), effectiveSequence);
+		PsJob psJob = PsJob.hr02GetJob(employeeId, new java.util.Date(effectiveDate.getTime()), effectiveSequence);
 //		LET $PSAction = &PS_Job.ACTION
 //		psAction = psJob.getAction();
 //	   	LET $PSAction_Reason = &PS_Job.ACTION_REASON
@@ -331,7 +330,7 @@ public class EmployeeTermination {
 //			LET $ErrorMessageParm = 'Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF'
 			String errorMessageParm = "Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF";
 //			DO Call-Error-Routine       !From ZHRI100A.SQR
-			ZHRI100A.callErrorRoutine(employeeId, errorMessageParm, zhri100aFields);
+//			ZHRI100A.callErrorRoutine(employeeId, errorMessageParm, zhri100aFields);
 //			!Default the Action and reason in the legacy system
 //			LET $PSVolInvol = 'V'
 			psVoluntaryOrInvoluntary = "V";
@@ -372,7 +371,7 @@ public class EmployeeTermination {
 	private void makeAS400PackageForErrorProcess(String processName, String employeeId, String errorMessageParm) {
 		List<String> parameterList = new ArrayList<String>();
 		HashMap<String, String> parameterMap = new HashMap<String, String>();
-		ZHRI100A.callErrorRoutine(employeeId, errorMessageParm, zhri100aFields);
+//		ZHRI100A.callErrorRoutine(employeeId, errorMessageParm, zhri100aFields);
 		String errorProgramParm = "";
 		String wrkEmployeeId2 = "";
 		String blankSpaceParm = "";
