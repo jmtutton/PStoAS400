@@ -2,7 +2,6 @@ package erd.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
@@ -36,7 +35,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	private Date effectiveDate;
 
 	@Column(name="EFFSEQ", nullable=false, precision=38)
-	private BigDecimal effectiveSequence;
+	private Integer effectiveSequence;
 
 	@Column(name="LASTUPDDTTM")
 	private Timestamp lastUpdatedDateAndTime;
@@ -45,7 +44,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	private String lastUpdatedUserId;
 
 	@Column(name="\"SEQUENCE\"", nullable=false, precision=38)
-	private BigDecimal sequence;
+	private Integer sequence;
 
 	@Column(name="ZHRF_ALT_EID_TYPE", nullable=false, length=2)
 	private String legacyAltEidType;
@@ -83,11 +82,11 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		this.effectiveDate = effectiveDate;
 	}
 
-	public BigDecimal getEffectiveSequence() {
+	public Integer getEffectiveSequence() {
 		return this.effectiveSequence;
 	}
 
-	public void setEffectiveSequence(BigDecimal effectiveSequence) {
+	public void setEffectiveSequence(Integer effectiveSequence) {
 		this.effectiveSequence = effectiveSequence;
 	}
 
@@ -115,11 +114,11 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		this.lastUpdatedUserId = lastUpdatedUserId;
 	}
 
-	public BigDecimal getSequence() {
+	public Integer getSequence() {
 		return this.sequence;
 	}
 
-	public void setSequence(BigDecimal sequence) {
+	public void setSequence(Integer sequence) {
 		this.sequence = sequence;
 	}
 
@@ -155,7 +154,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		this.legacyEmployeeId = legacyEmployeeId;
 	}
 
-	public CrossReferenceMultipleEmployeeId HR205GetEmpData(String employeeId) {
+	public CrossReferenceMultipleEmployeeId HR205_getEmpData(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR205-Get-EMP-data
 //		! Desc:  Gets the employees data from the POI table that needs to be
@@ -221,7 +220,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		return null;
 	}
 
-	public CrossReferenceMultipleEmployeeId GetMinEffdtEmp(String employeeId) {
+	public CrossReferenceMultipleEmployeeId getMinEffdtEmp(String employeeId) {
 //		!****************************
 //		begin-procedure get-min-effdt-emp
 //		LET $LegServiceDate =''
@@ -238,7 +237,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		return null;
 	}
 
-	public CrossReferenceMultipleEmployeeId GetLastInactiveDtEmp(String employeeId) {
+	public CrossReferenceMultipleEmployeeId getLastInactiveDtEmp(String employeeId) {
 //		!*************************************
 //		begin-procedure get-last-inactive-dt-emp
 //		begin-select
@@ -253,7 +252,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		return null;
 	}
 
-	public CrossReferenceMultipleEmployeeId HR202GetTermDate(String employeeId) {
+	public CrossReferenceMultipleEmployeeId HR202_getTermDate(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR202-get-term-date
 //		! Desc:  Gets the term date for POI/EMP
@@ -283,7 +282,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		return null;
 	}
 
-	public CrossReferenceMultipleEmployeeId HR201GetEmpData(String employeeId) {
+	public CrossReferenceMultipleEmployeeId HR201_getEmpData(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR201-Get-EMP-data
 //		! Desc:  Gets the employees data from the POI table that needs to be
@@ -325,7 +324,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * ZHRI100A.Get-LegId-For-SeqNum
 	 * This routine gets the Legacy ID from Alternate EID Table
 	 */
-	public static String getLegIdForSeqNum(String employeeId, BigDecimal sequence) {
+	public static String ZHRI100A_getLegIdForSeqNum(String employeeId, Integer sequence) {
 //		!check if the multiple EID table has the EID!
 //		BEGIN-SELECT
 //		MULT.ZHRF_LEG_EMPL_ID
@@ -360,14 +359,17 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * Update-OprId from ZHRI100A.SQR
 	 * This routine will UPDATE table PS_ZHRR_MULTPL_EID for the Non Employees and Multiple EIDs if the employee has a record in HR036P
 	 */
-	public void zhri100AUpdateOprId(String employeeId, BigDecimal sequence, String legacyEmployeeId) {
-//		Let $Update-Error-Flag = 'N'
-//		!Update the PS_ZHRR_MULTPL_EID table for Multiple EIDs 
-//		Begin-SQL  On-Error= Update-Error
-//		UPDATE PS_ZHRR_MULTPL_EID
-//		SET ZHRF_LEG_EMPL_ID = $LegEmplid
-//		WHERE EMPLID = $Wrk_Emplid
-//		AND SEQUENCE = #indexNum
+	public static void ZHRI100A_updateOprId(String employeeId, Integer sequence, String legacyEmployeeId) {
+		//BEGIN-PROCEDURE UPDATE-OPRID
+		//LET $Update-Error-Flag = 'N'
+		//!Update the PS_ZHRR_MULTPL_EID table for Multiple EIDs 
+		//BEGIN-SQL  On-Error = Update-Error
+		//UPDATE PS_ZHRR_MULTPL_EID
+		//SET ZHRF_LEG_EMPL_ID = $LegEmplid
+		//WHERE EMPLID = $Wrk_Emplid
+		//AND SEQUENCE = #indexNum
+		//END-SQL
+		//END-PROCEDURE UPDATE-OPRID
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -387,11 +389,11 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    	}
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
 	}
 
-	public static Date findEffectiveDateByEmployeeIdAndSequence(String wrkEmplId, BigDecimal wrkIndexNum, Date date) {
+	public static Date findEffectiveDateByEmployeeIdAndSequence(String wrkEmplId, Integer wrkIndexNum, Date date) {
 		// TODO Auto-generated method stub
 		return null;
 	}

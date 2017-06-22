@@ -1,6 +1,5 @@
 package erd.controller;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import erd.model.CrossReferenceMultipleEmployeeId;
@@ -25,7 +24,7 @@ public class NonPersonTerminate {
 	 * HR202-Process-Main from ZHRI202A.SQC
 	 * This is the main processing procedure.
 	 */
-	public static void hr202ProcessMain(String psAuditOperId, Integer indexNum, Date psDateIn) {
+	public static void HR202_processMain(String psAuditOperId, Integer indexNum, Date psDateIn) {
 		Boolean poiFlag = true;
 //		String errorProgramParm = "HRZ202A";
 //		!show '$PSAuditOperId: ' $PSAuditOperId
@@ -35,7 +34,7 @@ public class NonPersonTerminate {
 		System.out.println("psDateIn: " + psDateIn);
 		System.out.println("indexNum: " + indexNum);
 //		Do HR202-Initialize-Fields   !Execute a routine that will move blanks to all of the parms on the SBMRMTCMD
-		hr202InitializeFields();
+		HR202_initializeFields();
 //		!Format the legacy employee ID from the PeopleSoft Oprid for audit field
 //		Let $PSAuditEmpl = ltrim(rtrim($PSAuditOperId,' '),' ')   !Remove leading and trailing Blanks
 //		Let $PSAuditEmpl = ltrim($PSAuditEmpl,'E')  !Remove the leading 'E' from the employee ID
@@ -46,13 +45,13 @@ public class NonPersonTerminate {
 //		!do HR202-Get-Term-Date
 //		Let $PSTermDate = datetostr(strtodate($PSDateIn,'YYYY-MM-DD'),'YYYYMMDD')
 		String wrkEmplId = "?";
-		BigDecimal wrkIndexNum = new BigDecimal(0);
-		Date psTermDate = hr202GetTermDate(wrkEmplId, wrkIndexNum, psDateIn);
+		Integer wrkIndexNum = 0;
+		Date psTermDate = HR202_getTermDate(wrkEmplId, wrkIndexNum, psDateIn);
 //		!show '$PSTermDate: ' $PSTermDate
 		System.out.println("psTermDate: " + psTermDate);
 //		do Get-Oprid
 		String psEmpl = "?";
-		BigDecimal eidIndexNumber = new BigDecimal(0);
+		Integer eidIndexNumber = 0;
 //		String psOprId = ZHRI100A.getOprId(psEmpl, indexNum, poiFlag, eidIndexNumber);
 //		Let $PSEmpl = $PSOprid
 //		psEmpl = psOprId;
@@ -68,7 +67,7 @@ public class NonPersonTerminate {
 	 * HR202-Call-System from ZHRI202A.SQC
 	 * This routine calls the Legacy system.
 	 */
-	private static Integer hr202CallSystem(String psAuditEmpl, String psOprId, Date psTermDate) {
+	private static Integer HR202_callSystem(String psAuditEmpl, String psOprId, Date psTermDate) {
 		Integer status = 0;
 		String library = "library";
 		String command = "CALL " + library + "/HRZ202A Parm('" + psAuditEmpl + "' '" + psOprId + "' '" + psTermDate + "')";
@@ -94,7 +93,7 @@ public class NonPersonTerminate {
 	 * HR202-Get-Term-Date from ZHRI202A.SQC
 	 * Gets the term date for POI/EMP.
 	 */
-	private static Date hr202GetTermDate(String wrkEmplId, BigDecimal wrkIndexNum, Date psDateIn) {
+	private static Date HR202_getTermDate(String wrkEmplId, Integer wrkIndexNum, Date psDateIn) {
 		Date psTermDate;
 //		LET $PSTermDate = LTRIM(RTRIM(&PS_ZHRT_PER_POI_TR POI.EFFDT,' '),' ')
 //			FROM PS_ZHRT_PER_POI_TR PS_ZHRT_PER_POI_TR
@@ -123,7 +122,7 @@ public class NonPersonTerminate {
 	 * HR202-Initialize-Fields from ZHRI202A.SQC
 	 * Initialize the fields to ensure that that they all start out blank.
 	 */
-	private static void hr202InitializeFields() {
+	private static void HR202_initializeFields() {
 //		LET $PSEmpl = ' '
 //		LET $PSTermDate = ' '
 //		Let $ErrorProgramParm = 'HRZ202A'

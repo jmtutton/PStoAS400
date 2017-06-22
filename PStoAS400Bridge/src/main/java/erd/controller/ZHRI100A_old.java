@@ -1,7 +1,6 @@
 package erd.controller;
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -471,24 +470,24 @@ public class ZHRI100A_old {
 //			' ', ' ' , 9999999999
 //		FROM DUAL
 //		End-Select
-		HR036P hr036P = HR036P.findByEmployeeIdAndIndexNumber(l_employeeId, l_indexNumber);
-    	if(hr036P != null) {
-	    	if(hr036P.getEmployeeName() != null && !hr036P.getEmployeeName().isEmpty()) {
-	    		hr036P.setEmployeeName(erd.StringUtil.formatLegacyEmployeeNameToPeopleSoftEmployeeName(hr036P.getEmployeeName()));
-    		}
-//	    	LET $LegEmplid = substr($LegEmplid,1,5)
-	    	if(hr036P.getEmployeeId() != null && !hr036P.getEmployeeId().isEmpty()) {
-	    		hr036P.setEmployeeId(hr036P.getEmployeeId().substring(0,5));
-    		}
-//	    	IF (#indexNum = 0 and $PoiFlag = 'Y') OR $PoiFlag = 'N'
-//    			DO Insert-OprId
-//    		ELSE
-//    			IF (#indexNum <> 0 AND $PoiFlag = 'Y')
-//        			DO Update-OprId
-//      			END-IF
-//    		END-IF  
-			return hr036P.getEmployeeId();
-		}
+//		HR036P hr036P = HR036P.findByEmployeeIdAndIndexNumber(l_employeeId, l_indexNumber);
+//    	if(hr036P != null) {
+//	    	if(hr036P.getEmployeeName() != null && !hr036P.getEmployeeName().isEmpty()) {
+//	    		hr036P.setEmployeeName(erd.StringUtil.formatLegacyEmployeeNameToPeopleSoftEmployeeName(hr036P.getEmployeeName()));
+//    		}
+////	    	LET $LegEmplid = substr($LegEmplid,1,5)
+//	    	if(hr036P.getEmployeeId() != null && !hr036P.getEmployeeId().isEmpty()) {
+//	    		hr036P.setEmployeeId(hr036P.getEmployeeId().substring(0,5));
+//    		}
+////	    	IF (#indexNum = 0 and $PoiFlag = 'Y') OR $PoiFlag = 'N'
+////    			DO Insert-OprId
+////    		ELSE
+////    			IF (#indexNum <> 0 AND $PoiFlag = 'Y')
+////        			DO Update-OprId
+////      			END-IF
+////    		END-IF  
+//			return hr036P.getEmployeeId();
+//		}
     	return null;
 	}
 
@@ -499,7 +498,7 @@ public class ZHRI100A_old {
 	public static String getOprId(String l_psEmpl, Integer l_indexNumber, Boolean l_poiFlag) {
 		return getOprId(l_psEmpl, l_indexNumber, l_poiFlag, null);
 	}
-	public static String getOprId(String l_psEmpl, Integer l_indexNumber, Boolean l_poiFlag, BigDecimal l_eidIndexNumber) {
+	public static String getOprId(String l_psEmpl, Integer l_indexNumber, Boolean l_poiFlag, Integer l_eidIndexNumber) {
 //		LET $Found = 'N'
 //		boolean found = false;
 //		LET $PSOprid = ''
@@ -507,7 +506,7 @@ public class ZHRI100A_old {
 //		IF (#indexNum = 0 AND $PoiFlag = 'Y') OR $PoiFlag = 'N'
 		if((l_indexNumber == 0 && l_poiFlag) || !l_poiFlag) {
 //			DO Get-LegId-For-Seq0
-			psOprId = CrossReferenceEmployeeId.zhri100AGetLegIdForSeq0(l_psEmpl);
+			psOprId = CrossReferenceEmployeeId.ZHRI100A_getLegIdForSeq0(l_psEmpl);
 		}
 //		ELSE
 		else {
@@ -515,7 +514,7 @@ public class ZHRI100A_old {
 			if(l_indexNumber != 0 && l_poiFlag) {
 //				BigDecimal eidIndexNumber = trigger.getEidIndexNumber();
 //		    	DO Get-LegId-For-SeqNum
-				psOprId = CrossReferenceMultipleEmployeeId.getLegIdForSeqNum(l_psEmpl, l_eidIndexNumber);
+				psOprId = CrossReferenceMultipleEmployeeId.ZHRI100A_getLegIdForSeqNum(l_psEmpl, l_eidIndexNumber);
 //			END-IF
 			}
 //		END-IF

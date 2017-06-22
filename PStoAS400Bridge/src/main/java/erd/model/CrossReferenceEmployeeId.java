@@ -52,7 +52,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	 * HR05-Get-Next-OpId from ZHRI105A.SQC
 	 * This routine gets the operator id for the Recruiter.
 	 */
-	public CrossReferenceEmployeeId zhri105AGetNextOpId(String employeeId) {
+	public CrossReferenceEmployeeId ZHRI100A_getNextOpId(String employeeId) {
 //		Let $Found = 'N'
 //		begin-select
 //		COD.ZHRF_LEG_EMPL_ID
@@ -79,7 +79,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	 * Get-LegId-For-Seq0 - from ZHRI100A.SQR
 	 * This routine gets the Legacy ID from Employee CREF Table for Primary EIDs
 	 */
-	public static String zhri100AGetLegIdForSeq0(String employeeId) {
+	public static String ZHRI100A_getLegIdForSeq0(String employeeId) {
 //		BEGIN-SELECT
 //		RPOD.ZHRF_LEG_EMPL_ID
 //		    LET $PSOprid = &RPOD.ZHRF_LEG_EMPL_ID
@@ -109,7 +109,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	 * Insert-OprId from ZHRI100A.SQR
 	 * This routine will insert a row into the PS_ZHRT_EMPID_CREF table for the employee if the employee has a record in HR006P
 	 */
-	public void insert(String employeeId, String legacyEmployeeId) {
+	public void ZHRI100A_insertOprId(String employeeId, String legacyEmployeeId) {
 //		LET $Insert-Error-Flag = 'N'
 //		!Add to the PS_ZHRT_EMPID_CREF table
 //		Begin-SQL On-Error = Insert-Error
@@ -132,7 +132,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	 * AD-Get-LegSupervisorId from ZHRI100A.SQR
 	 * Gets ZHRF_LEG_EMPL_ID from PS_ZHRT_EMPID_CREF
 	 */
-	public static String zhri100AADGetLegSupervisorID(String employeeId) {
+	public static String ZHRI100A_getLegSupervisorID(String employeeId) {
 //		begin-select
 //		PS_ZHRT_EMPID_CREF.ZHRF_LEG_EMPL_ID
 //		LET $ADLegSupervisorID = &PS_ZHRT_EMPID_CREF.ZHRF_LEG_EMPL_ID

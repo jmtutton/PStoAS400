@@ -13,6 +13,40 @@
 !*        PS_ZHRT_TRMRS_CREF           Termntn Reason Cross Reference Table  Input
 !*********************************************************************
 ****************************************************************************
+
+begin-program
+  GET-CURRENT-DATETIME
+  Init-DateTime
+  Process-Main
+      Get-Variable
+      Check-interface-runfile
+      Built-Where-Clause-Delay
+      Get-Trigger-Data
+          Begin-Select loops=150
+          Check-If-Contractor
+          Check-If-Correct102A
+          Call-Programs
+              HR02-Process-Main
+                  HR02-Initialize-Fields
+                  HR02-Get-Job
+                  Get-Oprid
+                  HR02-Process-Data
+                      Call-System
+          Check-Effdt-transaction
+          Build-Active-Dir-Output-File
+          Update-Trigger-Row
+      Commit-Transaction
+      Call System Using $Command
+      Get-Trigger-Data-NonEmp
+      Commit-Transaction
+      Call System Using $Command_non
+      Get-Trigger-Data-POI-EMP-Convert
+      Commit-Transaction
+      Call System Using $Command_W
+      Call System Using $Command #status Wait
+  Reset
+end-program 
+
 Procedures Defined in This File:
 PROCEDURE              				DESCRIPTION
 -----------        					-----------                         

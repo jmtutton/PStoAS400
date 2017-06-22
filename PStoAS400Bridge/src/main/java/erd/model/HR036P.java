@@ -48,6 +48,22 @@ public class HR036P implements Serializable {
 		this.employeeId = employeeId;		
 	}
 	
+	public Integer getEmployeeNumber() {
+		return employeeNumber;
+	}
+
+	public void setEmployeeNumber(Integer employeeNumber) {
+		this.employeeNumber = employeeNumber;		
+	}
+	
+	public Integer getIndexNumber() {
+		return indexNumber;
+	}
+
+	public void setIndexNumber(Integer indexNumber) {
+		this.indexNumber = indexNumber;		
+	}
+	
 	@Override
 	public String toString() {
 		return "employeeId = " + employeeId + "\n"
@@ -58,15 +74,15 @@ public class HR036P implements Serializable {
 
 	/**
 	 */
-	public static HR036P findByEmployeeIdAndIndexNumber(String employeeId, Integer indexNumber) {
+	public static HR036P findByEmployeeNumberAndIndexNumber(Integer employeeNumber, Integer indexNumber) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<HR036P> resultList = em.createQuery(
 	    		    "SELECT h FROM HR036P h "
-	    		    		+ "WHERE h.employeeId = :employeeId "
+	    		    		+ "WHERE h.employeeNumber = :employeeNumber "
 	    		    		+ "AND h.indexNumber = :indexNumber ", HR036P.class)
-	    		    .setParameter("employeeId", employeeId)
+	    		    .setParameter("employeeNumber", employeeNumber)
 	    		    .setParameter("indexNumber", indexNumber)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {

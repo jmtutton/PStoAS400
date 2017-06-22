@@ -13,7 +13,7 @@ public class NonPersonTerminateTest {
 		String psAuditOperId = "e859v1";
 		Integer indexNum = 0;
 		Date psDateIn = new Date(new java.util.Date().getTime());
-		NonPersonTerminate.hr202ProcessMain(psAuditOperId, indexNum, psDateIn);
+		NonPersonTerminate.HR202_processMain(psAuditOperId, indexNum, psDateIn);
 	}
 
 }

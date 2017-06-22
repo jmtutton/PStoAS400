@@ -1130,16 +1130,14 @@ End-Procedure Call-Programs
 //completionStatus
 //wrkSequence
 
-Begin-Procedure Update-Trigger-Row
-begin-sql
-Update PS_ZHRT_INTTRIGGER
-	set Task_Flag = $CompletionStatus
-where SEQ_NBR = #WRKSEQUENCE
-end-sql
-
+BEGIN-PROCEDURE UPDATE-TRIGGER-ROW
+BEGIN-SQL
+UPDATE PS_ZHRT_INTTRIGGER
+	SET TASK_FLAG = $CompletionStatus
+WHERE SEQ_NBR = #WRKSEQUENCE
+END-SQL
 LET $CompletionStatus = 'P'     !Reset the completion Status for next pass
-
-End-Procedure Update-Trigger-Row
+END-PROCEDURE UPDATE-TRIGGER-ROW
 
 !---------------------------------Surya Added----------------------------!
 

@@ -2,7 +2,6 @@ package erd;
 
 import static org.junit.Assert.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.Test;
@@ -87,9 +86,9 @@ public class PszTriggerTest {
 
 	@Test 
 	public void testCaseTest() {
-		List<BigDecimal> resultList = PszTriggerEmployee.caseTest();
+		List<Integer> resultList = PszTriggerEmployee.caseTest();
 		assertNotNull(resultList);
-		for(BigDecimal result : resultList) {
+		for(Integer result : resultList) {
 			System.out.println("SequenceNumber: " + result);
 		}
 	}

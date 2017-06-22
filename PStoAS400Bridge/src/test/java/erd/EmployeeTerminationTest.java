@@ -2,7 +2,6 @@ package erd;
 
 import static org.junit.Assert.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.Test;
@@ -25,7 +24,7 @@ public class EmployeeTerminationTest {
 			System.out.println("triggerList either null or empty");
 			java.util.Date effectiveDate = new java.util.Date();
 			java.util.Date sqlDate = new java.util.Date(effectiveDate.getTime());
-			BigDecimal effectiveSequence = new BigDecimal(0);
+			Integer effectiveSequence = 0;
 			String employeeId = "347940";
 			String operatorId = "OPSHR";
 			Integer sequenceNumber = 90727260;

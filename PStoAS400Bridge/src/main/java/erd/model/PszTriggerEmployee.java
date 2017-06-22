@@ -1,6 +1,5 @@
 package erd.model;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -104,7 +103,7 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 		String processName = "ZHRI102A";
 		String employeeId = "347940";
 		String operatorId = "OPSHR";
-		BigDecimal effectiveSequence = new BigDecimal(0);
+		Integer effectiveSequence = 0;
 		Integer sequenceNumber = 90727260;
 		Date effectiveDate = new Date();
 		PszTriggerEmployee trigger = new PszTriggerEmployee();
@@ -121,7 +120,6 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	//TODO: fix query
 	public static List<PszTriggerEmployee> findTriggerDataList() {
 		Date asOfToday = new Date();
-		Date sysDate = new Date();
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -135,8 +133,8 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 			//      		FROM  PS_ZHRT_INTTRIGGER RZ2
 			//            	WHERE RZ2.EMPLID = RZ.EMPLID
 			//           		AND RZ2.TASK_FLAG = 'P'
-			//               	AND (RZ2.EFFDT <= SYSDATE 
-			//						OR RZ2.PROC_NAME='ZHRI101A' 
+			//               	AND (RZ2.EFFDT <= SYSDATE
+			//						OR RZ2.PROC_NAME='ZHRI101A'
 			//						OR RZ2.PROC_NAME='ZHRI106A'))
 	  	  	// 		AND RZ.EMPLID NOT IN (SELECT I.EMPLID FROM PS_ZHRT_INTTRIGGER I WHERE I.EMPLID = RZ.EMPLID AND I.TASK_FLAG = 'W') 
 			//  	AND JB.EMPLID = RZ.EMPLID
@@ -158,7 +156,7 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 //	    		    		+ "				FROM PszTriggerEmployee pe2 "
 //	    		    		+ "				WHERE pe2.employeeId = pe.employeeId "
 //	    		    		+ "					AND pe2.completionStatus = :completionStatus "
-//	    		    		+ "					AND (pe2.effectiveDate <= :sysDate "
+//	    		    		+ "					AND (pe2.effectiveDate <= CURRENT_DATE "
 //	    		    		+ "						OR pe2.processName = 'ZHRI101A' "
 //	    		    		+ "						OR pe2.processName = 'ZHRI106A')) "
 	    		    		+ "		AND pe.employeeId NOT IN (SELECT pe3.employeeId FROM PszTriggerEmployee pe3 WHERE pe3.employeeId = pe.employeeId AND pe3.completionStatus = 'W') " 
@@ -174,7 +172,6 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    		    		+ "					AND pj3.effectiveDate = pj.effectiveDate) "
 	    			, PszTriggerEmployee.class)
 	    		    .setParameter("asOfToday", asOfToday, TemporalType.DATE)
-//	    		    .setParameter("sysDate", sysDate, TemporalType.DATE)
 //	    		    .setParameter("completionStatus", "P")
 	    		    .setParameter("completionStatus", "C")
 	    		    .getResultList();
@@ -188,11 +185,11 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 		return null;
 	}
 
-	public static List<BigDecimal> caseTest() {
+	public static List<Integer> caseTest() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<BigDecimal> resultList = em.createQuery(""
+	    	List<Integer> resultList = em.createQuery(""
 //	    			+ "SELECT "
 //	    			+ "(CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END) "
 //					+ "((CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END) = "
@@ -200,7 +197,7 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    			+ "(CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END)) "
 //					+ "SELECT MIN(CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END) "
 //	    		    + "FROM PszTriggerEmployee pe"
-	    			, BigDecimal.class)
+	    			, Integer.class)
 	    		    .getResultList();
 	    	return resultList;
 	    }
@@ -210,4 +207,40 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    return null;
 	}
 
+	/**
+	 * Update-Trigger-Row from ZHRI100A.SQR
+	 * This routine update the trigger file flag switch
+	 * @param seqNum
+	 * @param status
+	 * @return
+	 */
+	public static int updateCompletionStatus(Integer sequenceNumber, String completionStatus) {
+		//BEGIN-PROCEDURE UPDATE-TRIGGER-ROW
+		//BEGIN-SQL
+		//UPDATE PS_ZHRT_INTTRIGGER
+		//	SET TASK_FLAG = $CompletionStatus
+		//WHERE SEQ_NBR = #WRKSEQUENCE
+		//END-SQL
+		//LET $CompletionStatus = 'P'     !Reset the completion Status for next pass
+		//END-PROCEDURE UPDATE-TRIGGER-ROW
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		int numberOfRecordsUpdated = 0;
+	    try {
+	    	em.getTransaction().begin();
+	    	numberOfRecordsUpdated = em.createQuery(
+	    		    "UPDATE " + ENTITY_NAME + " SET completionStatus = UPPER(:status) WHERE sequenceNumber = :sequenceNumber")
+	    		    .setParameter("sequenceNumber", sequenceNumber)
+	    		    .setParameter("status", completionStatus)
+	    		    .executeUpdate();
+//				//alternatively:
+//		    	TriggerEmployee trigger = em.find(TriggerEmployee.class, 1);
+//		    	trigger.setCompletionStatus(status);
+	    	em.getTransaction().commit();
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    }
+	    return numberOfRecordsUpdated;
+	}
 }

@@ -1,37 +1,88 @@
 package erd.controller;
 
 import java.io.File;
+import java.util.Date;
+import java.util.List;
 
-import erd.model.AdWrkFields;
+import erd.DateUtil;
+import erd.model.AS400Package;
+import erd.model.CrossReferenceEmployeeId;
+import erd.model.CrossReferenceMultipleEmployeeId;
+import erd.model.HR036P;
 import erd.model.PsDbOwner;
+import erd.model.PsJob;
 import erd.model.PszTriggerEmployee;
 import erd.model.PszVariable;
+import erd.model.PszXlat;
 import erd.model.Zhri100aFields;
 
 public class ZHRI100A {
 
-	public static String psEmpl; //$PSEmpl
-	public static String psOprid; //$PSOprid
-	public static String errorProgramParm = "HRZ102A"; //$ErrorProgramParm = 'HRZ102A'
+//	public static String psEmpl; //$PSEmpl
+//	public static String psOprid; //$PSOprid
+//	public static String errorProgramParm = "HRZ102A"; //$ErrorProgramParm = 'HRZ102A'
 	
 	public static void main() {
-//		#include 'setenv.sqc' !Set environment
-//		begin-program
-//		Do GET-CURRENT-DATETIME  !Gets the current date and time using curdttim.sqc
-//		Do Init-DateTime      !  Converts UNIX months to numeric     JHV  07/21/01
-//		do Process-Main
-		processMain();
-//		do Reset          !Reset.sqc
-//		end-program
+		//begin-program
+		//Get-Current-DateTime  //queries the database to get the current time. It also initializes a slew of string variables ($AsOfToday, $AsOfNow, $CurrentCentury, $ReportDate
+		//Init-DateTime  //sets a collection of variables that can be used by the other procedures in datetime.sqc that format dates or do date arithmetic
+		//Process-Main
+		try {
+			processMain();
+		} 
+		catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//Reset          !Reset.sqc
+		//end-program
 	}
+	
+	
+	//begin-program
+	//Get-Current-DateTime  //queries the database to get the current time. It also initializes a slew of string variables ($AsOfToday, $AsOfNow, $CurrentCentury, $ReportDate
+	//Init-DateTime  //sets a collection of variables that can be used by the other procedures in datetime.sqc that format dates or do date arithmetic
+	//ZHRI100A.Process-Main
+	//	ZHRI100A.Get-Variable()
+	//	ZHRI100A.Check-Interface-Runfile
+	//  ZHRI100A.Built-Where-Clause-Delay
+	//	ZHRI100A.Get-Trigger-Data
+	//    	Begin-Select loops=150
+	//		ZHRI100A.Check-If-Contractor
+	//		ZHRI100A.Check-If-Correct102A
+	//		ZHRI100A.Call-Programs
+	//			ZHRI100A.Intialize-AD-WrkFields
+	//			HR02-Process-Main  //This is the main processing procedure
+	//				HR02-Initialize-Fields  //Initialize the fields to ensure that that they all start out blank.
+	//				HR02-Get-Job  //This routine will the Job Data row for each of the employee numbers entered in the trigger file.
+	//					HR02-Get-Action-Reason  //This routine will determine if a termination was voluntary or involuntary basedd on Action and Action Reason codes.
+	//						HR02-Get-Reason-Description  //This routine gets the description field from the Action Reason table when Action = Termination and Action Code equals Other.
+	//				ZHRI100A.Get-OprId
+	//				HR02-Process-Data  //This routine moves 'N' to change address parameter and calls the RPG program.
+	//					Remove-Non-Letters-Numbers
+	//					HR02-Trim-Parameters
+	//					ZHRI100A.Call-System
+	//						Get-Current-DateTime
+	//						Call System Using $Command
+	//			End-Procedure HR02-Process-Main
+	//		ZHRI100A.Update-Trigger-Row
+	//	End-Procedure Get-Trigger-Data
+	//	Commit-Transaction
+	//	Call System Using $Command #status Wait
+	//Reset.sqc
+	//end-program
+	
+	
+	
 	/**
 	 * Process-Main from ZHRI100A,SQR
 	 * This is the process controlling procedure.
+	 * @throws InterruptedException 
 	 */
-	public static void processMain() {
+	public static void processMain() throws InterruptedException {
 		Zhri100aFields zhri100aFields;
-		PszTriggerEmployee trigger;
 		//Begin-Procedure Process-Main
+		//ZHRI100A.Get-Variable
 		zhri100aFields = initializeMainProperties();
 		//LET $WrkCriticalFlag = 'N'
 		zhri100aFields.wrkCriticalFlag = false;
@@ -39,221 +90,208 @@ public class ZHRI100A {
 		Boolean runFlag = true;
 		//while #run_flag = 1        !Never ending loop
 		while(runFlag == true) {
-			//do Check-interface-runfile
-			runFlag = checkInterfaceRunfile(zhri100aFields);
-			//do Built-Where-Clause-Delay    !Surya Added - TEMPMAST 
-			//do Get-Trigger-Data       !Process the interface requests
-			//trigger = getTriggerData(adLegacyOperatorId, adActionCode, poiFlag, isOkToProcess, completionStatus);
-			//do Commit-Transaction
-			//LET $Command = 'sleep 15'  !After interface run wait 15 seconds and do it again  !sree**rehost        !ZHR_MOD_ZHRI100A_sleep
-			//Call System Using $Command #status Wait            !sree**rehost     !ZHR_MOD_ZHRI100A_sleep
-			//do Get-Trigger-Data-NonEmp  !Surya Added - TEMPMAST - 12/29 - calls the procedure for POIs ad multiple EIDs 
-			//do Commit-Transaction !Surya Added - TEMPMAST  - 12/29
-			//LET $Command_non = 'sleep 15'  !Surya Added - TEMPMAST  after the main trigger table wait for 15 secs
-			//Call System Using $Command_non #status Wait !Surya Added - TEMPMAST - 12/29
-			//do Get-Trigger-Data-POI-EMP-Convert  !Surya Added - TEMPMAST  - 03/16- calls the procesdure for POI to EMP Hires after a delay
-			//do Commit-Transaction !Surya Added - TEMPMAST - 03/16
-			//LET $Command_W = 'sleep 15'  !Surya Added - TEMPMAST  after the main trigger table wait for 15 secs
-			//Call System Using $Command_W #status Wait !Surya Added - TEMPMAST  - 03/16
-			//If $file_open = 'Y'                        !ZHR_MOD_ZHRI100A_sleep
-				//close 1                                   !ZHR_MOD_ZHRI100A_sleep
-			//End-If                                     !ZHR_MOD_ZHRI100A_sleep
-			//LET $file_open = 'N'                       !ZHR_MOD_ZHRI100A_sleep
+			//ZHRI100A.Check-Interface-Runfile
+//			runFlag = ZHRI100A_CheckInterfaceRunFile(zhri100aFields.oracleSystemId);
+			//ZHRI100A.Get-Trigger-Data       !Process the interface requests
+			ZHRI100A_getTriggerData(zhri100aFields);
+			//TRANCTRL.Commit-Transaction
+			//LET $Command = 'sleep 15'  !After interface run wait 15 seconds and do it again  !sree**rehost  !ZHR_MOD_ZHRI100A_sleep
+			//Call System Using $Command #status Wait  !sree**rehost  !ZHR_MOD_ZHRI100A_sleep
+			//sleep for 15 seconds (15000 milliseconds)
+			Thread.sleep(15000);
+			//IF $file_open = 'Y'
+				//CLOSE 1
+				//TODO:
+			//END-IF
+			//LET $file_open = 'N'
+			runFlag = false; //*** I put this here for testing, so it stops after one iteration.
 		//end-while   !1=1
 		}
-		//LET $Command = 'mv' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.stop' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'  ! ALS-10/08/2008
-		//Show '$Command in Process-Main: ' $Command                                        ! ALS-10/08/2008
-		//Call System Using $Command #status Wait           !ZHR_MOD_ZHRI100A_sleep       
+		//LET $Command = 'mv' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.stop' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'
+		String command = "mv" + " " + "/usr/local/barch/" + zhri100aFields.oracleSystemId + "/work/hrinterface.stop" + " " + "/usr/local/barch/" + zhri100aFields.oracleSystemId + "/work/hrinterface.run";
+		//Show  + $Command in Process-Main: ' $Command
+		System.out.println("$Command in Process-Main: " + command);
+		//Call System Using $Command #status Wait   !ZHR_MOD_ZHRI100A_sleep       
 		//End-Procedure Process-Main
 	}
 
+	/**
+	 * FTP-File from ZHRI100A.SQR
+	 * This procedure will transfer the file from UNIX to NT server
+	 */
+	public static void ZHRI100A_ftpFile() {
+		//BEGIN-PROCEDURE FTP-FILE !LJM-04/03/01-Rehost
+		//IF #status != 0
+		//END-IF
+		//END-PROCEDURE
+		//*** do nothing ***
+	}
 
+	/**
+	 * Call-Programs from ZHRI100A.SQR
+	 * Subroutine will call appropriate programs
+	 * @param trigger 
+	 * @param zhri100aFields 
+	 */
+	public static void ZHRI100A_callPrograms(PszTriggerEmployee trigger, Zhri100aFields zhri100aFields) {
+		//WHEN = 'ZHRI102A'
+		//!Move fields to be used in the called SQC
+		//MOVE #Wrk_Sequence to #WrkSeqNbr
+//		wrkSeqNbr = wrkSequence;  //TODO: find where #Wrk_Sequence is set
+		//LET $PSAuditOperId = $AuditOprId
+		zhri100aFields.auditOperatorId = trigger.getOperatorId();
+        //LET $PSDateIn = $PSEffDt
+		zhri100aFields.effectiveDate = trigger.getEffectiveDate();
+        //LET $Wrk_Emplid = $PSEmplId
+		zhri100aFields.employeeId = trigger.getEmployeeId();
+        //LET $ADAction_Code = 'T'
+		zhri100aFields.adActionCode = "T";
+        //LET $ADLegOprid = ''
+		zhri100aFields.adLegacyOperatorId = "";
+        //DO HR02-Process-Main    !ZHRI102A.SQC
+		EmployeeTermination employeeTermination = new EmployeeTermination(trigger, zhri100aFields);
+		employeeTermination.HR02_processMain();
 
-//	!----------------------------------------------------------------------!                       !LJM-04/03/01-Rehost
-//	!   Procedure:    FTP-File                                             !   !LJM-04/03/01-Rehost
-//	!   Description:  This procedure will transfer the file from UNIX      !                       !LJM-04/03/01-Rehost
-//	!                 to NT server                                         !                       !LJM-04/03/01-Rehost
-//	!----------------------------------------------------------------------!                       !LJM-04/03/01-Rehost
-//	Begin-Procedure FTP-File                                                                       !LJM-04/03/01-Rehost
-//	If #status != 0
-//	End-If
-//	End-Procedure
-
-//	!----------------------------------------------------------------------!                       !LJM-04/03/01-Rehost
-//	!   Procedure:    Check-Interface-Runfile                              !                       !LJM-04/03/01-Rehost
-//	!   Description:  This procedure will check the existance run file     !                       !LJM-04/03/01-Rehost
-//	!----------------------------------------------------------------------!                       !LJM-04/03/01-Rehost
-//	Begin-Procedure Check-interface-runfile
-//	LET $RUN_FILEPATH = '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'   ! ALS-10/08/2008
-//	Show '$RUN_FILEPATH: ' $RUN_FILEPATH                                                ! ALS-10/08/2008
-//	LET #file_exists = exists($RUN_FILEPATH)
-//	If #file_exists = 0
-//LET #run_flag = 1
-//	Else
-//LET #run_flag = 0
-//	End-If
-//	End-Procedure Check-interface-runfile
-
-
-//	!----------------------------------------------------------------------
-//	! ERAC
-//	! Procedure:  Call-Programs
-//	! Desc:  Subroutine will call appropriate programs
-//	!----------------------------------------------------------------------
-//	Begin-Procedure Call-Programs
-//	do Intialize-AD-WrkFields
-//	LET $TrigTaskFlag = ''
-//	evaluate $WrkProcess
-//	    when = 'ZHRI101A'
-//	        !Move fields to be used in the called SQC
-//	        LET $Wrk_Oprid = $AuditOprid
-//	        LET $Wrk_Emplid = $PSEmplid
-//	        LET $Wrk_Effdt = $PSEffdt
-//	        move #PSEffseq to #Wrk_Effseq
-//	        LET $Wrk_Process_Name = $WrkProcess
-//	        LET $TrigTaskFlag = $WrkTaskFlag      !Surya Added - TEMPMAST 
-//	        LET $Wrk_Inf_ = ' '
-//	        LET $ADAction_Code = 'H'
-//	        LET $ADLegOprid = ''
-//	        Do HR01-Process-Main    !ZHRI101A.SQC
-//	        break
-//	    when = 'ZHRI102A'
-//	        !Move fields to be used in the called SQC
-//	        Move #Wrk_Sequence to #WrkSeqNbr
-//	        LET $PSAuditOperId = $AuditOprid
-//	        LET $PSDateIn = $PSEffdt
-//	        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
-//	        LET $ADAction_Code = 'T'
-//	        LET $ADLegOprid = ''
-//	        Do HR02-Process-Main    !ZHRI102A.SQC
-//	        break
-//	    when = 'ZHRI104A'
-//	        !Move fields to be used in the called SQC
-//	        LET $PSUserOprid = $AuditOprid
-//	        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
-//	        Move #PSEffseq to #WrkEffseq
-//	        LET $ADAction_Code = 'C'
-//	        LET $ADLegOprid = ''
-//	        Do HR04-Process-Main    !ZHRI104A.SQC
-//	        break
-//	    when = 'ZHRI105A'
-//	        !Move fields to be used in the called SQC
-//	        LET $PSemp = $AuditOprid
-//	        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
-//	        LET $ADAction_Code = 'C'
-//	        LET $ADLegOprid = ''
-//	        LET $Wrk_ADCountryCdBuild = 'Y'                 !sree-UAAMOD
-//	        Do HR05-Process-Main    !ZHRI105A.SQC
-//	        break
-//	    when = 'ZHRI106A'
-//	        !Move fields to be used in the called SQC
-//	        LET $Wrk_Oprid = $AuditOprid
-//	        LET $Wrk_Emplid = $PSEmplid
-//	        LET $Wrk_Effdt = $PSEffdt
-//	        move #PSEffseq to #Wrk_Effseq
-//	        LET $Wrk_Process_Name = $WrkProcess
-//	        LET $ADAction_Code = 'R'
-//	        Do HR01-Process-Main       !ZHRI101A.SQC
-//	        break
-//	    when = 'ZHRI107A'
-//	        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
-//	        LET $ADAction_Code = ''
-//	        LET $ADLegOprid = ''
-//	        Do HR07-Process-Main
-//	        break
-//	    when = 'ZHRI109A'
-//	        !Move fields to be used in the called SQC
-//	        LET $PSUserOprid = $AuditOprid
-//	        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
-//	        Move #PSEffseq to #WrkEffseq
-//	        LET $ADAction_Code = 'C'
-//	        LET $ADLegOprid = ''
-//	        Do HR09-Process-Main        !ZHRI100A.SQC
-//	        break
-//	    when = 'ZHRI101D'     !Row deleted on hire
-//	        LET $ErrorProgramParm = 'HRZ101A'
-//	        LET $ErrorMessageParm = 'A row was deleted on the hire process'
-//	        LET $WrkCriticalFlag = 'Y'
-//	        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-//	        Do Call-Error-Routine
-//	        LET $WrkCriticalFlag = 'N'
-//	        LET $CompletionStatus = 'C'
-//	        Do Update-Trigger-Row
-//	    when = 'ZHRI102D'     !Row deleted on term
-//	        LET $ErrorProgramParm = 'HRZ102A'
-//	        LET $ErrorMessageParm = 'A row was deleted on the termination process'
-//	        LET $WrkCriticalFlag = 'Y'
-//	        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-//	        Do Call-Error-Routine
-//	        LET $WrkCriticalFlag = 'N'
-//	        LET $CompletionStatus = 'C'
-//	        Do Update-Trigger-Row
-//	    when = 'ZHRI104D'     !Row deleted on jobstatus change
-//	        LET $ErrorProgramParm = 'HRZ104A'
-//	        LET $ErrorMessageParm = 'A row was deleted on the job-profile process'
-//	        LET $WrkCriticalFlag = 'Y'
-//	        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-//	        Do Call-Error-Routine
-//	        LET $WrkCriticalFlag = 'N'
-//	        LET $CompletionStatus = 'C'
-//	        Do Update-Trigger-Row
-//	    when = 'ZHRI105D'     !Row deleted on demographis change
-//	        LET $ErrorProgramParm = 'HRZ105A'
-//	        LET $ErrorMessageParm = 'A row was deleted on the demographics process'
-//	        LET $WrkCriticalFlag = 'Y'
-//	        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-//	        Do Call-Error-Routine
-//	        LET $WrkCriticalFlag = 'N'
-//	        LET $CompletionStatus = 'C'
-//	        Do Update-Trigger-Row
-//	    when = 'ZHRI106D'     !Row deleted on rehire
-//	        LET $ErrorProgramParm = 'HRZ101A'
-//	        LET $ErrorMessageParm = 'A row was deleted on the re-hire process'
-//	        LET $WrkCriticalFlag = 'Y'
-//	        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-//	        Do Call-Error-Routine
-//	        LET $WrkCriticalFlag = 'N'
-//	        LET $CompletionStatus = 'C'
-//	        Do Update-Trigger-Row
-//	    when = 'ZHRI107D'     !Row deleted on
-//	        LET $ErrorProgramParm = 'HRZ107A'
-//	        LET $ErrorMessageParm = 'A row was deleted on the dates process'
-//	        LET $WrkCriticalFlag = 'Y'
-//	        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-//	        Do Call-Error-Routine
-//	        LET $WrkCriticalFlag = 'N'
-//	        LET $CompletionStatus = 'C'
-//	        Do Update-Trigger-Row
-//	    when = 'ZHRI109D'
-//	        LET $ErrorProgramParm = 'HRZ109A'
-//	        LET $ErrorMessageParm = 'A row was deleted on the group transfer process'
-//	        LET $WrkCriticalFlag = 'Y'
-//	        Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-//	        Do Call-Error-Routine
-//	        LET $WrkCriticalFlag = 'N'
-//	        LET $CompletionStatus = 'C'
-//	        Do Update-Trigger-Row
-//	    when-other
-//	        LET $CompletionStatus = 'E'     !update to an E to prevent looping and to mark the record in error
-//	        Do Update-Trigger-Row
-//	        break
-//	end-evaluate
-//	End-Procedure Call-Programs
-
-//	!----------------------------------------------------------------------
-//	! ERAC
-//	! Procedure:  Update-Trigger-Row
-//	! Desc:  This routine update the trigger file flag switch
-//	!----------------------------------------------------------------------
-//	Begin-Procedure Update-Trigger-Row
-//	begin-sql
-//	Update PS_ZHRT_INTTRIGGER
-//	     set Task_Flag = $CompletionStatus
-//	where SEQ_NBR = #WRKSEQUENCE
-//	end-sql
-//	LET $CompletionStatus = 'P'     !Reset the completion Status for next pass
-//	End-Procedure Update-Trigger-Row
-//	!----------------------Surya Added - TEMPMAST Start --------------------!
+		//Begin-Procedure Call-Programs
+		//DO Intialize-AD-WrkFields
+		//LET $TrigTaskFlag = ''
+		//evaluate $WrkProcess
+		//    when = 'ZHRI101A'
+		//        !Move fields to be used in the called SQC
+		//        LET $Wrk_Oprid = $AuditOprid
+		//        LET $Wrk_Emplid = $PSEmplid
+		//        LET $Wrk_Effdt = $PSEffdt
+		//        move #PSEffseq to #Wrk_Effseq
+		//        LET $Wrk_Process_Name = $WrkProcess
+		//        LET $TrigTaskFlag = $WrkTaskFlag      !Surya Added - TEMPMAST 
+		//        LET $Wrk_Inf_ = ' '
+		//        LET $ADAction_Code = 'H'
+		//        LET $ADLegOprid = ''
+		//        DO HR01-Process-Main    !ZHRI101A.SQC
+		//        break
+		//    when = 'ZHRI102A'
+		//        !Move fields to be used in the called SQC
+		//        Move #Wrk_Sequence to #WrkSeqNbr
+		//        LET $PSAuditOperId = $AuditOprid
+		//        LET $PSDateIn = $PSEffdt
+		//        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+		//        LET $ADAction_Code = 'T'
+		//        LET $ADLegOprid = ''
+		//        DO HR02-Process-Main    !ZHRI102A.SQC
+		//        break
+		//    when = 'ZHRI104A'
+		//        !Move fields to be used in the called SQC
+		//        LET $PSUserOprid = $AuditOprid
+		//        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+		//        Move #PSEffseq to #WrkEffseq
+		//        LET $ADAction_Code = 'C'
+		//        LET $ADLegOprid = ''
+		//        DO HR04-Process-Main    !ZHRI104A.SQC
+		//        break
+		//    when = 'ZHRI105A'
+		//        !Move fields to be used in the called SQC
+		//        LET $PSemp = $AuditOprid
+		//        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+		//        LET $ADAction_Code = 'C'
+		//        LET $ADLegOprid = ''
+		//        LET $Wrk_ADCountryCdBuild = 'Y'                 !sree-UAAMOD
+		//        DO HR05-Process-Main    !ZHRI105A.SQC
+		//        break
+		//    when = 'ZHRI106A'
+		//        !Move fields to be used in the called SQC
+		//        LET $Wrk_Oprid = $AuditOprid
+		//        LET $Wrk_Emplid = $PSEmplid
+		//        LET $Wrk_Effdt = $PSEffdt
+		//        move #PSEffseq to #Wrk_Effseq
+		//        LET $Wrk_Process_Name = $WrkProcess
+		//        LET $ADAction_Code = 'R'
+		//        DO HR01-Process-Main       !ZHRI101A.SQC
+		//        break
+		//    when = 'ZHRI107A'
+		//        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+		//        LET $ADAction_Code = ''
+		//        LET $ADLegOprid = ''
+		//        DO HR07-Process-Main
+		//        break
+		//    when = 'ZHRI109A'
+		//        !Move fields to be used in the called SQC
+		//        LET $PSUserOprid = $AuditOprid
+		//        LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
+		//        Move #PSEffseq to #WrkEffseq
+		//        LET $ADAction_Code = 'C'
+		//        LET $ADLegOprid = ''
+		//        DO HR09-Process-Main        !ZHRI100A.SQC
+		//        break
+		//    when = 'ZHRI101D'     !Row deleted on hire
+		//        LET $ErrorProgramParm = 'HRZ101A'
+		//        LET $ErrorMessageParm = 'A row was deleted on the hire process'
+		//        LET $WrkCriticalFlag = 'Y'
+		//        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+		//        DO Call-Error-Routine
+		//        LET $WrkCriticalFlag = 'N'
+		//        LET $CompletionStatus = 'C'
+		//        DO Update-Trigger-Row
+		//    when = 'ZHRI102D'     !Row deleted on term
+		//        LET $ErrorProgramParm = 'HRZ102A'
+		//        LET $ErrorMessageParm = 'A row was deleted on the termination process'
+		//        LET $WrkCriticalFlag = 'Y'
+		//        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+		//        DO Call-Error-Routine
+		//        LET $WrkCriticalFlag = 'N'
+		//        LET $CompletionStatus = 'C'
+		//        DO Update-Trigger-Row
+		//    when = 'ZHRI104D'     !Row deleted on jobstatus change
+		//        LET $ErrorProgramParm = 'HRZ104A'
+		//        LET $ErrorMessageParm = 'A row was deleted on the job-profile process'
+		//        LET $WrkCriticalFlag = 'Y'
+		//        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+		//        DO Call-Error-Routine
+		//        LET $WrkCriticalFlag = 'N'
+		//        LET $CompletionStatus = 'C'
+		//        DO Update-Trigger-Row
+		//    when = 'ZHRI105D'     !Row deleted on demographis change
+		//        LET $ErrorProgramParm = 'HRZ105A'
+		//        LET $ErrorMessageParm = 'A row was deleted on the demographics process'
+		//        LET $WrkCriticalFlag = 'Y'
+		//        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+		//        DO Call-Error-Routine
+		//        LET $WrkCriticalFlag = 'N'
+		//        LET $CompletionStatus = 'C'
+		//        DO Update-Trigger-Row
+		//    when = 'ZHRI106D'     !Row deleted on rehire
+		//        LET $ErrorProgramParm = 'HRZ101A'
+		//        LET $ErrorMessageParm = 'A row was deleted on the re-hire process'
+		//        LET $WrkCriticalFlag = 'Y'
+		//        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+		//        DO Call-Error-Routine
+		//        LET $WrkCriticalFlag = 'N'
+		//        LET $CompletionStatus = 'C'
+		//        DO Update-Trigger-Row
+		//    when = 'ZHRI107D'     !Row deleted on
+		//        LET $ErrorProgramParm = 'HRZ107A'
+		//        LET $ErrorMessageParm = 'A row was deleted on the dates process'
+		//        LET $WrkCriticalFlag = 'Y'
+		//        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+		//        DO Call-Error-Routine
+		//        LET $WrkCriticalFlag = 'N'
+		//        LET $CompletionStatus = 'C'
+		//        DO Update-Trigger-Row
+		//    when = 'ZHRI109D'
+		//        LET $ErrorProgramParm = 'HRZ109A'
+		//        LET $ErrorMessageParm = 'A row was deleted on the group transfer process'
+		//        LET $WrkCriticalFlag = 'Y'
+		//        DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
+		//        DO Call-Error-Routine
+		//        LET $WrkCriticalFlag = 'N'
+		//        LET $CompletionStatus = 'C'
+		//        DO Update-Trigger-Row
+		//    when-other
+		//        LET $CompletionStatus = 'E'     !update to an E to prevent looping and to mark the record in error
+		//        DO Update-Trigger-Row
+		//        break
+		//end-evaluate
+	//End-Procedure Call-Programs
+	}
 
 //	!----------------------------------------------------------------------
 //	! ERAC
@@ -265,7 +303,7 @@ public class ZHRI100A {
 //	LET $taskflag = ' '
 //	begin-select
 //	SEC.TASK_FLAG
-//	    LET $taskflag = Ltrim(Rtrim(&SEC.TASK_FLAG,' '),' ')
+//	    LET $taskflag = LTRIM(RTRIM(&SEC.TASK_FLAG,' '),' ')
 //	from PS_ZHRT_ALTTRIGGER SEC
 //	WHERE SEC.PROC_NAME = 'ZHRI202A'
 //	AND SEC.EMPLID = $PSEmplid
@@ -291,9 +329,9 @@ public class ZHRI100A {
 //	RN.SEQ_NBR
 //	    MOVE &RN.SEQ_NBR TO #NWrkSequence
 //	RN.OPRID
-//	    LET $NAuditOprid = Ltrim(Rtrim(&RN.OPRID,' '),' ')
+//	    LET $NAuditOprid = LTRIM(RTRIM(&RN.OPRID,' '),' ')
 //	RN.EMPLID
-//	    LET $NPSEmplid = Ltrim(Rtrim(&RN.EMPLID,' '),' ')
+//	    LET $NPSEmplid = LTRIM(RTRIM(&RN.EMPLID,' '),' ')
 //	    Move $NPSEmplid to #NWrk_EmplID1
 //	    LET $NWrk_Emplid2 =  edit(#NWrk_EmplID1,'099999999')
 //	to_char(RN.EFFDT, 'YYYY-MM-DD') &RNEFFDT
@@ -301,17 +339,17 @@ public class ZHRI100A {
 //	RN.EFFSEQ
 //	    Move &RN.EFFSEQ to #NPSEffSeq
 //	RN.PROC_NAME
-//	    LET $NWrkProcess = ltrim(rtrim(&RN.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
+//	    LET $NWrkProcess = LTRIM(RTRIM(&RN.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
 //	RN.SEQUENCE 
 //	    move &RN.SEQUENCE TO #indexNum 
 //	   LET $PoiFlag = 'Y'
 //	   DO Call-Programs-NonEmp  
 //	   IF  $NPSEmplid = ''             
 //	      LET $NCompletionStatus = 'E'
-//	   End-if
-//	   If $NCompletionStatus <> 'P'
-//	     Do Update-Trigger-Row-NonEmp
-//	   End-If  
+//	   END-IF
+//	   IF $NCompletionStatus <> 'P'
+//	     DO Update-Trigger-Row-NonEmp
+//	   END-IF  
 //	from PS_ZHRT_ALTTRIGGER RN
 //	where RN.TASK_FLAG = 'P'
 //	and (RN.EFFDT <= $AsOfToday or RN.PROC_NAME='ZHRI201A' or  RN.PROC_NAME='ZHRI206A')
@@ -343,7 +381,7 @@ public class ZHRI100A {
 //	        move #NPSEffseq to #Wrk_Effseq
 //	        LET $Wrk_indexNum = to_char(#indexNum)
 //	        LET $Wrk_Process_Name = $NWrkProcess
-//	        Do HR201-Process-Main    !ZHRI201A.SQC
+//	        DO HR201-Process-Main    !ZHRI201A.SQC
 //	        break
 //	    when = 'ZHRI202A'
 //	        !Move fields to be used in the called SQC
@@ -351,7 +389,7 @@ public class ZHRI100A {
 //	        LET $PSDateIn = $NPSEffdt
 //	        LET $Wrk_Emplid = $NPSEmplid 
 //	        LET $Wrk_indexNum = to_char(#indexNum)                   
-//	        Do HR202-Process-Main    !ZHRI202A.SQC
+//	        DO HR202-Process-Main    !ZHRI202A.SQC
 //	        break
 //	    when = 'ZHRI205A'
 //	        !Move fields to be used in the called SQC
@@ -359,7 +397,7 @@ public class ZHRI100A {
 //	        LET $Wrk_Emplid = $NPSEmplid                              
 //	        LET $Wrk_indexNum = to_char(#indexNum)
 //	        LET $PSEffdt =  $NPSEffdt     
-//	        Do HR205-Process-Main    !ZHRI105A.SQC
+//	        DO HR205-Process-Main    !ZHRI105A.SQC
 //	        break
 //	    when = 'ZHRI206A'
 //	        !Move fields to be used in the called SQC
@@ -369,11 +407,11 @@ public class ZHRI100A {
 //	        move #NPSEffseq to #Wrk_Effseq
 //	        LET $Wrk_indexNum = to_char(#indexNum)
 //	        LET $Wrk_Process_Name = $NWrkProcess
-//	        Do HR201-Process-Main       !ZHRI201A.SQC
+//	        DO HR201-Process-Main       !ZHRI201A.SQC
 //	        break
 //	    when-other
 //	        LET $CompletionStatus = 'E'     !update to an E to prevent looping and to mark the record in error
-//	        Do Update-Trigger-Row-NonEmp  !Surya Added - TEMPMAST 
+//	        DO Update-Trigger-Row-NonEmp  !Surya Added - TEMPMAST 
 //	        break
 //	end-evaluate
 //	End-Procedure Call-Programs-NonEmp
@@ -394,23 +432,22 @@ public class ZHRI100A {
 //	LET $NCompletionStatus = 'P'     !Reset the completion Status for next pass
 //	End-Procedure Update-Trigger-Row-NonEmp
 
-
-//	!----------------------------------------------------------------------
-//	! ERAC
-//	! Procedure:  Built-Where-Clause-Delay
-//	! Desc:  Get the WHERE Clause for the delay hours in POI to EMP Transfer 
-//	!----------------------------------------------------------------------
-//	Begin-Procedure Built-Where-Clause-Delay
-//	LET $XWHERE = ''
-//	begin-select
-//	XWER.ZPTF_OUTPUT_01
-//	    LET $XWHERE = Ltrim(Rtrim(&XWER.ZPTF_OUTPUT_01,' '),' ')
-//	    LET $WHERE1 = 'AND SYSTIMESTAMP  >= TR.UPDATED_DATETIME + INTERVAL '|| '''' || $XWHERE || '''' || '  HOUR'
-//	from PS_ZPTT_XLAT_TBL XWER
-//	where XWER.ZPTF_INPUT_01 = 'TEMPMAST'
-//	and XWER.ZPTF_INPUT_02 = 'LEGACY-DELAY-HRS'       
-//	end-select
-//	End-Procedure Built-Where-Clause-Delay
+	/**
+	 * ZHRI100ABuiltWhereClauseDelay from ZHRI100A.SQR
+	 * Get the WHERE Clause for the delay hours in POI to EMP Transfer
+	 */
+	public static String ZHRI100A_buildWhereClauseDelay() {
+		String xWhere = PszXlat.findOutput01ByInput01AndInput02("TEMPMAST", "LEGACY-DELAY-HRS");
+		String where1 = "AND SYSTIMESTAMP  >= TR.UPDATED_DATETIME + INTERVAL " + "'" + xWhere + "'" + " HOUR";
+		//XWER.ZPTF_OUTPUT_01
+		//LET $XWHERE = LTRIM(RTRIM(&XWER.ZPTF_OUTPUT_01,' '),' ')
+		//LET $WHERE1 = 'AND SYSTIMESTAMP  >= TR.UPDATED_DATETIME + INTERVAL '|| '''' || $XWHERE || '''' || '  HOUR'
+		//from PS_ZPTT_XLAT_TBL XWER
+		//where XWER.ZPTF_INPUT_01 = 'TEMPMAST'
+		//and XWER.ZPTF_INPUT_02 = 'LEGACY-DELAY-HRS'       
+		//end-select
+		return where1;
+	}
 
 
 //	!----------------------------------------------------------------------
@@ -434,9 +471,9 @@ public class ZHRI100A {
 //	RA.SEQ_NBR
 //	    MOVE &RA.SEQ_NBR TO #WrkSequence
 //	RA.OPRID
-//	    LET $AuditOprid = Ltrim(Rtrim(&RA.OPRID,' '),' ')
+//	    LET $AuditOprid = LTRIM(RTRIM(&RA.OPRID,' '),' ')
 //	Ra.EMPLID
-//	    LET $PSEmplid = Ltrim(Rtrim(&RA.EMPLID,' '),' ')
+//	    LET $PSEmplid = LTRIM(RTRIM(&RA.EMPLID,' '),' ')
 //	    Move $PSEmplid to #Wrk_EmplID1
 //	    LET $Wrk_Emplid2 =  edit(#Wrk_EmplID1,'099999999')
 //	to_char(RA.EFFDT, 'YYYY-MM-DD') &RAEFFDT
@@ -444,17 +481,17 @@ public class ZHRI100A {
 //	RA.EFFSEQ
 //	    Move &RA.EFFSEQ to #PSEffSeq
 //	RA.PROC_NAME
-//	    LET $WrkProcess = ltrim(rtrim(&RA.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
+//	    LET $WrkProcess = LTRIM(RTRIM(&RA.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
 //	RA.TASK_FLAG
-//	    LET $WrkTaskFlag = ltrim(rtrim(&RA.TASK_FLAG,' '),' ')
+//	    LET $WrkTaskFlag = LTRIM(RTRIM(&RA.TASK_FLAG,' '),' ')
 //	   LET $PoiFlag = 'N'       
 //	   IF  $PSEmplid = ''             
 //	      LET $CompletionStatus = 'E'
-//	   End-if
-//	   Do Call-Programs 
-//	   If $CompletionStatus <> 'W'
-//	      Do Update-Trigger-Row
-//	   End-If       
+//	   END-IF
+//	   DO Call-Programs 
+//	   IF $CompletionStatus <> 'W'
+//	      DO Update-Trigger-Row
+//	   END-IF       
 //	FROM PS_ZHRT_INTTRIGGER RA,
 //	     PS_ZHRT_POI_TERM TR
 //	WHERE RA.TASK_FLAG = 'W'
@@ -469,48 +506,73 @@ public class ZHRI100A {
 //
 //	!------------Surya Added - TEMPMAST END-------------------------!
 //
-//	!----------------------------------------------------------------------
-//	! ERAC
-//	! Procedure:  Call-System
-//	! Desc:  Executes a command line statement stored in the $Command Variable
-//	!----------------------------------------------------------------------
-//	Begin-Procedure Call-System
-//	!#ifdef debugx
-//	!    show 'inside call system procedure'
-//	!#end-if !debugx
-//	LET #CommandLength = length($Command)             !Get the length of the command
-//	LET #SubstrStartPos = 1    !Initiate the starting positions to show the first 100 positions
-//	while #SubstrStartPos <= #CommandLength
-//	    LET $ShowCommand = substr($Command,#SubstrStartPos,100)   !Substring 100 positions to show
-//	    LET #SubstrStartPos = #SubstrStartPos + 100    !Increase the starting position by 100
-//	    Show $ShowCommand        !ZHR_MOD_ZHRI100A_110B
-//	end-while   !#SubstrStartPos <= #CommandLength
-//	!#ifdef debugx
-//	!    show 'before call system Rexec'
-//	!#end-if !debugx
-//	LET $Command = $RexecScript || ' ' || $Command || ' ' || $RMTSVR  !changed for v8.3
-//	show '$Command=> ' $Command
-//	Do GET-CURRENT-DATETIME  !Gets the current date and time using curdttim.sqc
-//	show 'Calling Command at: ' $SysDateTime   !Surya Added - TEMPMAST 
-//	Call System Using $Command #Status Wait      !Execute the command that was built on the command waiting until completion
-//	!#ifdef debugx
-//	!    show 'after call system Rexec'
-//	!#end-if !debugx
-//	If #status != 0
-//	  !error
-//	  LET $ErrorProgramParm = 'ZHRI100A'
-//	  LET $ErrorMessageParm = ' '
-//	  LET $ErrorMessageParm = 'Error executing Call System command, contact HR-PeopleSoft Oncall'
-//	  LET $WrkCriticalFlag  = 'Y'
-//	  Do Prepare-Error-Parms
-//	  if $PoiFlag = 'N'
-//	    Do Call-Error-Routine
-//	  else
-//	    Do Call-Error-Routine-NonEmp
-//	  end-if
-//	  LET $WrkCriticalFlag  = 'N'
-//	End-If
-//	End-Procedure Call-System
+	/**
+	 * ZHRI100A.Call-System
+	 * Executes a command line statement stored in the $Command Variable
+	 * @param command
+	 * @param zhri100aFields
+	 * @return 0 if success, non-zero if error
+	 */
+	public static Integer ZHRI100A_callSystem(String command, Zhri100aFields zhri100aFields) {
+		Integer status; //#Status
+//		String showCommand;
+//		Integer commandLength = command.length();
+//		Integer substringStartPosition = 1;
+		//BEGIN-PROCEDURE CALL-SYSTEM
+		//LET #CommandLength = length($Command)   !Get the length of the command
+//		commandLength = command.length();
+		//LET #SubstrStartPos = 1  !Initiate the starting positions to show the first 100 positions
+//		substringStartPosition = 1;
+		//WHILE #SubstrStartPos <= #CommandLength
+//		while(substringStartPosition <= commandLength) {
+			//LET $ShowCommand = SUBSTR($Command, #SubstrStartPos, 100)  !Substring 100 positions to show
+//			showCommand = command.substring(substringStartPosition, 100);
+			//LET #SubstrStartPos = #SubstrStartPos + 100  !Increase the starting position by 100
+//			substringStartPosition += 100;
+			//SHOW $ShowCommand  !ZHR_MOD_ZHRI100A_110B
+			System.out.println("command: " + command);
+		//END-WHILE   !#SubstrStartPos <= #CommandLength
+//		}
+		//LET $Command = $RexecScript || ' ' || $Command || ' ' || $RMTSVR
+		command = zhri100aFields.remoteExecScript + " " +  command + " " + zhri100aFields.remoteServerName;
+		//SHOW '$Command=> ' $Command
+		System.out.println("command: " + command);
+		//DO Get-Current-Datetime  !Gets the current date and time using curdttim.sqc
+		java.util.Date currentDate = new java.util.Date();
+		//SHOW 'Calling Command at: ' $SysDateTime  !Surya Added - TEMPMAST 
+		System.out.println("Calling Command at: " + currentDate);
+		//Call System Using $Command #Status Wait  !Execute the command that was built on the command waiting until completion
+		status = callSystemUsingCommand(command, zhri100aFields);
+		//IF #status != 0
+		if(!"0".equals(status)) {
+			//!error
+			//LET $ErrorProgramParm = 'ZHRI100A'
+			zhri100aFields.errorProgramParameter = "ZHRI100A";
+			//LET $ErrorMessageParm = ' '
+			//LET $ErrorMessageParm = 'Error executing Call System command, contact HR-PeopleSoft On-Call'
+			zhri100aFields.errorMessageParameter = "Error executing Call System command, contact HR-PeopleSoft Oncall";
+			//LET $WrkCriticalFlag = 'Y'
+			zhri100aFields.wrkCriticalFlag = true;
+			//DO Prepare-Error-Parms
+			prepareErrorParms();
+			//IF $PoiFlag = 'N'
+			if(!zhri100aFields.poiFlag) {
+				//DO Call-Error-Routine
+				ZHRI100A_callErrorRoutine(zhri100aFields);
+			//ELSE
+			}
+			else {
+				//DO Call-Error-Routine-NonEmp
+				callErrorRoutineNonEmp(zhri100aFields);
+			//END-IF
+			}
+			//LET $WrkCriticalFlag  = 'N'
+			zhri100aFields.wrkCriticalFlag = false;
+		}
+		//END-IF
+		return status;
+		//END-PROCEDURE CALL-SYSTEM
+	}
 //
 //
 //	!----------------------------------------------------------------------
@@ -521,10 +583,10 @@ public class ZHRI100A {
 //	!----------------------------------------------------------------------
 //	Begin-Procedure Prepare-Error-Parms
 //	!Prepare the date and time parms
-//	Do Get-Current-DateTime                                 !Get the current date and time
+//	DO Get-Current-DateTime                                 !Get the current date and time
 //	LET $AddDateErrorParm = datetostr(strtodate($AsOfToday,'DD-MON-YYYY'),'YYYYMMDD') !sree**rehost
-//	LET $AddTimeErrorParm =    substr($Out,10,2)    ||    substr($Out,13,2)    ||    substr($Out,16,2)
-//	LET $OpridErrorParm   =    Substr($AuditOprid,2,5)
+//	LET $AddTimeErrorParm =    SUBSTR($Out,10,2)    ||    SUBSTR($Out,13,2)    ||    SUBSTR($Out,16,2)
+//	LET $OpridErrorParm   =    SUBSTR($AuditOprid,2,5)
 //	End-Procedure Prepare-Error-Parms
 //
 //	!----------------------------------------------------------------------
@@ -534,7 +596,7 @@ public class ZHRI100A {
 //	!----------------------------------------------------------------------
 //	Begin-Procedure Call-Error-Routine
 //	!Make Sure that the ErrorMessageParm is always 75 Characters long
-//	LET $ErrorMessageParm = Substr($ErrorMessageParm,1,75)  !Make sure not more than 75 long
+//	LET $ErrorMessageParm = SUBSTR($ErrorMessageParm,1,75)  !Make sure not more than 75 long
 //	LET $ErrorMessageParm = Rpad($ErrorMessageParm,75,' ')  !Make sure not less than 75 long
 //	LET $Command =   '"CALL '       ||
 //	                 $Library                     ||
@@ -559,9 +621,11 @@ public class ZHRI100A {
 //	                 'Y'                          ||
 //	                 ''')" '
 //
-//	Do Call-System                                              
+//	DO Call-System                                              
+//	public static Integer callSystem(String employeeId, String command, Zhri100aFields zhri100aFields);
 //	End-Procedure Call-Error-Routine
-//
+
+		
 //	!----------------------------------------------------------------------
 //	! ERAC
 //	! Procedure:  Call-Error-Routine-NonEmp
@@ -569,7 +633,7 @@ public class ZHRI100A {
 //	!----------------------------------------------------------------------
 //	Begin-Procedure Call-Error-Routine-NonEmp
 //	!Make Sure that the ErrorMessageParm is always 75 Characters long
-//	LET $ErrorMessageParm = Substr($ErrorMessageParm,1,75)  !Make sure not more than 75 long
+//	LET $ErrorMessageParm = SUBSTR($ErrorMessageParm,1,75)  !Make sure not more than 75 long
 //	LET $ErrorMessageParm = Rpad($ErrorMessageParm,75,' ')  !Make sure not less than 75 long
 //	LET $Command =   '"CALL '       ||
 //	                 $Library                     ||
@@ -595,7 +659,7 @@ public class ZHRI100A {
 //	                 ''' '''                      ||
 //	                 'Y'                          ||
 //	                 ''')" '
-//	Do Call-System                                              
+//	DO Call-System                                              
 //	End-Procedure Call-Error-Routine-NonEmp
 //
 //	!----------------------------------------------------------------------
@@ -625,112 +689,208 @@ public class ZHRI100A {
 //	End-Procedure Check-If-Contractor
 //
 //
-//	!----------------------------------------------------------------------
-//	! ERAC
-//	! Procedure:  Check-If-Correct102A
-//	! Desc:  Checks to see if 102A process has JOB row
-//	!----------------------------------------------------------------------
-//	Begin-Procedure Check-If-Correct102A                         !CQ 103011
-//	LET $OK-to-process = 'N'
-//	if $WrkProcess = 'ZHRI102A'
-//	 do dtu-add-days($PSEffdt,1,$dt102)
-//	end-if
-//	Begin-Select
-//	'XX'
-//	LET $OK-to-process = 'Y'
-//	From PS_JOB RD
-//	where RD.EMPLID = $PSEmplid
-//	  and to_char(RD.EFFDT, 'YYYY-MM-DD') = $dt102
-//	End-Select
-//	End-Procedure Check-If-Correct102A
-//
-//
-//	!----------------------------------------------------------------------
-//	! ERAC
-//	! Procedure:  Build-Group-Where-Clause
-//	! Desc:  This routine will build the where clause that will select the
-//	!        correct Run-ID to use.
-//	!----------------------------------------------------------------------
-//	Begin-Procedure Build-Group-Where-Clause
-//	LET $WhereClause = ltrim(rtrim($WhereClause,' '),' ')  !Remove leading and trailing blanks
-//	if ($WhereClause = '')  !If the where clause is empty
-//	    LET $WhereClause = 'Where ((' || $Alias || '.HMRGP = ' || '''' || $SelectGroup || ''''  !Add the first statement to the where clause
-//	else  !The where clause is not empty
-//	    LET $WhereClause = $WhereClause || ' or ' || $Alias || '.HMRGP = ' || '''' ||$SelectGroup || ''''!append a condition to the where clause
-//	end-if      !$WhereClause = ''
-//	End-Procedure   Build-Group-Where-Clause
-//
-//	!----------------------------------------------------------------------
-//	! ERAC
-//	! Procedure:  Build-Emplid-Where-Clause
-//	! Desc:  Builds a where clause based on an employee id entered by the user
-//	!----------------------------------------------------------------------
-//
-//	Begin-Procedure Build-Emplid-Where-Clause
-//	    LET $WhereClause = 'Where ((' || $Alias || '.HMREMP = ' || '''' || $Run-Id || ''''  !Create the where clause
-//	End-Procedure Build-Emplid-Where-Clause
-//
+	
+	private static void prepareErrorParms() {
+		// TODO Auto-generated method stub
+		
+	}
 
-//	!----------------------------------------------------------------------
-//	! ERAC
-//	! Procedure:  Get-Oprid
-//	! Desc:  This routine gets the operator id from the operator definition
-//	!        table
-//	!----------------------------------------------------------------------
+
+	/**
+	 * Call System Using $Command #Status Wait
+	 * Execute the command that was built on the command waiting until completion
+	 * @param command
+	 * @param zhri100aFields
+	 * @return 0 if success, non-zero if error
+	 */
+	private static Integer callSystemUsingCommand(String command, Zhri100aFields zhri100aFields) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/**
+	 * Call-Error-Routine-NonEmp from ZHRI100A.SQR
+	 * @param zhri100aFields
+	 */
+	private static void callErrorRoutineNonEmp(Zhri100aFields zhri100aFields) {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * Call-Error-Routine from ZHRI100A.SQR
+	 * @param zhri100aFields
+	 */
+	public static void ZHRI100A_callErrorRoutine(Zhri100aFields zhri100aFields) {
+		//LET $Wrk_EmplId2 = EDIT(#Wrk_EmplId1,'099999999') //this value is used as a parameter in the error routine call //a 9-digit number left padded with zeros.
+		//Begin-Procedure Call-Error-Routine
+		String employeeId = String.format("%9s", zhri100aFields.employeeId).replace(' ', '0');
+		String addDateErrorParm = "";
+		String addTimeErrorParm = "";
+		String opridErrorParm = "";
+		String command; //$Command
+		//!Make Sure that the ErrorMessageParm is always 75 Characters long
+		//Let $ErrorMessageParm = SUBSTR($ErrorMessageParm,1,75)  !Make sure not more than 75 long
+		//let $ErrorMessageParm = Rpad($ErrorMessageParm,75,' ')  !Make sure not less than 75 long
+		String errorMessageParameter = String.format("%75s", zhri100aFields.errorMessageParameter);
+		//Let $Command =   '"CALL '       ||
+		// $Library                     ||
+		// '/HRZ110A '                  ||
+		// 'PARM('''                    ||
+		// $ErrorProgramParm            ||
+		// ''' '''                      ||
+		// $Wrk_Emplid2                 ||
+		// ''' '''                      ||
+		// ' '                          ||
+		// ''' '''                      ||
+		// $ErrorMessageParm            ||
+		// ''' '''                      ||
+		// $WrkCriticalFlag             ||
+		// ''' '''                      ||
+		// $AddDateErrorParm            ||
+		// ''' '''                      ||
+		// $AddTimeErrorParm            ||
+		// ''' '''                      ||
+		// $OpridErrorParm              ||
+		// ''' '''                      ||
+		// 'Y'                          ||
+		// ''')" '
+		command = "CALL '" + zhri100aFields.as400Library + "/HRZ110A PARM('"
+				+ zhri100aFields.errorProgramParameter + "' '"
+        		+ employeeId + "' ' ' '"
+        		+ errorMessageParameter + "' '"
+        		+ zhri100aFields.wrkCriticalFlag + "' '"
+        		+ addDateErrorParm + "' '"
+        		+ addTimeErrorParm + "' '"
+        		+ opridErrorParm + "' '"
+        		+ "' 'Y')";
+		//Do Call-System                                              
+		ZHRI100A_callSystem(command, zhri100aFields);
+		//End-Procedure Call-Error-Routine
+	}
+
+
+	/**
+	 * Check-If-Correct102A from ZHRI100A.SQR
+	 * Checks to see if 102A process has JOB row
+	 * @param psEmplId
+	 * @param psEffectiveDate
+	 * @param processName
+	 * @return true if corresponding PsJob record found
+	 */
+	public static Boolean ZHRI100A_checkIfCorrect102A(String employeeId, Date effectiveDate, String processName) {
+		//BEGIN-PROCEDURE CHECK-IF-CORRECT102A
+		//LET $OK-To-Process = 'N'
+		Boolean isOkToProcess = false;
+		//IF $WrkProcess = 'ZHRI102A'
+		if("ZHRI102A".equalsIgnoreCase(processName)) {
+			//DO DTU-ADD-DAYS($PSEffDt, 1, $Dt102)
+			//add a day to current effective date
+			effectiveDate = DateUtil.addDays(effectiveDate, 1);
+		}
+		//END-IF
+		//BEGIN-SELECT
+		//'XX'
+		//LET $OK-To-Process = 'Y'
+		//FROM PS_JOB PS_JOB WHERE PS_JOB.EMPLID = $PSEmplId AND TO_CHAR(PS_JOB.EFFDT, 'YYYY-MM-DD') = $Dt102
+		List<PsJob> psJobList = PsJob.findByEmployeeIdAndEffectiveDate(employeeId, effectiveDate);
+    	if(psJobList != null && !psJobList.isEmpty()) {
+    		isOkToProcess = true;
+    	}
+    	//END-SELECT
+		return isOkToProcess;
+		//END-PROCEDURE CHECK-IF-CORRECT102A
+	}
+
+
+	/**
+	 * Build-Group-Where-Clause from ZHRI100A.SQR
+	 * This routine will build the where clause that will select the correct Run-ID to use.
+	 * @return SQL where clause
+	 */
+	public static String ZHRI100A_buildGroupWhereClause(String whereClause) {
+		String alias = ""; //TODO: I can't find where this value is set
+		String selectGroup = ""; //TODO: I can't find where this value is set
+		//BEGIN-PROCEDURE BUILD-GROUP-WHERE-CLAUSE
+		//LET $WhereClause = LTRIM(RTRIM($WhereClause,' '),' ')  !Remove leading and trailing blanks
+		if(whereClause != null) {
+			whereClause = whereClause.trim();
+			//IF ($WhereClause = '')  !If the where clause is empty
+			if(whereClause.isEmpty()) {
+				//LET $WhereClause = 'WHERE ((' || $Alias || '.HMRGP = ' || '''' || $SelectGroup || ''''  !Add the first statement to the where clause
+				whereClause = "WHERE ((" + alias + ".HMRGP = " + "'" + selectGroup + "'";
+			}
+			//else  !The where clause is not empty
+			else {
+				//LET $WhereClause = $WhereClause || ' OR ' || $Alias || '.HMRGP = ' || '''' ||$SelectGroup || ''''!append a condition to the where clause
+				whereClause = whereClause+ " OR " + alias + ".HMRGP = " + "'" + selectGroup + "'";
+			//END-IF  !$WhereClause = ''
+			}
+		}
+		//END-PROCEDURE   BUILD-GROUP-WHERE-CLAUSE
+		return whereClause;
+	}
+
+	/**
+	 * Build-EmplId-Where-Clause from ZHRI100A.SQR
+	 * Builds a where clause based on an employee id entered by the user.
+	 * @return SQL where clause
+	 */
+	public static String ZHRI100A_buildEmplIdWhereClause() {
+		String alias = ""; //TODO: I can't find where this value is set
+		String runId = ""; //TODO: I can't find where this value is set
+		//BEGIN-PROCEDURE BUILD-EMPLID-WHERE-CLAUSE
+		//LET $WhereClause = 'WHERE ((' || $Alias || '.HMREMP = ' || '''' || $Run-Id || ''''  !Create the where clause
+		String whereClause = "WHERE ((" + alias + ".HMREMP = " + "'" + runId + "'";
+		//END-PROCEDURE BUILD-EMPLID-WHERE-CLAUSE
+		return whereClause;
+	}
+
+	/**
+	 * Get-OprId from ZHRI100A.SQR
+	 * This routine gets the operator id from the operator definition table
+	 */
+	public static String ZHRI100A_getOprId(String employeeId, Integer indexNumber, Zhri100aFields zhri100aFields) {
+		return ZHRI100A_getOprId(employeeId, zhri100aFields, indexNumber, null); 
+	}
+	public static String ZHRI100A_getOprId(String employeeId, Zhri100aFields zhri100aFields, Integer indexNumber, Integer eidIndexNumber) {
+		//BEGIN-PROCEDURE GET-OPRID
+		//LET $Found = 'N'
+		Boolean found = false;
+		//LET $PSOprId = ''
+		String psOprId;
+		//IF $PoiFlag = 'N'
+		if(!zhri100aFields.poiFlag) {
+			//MOVE 0 TO #indexNum
+			indexNumber = 0;
+		//END-IF
+		}
+		//IF #indexNum = 0
+		if(indexNumber.equals(0)) {
+//			DO GET-LEGID-FOR-SEQ0
+			psOprId = CrossReferenceEmployeeId.ZHRI100A_getLegIdForSeq0(employeeId);
+		}
+		//ELSE
+		else {
+			//DO GET-LEGID-FOR-SEQNUM
+			psOprId = CrossReferenceMultipleEmployeeId.ZHRI100A_getLegIdForSeqNum(employeeId, eidIndexNumber);
+		//END-IF
+		}
+		if(psOprId != null && !psOprId.isEmpty()) {
+			found = true;
+		}
+		//!If an OprId does not exist for the employee, create one
+		//IF ($Found = 'N')
+		if(!found) {
+			//DO GET-LEGACY-OPRID                  !sree**10/04/01
+			//LET $PSOprId = $LegEmplid
+			psOprId = ZHRI100A_getLegacyOprId(employeeId, indexNumber, zhri100aFields.poiFlag);
+		//END-IF  !$Found = 'N'
+		}
+		//END-PROCEDURE GET-OPRID
+		return psOprId;
+	}
+
 //
-//	Begin-Procedure Get-Oprid
-//	LET $Found = 'N'
-//	LET $PSOprid = ''
-//	if $PoiFlag = 'N'
-//	  move 0 to #indexNum
-//	end-if
-//	if #indexNum = 0
-//	    do get-LegID-for-seq0
-//	else 
-//	    do get-LegID-for-seqnum
-//	end-if
-//	!If an oprid does not exist for the employee, create one
-//	If ($Found = 'N')
-//	     do Get-Legacy-Oprid                  !sree**10/04/01
-//	     LET $PSOprid = $LegEmplid
-//	End-if    !$Found = 'N'
-//	End-Procedure Get-Oprid
-//
-//	!----------------------------------------------------------------------
-//	! ERAC
-//	! Procedure:  get-LegID-for-seq0
-//	! Desc:  This routine gets the Legacy ID from Employee CREF Table for 
-//	! Primary EIDs
-//	!----------------------------------------------------------------------
-//	Begin-Procedure get-LegID-for-seq0
-//	begin-select
-//	RPOD.ZHRF_LEG_EMPL_ID
-//	    LET $PSOprid = &RPOD.ZHRF_LEG_EMPL_ID
-//	    LET $Found = 'Y'
-//	from PS_ZHRT_EMPID_CREF RPOD
-//	where RPOD.Emplid = $Wrk_Emplid         
-//	end-select
-//	End-Procedure get-LegID-for-seq0
-//
-//	!----------------------------------------------------------------------
-//	! ERAC
-//	! Procedure:  get-LegID-for-seqnum
-//	! Desc:  This routine gets the Legacy ID from Alternate EID Table
-//	!----------------------------------------------------------------------
-//	Begin-Procedure get-LegID-for-seqnum
-//	!check if the multiple EID table has the EID!
-//	begin-select
-//	MULT.ZHRF_LEG_EMPL_ID
-//
-//	    LET $PSOprid = Ltrim(Rtrim(&MULT.ZHRF_LEG_EMPL_ID,' '),' ')
-//	    if $PSOprid <> ''
-//	      LET $Found = 'Y'
-//	    end-if
-//	from PS_ZHRR_MULTPL_EID MULT
-//	where MULT.Emplid = $Wrk_Emplid  
-//	and MULT.Sequence = #indexNum      
-//	end-select
-//	End-Procedure get-LegID-for-seqnum
 //
 //
 //	!----------------------------------------------------------------------
@@ -742,9 +902,9 @@ public class ZHRI100A {
 //	LET $LegEmplid = ''
 //	Move $Wrk_Emplid to #wrk_emplid                 !sree***10/04/01
 //	!Surya Added - TEMPMAST Start
-//	if $PoiFlag = 'N'
+//	IF $PoiFlag = 'N'
 //	  move 0 to #indexNum
-//	end-if
+//	END-IF
 //	!Surya Added - TEMPMAST End
 //	Begin-Select
 //	CHR36.H36NAM                                               !Rakesh***08/02/2004
@@ -756,18 +916,18 @@ public class ZHRI100A {
 //	  LET #WRK_CHR36_H36EM_NUM = &CHR36.H36EM#   !sm 07/12/02  !Rakesh***08/02/2004
 //	  IF #WRK_CHR36_H36EM_NUM = #wrk_emplid                    !Rakesh***08/02/2004
 //	    LET $LegEmpName = &CHR36.H36NAM                        !Rakesh***08/02/2004
-//	    Do Format-Employee-Name
+//	    DO Format-Employee-Name
 //	    LET $LegEmplid = &CHR36.H36EMP                         !Rakesh***08/02/2004
-//	    LET $LegEmplid = substr($LegEmplid,1,5)
+//	    LET $LegEmplid = SUBSTR($LegEmplid,1,5)
 //	    !DO Insert-Oprid  !Surya Added - TEMPMAST 
 //	    !Surya Added - TEMPMAST Start
 //	    If #indexNum = 0
 //	      DO Insert-Oprid
 //	    else
 //	      DO Update-Oprid
-//	    end-if  
+//	    END-IF  
 //	    !Surya Added - TEMPMAST End
-//	  End-if    !#WRK_CHR36_H36EM_NUM = #wrk_emplid            !Rakesh***08/02/2004
+//	  END-IF    !#WRK_CHR36_H36EM_NUM = #wrk_emplid            !Rakesh***08/02/2004
 //	from HR036P CHR36                                          !Rakesh***08/02/2004
 //	where CHR36.H36EM# = #wrk_emplid                           !Rakesh***08/02/2004
 //	and CHR36.H36INX = #indexNum 
@@ -826,7 +986,7 @@ public class ZHRI100A {
 //	!----------------------------------------------------------------------
 //	Begin-Procedure Insert-Error
 //	LET $ErrorMessageParm = $Sql-error
-//	Do Call-Error-Routine
+//	DO Call-Error-Routine
 //	LET $Insert-Error-Flag = 'Y'
 //	End-Procedure Insert-Error
 //
@@ -841,10 +1001,10 @@ public class ZHRI100A {
 //	Begin-Procedure Update-Error
 //	!#ifdef debugx
 //	!    show 'inside Update-Error'
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	LET $ErrorMessageParm = $Sql-error
-//	Do Call-Error-Routine
+//	DO Call-Error-Routine
 //	LET $Update-Error-Flag = 'Y'
 //
 //	End-Procedure Update-Error
@@ -860,7 +1020,7 @@ public class ZHRI100A {
 //	Begin-Procedure Format-Employee-Name
 //	!#ifdef debugx
 //	!    show 'inside format employee name'
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //
 //	! Break apart the legacy system name field at the *
@@ -886,7 +1046,7 @@ public class ZHRI100A {
 //	Begin-Procedure Check-Effdt-Transaction
 //	!#ifdef debugx
 //	 !   show 'inside Check-Effdt-Transaction'
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	LET $WrkADEffdt = ''
 //
@@ -930,44 +1090,44 @@ public class ZHRI100A {
 //	Begin-Procedure Build-Active-Dir-Output-File
 //	!#ifdef debugx
 //	!    show 'inside build active dir output file'
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	LET $Wrkcreatefile = 'Y'
-//	If $Wrk_AD_JobDataBuild = 'N'
-//	   do AD-Get-Job-Data
-//	End-If
+//	IF $Wrk_AD_JobDataBuild = 'N'
+//	   DO AD-Get-Job-Data
+//	END-IF
 //
-//	do AD-Get-Job-Description
-//	do AD-Get-EmplStatus-Description
+//	DO AD-Get-Job-Description
+//	DO AD-Get-EmplStatus-Description
 //
-//	If $Wrk_AD_PersdataEffdtBuild = 'N'
-//	 do AD-Get-Pers-Data-Effdt
-//	End-If
+//	IF $Wrk_AD_PersdataEffdtBuild = 'N'
+//	 DO AD-Get-Pers-Data-Effdt
+//	END-IF
 //
-//	If $Wrk_AD_Getbusinessphone = 'N'
-//	 do AD-Get-Business-Phone
-//	End-If
+//	IF $Wrk_AD_Getbusinessphone = 'N'
+//	 DO AD-Get-Business-Phone
+//	END-IF
 //
-//	If $Wrk_AD_PersDataBuild = 'N'
-//	 do AD-Get-Personal-Data
-//	End-If
+//	IF $Wrk_AD_PersDataBuild = 'N'
+//	 DO AD-Get-Personal-Data
+//	END-IF
 //
-//	If $Wrk_AD_CountryCdBuild = 'N'
-//	 do AD-Get-Country-Code
-//	End-If
+//	IF $Wrk_AD_CountryCdBuild = 'N'
+//	 DO AD-Get-Country-Code
+//	END-IF
 //
-//	do AD-Get-Employee-Fax
-//	do AD-Get-Namesuffix
-//	do AD-Get-JobStart-Date
-//	do AD-Get-Employment-Data
+//	DO AD-Get-Employee-Fax
+//	DO AD-Get-Namesuffix
+//	DO AD-Get-JobStart-Date
+//	DO AD-Get-Employment-Data
 //
-//	If $ADSupervisorID <> ''
-//	do AD-Get-LegSuperviorID
-//	End-If
+//	IF $ADSupervisorID <> ''
+//	DO AD-Get-LegSuperviorID
+//	END-IF
 //
-//	If $Wrk_AD_NamesBuild = 'N'
-//	 do AD-Get-Names
-//	End-If
+//	IF $Wrk_AD_NamesBuild = 'N'
+//	 DO AD-Get-Names
+//	END-IF
 //
 //	LET $ADEmplid = $PSEmplid
 //
@@ -978,20 +1138,20 @@ public class ZHRI100A {
 //	LET $ADJobCd  = $PSJobcode
 //	LET $ADJobDescr = $PSJobDescription
 //	LET $ADEmplStatus = $PSEmplStatus
-//	  If $PSRehireDt <> ''
+//	  IF $PSRehireDt <> ''
 //	    LET $ADHireDt = $PSRehiredt
 //	  else
 //	    LET $ADHireDt = $PSHiredt
-//	  End-If
-//	If ($PSAction = 'REH')
+//	  END-IF
+//	IF ($PSAction = 'REH')
 //	and ($PSAction_Reason = 'REH')
 //	and ($WrkProcess = 'ZHRI102A')
 //	 LET $ADAction_Code = 'R'
-//	End-If
+//	END-IF
 //
-//	!  If $ADAction_Code = 'T'
+//	!  IF $ADAction_Code = 'T'
 //	    LET $ADTermDt = $PSTerminationdt
-//	!  End-If
+//	!  END-IF
 //
 //	LET $ADCountry = $PSLoc_Country
 //	LET $ADFullPartTime = $PSFullPartTime
@@ -1001,7 +1161,7 @@ public class ZHRI100A {
 //	LET $ADLangCd = $PSLangCd
 //	LET $ADPrfName = $PSPrfName
 //
-//	do Write-Active-Dir-Output-File
+//	DO Write-Active-Dir-Output-File
 //	End-Procedure Build-Active-Dir-Output-File
 //
 //	!----------------------------------------------------------------------
@@ -1013,22 +1173,22 @@ public class ZHRI100A {
 //	Begin-Procedure AD-Get-Job-Data
 //	!#ifdef debugx
 //	!    show 'inside ad get job data'
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	Begin-Select
 //
 //	AD.LOCATION
-//	    LET $PSLocation = ltrim(rtrim(&AD.LOCATION,' '),' ')            !Remove leading and trailing blanks
+//	    LET $PSLocation = LTRIM(RTRIM(&AD.LOCATION,' '),' ')            !Remove leading and trailing blanks
 //	AD.FULL_PART_TIME
-//	    LET $PSFullPartTime = ltrim(rtrim(&AD.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
+//	    LET $PSFullPartTime = LTRIM(RTRIM(&AD.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
 //	AD.EMPL_CLASS
-//	    LET $PSEmplClass = ltrim(rtrim(&AD.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
+//	    LET $PSEmplClass = LTRIM(RTRIM(&AD.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
 //	AD.EMPL_STATUS
-//	    LET $PSEmplStatus = ltrim(rtrim(&AD.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
+//	    LET $PSEmplStatus = LTRIM(RTRIM(&AD.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
 //	AD.DEPTID
-//	    LET $PSDeptid = ltrim(rtrim(&AD.DEPTID,' '),' ')                !Remove leading and trailing blanks
+//	    LET $PSDeptid = LTRIM(RTRIM(&AD.DEPTID,' '),' ')                !Remove leading and trailing blanks
 //	AD.JOBCODE
-//	    LET $PSJobcode = ltrim(rtrim(&AD.JOBCODE,' '),' ')              !Remove leading and trailing blanks
+//	    LET $PSJobcode = LTRIM(RTRIM(&AD.JOBCODE,' '),' ')              !Remove leading and trailing blanks
 //
 //	from PS_JOB AD
 //	where AD.EMPLID = $Wrk_Emplid
@@ -1057,7 +1217,7 @@ public class ZHRI100A {
 //	Begin-Procedure AD-Get-Job-Description
 //	!#ifdef debugx
 //	 !   show 'inside ad get job description'
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	LET $PSJobDescription = ''
 //	Begin-Select
@@ -1065,7 +1225,7 @@ public class ZHRI100A {
 //	AD9.JOBCODE
 //	AD9.DESCR
 //
-//	 LET $PSJobDescription = ltrim(rtrim(&AD9.DESCR,' '),' ')
+//	 LET $PSJobDescription = LTRIM(RTRIM(&AD9.DESCR,' '),' ')
 //
 //	from PS_JOBCODE_TBL AD9
 //	where AD9.JOBCODE = $PSJobcode
@@ -1083,26 +1243,26 @@ public class ZHRI100A {
 //	Begin-Procedure AD-Get-EmplStatus-Description
 //	!#ifdef debugx
 //	!    show 'inside ad get emplstatus description'
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	Begin-Select
 //
 //	AD10.XLATLONGNAME
 //
-//	 LET $ADEmplStatusDescr = ltrim(rtrim(&AD10.XLATLONGNAME,' '),' ')
+//	 LET $ADEmplStatusDescr = LTRIM(RTRIM(&AD10.XLATLONGNAME,' '),' ')
 //
-//	! from XLATTABLE AD10                                                               ! ALS-10/08/2008 - Commented Out
-//	from PSXLATITEM AD10                                                                ! ALS-10/08/2008
+//	! from XLATTABLE AD10                                                                - Commented Out
+//	from PSXLATITEM AD10                                                                
 //
 //	where AD10.FIELDNAME = 'EMPL_STATUS'
 //	and AD10.FIELDVALUE = $PSEmplstatus
-//	! and AD10.LANGUAGE_CD = 'ENG'                                                      ! ALS-10/08/2008 - Commented Out
-//	! and AD10.EFFDT = (Select max(AD11.EFFDT) from XLATTABLE AD11                      ! ALS-10/08/2008 - Commented Out
-//	and AD10.EFFDT = (Select max(AD11.EFFDT) from PSXLATITEM AD11                       ! ALS-10/08/2008
+//	! and AD10.LANGUAGE_CD = 'ENG'                                                       - Commented Out
+//	! and AD10.EFFDT = (Select max(AD11.EFFDT) from XLATTABLE AD11                       - Commented Out
+//	and AD10.EFFDT = (Select max(AD11.EFFDT) from PSXLATITEM AD11                       
 //	                  where AD10.FIELDNAME = AD11.FIELDNAME
 //	                  and AD10.FIELDVALUE = AD11.FIELDVALUE
-//	!                  and AD10.LANGUAGE_CD = AD11.LANGUAGE_CD                          ! ALS-10/08/2008 - Commented Out
-//	                  and AD11.EFFDT <= SYSDATE                                         ! ALS-10/08/2008
+//	!                  and AD10.LANGUAGE_CD = AD11.LANGUAGE_CD                           - Commented Out
+//	                  and AD11.EFFDT <= SYSDATE                                         
 //	                                  )
 //	End-Select
 //	End-Procedure AD-Get-EmplStatus-Description
@@ -1116,15 +1276,15 @@ public class ZHRI100A {
 //	Begin-Procedure AD-Get-JobStart-Date
 //	!#ifdef debugx
 //	 !   show 'inside ad get job start date'
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	Begin-Select
 //
 //	to_char(AD4.EFFDT,'YYYY-MM-DD') &AD4.EFFDT
 //
-//	  LET $ADJobStartYr   = substr(&AD4.EFFDT,1,4)
-//	  LET $ADJobStartMnth = substr(&AD4.EFFDT,6,2)
-//	  LET $ADJobStartDay  = substr(&AD4.EFFDT,9,2)
+//	  LET $ADJobStartYr   = SUBSTR(&AD4.EFFDT,1,4)
+//	  LET $ADJobStartMnth = SUBSTR(&AD4.EFFDT,6,2)
+//	  LET $ADJobStartDay  = SUBSTR(&AD4.EFFDT,9,2)
 //	  LET $ADJobStartdt   = $ADJobStartYr || $ADJobStartMnth || $ADJobStartDay
 //
 //	    LET $PSJobStartdt = &AD4.EFFDT
@@ -1160,13 +1320,13 @@ public class ZHRI100A {
 //	Begin-Procedure AD-Get-Pers-Data-effdt
 //	!#ifdef debugx
 //	 !   show 'inside ad get pers data effdt'
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	begin-select
 //
 //	ADPDE2A.First_Name
 //	ADPDE2A.Last_Name
-//	ADPDE2A.Middle_Name    !added for v8.3
+//	ADPDE2A.Middle_Name    
 //
 //	  LET $ADPSLastName   = RTRIM(LTRIM(&ADPDE2A.Last_Name,' '),' ')
 //	  LET $ADPSFirstName  = RTRIM(LTRIM(&ADPDE2A.First_Name,' '),' ')
@@ -1175,11 +1335,11 @@ public class ZHRI100A {
 //
 //	from PS_NAMES ADPDE2A     !Changed for v8.3
 //	where ADPDE2A.Emplid = $PSEmplid
-//	  and ADPDE2A.NAME_TYPE = 'PRI'                                    !added for v8.3
+//	  and ADPDE2A.NAME_TYPE = 'PRI'                                    
 //	  and ADPDE2A.Effdt = (select max(ADPDE2B.effdt) from  PS_NAMES ADPDE2B  !Changed for v8.3
 //	                       where ADPDE2B.emplid    = ADPDE2A.emplid
 //	                       and   ADPDE2B.NAME_TYPE = ADPDE2A.NAME_TYPE
-//	                       and   to_char(ADPDE2B.EFFDT,'YYYY-MM-DD') <= $PSEffdt) !added for v8.3
+//	                       and   to_char(ADPDE2B.EFFDT,'YYYY-MM-DD') <= $PSEffdt) 
 //
 //	end-select
 //
@@ -1195,7 +1355,7 @@ public class ZHRI100A {
 //	Begin-Procedure AD-Get-NameSuffix
 //	!#ifdef debugx
 //	 !   show 'inside ad get name suffix'
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	begin-select
 //
@@ -1206,11 +1366,11 @@ public class ZHRI100A {
 //
 //	from PS_NAMES ANAME     !Changed for v8.3
 //	where ANAME.Emplid = $PSEmplid
-//	  and ANAME.NAME_TYPE = 'PRI'                                    !added for v8.3
+//	  and ANAME.NAME_TYPE = 'PRI'                                    
 //	  and ANAME.Effdt = (select max(ANAME2.effdt) from  PS_NAMES ANAME2  !Changed for v8.3
 //	                       where ANAME2.emplid     = ANAME.emplid
 //	                       and   ANAME2.NAME_TYPE  = ANAME.NAME_TYPE
-//	                       and   to_char(ANAME2.EFFDT,'YYYY-MM-DD') <= $PSEffdt) !added for v8.3
+//	                       and   to_char(ANAME2.EFFDT,'YYYY-MM-DD') <= $PSEffdt) 
 //
 //	end-select
 //
@@ -1226,7 +1386,7 @@ public class ZHRI100A {
 //	Begin-Procedure AD-Get-Personal-Data
 //	!#ifdef debugx
 //	 !   show 'inside ad get personal data '
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	LET $PSLangCd = ''
 //
@@ -1252,14 +1412,14 @@ public class ZHRI100A {
 //	Begin-Procedure AD-Get-Country-Code
 //	!#ifdef debugx
 //	 !   show 'inside ad get country code '
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	LET $PSLoc_Country = ''
 //
 //	Begin-Select
 //
 //	ADL2.COUNTRY
-//	    LET $PSLoc_Country = ltrim(rtrim(&ADL2.COUNTRY,' '),' ')         !Remove leading and trailing blanks
+//	    LET $PSLoc_Country = LTRIM(RTRIM(&ADL2.COUNTRY,' '),' ')         !Remove leading and trailing blanks
 //
 //	from PS_LOCATION_TBL ADL2
 //	where ADL2.LOCATION = $PSLOCATION
@@ -1278,13 +1438,13 @@ public class ZHRI100A {
 //	Begin-Procedure AD-Get-Business-Phone
 //	!#ifdef debugx
 //	 !   show 'inside ad get business phone '
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	LET $PSBusiness_Phone = ''
 //	begin-select
 //	ADPP2.Phone
 //
-//	 do Remove-Non-Letters-Numbers (&ADPP2.Phone, $PSBusiness_Phone)   !From ZRmvSpcChr.sqc
+//	 DO Remove-Non-Letters-Numbers (&ADPP2.Phone, $PSBusiness_Phone)   !From ZRmvSpcChr.sqc
 //
 //	from PS_Personal_Phone ADPP2
 //	where ADPP2.Phone_Type = 'BUSN'
@@ -1304,11 +1464,11 @@ public class ZHRI100A {
 //	Begin-Procedure AD-Get-Employee-Fax
 //	!#ifdef debugx
 //	 !   show 'inside ad get employee fax'
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	begin-select
 //	ADPP3.Phone
-//	 do Remove-Non-Letters-Numbers (&ADPP3.Phone, $ADEmployeeFax)   !From ZRmvSpcChr.sqc
+//	 DO Remove-Non-Letters-Numbers (&ADPP3.Phone, $ADEmployeeFax)   !From ZRmvSpcChr.sqc
 //
 //	from PS_Personal_Phone ADPP3
 //	where ADPP3.Phone_Type = 'FAX'
@@ -1326,7 +1486,7 @@ public class ZHRI100A {
 //	Begin-Procedure AD-Get-LegSuperviorID
 //	!#ifdef debugx
 //	 !   show 'inside ad get leg supervisor id '
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //
 //	begin-select
 //	RPOD1.ZHRF_LEG_EMPL_ID
@@ -1352,19 +1512,19 @@ public class ZHRI100A {
 //	LET $ADSupervisorID = ' '
 //	begin-select
 //	to_char(ADE.HIRE_DT,'YYYY-MM-DD')       &ADEHire_Dt
-//	  LET $PSHireYr = substr(&ADEHire_Dt,1,4)
-//	  LET $PSHireMnth = substr(&ADEHire_Dt,6,2)
-//	  LET $PSHireDay = substr(&ADEHire_Dt,9,2)
+//	  LET $PSHireYr = SUBSTR(&ADEHire_Dt,1,4)
+//	  LET $PSHireMnth = SUBSTR(&ADEHire_Dt,6,2)
+//	  LET $PSHireDay = SUBSTR(&ADEHire_Dt,9,2)
 //	  LET $PSHiredt = $PSHireYr || $PSHireMnth || $PSHireDay
 //	to_char(ADE.REHIRE_DT,'YYYY-MM-DD')       &ADERehire_Dt
-//	  LET $PSRehireYr = substr(&ADERehire_Dt,1,4)
-//	  LET $PSRehireMnth = substr(&ADERehire_Dt,6,2)
-//	  LET $PSRehireDay = substr(&ADERehire_Dt,9,2)
+//	  LET $PSRehireYr = SUBSTR(&ADERehire_Dt,1,4)
+//	  LET $PSRehireMnth = SUBSTR(&ADERehire_Dt,6,2)
+//	  LET $PSRehireDay = SUBSTR(&ADERehire_Dt,9,2)
 //	  LET $PSRehiredt = $PSRehireYr || $PSRehireMnth || $PSRehireDay
 //	to_char(ADE.TERMINATION_DT,'YYYY-MM-DD')  &ADETermination_Dt
-//	  LET $PSTermYr = substr(&ADETermination_Dt,1,4)
-//	  LET $PSTermMnth = substr(&ADETermination_Dt,6,2)
-//	  LET $PSTermDay = substr(&ADETermination_Dt,9,2)
+//	  LET $PSTermYr = SUBSTR(&ADETermination_Dt,1,4)
+//	  LET $PSTermMnth = SUBSTR(&ADETermination_Dt,6,2)
+//	  LET $PSTermDay = SUBSTR(&ADETermination_Dt,9,2)
 //	  LET $PSTerminationdt =  $PSTermYr || $PSTermMnth || $PSTermDay
 //	ADE.SUPERVISOR_ID
 //	  LET $ADSupervisorID = &ADE.SUPERVISOR_ID
@@ -1381,7 +1541,7 @@ public class ZHRI100A {
 //	Begin-Procedure AD-Get-Names
 //	!#ifdef debugx
 //	 !   show 'inside ad get names '
-//	!#end-if !debugx
+//	!#END-IF !debugx
 //	LET $PSPrfName = ''
 //	begin-select
 //	ADN.First_Name   !changed for v8.3 and defect 993
@@ -1389,10 +1549,10 @@ public class ZHRI100A {
 //	from PS_Names ADN
 //	where ADN.Emplid = $PSEmplid
 //	  and ADN.NAME_TYPE = 'PRF'
-//	  and ADN.EFFDT     = (SELECT MAX(EFFDT) FROM PS_Names ADN2   !added for v8.3
-//	                      WHERE ADN2.EMPLID   = ADN.EMPLID        !added for v8.3
-//	                      AND ADN2.NAME_TYPE  = ADN.NAME_TYPE     !added for v8.3
-//	                      AND to_char(ADN2.EFFDT,'YYYY-MM-DD') <= $PSEffdt) !added for v8.3
+//	  and ADN.EFFDT     = (SELECT MAX(EFFDT) FROM PS_Names ADN2   
+//	                      WHERE ADN2.EMPLID   = ADN.EMPLID        
+//	                      AND ADN2.NAME_TYPE  = ADN.NAME_TYPE     
+//	                      AND to_char(ADN2.EFFDT,'YYYY-MM-DD') <= $PSEffdt) 
 //	end-select
 //	end-procedure AD-Get-Names
 //
@@ -1522,40 +1682,41 @@ public class ZHRI100A {
 		Zhri100aFields zhri100aFields = new Zhri100aFields();
 		String wrkProcessName = "ZHRI100A";
 		zhri100aFields.dbName = PsDbOwner.findDbName();
-//		! This gets the oracle_sid
-//		LET $PS_HOME = getenv('PS_HOME')
-		zhri100aFields.peopleSoftHomePath = System.getenv("PS_HOME");
-//		LET $AD_HOME = $PS_HOME || '/data/activedir/'                   !Path for Active Directory
+		//LET $PS_HOME = getenv('PS_HOME')  !This gets the oracle_sid
+//		zhri100aFields.peopleSoftHomePath = System.getenv("PS_HOME");
+		zhri100aFields.peopleSoftHomePath = "C:/people soft/";
+		//LET $AD_HOME = $PS_HOME || '/data/activedir/'  !Path for Active Directory
 		zhri100aFields.activeDirectoryHomePath = zhri100aFields.peopleSoftHomePath + "/data/activedir/"; //TODO: where is this used???
-//		LET $ORACLE_SID = getenv('ORACLE_SID') !added for v8.3
-//		UPPERCASE $ORACLE_SID                  !added for v8.3
-		zhri100aFields.oracleSystemId = System.getenv("ORACLE_SID");
+		//LET $ORACLE_SID = getenv('ORACLE_SID') 
+//		zhri100aFields.oracleSystemId = System.getenv("ORACLE_SID");
+		zhri100aFields.oracleSystemId = "PS90HRQA";
 		if(zhri100aFields.oracleSystemId != null) {
+			//UPPERCASE $ORACLE_SID                  
 			zhri100aFields.oracleSystemId = zhri100aFields.oracleSystemId.toUpperCase();
 		}
-//		!Returns name of AS/400 machine for use in zbas002b.sh
-//		LET $Variable_Needed = ' '            !added for v8.3
-//		LET $Variable_Needed = 'RMTSVR'       !added for v8.3
-//		Do  Get-Variable                      !added for v8.3
-//		LET $RMTSVR = $PSZPTT_VARIABLE_VAL    !added for v8.3  
-//		Show '$RMTSVR: ' $RMTSVR                                                            ! ALS-10/08/2008
+		//!Returns name of AS/400 machine for use in zbas002b.sh
+		//LET $Variable_Needed = ' '            
+		//LET $Variable_Needed = 'RMTSVR'       
+		//DO  Get-Variable                      
+		//LET $RMTSVR = $PSZPTT_VARIABLE_VAL      
+		//Show '$RMTSVR: ' $RMTSVR                                                            
 		zhri100aFields.remoteServerName = PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "RMTSVR"); //TODO: where is this used???
-//		LET $RexecScript = '/usr/local/barch/' || $ORACLE_SID || '/scripts/zbas002b.sh'     ! ALS-10/08/2008
-//		Show '$RexecScript: ' $RexecScript                                                  ! ALS-10/08/2008
+		//LET $RexecScript = '/usr/local/barch/' || $ORACLE_SID || '/scripts/zbas002b.sh'     
+		//Show '$RexecScript: ' $RexecScript                                                  
 		zhri100aFields.remoteExecScript = "/usr/local/barch/" + zhri100aFields.oracleSystemId + "/scripts/zbas002b.sh"; //TODO: where is this used???
-//		!Returns library name on AS/400 where programs reside
-//		LET $Variable_Needed = ' '            !added for v8.3
-//		LET $Variable_Needed = 'AS400library' !added for v8.3
-//		Do  Get-Variable                      !added for v8.3
-//		LET $Library = $PSZPTT_VARIABLE_VAL   !added for v8.3
-//		Show '$Library: ' $Library                                                          ! ALS-10/08/2008
+		//!Returns library name on AS/400 where programs reside
+		//LET $Variable_Needed = ' '            
+		//LET $Variable_Needed = 'AS400library' 
+		//DO  Get-Variable                      
+		//LET $Library = $PSZPTT_VARIABLE_VAL   
+		//Show '$Library: ' $Library                                                          
 		zhri100aFields.as400Library = PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "AS400library");
-//		!Returns IP address of NT server
-//		LET $Variable_Needed = ' '             !added for v8.3
-//		LET $Variable_Needed = 'RMTNTADSVR'    !added for v8.3
-//		Do Get-Variable                        !added for v8.3
-//		LET $RMTNTADSVR = $PSZPTT_VARIABLE_VAL !added for v8.3
-//		Show '$RMTNTADSVR: ' $RMTNTADSVR                                                    ! ALS-10/08/2008
+		//!Returns IP address of NT server
+		//LET $Variable_Needed = ' '             
+		//LET $Variable_Needed = 'RMTNTADSVR'    
+		//DO Get-Variable                        
+		//LET $RMTNTADSVR = $PSZPTT_VARIABLE_VAL 
+		//Show '$RMTNTADSVR: ' $RMTNTADSVR                                                    
 		zhri100aFields.remoteAdServerName = PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "RMTNTADSVR"); //TODO: where is this used???
 		return zhri100aFields;
 	}
@@ -1563,42 +1724,46 @@ public class ZHRI100A {
 	/**
 	 * ZHRI100A.Check-Interface-Runfile
 	 * This procedure will check the existence run file
+	 * @param oracleSystemId
+	 * @return true is run file does not exist
 	 */
-	public static Boolean checkInterfaceRunfile(Zhri100aFields zhri100aFields) {
+	public static Boolean ZHRI100A_checkInterfaceRunFile(String oracleSystemId) {
 		Boolean runFlag = false;
 		String runFilePath;
-//		LET $RUN_FILEPATH = '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'  //concatenate
-		runFilePath = "/usr/local/barch/" + zhri100aFields.oracleSystemId + "/work/hrinterface.run";
-//		LET #file_exists = exists($RUN_FILEPATH)
+		//LET $RUN_FILEPATH = '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'  //concatenate
+		runFilePath = "/usr/local/barch/" + oracleSystemId + "/work/hrinterface.run";
+		//LET #file_exists = exists($RUN_FILEPATH)
 		Boolean fileExists = (new File(runFilePath)).exists();
-//		IF #file_exists = 0
+		//IF #file_exists = 0
 		if(fileExists == false) {
-//			LET #run_flag = 1
+			//LET #run_flag = 1
 			runFlag = true;		}
-//		ELSE
+		//ELSE
 		else {
-//			LET #run_flag = 0
+			//LET #run_flag = 0
 			runFlag = false;
-//		END-IF
+		//END-IF
 		}
 		return runFlag;
 	}
 	
 	/**
-	 * Get-Trigger-Data - from ZHRI100A.SQR
+	 * Get-Trigger-Data from ZHRI100A.SQR
 	 * This procedure will get the trigger data that needs to be interfaced
+	 * @param zhri100aFields
 	 */
-	public static PszTriggerEmployee getTriggerData(String adLegacyOperatorId, String adActionCode, Boolean poiFlag, Boolean isOkToProcess, String completionStatus) {
+	//TODO
+	//TODO
+	//TODO
+	public static void ZHRI100A_getTriggerData(Zhri100aFields zhri100aFields) {
 		//asOfToday
 		//sysDate
-		//adActionCode
-		//adLegOprId
 		//fileOpen
 		PszTriggerEmployee trigger = PszTriggerEmployee.createMockTriggerForEmployeeTermination();
 		Boolean adFound = false; //$AdFound  //TODO: where should this be set???
-		//Begin-Procedure Get-Trigger-Data
+		//BEGIN-PROCEDURE GET-TRIGGER-DATA
 		//LET $CompletionStatus = 'P'   !Initialize the CompletionStatus field
-		completionStatus = "P";
+		String completionStatus = "P";
 		//LET $PoiFlag = ''  !Initialize the POIFlag -- Surya Added - TEMPMAST 
 		//LET #WrkSequence = 0
 		//LET $AuditOprid = ''
@@ -1609,100 +1774,264 @@ public class ZHRI100A {
 		//LET #PSEffSeq = 0
 		//LET $WrkProcess= ''
 		//LET $WrkTaskFlag = ''
-		//Begin-Select loops=150
-		//RZ.SEQ_NBR
-		//MOVE &RZ.SEQ_NBR TO #WrkSequence
-		//RZ.OPRID
-		//LET $AuditOprid = Ltrim(Rtrim(&RZ.OPRID,' '),' ')
-		//RZ.EMPLID
-		//LET $PSEmplid = Ltrim(Rtrim(&RZ.EMPLID,' '),' ')
-		//Move $PSEmplid to #Wrk_EmplID1
-		//LET $Wrk_Emplid2 =  edit(#Wrk_EmplID1,'099999999')
-		//to_char(RZ.EFFDT, 'YYYY-MM-DD') &RZEFFDT
-		//LET $PSEffdt = &RZEFFDT
-		//RZ.EFFSEQ
-		//Move &RZ.EFFSEQ to #PSEffSeq
-		//RZ.PROC_NAME
-		//LET $WrkProcess = ltrim(rtrim(&RZ.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
-		//RZ.TASK_FLAG                                                        !Surya Added - TEMPMAST 
-		//LET $WrkTaskFlag = ltrim(rtrim(&RZ.TASK_FLAG,' '),' ')          !Surya Added - TEMPMAST 
-		//If $file_open = 'N'
-		//    !open $open_file1 as 1 for-append record=337
-		//    !LET $file_open = 'Y'
-		//End-If
-		//LET $PoiFlag = 'N'    !Surya Added - TEMPMAST 
-		//Do Check-If-Contractor
-		//If $Found = 'N'     !Not a contractor
-		//		and  $PSEmplid <> ''    ! not a blank emplid   ZHR_MOD_ZHRI100A_110A
-		//!CQ 103011 Added a check for 'ZHRI102A' - to see if corresponding row on JOB 
-		//	if $WrkProcess = 'ZHRI102A'                                       !CQ 103011
-		//  	Do Check-If-Correct102A                                        !CQ 103011                 
-		//      if $OK-to-process = 'Y'                                        !CQ 103011
-		//   		Do Call-Programs                                            !CQ 103011
-		//      else                                                           !CQ 103011
-		//         LET $CompletionStatus = 'C'                                 !CQ 103011
-		//         Do Update-Trigger-Row                                       !CQ 103011
-		//      end-if                                                         !CQ 103011
-		//	else
-		//      !Do Call-Programs        !Surya  - TEMPMAST  commented
-		//      !Surya Added - TEMPMAST - Start
-		//      if $WrkProcess = 'ZHRI101A' 
-		//    		do Check-if-POI-Termed
-		//        	if ($taskflag = 'C' OR $taskflag ='P')
-		//          	LET $CompletionStatus = 'W'
-		//          	Do Update-Trigger-Row
-		//        	else 
-		//          	Do Call-Programs                              
-		//        	end-if 
-		// 		else 
-		//    		Do Call-Programs               
-		//      end-if
-		//      !Surya Added - TEMPMAST - End
-		//	end-if
-		//Else
-		//	If $Found = 'Y'
-		// 		LET $CompletionStatus = 'C'
-		//	End-if
-		// 	IF  $PSEmplid = ''             !ZHR_MOD_ZHRI100A_110A
-		// 		LET $CompletionStatus = 'E'
-		// 	End-if
-		//End-If    !$Found = 'N'
-		//If $CompletionStatus <> 'P'
-		//	If ($ADAction_Code <> '') AND ($ADLegOprid <> '')
-		//   	!DO Check-Effdt-transaction
-		//     	IF $AdFound = 'N'
-		//  		!Do Build-Active-Dir-Output-File      10/14/2005  Jane Parks / ZHR_ZHRI100A_REMOVE_AD
-		//     	End-If
-		//	End-If
-		// 	Do Update-Trigger-Row
-		//End-If    !$CompletionStatus <> 'P'
-		//from PS_ZHRT_INTTRIGGER RZ ,PS_JOB JB
-		//where RZ.TASK_FLAG = 'P'
-		//  and (RZ.EFFDT <= $AsOfToday or RZ.PROC_NAME='ZHRI101A' or  RZ.PROC_NAME='ZHRI106A')
-		//  and (case when proc_name in ('ZHRI101A', 'ZHRI106A') then SEQ_NBR else SEQ_NBR*10 END) = 
-		//  (select min(case when proc_name in ('ZHRI101A', 'ZHRI106A') then SEQ_NBR else SEQ_NBR*10 END)  
-		//             from  PS_ZHRT_INTTRIGGER RZ2
-		//              where RZ2.EMPLID = RZ.EMPLID
-		//                and RZ2.TASK_FLAG = 'P'
-		//                and (RZ2.EFFDT <= SYSDATE or RZ2.PROC_NAME='ZHRI101A' or
-		//                     RZ2.PROC_NAME='ZHRI106A'))
-		//!                    and RZ2.TASK_FLAG = 'P'
-		//!                    and RZ2.EFFDT <= trunc(sysdate))
-		//!Surya  - TEMPMAST  Added the below NOT IN to restrict the rows other than 101 to process when there is a delay
-		// and RZ.EMPLID NOT IN (SELECT I.EMPLID FROM PS_ZHRT_INTTRIGGER I WHERE I.EMPLID = RZ.EMPLID AND I.TASK_FLAG = 'W') 
-		//  and JB.EMPLID = RZ.EMPLID
-		//  and JB.EFFDT = (SELECT MAX(JB2.EFFDT)
-		//                FROM  PS_JOB JB2
-		//               WHERE  JB2.EMPLID = JB.EMPLID
-		//                 AND  JB2.EMPL_RCD = JB.EMPL_RCD)
-		//  and JB.EFFSEQ = (SELECT MAX(JB3.EFFSEQ)
-		//                 FROM PS_JOB JB3
-		//                WHERE JB3.EMPLID = JB.EMPLID
-		//                 AND  JB3.EMPL_RCD = JB.EMPL_RCD
-		//                 AND  JB3.EFFDT = JB.EFFDT)
-		//End-Select
-		//End-Procedure Get-Trigger-Data
-		return trigger;
+		//BEGIN-SELECT LOOPS=150
+		//	RZ.SEQ_NBR
+		//	MOVE &RZ.SEQ_NBR TO #WrkSequence
+		//	RZ.OPRID
+		//	LET $AuditOprid = LTRIM(RTRIM(&RZ.OPRID,' '),' ')
+		//	RZ.EMPLID
+		//	LET $PSEmplid = LTRIM(RTRIM(&RZ.EMPLID,' '),' ')
+		//	MOVE $PSEmplid TO #Wrk_EmplID1
+		//	LET $Wrk_Emplid2 =  EDIT(#Wrk_EmplID1,'099999999')
+		//	TO_CHAR(RZ.EFFDT, 'YYYY-MM-DD') &RZEFFDT
+		//	LET $PSEffdt = &RZEFFDT
+		//	RZ.EFFSEQ
+		//	MOVE &RZ.EFFSEQ TO #PSEffSeq
+		//	RZ.PROC_NAME
+		//	LET $WrkProcess = LTRIM(RTRIM(&RZ.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
+		//	RZ.TASK_FLAG                                                        !Surya Added - TEMPMAST 
+		//	LET $WrkTaskFlag = LTRIM(RTRIM(&RZ.TASK_FLAG,' '),' ')          !Surya Added - TEMPMAST 
+		//IF $file_open = 'N'
+		Boolean fileIsOpen = false;
+		if(!fileIsOpen) {
+			//!open $open_file1 as 1 for-append record=337
+			//!LET $file_open = 'Y'
+			//do nothing
+		//END-IF
+		}
+		//LET $PoiFlag = 'N'  !Surya Added - TEMPMAST 
+		zhri100aFields.poiFlag = false;
+		//DO Check-If-Contractor
+		Boolean isContractor = PsJob.employeeIsContractor(trigger.getEmployeeId());
+		//IF $Found = 'N' AND  $PSEmplid <> ''  !Not a contractor and not a blank EmplId   !ZHR_MOD_ZHRI100A_110A
+		if(!isContractor && trigger.getEmployeeId() != null && !trigger.getEmployeeId().isEmpty()) {
+			//Added a check for 'ZHRI102A' - to see if corresponding row on JOB 
+			//IF $WrkProcess = 'ZHRI102A'
+			if("ZHRI102A".equalsIgnoreCase(trigger.getProcessName())) {
+				//DO Check-If-Correct102A
+				Boolean isOkToProcess = ZHRI100A_checkIfCorrect102A(trigger.getEmployeeId(), trigger.getEffectiveDate(), trigger.getProcessName());
+				//IF $OK-to-process = 'Y'
+				if(isOkToProcess) {
+					//DO Call-Programs
+					ZHRI100A_callPrograms(trigger, zhri100aFields);
+				}
+				//ELSE                                                           
+				else {
+					//LET $CompletionStatus = 'C'                                 
+					completionStatus = "C";
+					//DO Update-Trigger-Row                                       
+					int numberOfRecordsUpdated = PszTriggerEmployee.updateCompletionStatus(trigger.getSequenceNumber(), completionStatus);
+					System.out.println("numberOfRecordsUpdated: " + numberOfRecordsUpdated);
+					completionStatus = "P";     //!Reset the completion Status for next pass
+				//END-IF                                                         
+				}
+			}
+		}
+		//ELSE
+		else {
+			//IF $Found = 'Y'
+			if(isContractor) {
+				//LET $CompletionStatus = 'C'
+				completionStatus = "C";
+			//END-IF
+			}
+			//IF  $PSEmplid = ''
+			if(trigger.getEmployeeId() == null || trigger.getEmployeeId().isEmpty()) {
+				//LET $CompletionStatus = 'E'
+				completionStatus = "E";
+			//END-IF
+			}
+		//END-IF  !$Found = 'N'
+		}
+		//IF $CompletionStatus <> 'P'
+		if(!"P".equalsIgnoreCase(completionStatus)) {
+		//	IF ($ADAction_Code <> '') AND ($ADLegOprid <> '')
+			if(!zhri100aFields.adActionCode.isEmpty() && !zhri100aFields.adLegacyOperatorId.isEmpty()) {
+				//!DO Check-EffDt-Transaction
+				//do nothing
+				//IF $AdFound = 'N'
+				if(!adFound) {
+					//!DO Build-Active-Dir-Output-File	!ZHR_ZHRI100A_REMOVE_AD
+					//do nothing
+				//END-IF
+				}
+			//END-IF
+			}
+			//DO Update-Trigger-Row
+			int numberOfRecordsUpdated = PszTriggerEmployee.updateCompletionStatus(trigger.getSequenceNumber(), completionStatus);
+			System.out.println("numberOfRecordsUpdated: " + numberOfRecordsUpdated);
+		//END-IF  !$CompletionStatus <> 'P'
+		}
+		//FROM PS_ZHRT_INTTRIGGER RZ ,PS_JOB JB
+		//WHERE RZ.TASK_FLAG = 'P'
+		//	AND (RZ.EFFDT <= $AsOfToday or RZ.PROC_NAME='ZHRI101A' OR  RZ.PROC_NAME='ZHRI106A')
+		//  AND (CASE WHEN PROC_NAME IN ('ZHRI101A', 'ZHRI106A') THEN SEQ_NBR ELSE SEQ_NBR*10 END) = 
+		//  		(SELECT MIN(CASE WHEN PROC_NAME IN ('ZHRI101A', 'ZHRI106A') THEN SEQ_NBR ELSE SEQ_NBR*10 END)  
+		//      			FROM  PS_ZHRT_INTTRIGGER RZ2
+		//      			WHERE RZ2.EMPLID = RZ.EMPLID
+		//      				AND RZ2.TASK_FLAG = 'P'
+		//        				AND (RZ2.EFFDT <= SYSDATE
+		//								OR RZ2.PROC_NAME='ZHRI101A'
+		//								OR RZ2.PROC_NAME='ZHRI106A'))
+		//!Surya - TEMPMAST Added the below NOT IN to restrict the rows other than 101 to process when there is a delay
+		//	AND RZ.EMPLID NOT IN (SELECT I.EMPLID FROM PS_ZHRT_INTTRIGGER I WHERE I.EMPLID = RZ.EMPLID AND I.TASK_FLAG = 'W') 
+		//  AND JB.EMPLID = RZ.EMPLID
+		//  AND JB.EFFDT = 
+		//			(SELECT MAX(JB2.EFFDT) FROM  PS_JOB JB2
+		//         			WHERE  JB2.EMPLID = JB.EMPLID
+		//          			AND  JB2.EMPL_RCD = JB.EMPL_RCD)
+		//  AND JB.EFFSEQ = 
+		//			(SELECT MAX(JB3.EFFSEQ) FROM PS_JOB JB3
+		//                	WHERE JB3.EMPLID = JB.EMPLID
+		//                 		AND  JB3.EMPL_RCD = JB.EMPL_RCD
+		//                 		AND  JB3.EFFDT = JB.EFFDT)
+		//END-SELECT
+		//END-PROCEDURE GET-TRIGGER-DATA
+	}
+	
+	/**
+	 * Get-Legacy-OprId from ZHRI100A.SQR
+	 * Gets the new OprId from the legacy system
+	 * Formulates legacy OprId from HR036P where HR036P.H36EM# = #wrk_emplid and HR036P.H36INX = #indexNum UNION
+	 */
+	public static String ZHRI100A_getLegacyOprId(String employeeId, Integer indexNumber, Boolean poiFlag) {
+		//Begin-Procedure Get-Legacy-Oprid                !sree**10/04/01
+		//Let $LegEmplid = ''
+		String legacyEmployeeId;
+		String legacyEmployeeName;
+		//MOVE $Wrk_Emplid TO #wrk_emplid                 !sree***10/04/01
+		Integer employeeNumber = -1;
+		try {
+			employeeNumber = Integer.parseInt(employeeId);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		//!Surya Added - TEMPMAST Start
+		//IF $PoiFlag = 'N'
+		if(!poiFlag) {
+			indexNumber = 0;
+			//MOVE 0 TO #indexNum
+		//END-IF
+		}
+		//!Surya Added - TEMPMAST End
+		//Begin-Select
+		//CHR36.H36NAM                                               !Rakesh***08/02/2004
+		//CHR36.H36EMP                                               !Rakesh***08/02/2004
+		//CHR36.H36EM#                                               !Rakesh***08/02/2004
+		//from HR036P CHR36 where CHR36.H36EM# = #wrk_emplid and CHR36.H36INX = #indexNum 
+		//UNION SELECT ' ', ' ' , 9999999999 FROM DUAL
+		//END-SELECT
+		HR036P hr036P = HR036P.findByEmployeeNumberAndIndexNumber(employeeNumber, indexNumber);
+    	if(hr036P != null) {
+			//!This IF statement and OR part of Select is a workaround to some problem in v8
+			//!(gateway and new version of SQR).  The Select was hanging if it couldn't find a
+			//! match in HR036P, so the Select assures that the Select always finds a match.
+			//LET #WRK_CHR36_H36EM_NUM = &CHR36.H36EM#   !sm 07/12/02  !Rakesh***08/02/2004
+			//IF #WRK_CHR36_H36EM_NUM = #wrk_emplid                    !Rakesh***08/02/2004
+			if(hr036P.getEmployeeNumber() == employeeNumber) {
+				//LET $LegEmpName = &CHR36.H36NAM                        !Rakesh***08/02/2004
+				legacyEmployeeName = hr036P.getEmployeeName();
+				//DO Format-Employee-Name
+		    	if(legacyEmployeeName != null && !legacyEmployeeName.isEmpty()) {
+		    		legacyEmployeeName = erd.StringUtil.formatLegacyEmployeeNameToPeopleSoftEmployeeName(hr036P.getEmployeeName());
+		    	}
+				//LET $LegEmplid = &CHR36.H36EMP                         !Rakesh***08/02/2004
+	    		legacyEmployeeId = hr036P.getEmployeeId();
+				//LET $LegEmplid = substr($LegEmplid,1,5)
+		    	if(legacyEmployeeId != null && !legacyEmployeeId.isEmpty()) {
+		    		legacyEmployeeId = legacyEmployeeId.substring(0, 5);
+		    	}
+				//!DO Insert-Oprid  !Surya Added - TEMPMAST 
+				//!Surya Added - TEMPMAST Start
+				//IF #indexNum = 0
+		    	if(indexNumber == 0) {
+					//DO INSERT-OPRID
+		    		CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId(employeeId, indexNumber, employeeId);
+		    	}
+				//ELSE
+		    	else {
+					//DO UPDATE-OPRID
+		    		CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId(employeeId, indexNumber, employeeId);
+				//END-IF  
+		    	}
+				//!Surya Added - TEMPMAST End
+			//END-IF  !#WRK_CHR36_H36EM_NUM = #wrk_emplid
+			}
+			return hr036P.getEmployeeId();
+    	}
+    	return null;
+		//END-PROCEDURE GET-LEGACY-OPRID
+//		
+////		LET $LegEmplId = ''
+////		MOVE $Wrk_Emplid to #wrk_emplid
+////		IF $PoiFlag = 'N'
+//		if(!poiFlag) {
+////			MOVE 0 to #indexNum
+//			indexNumber = 0;
+////		END-IF
+//		}
+////		Begin-Select
+////		HR036P.H36NAM
+////		HR036P.H36EMP
+////		HR036P.H36EM#
+//		HR036P hr036P = HR036P.findByEmployeeIdAndIndexNumber(employeeId, indexNumber);
+////	  	!This IF statement and OR part of Select is a workaround to some problem in v8 (gateway and new version of SQR). 
+////		!The Select was hanging if it couldn't find a match in HR036P, so the Select assures that the Select always finds a match.
+////	  	LET #WRK_CHR36_H36EM_NUM = &HR036P.H36EM#
+////	  	IF #WRK_CHR36_H36EM_NUM = #wrk_emplid
+////	    	LET $LegEmpName = &HR036P.H36NAM
+////	    	DO Format-Employee-Name
+////	    	LET $LegEmplid = &HR036P.H36EMP
+////	    	LET $LegEmplid = SUBSTR($LegEmplid,1,5)
+////	    	IF (#indexNum = 0 and $PoiFlag = 'Y') OR $PoiFlag = 'N'
+////	    		DO Insert-OprId
+//		CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId(employeeId, indexNumber, employeeId);
+////	    	ELSE
+////	    		IF (#indexNum <> 0 AND $PoiFlag = 'Y')
+////	        		DO Update-OprId
+//					CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId(employeeId, indexNumber, employeeId);
+////	      		END-IF
+////	    	END-IF  
+////		END-IF    !#WRK_CHR36_H36EM_NUM = #wrk_emplid
+////		FROM HR036P
+////		WHERE HR036P.H36EM# = #wrk_emplid
+////		AND HR036P.H36INX = #indexNum 
+////		UNION
+////		SELECT
+////			' ', ' ' , 9999999999
+////		FROM DUAL
+////		End-Select
+////	  	LET #WRK_CHR36_H36EM_NUM = &HR036P.H36EM#
+//		HR036P hr036P = HR036P.findByEmployeeIdAndIndexNumber(employeeId, indexNumber);
+////	  	IF #WRK_CHR36_H36EM_NUM = #wrk_emplid
+//    	if(hr036P != null) {
+//	    	if(hr036P.getEmployeeName() != null && !hr036P.getEmployeeName().isEmpty()) {
+//	    		//LET $LegEmpName = &HR036P.H36NAM
+//	    		legacyEmployeeName = erd.StringUtil.formatLegacyEmployeeNameToPeopleSoftEmployeeName(hr036P.getEmployeeName());
+//    		}
+//	    	//LET $LegEmplid = SUBSTR($LegEmplid,1,5)
+//	    	if(hr036P.getEmployeeId() != null && !hr036P.getEmployeeId().isEmpty()) {
+//	    		legacyEmployeeId = hr036P.getEmployeeId().substring(0, 5);
+//	    		
+//    		}
+//	    	//IF (#indexNum = 0 AND $PoiFlag = 'Y') OR $PoiFlag = 'N'
+//	    	if((indexNumber == 0 && poiFlag) || !poiFlag) {
+//	    		//DO Insert-OprId
+//	    		CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId(employeeId, indexNumber, employeeId);
+//	    	//ELSE
+//	    	}
+//	    	else {
+//		    	//IF (#indexNum <> 0 AND $PoiFlag = 'Y')
+//		    	if(indexNumber != 0 && poiFlag) {
+//	    			//DO Update-OprId
+//	    		//END-IF
+//		    	}
+//		    //END-IF  
+//	    	}
+//			return hr036P.getEmployeeId();
+//		}
+//    	return null;
 	}
 
 }

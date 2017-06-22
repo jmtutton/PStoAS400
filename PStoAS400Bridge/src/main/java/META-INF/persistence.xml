@@ -51,6 +51,7 @@
         <class>erd.model.PszTriggerEmployee</class>
         <class>erd.model.PszTriggerNonPerson</class>
         <class>erd.model.PszTriggerSuperclass</class>
+        <class>erd.model.PszXlat</class>
 		<properties>
 <!--             <property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/> -->
 <!--             <property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@ppddbl44.corp.erac.com:1521:PS90HRQA"/> -->

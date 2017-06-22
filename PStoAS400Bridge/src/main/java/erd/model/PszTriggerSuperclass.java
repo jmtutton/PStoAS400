@@ -1,7 +1,6 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -43,7 +42,7 @@ abstract class PszTriggerSuperclass implements Serializable {
 	protected Date effectiveDate;
 	   
 	@Column(name = "EFFSEQ")
-	protected BigDecimal effectiveSequence;
+	protected Integer effectiveSequence;
 	   
 	@Column(name = "PROC_NAME")
 	protected String processName;  //TODO: make enum
@@ -69,7 +68,7 @@ abstract class PszTriggerSuperclass implements Serializable {
 	public Date getEffectiveDate() {
 		return effectiveDate;
 	}
-	public BigDecimal getEffectiveSequence() {
+	public Integer getEffectiveSequence() {
 		return effectiveSequence;
 	}
 	public String getProcessName() {
@@ -88,7 +87,7 @@ abstract class PszTriggerSuperclass implements Serializable {
 	public void setEffectiveDate(Date effectiveDate) {
 		this.effectiveDate = effectiveDate;
 	}
-	public void setEffectiveSequence(BigDecimal effectiveSequence) {
+	public void setEffectiveSequence(Integer effectiveSequence) {
 		this.effectiveSequence = effectiveSequence;
 	}
 	public void setProcessName(String processName) {
@@ -260,28 +259,28 @@ abstract class PszTriggerSuperclass implements Serializable {
 //		End-Procedure Get-Trigger-Data-NonEmp
 		return null;
 	}
-
-	public static int updateCompletionStatus(Integer seqNum, String status) {
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-		EntityManager em = emfactory.createEntityManager();
-		int numberOfRecordsUpdated = 0;
-	    try {
-	    	em.getTransaction().begin();
-	    	numberOfRecordsUpdated = em.createQuery(
-	    		    "UPDATE " + ENTITY_NAME + " SET completionStatus = UPPER(:status) WHERE sequenceNumber = :sequenceNumber")
-	    		    .setParameter("sequenceNumber", seqNum)
-	    		    .setParameter("status", status)
-	    		    .executeUpdate();
-//				//alternatively:
-//		    	TriggerEmployee trigger = em.find(TriggerEmployee.class, 1);
-//		    	trigger.setCompletionStatus(status);
-	    	em.getTransaction().commit();
-	    }
-	    catch (Exception e) {
-	       e.printStackTrace();
-	    }
-	    return numberOfRecordsUpdated;
-	}
+//
+//	public static int updateCompletionStatus(Integer seqNum, String status) {
+//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+//		EntityManager em = emfactory.createEntityManager();
+//		int numberOfRecordsUpdated = 0;
+//	    try {
+//	    	em.getTransaction().begin();
+//	    	numberOfRecordsUpdated = em.createQuery(
+//	    		    "UPDATE " + ENTITY_NAME + " SET completionStatus = UPPER(:status) WHERE sequenceNumber = :sequenceNumber")
+//	    		    .setParameter("sequenceNumber", seqNum)
+//	    		    .setParameter("status", status)
+//	    		    .executeUpdate();
+////				//alternatively:
+////		    	TriggerEmployee trigger = em.find(TriggerEmployee.class, 1);
+////		    	trigger.setCompletionStatus(status);
+//	    	em.getTransaction().commit();
+//	    }
+//	    catch (Exception e) {
+//	       e.printStackTrace();
+//	    }
+//	    return numberOfRecordsUpdated;
+//	}
 	
 	public enum CompletionStatusCode {
 		P ("pending"), C ("completed"), E ("error");
