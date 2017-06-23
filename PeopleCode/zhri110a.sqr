@@ -14,9 +14,9 @@
 !*
 !*  Table                  Description                            Access
 !*  PS_ZHRT_INTTRIGGER     Interface Trigger                      Select, Delete
-!*  PS_ZHRT_HISTRIGGER     Interface Trigger History              Insert, Delete                           ------
-!*
-!*
+!*  PS_ZHRT_HISTRIGGER     Interface Trigger History              Insert, Delete                          
+!*  PS_ZHRT_ALTTRIGGER     Alternate Interface Trigger            Select, Delete
+!*  PS_ZHRT_HISALTTRIG     Alternate Interface Trigger History    Insert, Delete 
 !*
 !*  Input/output Files:
 !*
@@ -45,7 +45,16 @@
 !			-Added displays to track section movement.
 !
 !**********************************************************************
-!
+!  05/10/2017  Surya Sobha    TEMPMAST Phase 2
+!                             Modified the program include the Alternate trigger table to the purge
+!                             Added the below procedures -
+!                             Process-Main-Alt
+!                             Update-History-Row-Alt
+!                             Delete-Trigger-Record-Alt
+!                             Delete-History-Row-Alt
+!                             Delete-Orphan-Rows 
+!                             Delete-Blank-NEW-Emplid
+!**********************************************************************
 #include 'setenv.sqc' !Set environment
 
 begin-program
@@ -61,6 +70,17 @@ begin-program
   Do Process-Main
   Display '- Entering Delete-History-Row...'				! 07/29/2008  
   Do Delete-History-Row
+  
+  Do Delete-Orphan-Rows     !Surya Sobha Added 05/10/2017 - Tempmast Phase 2.0            
+  Display '- Entering Delete-Orphan-Rows...'        !Surya Sobha Added 05/10/2017 - Tempmast Phase 2.0
+  Do Delete-Blank-NEW-Emplid !Surya Sobha Added 05/10/2017 - Tempmast Phase 2.0
+  Display '- Entering Delete-Blank-NEW-Emplid ...'  !Surya Sobha Added 05/10/2017 - Tempmast Phase 2.0
+  
+  Display '- Entering Process-Main-Alt...'		      !Surya Sobha Added 05/10/2017 - Tempmast Phase 2.0 			
+  Do Process-Main-Alt                               !Surya Sobha Added 05/10/2017 - Tempmast Phase 2.0 
+  Display '- Entering Delete-History-Row-Alt...'		!Surya Sobha Added 05/10/2017 - Tempmast Phase 2.0 	 
+  Do Delete-History-Row-Alt                         !Surya Sobha Added 05/10/2017 - Tempmast Phase 2.0 
+  
 !
   Do Reset                       					! RESET.SQC, Reset printer & print 'End of Report'
   Do Stdapi-Term                      					! STDAPI.SQC, Process Scheduler Interface, executes EOJ.SQC
@@ -84,6 +104,16 @@ Begin-Procedure Process-Main
   Display 'Entered Process-Main.'
   #endif
 !											! 07/29/2008- End
+
+!Surya Sobha Added 05/10/2017 - Tempmast Phase 2.0 
+Let #WrkSequence = 0
+Let $WrkOprid = ''
+Let $WrkEffdt = ''
+Let #WrkFSeq = 0
+Let $WrkProc = ''
+Let $WrkTask = ''
+!Surya Sobha Added 05/10/2017 - Tempmast Phase 2.0 
+
 Begin-Select
 
 RZ.SEQ_NBR
@@ -102,13 +132,13 @@ RZ.TASK_FLAG
     Move &RZ.TASK_FLAG to $WrkTask
 
     Do Check-old-enough($AsOfToday,$WrkEffdt,#num_days)
-
     If #num_days > 30
         Do Update-History-Row
     End-if    !#num_days > 30
 
 FROM PS_ZHRT_INTTRIGGER RZ
-where RZ.TASK_FLAG <> 'P'    						!ZHR_MOD_ZHRI100A_110A
+!where RZ.TASK_FLAG <> 'P'    						!ZHR_MOD_ZHRI100A_110A !Commented 05/10/2017 - Tempmast Phase 2.0 
+where RZ.TASK_FLAG NOT IN  ('P','W')      !Surya Sobha Added 05/10/2017 - Tempmast Phase 2.0 
 order by seq_nbr
 End-Select
 
@@ -256,6 +286,234 @@ End-SQL
 !											! 07/29/2008- End
 End-Procedure Delete-History-Row
 
+!Surya Sobha Added 05/10/2017 - Tempmast Phase 2.0 
+
+!----------------------------------------------------------------------
+! Erac
+! Procedure:  Delete-Orphan-Rows
+! Desc:  Deletes all orphan rows less than 90 days
+!        created on PS_ZHRT_INTTRIGGER when POIs are added
+!----------------------------------------------------------------------
+
+Begin-procedure Delete-Orphan-Rows
+!											
+  #ifdef debug
+  Display 'Entering Delete-Orphan-Rows.'
+  #endif
+!										
+Begin-SQL
+
+DELETE FROM PS_ZHRT_INTTRIGGER TRG
+WHERE  NOT EXISTS (SELECT DISTINCT 'X' FROM PS_JOB J WHERE J.EMPLID = TRG.EMPLID 
+                            and J.EFFDT = (SELECT MAX(J1.EFFDT) FROM PS_JOB J1
+                            WHERE J1.EMPLID = J.EMPLID
+                            AND J1.EMPL_RCD= J.EMPL_RCD
+                            AND J1.EFFDT <= SYSDATE))
+AND TRG.TASK_FLAG = 'P'
+AND TRG.EMPLID <> 'NEW' 
+AND TRG.EMPLID <> ' '
+AND TRG.EFFDT  <= SYSDATE -90  
+
+End-SQL
+!											
+  #ifdef debug
+  Display 'Exiting Delete-Orphan-Rows.'
+  #endif
+!										
+End-procedure Delete-Orphan-Rows
+
+!----------------------------------------------------------------------
+! Erac
+! Procedure:  Delete-Blank-NEW-Emplid
+! Desc:  Deletes all rows with BLANK or NEW Emplid which is older 
+!        than 180 days
+!----------------------------------------------------------------------
+
+Begin-procedure Delete-Blank-NEW-Emplid
+!											
+  #ifdef debug
+  Display 'Entering Delete-Blank-NEW-Emplid.'
+  #endif
+!										
+Begin-SQL
+
+DELETE FROM PS_ZHRT_INTTRIGGER TR
+WHERE TR.TASK_FLAG = 'P'
+AND (TR.EMPLID = 'NEW' 
+OR TR.EMPLID = ' ')
+AND TR.EFFDT <= SYSDATE - 180 
+
+End-SQL
+!											
+  #ifdef debug
+  Display 'Exiting Delete-Blank-NEW-Emplid.'
+  #endif
+!										
+End-procedure Delete-Blank-NEW-Emplid
+
+!----------------------------------------------------------------------
+! ERAC
+! Procedure:  Process-Main-Alt
+! Desc:  This is the process controling procedure.
+!----------------------------------------------------------------------
+
+Begin-Procedure Process-Main-Alt
+!											
+  #ifdef debug
+  Display 'Entered Process-Main-Alt.'
+  #endif
+!	
+
+Let #WrkSequence = 0
+Let $WrkOprid = ''
+Let $WrkEffdt = ''
+Let #WrkFSeq = 0
+Let $WrkProc = ''
+Let $WrkTask = ''
+Let #SeqNo = 0
+										
+Begin-Select
+
+AZ.SEQ_NBR
+    Move &AZ.SEQ_NBR TO #WrkSequence
+AZ.OPRID
+    Move &AZ.OPRID TO $WrkOprid
+AZ.EMPLID
+    Move &AZ.EMPLID to $WrkEmplid
+AZ.EFFDT
+    Let $WrkEffdt = &AZ.EFFDT
+AZ.EFFSEQ
+    Move &AZ.EFFSEQ to #WrkFSeq
+AZ.PROC_NAME
+    Move &AZ.PROC_NAME to $WrkProc
+AZ.TASK_FLAG
+    Move &AZ.TASK_FLAG to $WrkTask
+AZ.SEQUENCE
+    Move &AZ.SEQUENCE TO #SeqNo
+
+    Do Check-old-enough($AsOfToday,$WrkEffdt,#num_days)
+    If #num_days > 30
+        Do Update-History-Row-Alt
+    End-if    !#num_days > 30
+
+FROM PS_ZHRT_ALTTRIGGER AZ
+where AZ.TASK_FLAG <> 'P'  					
+order by AZ.SEQ_NBR
+End-Select
+
+
+Do Delete-Trigger-Record-Alt
+
+!											
+  #ifdef debug
+  Display 'Exiting Process-Main-Alt.'
+  #endif
+!											
+End-Procedure Process-Main-Alt
+
+!----------------------------------------------------------------------
+! Erac
+! Procedure:  Update-History-Row-Alt
+! Desc:  This will update the history table with the data from the trigger
+!        table and the current (or archive) date and remove it from the trigger table
+!----------------------------------------------------------------------
+
+Begin-procedure Update-History-Row-Alt
+!											
+  #ifdef debug
+  Display 'Entering Update-History-Row_Alt.'
+  #endif
+!											
+Begin-SQL
+Insert into PS_ZHRT_HISALTTRIG 
+  (SEQ_NBR,
+  OPRID,
+  EMPLID,
+  EFFDT,
+  EFFSEQ,
+  PROC_NAME,
+  TASK_FLAG,
+  SEQUENCE,
+  Archive_DT)
+values (
+  #WrkSequence,
+  $WrkOprid,
+  $WrkEmplid,
+  $WrkEffdt,
+  #WrkFSeq,
+  $WrkProc,
+  $WrkTask,
+  #SeqNo,
+  $AsOfToday)
+
+End-SQL
+
+!											
+  #ifdef debug
+  Display 'Exiting Update-History-Row-Alt.'
+  #endif
+!										
+End-procedure Update-History-Row-Alt
+
+
+!----------------------------------------------------------------------
+! Erac
+! Procedure:  Delete-Trigger-Record-Alt
+! Desc:  Deletes all trigger records where the sequence number exists in the history file
+!----------------------------------------------------------------------
+
+Begin-procedure Delete-Trigger-Record-Alt
+!											
+  #ifdef debug
+  Display 'Entering Delete-Trigger-Record.'
+  #endif
+!										
+Begin-SQL
+
+DELETE from PS_ZHRT_ALTTRIGGER 
+  WHERE SEQ_NBR IN (SELECT SEQ_NBR FROM PS_ZHRT_HISALTTRIG)
+
+End-SQL
+!											
+  #ifdef debug
+  Display 'Exiting Delete-Trigger-Record-Alt.'
+  #endif
+!										
+End-procedure Delete-Trigger-Record-Alt
+
+
+!----------------------------------------------------------------------
+! Erac
+! Procedure:  Delete-History-Row-Alt
+! Desc:  Deletes all History Records that have been on file at least one year.
+!------------------------------------------------------------------------
+
+Begin-Procedure Delete-History-Row-Alt
+!											
+  #ifdef debug
+  Display 'Entering Delete-History-Row-Alt.'
+  #endif
+!											
+Let #Year = substr($AsOfToday,8,4)
+Let #Year = #Year - 1
+Let $Year = #Year
+Let $Year = Substr($Year, 1, 4)
+Let $PurgeDt = Substr($AsOfToday,1,7) || $Year
+
+Begin-SQL
+
+DELETE from PS_ZHRT_HISALTTRIG 
+    WHERE Archive_DT < $PurgeDt
+
+End-SQL
+!											
+  #ifdef debug
+  Display 'Exiting Delete-History-Row-Alt.'
+  #endif
+!											
+End-Procedure Delete-History-Row-Alt
+
+!Surya Sobha End 05/10/2017 - Tempmast Phase 2.0 
 
 !***********************************************************************
 #Include 'curdttim.sqc'  !Get-Current-DateTime procedure
