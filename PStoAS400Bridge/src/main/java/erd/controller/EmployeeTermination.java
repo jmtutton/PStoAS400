@@ -2,11 +2,13 @@ package erd.controller;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import erd.model.AS400Package;
+import erd.model.ActionFields;
 import erd.model.CrossReferenceTerminationReason;
 import erd.model.PsActionReason;
 import erd.model.PsJob;
@@ -18,10 +20,6 @@ import erd.model.Zhri100aFields;
  * PeopleCode filename ZHRI102A.SQC
  * Update the Legacy files which where modified by the HR program ZHRI102A.  
  * Only specific fields will be updated, those which were changed on the AAHR02 screen.
- * Tables Used:
- *        PsJob									PS_Job                       Job Table
- *        PsActionReason						PS_Action Reason             Action Reason Table
- *        CrossReferenceTerminationReason		PS_ZHRT_TRMRS_CREF           Termination Reason Cross Reference Table
  * @author John Tutton john@tutton.net
  */
 
@@ -30,6 +28,7 @@ public class EmployeeTermination {
 	PszTriggerEmployee trigger;
 	PsJob psJob;
 	Zhri100aFields zhri100aFields;
+	ActionFields actionFields;
 	
 	public EmployeeTermination(PszTriggerEmployee trigger, Zhri100aFields zhri100aFields) {
 		this.trigger = trigger;
@@ -52,18 +51,19 @@ public class EmployeeTermination {
              Audit Operator ID
              Termination Reason
 	 */
-	String psTerminationMonth; //$PSTermMnth  //Two digit representation of month
-	String psTerminationDay; //$PsTermDay  //Two digit representation of day
-	String psTerminationYear; //$PSTermYr  //Four digit representation of year
-	String psRehireMonth; //$PSReHireMnth  //Two digit representation of month
-	String psRehireDay; //$PSReHireDay  //Two digit representation of day
-	String psRehireYear; //$PSReHireYr  //Four digit representation of year
-	String psVoluntaryOrInvoluntary; //$PSVolInvol
-	String psTerminationCode; //$PSTermCode
-	String psTerminationReason; //$PSTermReason is at most 30 positions long, but HRZ102A receives it with a length of 35 positions; needs to be padded to 35
+//	String psTerminationMonth; //$PSTermMnth  //Two digit representation of month
+//	String psTerminationDay; //$PsTermDay  //Two digit representation of day
+//	String psTerminationYear; //$PSTermYr  //Four digit representation of year
+//	String psRehireMonth; //$PSReHireMnth  //Two digit representation of month
+//	String psRehireDay; //$PSReHireDay  //Two digit representation of day
+//	String psRehireYear; //$PSReHireYr  //Four digit representation of year
+//	
+//	String psVoluntaryOrInvoluntary; //$PSVolInvol
+//	String psTerminationCode; //$PSTermCode
+//	String psTerminationReason; //$PSTermReason is at most 30 positions long, but HRZ102A receives it with a length of 35 positions; needs to be padded to 35
 
-	Date terminationDate;
-	Date rehireDate;
+//	Date terminationDate;
+//	Date rehireDate;
 	
 //	String psAction; //$PSAction
 //	String psActionReason; //$PSAction_Reason
@@ -166,56 +166,52 @@ public class EmployeeTermination {
 			completionStatus = HR02_processData(trigger.getEmployeeId(), psJob);
 		//END-IF    !$PSEmpl <> '' and $PSEmpl <> ' '
 		}
+		makeAS400PackageForHRZ102AProcess(zhri100aFields, actionFields);
+		makeAS400PackageForErrorProcess(trigger.getProcessName(), zhri100aFields);
 		return completionStatus;
 	}
 	
 	/**
-	 * HR02-Process-Data - from ZHRI102A.SQC
+	 * HR02-Process-Data from ZHRI102A.SQC
 	 * This routine moves 'N' to change address parameter and calls the RPG program.
+	 * @param employeeId
+	 * @param psJob
+	 * @return
 	 */
 	private String HR02_processData(String employeeId, PsJob psJob) {
 		String completionStatus = "E";
 		//LET $PSChange = 'N'
 		//Boolean psChange = false; //not used
-		//IF ($PSAction = 'REH') AND ($PSAction_Reason = 'REH')
+
 		//Rehire
+		//IF ($PSAction = 'REH') AND ($PSAction_Reason = 'REH')
 		if("REH".equals(psJob.getAction()) && "REH".equals(psJob.getActionReason())) {
 			//LET $PSRehireYr = substr($PSDate,1,4)
-			psRehireYear = new SimpleDateFormat("yyyy").format(psJob.getEffectiveDate());
+			actionFields.setRehireYear(new SimpleDateFormat("yyyy").format(psJob.getEffectiveDate()));
 			//LET $PSRehireMnth = substr($PSDate,6,2)
-			psRehireMonth = new SimpleDateFormat("mm").format(psJob.getEffectiveDate());
+			actionFields.setRehireMonth(new SimpleDateFormat("mm").format(psJob.getEffectiveDate()));
 			//LET $PSRehireDay = substr($PSDate,9,2)
-			psRehireDay = new SimpleDateFormat("dd").format(psJob.getEffectiveDate());
+			actionFields.setRehireDay(new SimpleDateFormat("dd").format(psJob.getEffectiveDate()));
 		//END-IF
 		}
+		
 		//Termination
 		//IF ($psAction = 'TER' OR $psAction = 'RET' OR $psAction = 'TWP' OR $psAction = 'TWB')
 		if("TER".equals(psJob.getAction()) || "RET".equals(psJob.getAction()) || "TWP".equals(psJob.getAction()) || "TWB".equals(psJob.getAction())) {
 			//LET $PSTermYr = substr($PSDate,1,4)
-			psTerminationYear = new SimpleDateFormat("yyyy").format(psJob.getEffectiveDate());
+			actionFields.setTerminationYear(new SimpleDateFormat("yyyy").format(psJob.getEffectiveDate()));
 			//LET $PSTermMnth = substr($PSDate,6,2)
-			psTerminationMonth = new SimpleDateFormat("mm").format(psJob.getEffectiveDate());
+			actionFields.setTerminationMonth(new SimpleDateFormat("mm").format(psJob.getEffectiveDate()));
 			//LET $PSTermDay = substr($PSDate,9,2)
-			psTerminationDay = new SimpleDateFormat("dd").format(psJob.getEffectiveDate());
+			actionFields.setTerminationDay(new SimpleDateFormat("dd").format(psJob.getEffectiveDate()));
 		//END-IF
 		}
+		
 		//DO Remove-Non-Letters-Numbers ($PSTermReason, $PSTermReason)        !ZRmvSpcChr.sqc
-		psTerminationReason = psTerminationReason.replaceAll("[^a-zA-Z0-9]", "");
+		actionFields.setTerminationReason(actionFields.getTerminationReason().replaceAll("[^a-zA-Z0-9]", ""));
 		//DO HR02-Trim-Parameters     !Routine to trim the parameters to insure that there are not a larger number of blanks being passed
-		//HR02TrimParameters();
-		String command = "\"CALL " + zhri100aFields.as400Library + "/HRZ102A " + "Parm('" + employeeId + "' '"
-				+ psTerminationMonth + "' '"
-        		+ psTerminationDay + "' '"
-        		+ psTerminationYear + "' '"
-        		+ psRehireMonth + "' '"
-        		+ psRehireDay + "' '"
-        		+ psRehireYear + "' '"
-        		+ psVoluntaryOrInvoluntary + "' '"
-        		+ psTerminationCode + "' '"
-        		+ zhri100aFields.auditOperatorId + "' '"
-        		+ psTerminationReason + "'";
-		//LET $Part1 = '"CALL ' || $Library ||'/HRZ102A '
-		//LET $Command = $Part1||$Part2
+		HR02_trimParameters();
+		String command = makeAS400PackageForHRZ102AProcess(zhri100aFields, actionFields);
 		//DO Call-System   !From ZHRI100A.SQR
 		Integer status = ZHRI100A.ZHRI100A_callSystem(command, zhri100aFields);
 		//IF (#Status = 0)
@@ -231,114 +227,137 @@ public class EmployeeTermination {
 	 * HR02-Trim-Parameters - from ZHRI102A.SQC
 	 * This routine trims all leading and trailing blanks from the data.
 	 */
-	private void HR02TrimParameters() {
-//		LET $PSAuditOperId= RTRIM(LTRIM($PSAuditOperId,' '),' ')
-//		LET $PSEmpl = RTRIM(LTRIM($PSEmpl,' '),' ')
-//		LET $PSTermMnth = RTRIM(LTRIM($PSTermMnth,' '),' ')
-//		LET $PsTermDay = RTRIM(LTRIM($PsTermDay,' '),' ')
-//		LET $PSTermYr = RTRIM(LTRIM($PSTermYr,' '),' ')
-//		LET $PSReHireMnth = RTRIM(LTRIM($PSReHireMnth,' '),' ')
-//		LET $PSReHireDay = RTRIM(LTRIM($PSReHireDay,' '),' ')
-//		LET $PSReHireYr = RTRIM(LTRIM($PSReHireYr,' '),' ')
-//		LET $PSState = RTRIM(LTRIM($PSState,' '),' ')
-//		LET $PSZip = RTRIM(LTRIM($PSZip,' '),' ')
-//		LET $PSVolInvol = RTRIM(LTRIM($PSVolInvol,' '),' ')
-//		LET $PSTermCode = RTRIM(LTRIM($PSTermCode,' '),' ')
-//		LET $PSTermReason = RTRIM(LTRIM($PSTermReason,' '),' ')
-//		! $PSTermReason is at most 30 positions long, but HRZ102A receives it with a length of 35 positons.
-//		LET $PSTermReason = Rpad($PSTermReason,35,' ')  !Make sure not less than 35 long
+	private void HR02_trimParameters() {
+		//LET $PSAuditOperId= RTRIM(LTRIM($PSAuditOperId,' '),' ')
+		//LET $PSEmpl = RTRIM(LTRIM($PSEmpl,' '),' ')
+		//LET $PSTermMnth = RTRIM(LTRIM($PSTermMnth,' '),' ')
+		//LET $PsTermDay = RTRIM(LTRIM($PsTermDay,' '),' ')
+		//LET $PSTermYr = RTRIM(LTRIM($PSTermYr,' '),' ')
+		//LET $PSReHireMnth = RTRIM(LTRIM($PSReHireMnth,' '),' ')
+		//LET $PSReHireDay = RTRIM(LTRIM($PSReHireDay,' '),' ')
+		//LET $PSReHireYr = RTRIM(LTRIM($PSReHireYr,' '),' ')
+		//LET $PSState = RTRIM(LTRIM($PSState,' '),' ')
+		//LET $PSZip = RTRIM(LTRIM($PSZip,' '),' ')
+		//LET $PSVolInvol = RTRIM(LTRIM($PSVolInvol,' '),' ')
+		//LET $PSTermCode = RTRIM(LTRIM($PSTermCode,' '),' ')
+		//LET $PSTermReason = RTRIM(LTRIM($PSTermReason,' '),' ')
+		//! $PSTermReason is at most 30 positions long, but HRZ102A receives it with a length of 35 positons.
+		//LET $PSTermReason = Rpad($PSTermReason,35,' ')  !Make sure not less than 35 long
 	}
 	
 	/**
 	 * HR02-Get-Job - from ZHRI102A.SQC
 	 * This routine will the Job Data row for each of the employee numbers entered in the trigger file.
+	 * @param employeeId
+	 * @param effectiveDate
+	 * @param effectiveSequence
+	 * @return
 	 */
 	private PsJob HR02_getJob(String employeeId, Date effectiveDate, Integer effectiveSequence) {
 		PsJob psJob = PsJob.HR02_getJob(employeeId, new java.util.Date(effectiveDate.getTime()), effectiveSequence);
-//		LET $PSAction = &PS_Job.ACTION
-//		psAction = psJob.getAction();
-//	   	LET $PSAction_Reason = &PS_Job.ACTION_REASON
-//		psActionReason = psJob.getActionReason();
-//	   	LET $PSLocation = &PS_Job.Location
-//		psLocation = psJob.getLocation();
-//	   	LET $PSCompany = &PS_Job.Company
-//		psCompany = psJob.getCompany();
-//	   	LET $PSBusinessUnit = &PS_Job.Business_Unit
-//		psBusinessUnit = psJob.getBusinessUnit();
-//	   	LET $PSEmplClass = &PS_Job.Empl_Class
-//		psEmplClass = psJob.getEmplClass();
-//	   	LET $PSEmplStatus = &PS_Job.Empl_Status
-//		psEmplStatus = psJob.getEmplStatus();
-//	   	LET $PSDeptId = &PS_Job.DeptId
-//		psDeptId = psJob.getDeptId();
-//	   	LET $PSJobCode = &PS_Job.JobCode
-//		psJobCode = psJob.getJobCode();
-//	   	LET $Wrk_AD_JobDataBuild = 'Y'
-//		wrkAdJobDataBuild = true;
-//	   	IF $PSAction <> 'REH'
+		//LET $PSAction = &PS_Job.ACTION
+		//psAction = psJob.getAction();
+		//LET $PSAction_Reason = &PS_Job.ACTION_REASON
+		//psActionReason = psJob.getActionReason();
+		//LET $PSLocation = &PS_Job.Location
+		//psLocation = psJob.getLocation();
+		//LET $PSCompany = &PS_Job.Company
+		//psCompany = psJob.getCompany();
+		//LET $PSBusinessUnit = &PS_Job.Business_Unit
+		//psBusinessUnit = psJob.getBusinessUnit();
+		//LET $PSEmplClass = &PS_Job.Empl_Class
+		//psEmplClass = psJob.getEmplClass();
+		//LET $PSEmplStatus = &PS_Job.Empl_Status
+		//psEmplStatus = psJob.getEmplStatus();
+		//LET $PSDeptId = &PS_Job.DeptId
+		//psDeptId = psJob.getDeptId();
+		//LET $PSJobCode = &PS_Job.JobCode
+		//psJobCode = psJob.getJobCode();
+		//LET $Wrk_AD_JobDataBuild = 'Y'
+		//wrkAdJobDataBuild = true;
+		//IF $PSAction <> 'REH'
 		if(!"REH".equalsIgnoreCase(psJob.getAction())) {
-//	        DO HR02-Get-Action-Reason
-			psJob.setActionReason(HR02_getActionReason(employeeId, psJob.getAction(), psJob.getActionReason()));
-//	   	END-IF    !$PSAction <> 'REH'
+			//DO HR02-Get-Action-Reason
+			actionFields = HR02_getActionReason(psJob);
+		//END-IF    !$PSAction <> 'REH'
 		}
 		return psJob;
 	}
 
 	/**
-	 * HR02-Get-Action-Reason - from ZHRI102A.SQC
+	 * HR02-Get-Action-Reason from ZHRI102A.SQC
 	 * This routine will determine if a termination was voluntary or involuntary based on Action and Action Reason codes.
-	 * @return 
+	 * @param psJob
+	 * @return
 	 */
-	private String HR02_getActionReason(String employeeId, String psAction, String psActionReason) {
-//		LET $Found = 'N'   !Initialize the record found variable
+	private ActionFields HR02_getActionReason(PsJob psJob) {
+		ActionFields actionFields = new ActionFields();
+		//LET $Found = 'N'   !Initialize the record found variable
 		Boolean found = false;
-//		BEGIN-SELECT
-		CrossReferenceTerminationReason terminationReason = CrossReferenceTerminationReason.findByActionAndActionReasonAndStatus(psAction, psActionReason, "A");
+		//BEGIN-SELECT
+		CrossReferenceTerminationReason terminationReason = CrossReferenceTerminationReason.findByActionAndActionReasonAndStatus(psJob.getAction(), psJob.getActionReason(), "A");
 		if(terminationReason != null) {
-	//		PS_ZHRT_TRMRS_CREF.ZHRF_LEGTERMCD
-	//		LET $PSVolInvol = &PS_ZHRT_TRMRS_CREF.ZHRF_LEGTERMCD
-			psVoluntaryOrInvoluntary = terminationReason.getLegacyTerminationCode();
-	//		PS_ZHRT_TRMRS_CREF.ZHRF_LEGTERMRSN
-	//		LET $PSTermCode = &PS_ZHRT_TRMRS_CREF.ZHRF_LEGTERMRSN
-			psTerminationCode = terminationReason.getLegacyTerminationReason();
-	//		IF $PSTermCode = 'O' AND $PSAction = 'TER'
-			if("O".equalsIgnoreCase(psTerminationCode) && "TER".equalsIgnoreCase(psAction)) {
-	//			DO HR02-Get-Reason-Description
-				psTerminationReason = PsActionReason.findReasonDescriptionByActionAndActionReason(psAction, psActionReason);
-	//		END-IF    !$PSTermCode = 'O'
+			//PS_ZHRT_TRMRS_CREF.ZHRF_LEGTERMCD
+			//LET $PSVolInvol = &PS_ZHRT_TRMRS_CREF.ZHRF_LEGTERMCD
+			actionFields.setVoluntaryOrInvoluntary(terminationReason.getLegacyTerminationCode());
+			//PS_ZHRT_TRMRS_CREF.ZHRF_LEGTERMRSN
+			//LET $PSTermCode = &PS_ZHRT_TRMRS_CREF.ZHRF_LEGTERMRSN
+			actionFields.setTerminationCode(terminationReason.getLegacyTerminationReason());
+			//IF $PSTermCode = 'O' AND $PSAction = 'TER'
+			if("O".equalsIgnoreCase(actionFields.getTerminationCode()) && "TER".equalsIgnoreCase(psJob.getAction())) {
+				//DO HR02-Get-Reason-Description
+				actionFields.setTerminationReason(PsActionReason.findReasonDescriptionByActionAndActionReason(psJob.getAction(), psJob.getActionReason()));
+			//END-IF    !$PSTermCode = 'O'
 			}
-	//		LET $Found = 'Y'     !Mark that a record was found
-	//		FROM PS_ZHRT_TRMRS_CREF PS_ZHRT_TRMRS_CREF
-	//		WHERE PS_ZHRT_TRMRS_CREF.STATUS = 'A'
-	//			AND PS_ZHRT_TRMRS_CREF.ACTION = $PSAction
-	//			AND PS_ZHRT_TRMRS_CREF.ACTION_REASON = $PSAction_Reason
-	//		END-SELECT
+			//LET $Found = 'Y'     !Mark that a record was found
+			//FROM PS_ZHRT_TRMRS_CREF PS_ZHRT_TRMRS_CREF
+			//WHERE PS_ZHRT_TRMRS_CREF.STATUS = 'A'
+			//	AND PS_ZHRT_TRMRS_CREF.ACTION = $PSAction
+			//	AND PS_ZHRT_TRMRS_CREF.ACTION_REASON = $PSAction_Reason
+			//END-SELECT
 			found = true;
 		}
-//		IF $Found = 'N'
+		//IF $Found = 'N'
 		if(!found) {
-//			LET $ErrorMessageParm = 'Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF'
+			//LET $ErrorMessageParm = 'Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF'
 			zhri100aFields.errorMessageParameter = "Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF";
-//			DO Call-Error-Routine       !From ZHRI100A.SQR
-			ZHRI100A.ZHRI100A_callErrorRoutine(zhri100aFields);
-//			!Default the Action and reason in the legacy system
-//			LET $PSVolInvol = 'V'
-			psVoluntaryOrInvoluntary = "V";
-//			LET $PSTermCode = 'O'
-			psTerminationCode = "O";
-//			LET $PSTermReason = 'ACTION REASON NOT SELECTED IN PS'
-			psTerminationReason = "ACTION REASON NOT SELECTED IN PS";
-//		END-IF    !$Found = 'N'
+			//DO Call-Error-Routine       !From ZHRI100A.SQR
+			ZHRI100A.ZHRI100A_callErrorRoutine("HRZ102A", zhri100aFields);
+			//!Default the Action and reason in the legacy system
+			//LET $PSVolInvol = 'V'
+			actionFields.setVoluntaryOrInvoluntary("V");
+			//LET $PSTermCode = 'O'
+			actionFields.setTerminationCode("O");
+			//LET $PSTermReason = 'ACTION REASON NOT SELECTED IN PS'
+			actionFields.setTerminationReason("ACTION REASON NOT SELECTED IN PS");
+		//END-IF    !$Found = 'N'
 		}
-		return psActionReason;
+		return actionFields;
 	}
 	
 	/**
+	 * 
+	 * @param zhri100aFields
+	 * @param actionFields
 	 */
-	private void makeAS400PackageForHRZ102AProcess() {
+	private String makeAS400PackageForHRZ102AProcess(Zhri100aFields zhri100aFields, ActionFields actionFields) {
 		String processName = "HRZ102A";
-		
 		List<String> parameterList = new ArrayList<String>();
+		HashMap<String, String> parameterMap = new HashMap<String, String>();
+		
+		String command = "\"CALL " + zhri100aFields.as400Library + "/" + processName + " " 
+				+ "PARM('" + zhri100aFields.employeeId + "' "
+				+ "'" + actionFields.getTerminationMonth() + "' "
+				+ "'" + actionFields.getTerminationDay() + "' "
+				+ "'" + actionFields.getTerminationYear() + "' "
+				+ "'" + actionFields.getRehireMonth() + "' "
+				+ "'" + actionFields.getRehireDay() + "' "
+				+ "'" + actionFields.getRehireYear() + "' "
+				+ "'" + actionFields.getVoluntaryOrInvoluntary() + "' "
+				+ "'" + actionFields.getTerminationCode() + "' "
+				+ "'" + zhri100aFields.auditOperatorId + "' "
+				+ "'" + actionFields.getTerminationReason() + "')\" ";
+
 		parameterList.add("employeeId");
 		parameterList.add("terminationMonth");
 		parameterList.add("terminationDay");
@@ -351,71 +370,79 @@ public class EmployeeTermination {
 		parameterList.add("auditOperatorId");
 		parameterList.add("terminationReason");
 
-		HashMap<String, String> parameterMap = new HashMap<String, String>();
+		parameterMap.put("employeeId", zhri100aFields.employeeId);
+		parameterMap.put("terminationMonth", actionFields.getTerminationMonth());
+		parameterMap.put("terminationDay", actionFields.getTerminationDay());
+		parameterMap.put("terminationYear", actionFields.getTerminationYear());
+		parameterMap.put("rehireMonth", actionFields.getRehireMonth());
+		parameterMap.put("rehireDay", actionFields.getRehireDay());
+		parameterMap.put("rehireYear", actionFields.getRehireYear());
+		parameterMap.put("voluntaryOrInvoluntary", actionFields.getVoluntaryOrInvoluntary());
+		parameterMap.put("terminationCode", actionFields.getTerminationCode());
+		parameterMap.put("auditOperatorId", zhri100aFields.auditOperatorId);
+		parameterMap.put("terminationReason", actionFields.getTerminationReason());
 		
-		zhri100aFields.as400Package = new AS400Package(processName, parameterList, parameterMap);
+//		AS400Package as400Package = new AS400Package(processName, parameterList, parameterMap);
+//		return as400Package;
+		return command;
 	}
 	
 	/**
+	 * 
+	 * @param processName
+	 * @param zhri100aFields
+	 * @return
 	 */
-	private void makeAS400PackageForErrorProcess(String processName, String employeeId, String errorMessageParm) {
+	private AS400Package  makeAS400PackageForErrorProcess(String processName, Zhri100aFields zhri100aFields) {
 		List<String> parameterList = new ArrayList<String>();
 		HashMap<String, String> parameterMap = new HashMap<String, String>();
-//		ZHRI100A.callErrorRoutine(employeeId, errorMessageParm, zhri100aFields);
-		String errorProgramParm = "";
-		String wrkEmployeeId2 = "";
-		String blankSpaceParm = "";
-//		String errorMessageParm = "Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF";
-		String wrkCriticalFlag = "";
-		String addDateErrorParm = "";
-		String addTimeErrorParm = "";
-		String opridErrorParm = "";
-		String yesOrNoParm = ""; //TODO: What should this value really be called
+		String errorProgramParameter = zhri100aFields.errorProgramParameter;
+		String employeeId = zhri100aFields.employeeId;
+		String blankSpaceParameter = " ";
+		String errorMessageParameter = zhri100aFields.errorMessageParameter;
+		String criticalFlag = zhri100aFields.criticalFlag ? "Y" : "N";
+		Calendar now = Calendar.getInstance();
+		String errorDateParameter =  now.get(Calendar.MONTH) + "/" + now.get(Calendar.DATE) + "/" + now.get(Calendar.YEAR);
+		String errorTimeParameter = now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND);
+		String opridErrorParameter = zhri100aFields.operatorId;
+		String yesOrNoParameter = "Y"; //TODO: What should this value really be called
 		//!Make Sure that the ErrorMessageParm is always 75 Characters long
-		errorMessageParm = String.format("%75s", errorMessageParm);
-//		LET $Command =   '"CALL '       ||
-//		                 $Library                     ||
-//		                 '/HRZ110A '                  ||
-//		                 'PARM('''                    ||
-//		                 $ErrorProgramParm            ||
-//		                 ''' '''                      ||
-//		                 $Wrk_EmplId2                 ||
-//		                 ''' '''                      ||
-//		                 ' '                          ||
-//		                 ''' '''                      ||
-//		                 $ErrorMessageParm            ||
-//		                 ''' '''                      ||
-//		                 $WrkCriticalFlag             ||
-//		                 ''' '''                      ||
-//		                 $AddDateErrorParm            ||
-//		                 ''' '''                      ||
-//		                 $AddTimeErrorParm            ||
-//		                 ''' '''                      ||
-//		                 $OpridErrorParm              ||
-//		                 ''' '''                      ||
-//		                 'Y'                          ||
-//		                 ''')" '
-		parameterList.add("errorProgramParm");
-		parameterList.add("wrkEmployeeId2");
-		parameterList.add("blankSpaceParm");
-		parameterList.add("errorMessageParm");
-		parameterList.add("wrkCriticalFlag");
-		parameterList.add("addDateErrorParm");
-		parameterList.add("addTimeErrorParm");
-		parameterList.add("opridErrorParm");
-		parameterList.add("yesOrNoParm");
+		errorMessageParameter = String.format("%75s", errorMessageParameter);
+		String command = "\"CALL " + zhri100aFields.as400Library + "/" + processName + " "
+					+ "PARM('"
+					+ "'" + errorProgramParameter + "' "
+					+ "'" + employeeId + "' "
+					+ "'" + blankSpaceParameter + "' "
+					+ "'" + errorMessageParameter + "' "
+					+ "'" + criticalFlag + "' "
+					+ "'" + errorDateParameter + "' "
+					+ "'" + errorTimeParameter + "' "
+					+ "'" + opridErrorParameter + "' "
+					+ "'" + yesOrNoParameter + "')\" ";
+		System.out.println(command);
+
+		parameterList.add("errorProgramParameter");
+		parameterList.add("employeeId");
+		parameterList.add("blankSpaceParameter");
+		parameterList.add("errorMessageParameter");
+		parameterList.add("criticalFlag");
+		parameterList.add("errorDateParameter");
+		parameterList.add("errorTimeParameter");
+		parameterList.add("opridErrorParameter");
+		parameterList.add("yesOrNoParameter");
 		
-		parameterMap.put("errorProgramParm", errorProgramParm);
-		parameterMap.put("wrkEmployeeId2", wrkEmployeeId2);
-		parameterMap.put("blankSpaceParm", blankSpaceParm);
-		parameterMap.put("errorMessageParm", errorMessageParm);
-		parameterMap.put("wrkCriticalFlag", wrkCriticalFlag);
-		parameterMap.put("addDateErrorParm", addDateErrorParm);
-		parameterMap.put("addTimeErrorParm", addTimeErrorParm);
-		parameterMap.put("opridErrorParm", opridErrorParm);
-		parameterMap.put("yesOrNoParm", yesOrNoParm);
+		parameterMap.put("errorProgramParameter", errorProgramParameter);
+		parameterMap.put("employeeId", employeeId);
+		parameterMap.put("blankSpaceParameter", blankSpaceParameter);
+		parameterMap.put("errorMessageParameter", errorMessageParameter);
+		parameterMap.put("criticalFlag", criticalFlag);
+		parameterMap.put("errorDateParameter", errorDateParameter);
+		parameterMap.put("errorTimeParameter", errorTimeParameter);
+		parameterMap.put("opridErrorParameter", opridErrorParameter);
+		parameterMap.put("yesOrNoParm", yesOrNoParameter);
 		
-		zhri100aFields.as400Package = new AS400Package(processName, parameterList, parameterMap);
+		AS400Package as400Package = new AS400Package(processName, parameterList, parameterMap);
+		return as400Package;
 	}
 	
 }

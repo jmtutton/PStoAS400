@@ -126,7 +126,7 @@ public class ZHRI100A_old {
 		zhri100aFields.remoteExecScript = "/usr/local/barch/" + zhri100aFields.oracleSystemId + "/scripts/zbas002b.sh"; //TODO: where is this used???
 		zhri100aFields.as400Library = PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "AS400library");
 		zhri100aFields.remoteAdServerName = PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(wrkProcessName, zhri100aFields.dbName, "RMTNTADSVR"); //TODO: where is this used???
-		zhri100aFields.wrkCriticalFlag = false;
+		zhri100aFields.criticalFlag = false;
 //		zhri100aFields.runFlag = true;
 		return zhri100aFields;
 	}
@@ -262,7 +262,7 @@ public class ZHRI100A_old {
 //        		+ wrkEmployeeId2 + "' ' ' '"
         		+ employeeId + "' ' ' '"
         		+ errorMessageParm + "' '"
-        		+ zhri100aFields.wrkCriticalFlag + "' '"
+        		+ zhri100aFields.criticalFlag + "' '"
         		+ addDateErrorParm + "' '"
         		+ addTimeErrorParm + "' '"
         		+ opridErrorParm + "' '"
@@ -328,7 +328,7 @@ public class ZHRI100A_old {
 //		  	LET $ErrorMessageParm = 'Error executing Call System command, contact HR-PeopleSoft Oncall'
 			String errorMessageParm = "Error executing Call System command, contact HR-PeopleSoft Oncall";
 //		  	LET $WrkCriticalFlag  = 'Y'
-			zhri100aFields.wrkCriticalFlag = true;
+			zhri100aFields.criticalFlag = true;
 //		  	DO Prepare-Error-Parms
 //		  	IF $PoiFlag = 'N'
 			if(!poiFlag) {
@@ -342,7 +342,7 @@ public class ZHRI100A_old {
 //		  	END-IF
 			}
 //		  	LET $WrkCriticalFlag  = 'N'
-			zhri100aFields.wrkCriticalFlag = false;
+			zhri100aFields.criticalFlag = false;
 //		END-IF
 		}
 		return status;
