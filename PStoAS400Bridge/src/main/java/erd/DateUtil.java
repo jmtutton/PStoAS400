@@ -18,4 +18,17 @@ public class DateUtil {
         cal.add(Calendar.DATE, days); //minus number would decrement the days
         return cal.getTime();
     }
+
+    public static Date asOfToday() {
+    	Date asOfToday = new Date();
+		//BEGIN-SELECT
+		//{DateTimeOut-Prefix}SYSDATE{DateTimeOut-Suffix} &_SysDateTime
+		//FROM PSCLOCK
+		//END-SELECT
+		//                    
+		//LET $tempDate = strtodate(&_SysDateTime,{Native-DateTimeMask})
+		//LET $_AsOfToday = datetostr($tempDate,{Native-DateMask})
+    	return asOfToday;
+    }
+
 }

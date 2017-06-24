@@ -1,11 +1,23 @@
 package erd.controller;
 
+import erd.model.PszTriggerEmployee;
+import erd.model.Zhri100aFields;
+
 /**
- * ZHRI101A – New Hire Process
+ * ZHRI101A ï¿½ New Hire Process
  * @author John Tutton john@tutton.net
  *
  */
 
 public class EmployeeNewHire {
+
+	public EmployeeNewHire(PszTriggerEmployee trigger, Zhri100aFields zhri100aFields) {
+		// TODO Auto-generated constructor stub
+	}
+
+	public String HR01_processMain() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

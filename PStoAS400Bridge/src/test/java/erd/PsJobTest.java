@@ -31,13 +31,24 @@ public class PsJobTest {
 	}
 
 	@Test
-	public void testEmployeeIsContractor() {
+	public void testCheckIfContractor() {
 		//TODO: need a test case where EMPL_CLASS = 'R'
 		String employeeId = "524338";
-		boolean result = PsJob.employeeIsContractor(employeeId);
+		boolean result = PsJob.ZHRI100A_checkIfContractor(employeeId);
 		assertNotNull(result);
-//		assertTrue(result);
-		System.out.println("\nresult = " + result);
+		assertFalse(result);
+		System.out.println("\nresult: " + result);
+	}
+
+	@Test
+	public void testCheckIfCorrect102A() {
+		String employeeId = "349NV";
+		Date effectiveDate = new Date();
+		String processName = "ZHRI102A";
+		boolean result = PsJob.ZHRI100A_checkIfCorrect102A(employeeId, effectiveDate, processName);
+		assertNotNull(result);
+		assertTrue(result);
+		System.out.println("\nresult: " + result);
 	}
 
 	@Test

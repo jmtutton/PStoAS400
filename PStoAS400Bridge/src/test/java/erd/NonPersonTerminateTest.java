@@ -1,19 +1,19 @@
 package erd;
 
-import java.util.Date;
-
 import org.junit.Test;
 
-import erd.controller.NonPersonTerminate;
+import erd.controller.NonPersonTermination;
+import erd.model.PszTriggerNonPerson;
+import erd.model.Zhri100aFields;
 
 public class NonPersonTerminateTest {
 
 	@Test
 	public void testHr202ProcessMain() {
-		String psAuditOperId = "e859v1";
-		Integer indexNum = 0;
-		Date psDateIn = new Date(new java.util.Date().getTime());
-		NonPersonTerminate.HR202_processMain(psAuditOperId, indexNum, psDateIn);
+		PszTriggerNonPerson trigger = null;
+		Zhri100aFields zhri100aFields = null;
+		NonPersonTermination nonPersonTermination = new NonPersonTermination(trigger, zhri100aFields);
+		nonPersonTermination.HR202_processMain();
 	}
 
 }

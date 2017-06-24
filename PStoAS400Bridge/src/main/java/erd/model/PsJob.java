@@ -2,6 +2,9 @@ package erd.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import erd.DateUtil;
+
 import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
@@ -9,7 +12,7 @@ import java.util.List;
 /**
  * The persistent class for the PS_JOB database table.
  * Contains job records along with other data. Effective dated someone's job history will be stored in this table.
- * @author	John Tutton john@tutton.net
+ * @author John Tutton john@tutton.net
  */
 @Entity
 @Table(name="PS_JOB")
@@ -530,31 +533,31 @@ public class PsJob implements Serializable {
 	}
 
 	public String getAbsenceSystemCd() {
-		return this.absenceSystemCd.trim();
+		return absenceSystemCd != null ? absenceSystemCd.trim() : absenceSystemCd;
 	}
 
 	public void setAbsenceSystemCd(String absenceSystemCd) {
-		this.absenceSystemCd = absenceSystemCd;
+		this.absenceSystemCd = absenceSystemCd != null ? absenceSystemCd.trim() : absenceSystemCd;
 	}
 
 	public String getAccdntCdFra() {
-		return this.accdntCdFra.trim();
+		return accdntCdFra != null ? accdntCdFra.trim() : accdntCdFra;
 	}
 
 	public void setAccdntCdFra(String accdntCdFra) {
-		this.accdntCdFra = accdntCdFra;
+		this.accdntCdFra = accdntCdFra != null ? accdntCdFra.trim() : accdntCdFra;
 	}
 
 	public String getAcctCd() {
-		return this.acctCd.trim();
+		return acctCd != null ? acctCd.trim() : acctCd;
 	}
 
 	public void setAcctCd(String acctCd) {
-		this.acctCd = acctCd;
+		this.acctCd = acctCd != null ? acctCd.trim() : acctCd;
 	}
 
 	public String getAction() {
-		return this.action.trim();
+		return action != null ? action.trim() : action;
 	}
 
 	public Date getActionDt() {
@@ -562,15 +565,15 @@ public class PsJob implements Serializable {
 	}
 
 	public String getActionReason() {
-		return this.actionReason.trim();
+		return actionReason != null ? actionReason.trim() : actionReason;
 	}
 
 	public void setActionReason(String actionReason) {
-		this.actionReason = actionReason.trim();
+		this.actionReason = actionReason != null ? actionReason.trim() : actionReason;
 	}
 
 	public String getAddsToFteActual() {
-		return this.addsToFteActual.trim();
+		return addsToFteActual != null ? addsToFteActual.trim() : addsToFteActual;
 	}
 
 	public Integer getAnnlBenefBaseRt() {
@@ -582,7 +585,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getApptType() {
-		return this.apptType.trim();
+		return apptType != null ? apptType.trim() : apptType;
 	}
 
 	public Date getAsgnEndDt() {
@@ -594,35 +597,35 @@ public class PsJob implements Serializable {
 	}
 
 	public String getAutoEndFlg() {
-		return this.autoEndFlg.trim();
+		return autoEndFlg != null ? autoEndFlg.trim() : autoEndFlg;
 	}
 
 	public String getBargUnit() {
-		return this.bargUnit.trim();
+		return bargUnit != null ? bargUnit.trim() : bargUnit;
 	}
 
 	public String getBasAction() {
-		return this.basAction.trim();
+		return basAction != null ? basAction.trim() : basAction;
 	}
 
 	public String getBasGroupId() {
-		return this.basGroupId.trim();
+		return basGroupId != null ? basGroupId.trim() : basGroupId;
 	}
 
 	public String getBenStatus() {
-		return this.benStatus.trim();
+		return benStatus != null ? benStatus.trim() : benStatus;
 	}
 
 	public String getBenefitSystem() {
-		return this.benefitSystem.trim();
+		return benefitSystem != null ? benefitSystem.trim() : benefitSystem;
 	}
 
 	public String getBorderWalker() {
-		return this.borderWalker.trim();
+		return borderWalker != null ? borderWalker.trim() : borderWalker;
 	}
 
 	public String getBusinessUnit() {
-		return this.businessUnit.trim();
+		return businessUnit != null ? businessUnit.trim() : businessUnit;
 	}
 
 	public Integer getChangeAmt() {
@@ -634,19 +637,19 @@ public class PsJob implements Serializable {
 	}
 
 	public String getClassIndc() {
-		return this.classIndc.trim();
+		return classIndc != null ? classIndc.trim() : classIndc;
 	}
 
 	public String getCobraAction() {
-		return this.cobraAction.trim();
+		return cobraAction != null ? cobraAction.trim() : cobraAction;
 	}
 
 	public String getCompFrequency() {
-		return this.compFrequency.trim();
+		return compFrequency != null ? compFrequency.trim() : compFrequency;
 	}
 
 	public String getCompany() {
-		return this.company.trim();
+		return company != null ? company.trim() : company;
 	}
 
 	public Integer getComprate() {
@@ -654,7 +657,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getContractNum() {
-		return this.contractNum.trim();
+		return contractNum != null ? contractNum.trim() : contractNum;
 	}
 
 	public Integer getCtgRate() {
@@ -662,15 +665,15 @@ public class PsJob implements Serializable {
 	}
 
 	public String getCurRtType() {
-		return this.curRtType.trim();
+		return curRtType != null ? curRtType.trim() : curRtType;
 	}
 
 	public String getCurrencyCd() {
-		return this.currencyCd.trim();
+		return currencyCd != null ? currencyCd.trim() : currencyCd;
 	}
 
 	public String getCurrencyCd1() {
-		return this.currencyCd1.trim();
+		return currencyCd1 != null ? currencyCd1.trim() : currencyCd1;
 	}
 
 	public Integer getDailyRt() {
@@ -682,19 +685,19 @@ public class PsJob implements Serializable {
 	}
 
 	public String getDeptId() {
-		return this.departmentId.trim();
+		return departmentId != null ? departmentId.trim() : departmentId;
 	}
 
 	public String getDirectlyTipped() {
-		return this.directlyTipped.trim();
+		return directlyTipped != null ? directlyTipped.trim() : directlyTipped;
 	}
 
 	public String getEarnsDistType() {
-		return this.earnsDistType.trim();
+		return earnsDistType != null ? earnsDistType.trim() : earnsDistType;
 	}
 
 	public String getEeoClass() {
-		return this.eeoClass.trim();
+		return eeoClass != null ? eeoClass.trim() : eeoClass;
 	}
 
 	public Date getEffectiveDate() {
@@ -706,55 +709,55 @@ public class PsJob implements Serializable {
 	}
 
 	public String getEligConfig1() {
-		return this.eligConfig1.trim();
+		return eligConfig1 != null ? eligConfig1.trim() : eligConfig1;
 	}
 
 	public String getEligConfig2() {
-		return this.eligConfig2.trim();
+		return eligConfig2 != null ? eligConfig2.trim() : eligConfig2;
 	}
 
 	public String getEligConfig3() {
-		return this.eligConfig3.trim();
+		return eligConfig3 != null ? eligConfig3.trim() : eligConfig3;
 	}
 
 	public String getEligConfig4() {
-		return this.eligConfig4.trim();
+		return eligConfig4 != null ? eligConfig4.trim() : eligConfig4;
 	}
 
 	public String getEligConfig5() {
-		return this.eligConfig5.trim();
+		return eligConfig5 != null ? eligConfig5.trim() : eligConfig5;
 	}
 
 	public String getEligConfig6() {
-		return this.eligConfig6.trim();
+		return eligConfig6 != null ? eligConfig6.trim() : eligConfig6;
 	}
 
 	public String getEligConfig7() {
-		return this.eligConfig7.trim();
+		return eligConfig7 != null ? eligConfig7.trim() : eligConfig7;
 	}
 
 	public String getEligConfig8() {
-		return this.eligConfig8.trim();
+		return eligConfig8 != null ? eligConfig8.trim() : eligConfig8;
 	}
 
 	public String getEligConfig9() {
-		return this.eligConfig9.trim();
+		return eligConfig9 != null ? eligConfig9.trim() : eligConfig9;
 	}
 
 	public String getEmplClass() {
-		return this.employeeClass.trim();
+		return employeeClass != null ? employeeClass.trim() : employeeClass;
 	}
 
 	public String getEmplCtg() {
-		return this.emplCtg.trim();
+		return emplCtg != null ? emplCtg.trim() : emplCtg;
 	}
 
 	public String getEmplCtgL1() {
-		return this.emplCtgL1.trim();
+		return emplCtgL1 != null ? emplCtgL1.trim() : emplCtgL1;
 	}
 
 	public String getEmplCtgL2() {
-		return this.emplCtgL2.trim();
+		return emplCtgL2 != null ? emplCtgL2.trim() : emplCtgL2;
 	}
 
 	public Integer getEmploymentRecordNumber() {
@@ -762,19 +765,19 @@ public class PsJob implements Serializable {
 	}
 
 	public String getEmplStatus() {
-		return this.emplStatus.trim();
+		return emplStatus != null ? emplStatus.trim() : emplStatus;
 	}
 
 	public String getEmplType() {
-		return this.emplType.trim();
+		return emplType != null ? emplType.trim() : emplType;
 	}
 
 	public String getEmployeeId() {
-		return this.employeeId.trim();
+		return employeeId != null ? employeeId.trim() : employeeId;
 	}
 
 	public String getEncumbOverride() {
-		return this.encumbOverride.trim();
+		return encumbOverride != null ? encumbOverride.trim() : encumbOverride;
 	}
 
 	public Date getEntryDate() {
@@ -782,7 +785,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getEstabid() {
-		return this.estabid.trim();
+		return estabid != null ? estabid.trim() : estabid;
 	}
 
 	public Integer getExemptHoursMonth() {
@@ -790,7 +793,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getExemptJobLbr() {
-		return this.exemptJobLbr.trim();
+		return exemptJobLbr != null ? exemptJobLbr.trim() : exemptJobLbr;
 	}
 
 	public Date getExpectedEndDate() {
@@ -802,11 +805,11 @@ public class PsJob implements Serializable {
 	}
 
 	public String getFicaStatusEe() {
-		return this.ficaStatusEe.trim();
+		return ficaStatusEe != null ? ficaStatusEe.trim() : ficaStatusEe;
 	}
 
 	public String getFlsaStatus() {
-		return this.flsaStatus.trim();
+		return flsaStatus != null ? flsaStatus.trim() : flsaStatus;
 	}
 
 	public Date getForcePublish() {
@@ -818,43 +821,43 @@ public class PsJob implements Serializable {
 	}
 
 	public String getFullPartTime() {
-		return this.fullOrPartTime.trim();
+		return fullOrPartTime != null ? fullOrPartTime.trim() : fullOrPartTime;
 	}
 
 	public String getFunctionCd() {
-		return this.functionCd.trim();
+		return functionCd != null ? functionCd.trim() : functionCd;
 	}
 
 	public String getGlPayType() {
-		return this.glPayType.trim();
+		return glPayType != null ? glPayType.trim() : glPayType;
 	}
 
 	public String getGpAsofDtExgRt() {
-		return this.gpAsofDtExgRt.trim();
+		return gpAsofDtExgRt != null ? gpAsofDtExgRt.trim() : gpAsofDtExgRt;
 	}
 
 	public String getGpDfltCurrttyp() {
-		return this.gpDfltCurrttyp.trim();
+		return gpDfltCurrttyp != null ? gpDfltCurrttyp.trim() : gpDfltCurrttyp;
 	}
 
 	public String getGpDfltEligGrp() {
-		return this.gpDfltEligGrp.trim();
+		return gpDfltEligGrp != null ? gpDfltEligGrp.trim() : gpDfltEligGrp;
 	}
 
 	public String getGpDfltExrtdt() {
-		return this.gpDfltExrtdt.trim();
+		return gpDfltExrtdt != null ? gpDfltExrtdt.trim() : gpDfltExrtdt;
 	}
 
 	public String getGpEligGrp() {
-		return this.gpEligGrp.trim();
+		return gpDfltExrtdt != null ? gpDfltExrtdt.trim() : gpDfltExrtdt;
 	}
 
 	public String getGpPaygroup() {
-		return this.gpPaygroup.trim();
+		return gpPaygroup != null ? gpPaygroup.trim() : gpPaygroup;
 	}
 
 	public String getGrade() {
-		return this.grade.trim();
+		return grade != null ? grade.trim() : grade;
 	}
 
 	public Date getGradeEntryDt() {
@@ -866,7 +869,7 @@ public class PsJob implements Serializable {
 	}
 
 	public String getHolidaySchedule() {
-		return this.holidaySchedule.trim();
+		return holidaySchedule != null ? holidaySchedule.trim() : holidaySchedule;
 	}
 
 	public Integer getHourlyRt() {
@@ -874,19 +877,19 @@ public class PsJob implements Serializable {
 	}
 
 	public String getHourlyRtFra() {
-		return this.hourlyRtFra.trim();
+		return hourlyRtFra != null ? hourlyRtFra.trim() : hourlyRtFra;
 	}
 
 	public String getHrStatus() {
-		return this.hrStatus.trim();
+		return hrStatus != null ? hrStatus.trim() : hrStatus;
 	}
 
 	public String getInterctrWrksCncl() {
-		return this.interctrWrksCncl.trim();
+		return interctrWrksCncl != null ? interctrWrksCncl.trim() : interctrWrksCncl;
 	}
 
 	public String getJobDataSrcCd() {
-		return this.jobDataSrcCd.trim();
+		return jobDataSrcCd != null ? jobDataSrcCd.trim() : jobDataSrcCd;
 	}
 
 	public Date getJobEntryDt() {
@@ -894,23 +897,23 @@ public class PsJob implements Serializable {
 	}
 
 	public String getJobIndicator() {
-		return this.jobIndicator.trim();
+		return jobIndicator != null ? jobIndicator.trim() : jobIndicator;
 	}
 
 	public String getJobCode() {
-		return this.jobCode.trim();
+		return jobCode != null ? jobCode.trim() : jobCode;
 	}
 
 	public String getLaborAgreement() {
-		return this.laborAgreement.trim();
+		return laborAgreement != null ? laborAgreement.trim() : laborAgreement;
 	}
 
 	public String getLaborFacilityId() {
-		return this.laborFacilityId.trim();
+		return laborFacilityId != null ? laborFacilityId.trim() : laborFacilityId;
 	}
 
 	public String getLaborTypeGer() {
-		return this.laborTypeGer.trim();
+		return laborTypeGer != null ? laborTypeGer.trim() : laborTypeGer;
 	}
 
 	public Date getLastDateWorked() {
@@ -926,15 +929,15 @@ public class PsJob implements Serializable {
 	}
 
 	public String getLastUpdatedUserId() {
-		return this.lastUpdatedUserId.trim();
+		return lastUpdatedUserId != null ? lastUpdatedUserId.trim() : lastUpdatedUserId;
 	}
 
 	public String getLayoffExemptFlag() {
-		return this.layoffExemptFlag.trim();
+		return layoffExemptFlag != null ? layoffExemptFlag.trim() : layoffExemptFlag;
 	}
 
 	public String getLayoffExemptRsn() {
-		return this.layoffExemptRsn.trim();
+		return layoffExemptRsn != null ? layoffExemptRsn.trim() : layoffExemptRsn;
 	}
 
 	public Date getLbrFacEntryDt() {
@@ -942,19 +945,19 @@ public class PsJob implements Serializable {
 	}
 
 	public String getLdwOvr() {
-		return this.ldwOvr.trim();
+		return ldwOvr != null ? ldwOvr.trim() : ldwOvr;
 	}
 
 	public void setLdwOvr(String ldwOvr) {
-		this.ldwOvr = ldwOvr;
+		this.ldwOvr = ldwOvr != null ? ldwOvr.trim() : ldwOvr;
 	}
 
 	public String getLocation() {
-		return this.location.trim();
+		return location != null ? location.trim() : location;
 	}
 
 	public void setLocation(String location) {
-		this.location = location;
+		this.location = location != null ? location.trim() : location;
 	}
 
 	public Date getLstAsgnStartDt() {
@@ -966,11 +969,11 @@ public class PsJob implements Serializable {
 	}
 
 	public String getLumpSumPay() {
-		return this.lumpSumPay.trim();
+		return lumpSumPay != null ? lumpSumPay.trim() : lumpSumPay;
 	}
 
 	public void setLumpSumPay(String lumpSumPay) {
-		this.lumpSumPay = lumpSumPay;
+		this.lumpSumPay = lumpSumPay != null ? lumpSumPay.trim() : lumpSumPay;
 	}
 
 	public Integer getMainApptNumJpn() {
@@ -998,11 +1001,11 @@ public class PsJob implements Serializable {
 	}
 
 	public String getOfficerCd() {
-		return this.officerCd.trim();
+		return officerCd != null ? officerCd.trim() : officerCd;
 	}
 
 	public void setOfficerCd(String officerCd) {
-		this.officerCd = officerCd;
+		this.officerCd = officerCd != null ? officerCd.trim() : officerCd;
 	}
 
 	public Integer getPaidFte() {
@@ -1022,59 +1025,59 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPaidHrsFrequency() {
-		return this.paidHrsFrequency.trim();
+		return paidHrsFrequency != null ? paidHrsFrequency.trim() : paidHrsFrequency;
 	}
 
 	public void setPaidHrsFrequency(String paidHrsFrequency) {
-		this.paidHrsFrequency = paidHrsFrequency;
+		this.paidHrsFrequency = paidHrsFrequency != null ? paidHrsFrequency.trim() : paidHrsFrequency;
 	}
 
 	public String getPaySystemFlg() {
-		return this.paySystemFlg.trim();
+		return paySystemFlg != null ? paySystemFlg.trim() : paySystemFlg;
 	}
 
 	public void setPaySystemFlg(String paySystemFlg) {
-		this.paySystemFlg = paySystemFlg;
+		this.paySystemFlg = paySystemFlg != null ? paySystemFlg.trim() : paySystemFlg;
 	}
 
 	public String getPayUnionFee() {
-		return this.payUnionFee.trim();
+		return payUnionFee != null ? payUnionFee.trim() : payUnionFee;
 	}
 
 	public void setPayUnionFee(String payUnionFee) {
-		this.payUnionFee = payUnionFee;
+		this.payUnionFee = payUnionFee != null ? payUnionFee.trim() : payUnionFee;
 	}
 
 	public String getPaygroup() {
-		return this.paygroup.trim();
+		return paygroup != null ? paygroup.trim() : paygroup;
 	}
 
 	public void setPaygroup(String paygroup) {
-		this.paygroup = paygroup;
+		this.paygroup = paygroup != null ? paygroup.trim() : paygroup;
 	}
 
 	public String getPerOrg() {
-		return this.perOrg.trim();
+		return perOrg != null ? perOrg.trim() : perOrg;
 	}
 
 	public void setPerOrg(String perOrg) {
-		this.perOrg = perOrg;
+		this.perOrg = perOrg != null ? perOrg.trim() : perOrg;
 	}
 
 	public String getPerformGroupGer() {
-		return this.performGroupGer.trim();
+		return performGroupGer != null ? performGroupGer.trim() : performGroupGer;
 	}
 
 	public void setPerformGroupGer(String performGroupGer) {
-		this.performGroupGer = performGroupGer;
+		this.performGroupGer = performGroupGer != null ? performGroupGer.trim() : performGroupGer;
 	}
 
 	public String getPoiType() {
-		return this.poiType.trim();
+		return poiType != null ? poiType.trim() : poiType;
 	}
 
 	public void setPoiType(String poiType) {
-		this.poiType = poiType;
+		this.poiType = poiType != null ? poiType.trim() : poiType;
 	}
 
 	public Date getPositionEntryDt() {
@@ -1086,123 +1089,123 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPositionNbr() {
-		return this.positionNbr.trim();
+		return positionNbr != null ? positionNbr.trim() : positionNbr;
 	}
 
 	public void setPositionNbr(String positionNbr) {
-		this.positionNbr = positionNbr;
+		this.positionNbr = positionNbr != null ? positionNbr.trim() : positionNbr;
 	}
 
 	public String getPositionOverride() {
-		return this.positionOverride.trim();
+		return positionOverride != null ? positionOverride.trim() : positionOverride;
 	}
 
 	public void setPositionOverride(String positionOverride) {
-		this.positionOverride = positionOverride;
+		this.positionOverride = positionOverride != null ? positionOverride.trim() : positionOverride;
 	}
 
 	public String getPosnChangeRecord() {
-		return this.posnChangeRecord.trim();
+		return posnChangeRecord != null ? posnChangeRecord.trim() : posnChangeRecord;
 	}
 
 	public void setPosnChangeRecord(String posnChangeRecord) {
-		this.posnChangeRecord = posnChangeRecord;
+		this.posnChangeRecord = posnChangeRecord != null ? posnChangeRecord.trim() : posnChangeRecord;
 	}
 
 	public String getProrateCntAmt() {
-		return this.prorateCntAmt.trim();
+		return prorateCntAmt != null ? prorateCntAmt.trim() : prorateCntAmt;
 	}
 
 	public void setProrateCntAmt(String prorateCntAmt) {
-		this.prorateCntAmt = prorateCntAmt;
+		this.prorateCntAmt = prorateCntAmt != null ? prorateCntAmt.trim() : prorateCntAmt;
 	}
 
 	public String getRegulatoryRegion() {
-		return this.regulatoryRegion.trim();
+		return regulatoryRegion != null ? regulatoryRegion.trim() : regulatoryRegion;
 	}
 
 	public void setRegulatoryRegion(String regulatoryRegion) {
-		this.regulatoryRegion = regulatoryRegion;
+		this.regulatoryRegion = regulatoryRegion != null ? regulatoryRegion.trim() : regulatoryRegion;
 	}
 
 	public String getRegTemp() {
-		return this.regularOrTemporary.trim();
+		return regularOrTemporary != null ? regularOrTemporary.trim() : regularOrTemporary;
 	}
 
 	public void setRegTemp(String regularOrTemporary) {
-		this.regularOrTemporary = regularOrTemporary;
+		this.regularOrTemporary = regularOrTemporary != null ? regularOrTemporary.trim() : regularOrTemporary;
 	}
 
 	public String getReportsTo() {
-		return this.reportsTo.trim();
+		return reportsTo != null ? reportsTo.trim() : reportsTo;
 	}
 
 	public void setReportsTo(String reportsTo) {
-		this.reportsTo = reportsTo;
+		this.reportsTo = reportsTo != null ? reportsTo.trim() : reportsTo;
 	}
 
 	public String getSalAdminPlan() {
-		return this.salAdminPlan.trim();
+		return salAdminPlan != null ? salAdminPlan.trim() : salAdminPlan;
 	}
 
 	public void setSalAdminPlan(String salAdminPlan) {
-		this.salAdminPlan = salAdminPlan;
+		this.salAdminPlan = salAdminPlan != null ? salAdminPlan.trim() : salAdminPlan;
 	}
 
 	public String getSetIdDept() {
-		return this.setIdDept.trim();
+		return setIdDept != null ? setIdDept.trim() : setIdDept;
 	}
 
 	public void setSetIdDept(String setIdDept) {
-		this.setIdDept = setIdDept;
+		this.setIdDept = setIdDept != null ? setIdDept.trim() : setIdDept;
 	}
 
 	public String getSetIdJobCode() {
-		return this.setIdJobCode.trim();
+		return setIdJobCode != null ? setIdJobCode.trim() : setIdJobCode;
 	}
 
 	public void setSetidJobCode(String setIdJobCode) {
-		this.setIdJobCode = setIdJobCode;
+		this.setIdJobCode = setIdJobCode != null ? setIdJobCode.trim() : setIdJobCode;
 	}
 
 	public String getSetIdLbrAgrmnt() {
-		return this.setidLbrAgrmnt.trim();
+		return setidLbrAgrmnt != null ? setidLbrAgrmnt.trim() : setidLbrAgrmnt;
 	}
 
 	public void setSetidLbrAgrmnt(String setidLbrAgrmnt) {
-		this.setidLbrAgrmnt = setidLbrAgrmnt;
+		this.setidLbrAgrmnt = setidLbrAgrmnt != null ? setidLbrAgrmnt.trim() : setidLbrAgrmnt;
 	}
 
 	public String getSetidLocation() {
-		return this.setidLocation.trim();
+		return setidLocation != null ? setidLocation.trim() : setidLocation;
 	}
 
 	public void setSetidLocation(String setidLocation) {
-		this.setidLocation = setidLocation;
+		this.setidLocation = setidLocation != null ? setidLocation.trim() : setidLocation;
 	}
 
 	public String getSetIdSalary() {
-		return this.setIdSalary.trim();
+		return setIdSalary != null ? setIdSalary.trim() : setIdSalary;
 	}
 
 	public void setSetIdSalary(String setIdSalary) {
-		this.setIdSalary = setIdSalary;
+		this.setIdSalary = setIdSalary != null ? setIdSalary.trim() : setIdSalary;
 	}
 
 	public String getSetIdSupvLvl() {
-		return this.setIdSupvLvl.trim();
+		return setIdSupvLvl != null ? setIdSupvLvl.trim() : setIdSupvLvl;
 	}
 
 	public void setSetIdSupvLvl(String setIdSupvLvl) {
-		this.setIdSupvLvl = setIdSupvLvl;
+		this.setIdSupvLvl = setIdSupvLvl != null ? setIdSupvLvl.trim() : setIdSupvLvl;
 	}
 
 	public String getShift() {
-		return this.shift.trim();
+		return shift != null ? shift.trim() : shift;
 	}
 
 	public void setShift(String shift) {
-		this.shift = shift;
+		this.shift = shift != null ? shift.trim() : shift;
 	}
 
 	public Integer getShiftFactor() {
@@ -1222,19 +1225,19 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSocSecRiskCode() {
-		return this.socSecRiskCode.trim();
+		return socSecRiskCode != null ? socSecRiskCode.trim() : socSecRiskCode;
 	}
 
 	public void setSocSecRiskCode(String socSecRiskCode) {
-		this.socSecRiskCode = socSecRiskCode;
+		this.socSecRiskCode = socSecRiskCode != null ? socSecRiskCode.trim() : socSecRiskCode;
 	}
 
 	public String getSpkCommIdGer() {
-		return this.spkCommIdGer.trim();
+		return spkCommIdGer != null ? spkCommIdGer.trim() : spkCommIdGer;
 	}
 
 	public void setSpkCommIdGer(String spkCommIdGer) {
-		this.spkCommIdGer = spkCommIdGer;
+		this.spkCommIdGer = spkCommIdGer != null ? spkCommIdGer.trim() : spkCommIdGer;
 	}
 
 	public Integer getStdHours() {
@@ -1246,11 +1249,11 @@ public class PsJob implements Serializable {
 	}
 
 	public String getStdHrsFrequency() {
-		return this.stdHrsFrequency.trim();
+		return stdHrsFrequency != null ? stdHrsFrequency.trim() : stdHrsFrequency;
 	}
 
 	public void setStdHrsFrequency(String stdHrsFrequency) {
-		this.stdHrsFrequency = stdHrsFrequency;
+		this.stdHrsFrequency = stdHrsFrequency != null ? stdHrsFrequency.trim() : stdHrsFrequency;
 	}
 
 	public Integer getStep() {
@@ -1270,43 +1273,43 @@ public class PsJob implements Serializable {
 	}
 
 	public String getSupervisorId() {
-		return this.supervisorId.trim();
+		return supervisorId != null ? supervisorId.trim() : supervisorId;
 	}
 
 	public void setSupervisorId(String supervisorId) {
-		this.supervisorId = supervisorId;
+		this.supervisorId = supervisorId != null ? supervisorId.trim() : supervisorId;
 	}
 
 	public String getSupvLvlId() {
-		return this.supvLvlId.trim();
+		return supvLvlId != null ? supvLvlId.trim() : supvLvlId;
 	}
 
 	public void setSupvLvlId(String supvLvlId) {
-		this.supvLvlId = supvLvlId;
+		this.supvLvlId = supvLvlId != null ? supvLvlId.trim() : supvLvlId;
 	}
 
 	public String getTariffAreaGer() {
-		return this.tariffAreaGer.trim();
+		return tariffAreaGer != null ? tariffAreaGer.trim() : tariffAreaGer;
 	}
 
 	public void setTariffAreaGer(String tariffAreaGer) {
-		this.tariffAreaGer = tariffAreaGer;
+		this.tariffAreaGer = tariffAreaGer != null ? tariffAreaGer.trim() : tariffAreaGer;
 	}
 
 	public String getTariffGer() {
-		return this.tariffGer.trim();
+		return tariffGer != null ? tariffGer.trim() : tariffGer;
 	}
 
 	public void setTariffGer(String tariffGer) {
-		this.tariffGer = tariffGer;
+		this.tariffGer = tariffGer != null ? tariffGer.trim() : tariffGer;
 	}
 
 	public String getTaxLocationCd() {
-		return this.taxLocationCd.trim();
+		return taxLocationCd != null ? taxLocationCd.trim() : taxLocationCd;
 	}
 
 	public void setTaxLocationCd(String taxLocationCd) {
-		this.taxLocationCd = taxLocationCd;
+		this.taxLocationCd = taxLocationCd != null ? taxLocationCd.trim() : taxLocationCd;
 	}
 
 	public Date getTerminationDt() {
@@ -1318,11 +1321,11 @@ public class PsJob implements Serializable {
 	}
 
 	public String getUnionCd() {
-		return this.unionCd.trim();
+		return unionCd != null ? unionCd.trim() : unionCd;
 	}
 
 	public void setUnionCd(String unionCd) {
-		this.unionCd = unionCd;
+		this.unionCd = unionCd != null ? unionCd.trim() : unionCd;
 	}
 
 	public Integer getUnionFeeAmount() {
@@ -1350,19 +1353,19 @@ public class PsJob implements Serializable {
 	}
 
 	public String getUnionFullPart() {
-		return this.unionFullPart.trim();
+		return unionFullPart != null ? unionFullPart.trim() : unionFullPart;
 	}
 
 	public void setUnionFullPart(String unionFullPart) {
-		this.unionFullPart = unionFullPart;
+		this.unionFullPart = unionFullPart != null ? unionFullPart.trim() : unionFullPart;
 	}
 
 	public String getUnionPos() {
-		return this.unionPos.trim();
+		return unionPos != null ? unionPos.trim() : unionPos;
 	}
 
 	public void setUnionPos(String unionPos) {
-		this.unionPos = unionPos;
+		this.unionPos = unionPos != null ? unionPos.trim() : unionPos;
 	}
 
 	public Date getUnionSeniorityDt() {
@@ -1374,43 +1377,43 @@ public class PsJob implements Serializable {
 	}
 
 	public String getValue1Fra() {
-		return this.value1Fra.trim();
+		return value1Fra != null ? value1Fra.trim() : value1Fra;
 	}
 
 	public void setValue1Fra(String value1Fra) {
-		this.value1Fra = value1Fra;
+		this.value1Fra = value1Fra != null ? value1Fra.trim() : value1Fra;
 	}
 
 	public String getValue2Fra() {
-		return this.value2Fra.trim();
+		return value2Fra != null ? value2Fra.trim() : value2Fra;
 	}
 
 	public void setValue2Fra(String value2Fra) {
-		this.value2Fra = value2Fra;
+		this.value2Fra = value2Fra != null ? value2Fra.trim() : value2Fra;
 	}
 
 	public String getValue3Fra() {
-		return this.value3Fra.trim();
+		return value3Fra != null ? value3Fra.trim() : value3Fra;
 	}
 
 	public void setValue3Fra(String value3Fra) {
-		this.value3Fra = value3Fra;
+		this.value3Fra = value3Fra != null ? value3Fra.trim() : value3Fra;
 	}
 
 	public String getValue4Fra() {
-		return this.value4Fra.trim();
+		return value4Fra != null ? value4Fra.trim() : value4Fra;
 	}
 
 	public void setValue4Fra(String value4Fra) {
-		this.value4Fra = value4Fra;
+		this.value4Fra = value4Fra != null ? value4Fra.trim() : value4Fra;
 	}
 
 	public String getValue5Fra() {
-		return this.value5Fra.trim();
+		return value5Fra != null ? value5Fra.trim() : value5Fra;
 	}
 
 	public void setValue5Fra(String value5Fra) {
-		this.value5Fra = value5Fra;
+		this.value5Fra = value5Fra != null ? value5Fra.trim() : value5Fra;
 	}
 
 	public Integer getWorkDayHours() {
@@ -1422,32 +1425,34 @@ public class PsJob implements Serializable {
 	}
 
 	public String getWppStopFlag() {
-		return this.wppStopFlag.trim();
+		return wppStopFlag != null ? wppStopFlag.trim() : wppStopFlag;
 	}
 
 	public void setWppStopFlag(String wppStopFlag) {
-		this.wppStopFlag = wppStopFlag;
+		this.wppStopFlag = wppStopFlag != null ? wppStopFlag.trim() : wppStopFlag;
 	}
 
 	public String getWrksCnclFunction() {
-		return this.wrksCnclFunction.trim();
+		return wrksCnclFunction != null ? wrksCnclFunction.trim() : wrksCnclFunction;
 	}
 
 	public void setWrksCnclFunction(String wrksCnclFunction) {
-		this.wrksCnclFunction = wrksCnclFunction;
+		this.wrksCnclFunction = wrksCnclFunction != null ? wrksCnclFunction.trim() : wrksCnclFunction;
 	}
 
 	public String getWrksCnclRoleChe() {
-		return this.wrksCnclRoleChe.trim();
+		return wrksCnclRoleChe != null ? wrksCnclRoleChe.trim() : wrksCnclRoleChe;
 	}
 
 	public void setWrksCnclRoleChe(String wrksCnclRoleChe) {
-		this.wrksCnclRoleChe = wrksCnclRoleChe;
+		this.wrksCnclRoleChe = wrksCnclRoleChe != null ? wrksCnclRoleChe.trim() : wrksCnclRoleChe;
 	}
 
 	/**
 	 * HR01-Get-Job-Data
 	 * Gets the employees data from the job table that needs to be interfaced to the legacy system
+	 * @param employeeId
+	 * @return
 	 */
 	public PsJob hr01GetJobData(String employeeId) {
 //		Begin-Select
@@ -1530,14 +1535,23 @@ public class PsJob implements Serializable {
 	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
 	    				+ "AND p.effectiveSequence = :effectiveSequence "
 	    				+ "AND p.employmentRecordNumber = 0 "
-	    				+ "AND p.effectiveDate = :effectiveDate "
+	    				+ "AND p.effectiveDate <= :effectiveDate "
 	    				, PsJob.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .setParameter("effectiveSequence", effectiveSequence)
 	    		    .getResultList();
+    		System.out.println("HR02_getJob.resultList.size(): " + resultList.size());
 	    	if(resultList != null && resultList.size() > 0) {
-	    		return resultList.get(0);
+	    		PsJob result0 = resultList.get(0);
+	    		for(PsJob result : resultList) {
+		    		System.out.println("HR02_getJob.result.getAction(): " + result.getAction());
+		    		System.out.println("HR02_getJob.result.getEmployeeId(): " + result.getEmployeeId());
+		    		System.out.println("HR02_getJob.result.getActionReason(): " + result.getActionReason());
+		    		System.out.println("HR02_getJob.result.getEffectiveDate(): " + result.getEffectiveDate());
+		    		System.out.println("HR02_getJob.result.getEffseq(): " + result.getEffseq());
+	    		}
+	    		return result0;
 	    	}
 	    }
 	    catch (Exception e) {
@@ -1549,6 +1563,9 @@ public class PsJob implements Serializable {
 	/**
 	 * HR04-Get-Job-Data
 	 * Gets the employees data from the job table that needs to be interfaced to the legacy system
+	 * @param employeeId
+	 * @param effectiveDate
+	 * @return
 	 */
 	public static PsJob hr04GetJobData(String employeeId, Date effectiveDate) {
 //		Begin-Select
@@ -1594,7 +1611,7 @@ public class PsJob implements Serializable {
 	    	List<PsJob> resultList = em.createQuery(
 	    		    "SELECT pj FROM PsJob pj "
 	    		    		+ "WHERE UPPER(TRIM(pj.employeeId)) = :employeeId "
-	    		    		+ "		AND pj.effectiveDate = :effectiveDate "	
+	    		    		+ "		AND pj.effectiveDate <= :effectiveDate "	
 	    		    		+ "		AND pj.effectiveSequence = (SELECT MAX(pj2.effectiveSequence) FROM PsJob pj2 "
 	    		    		+ "				WHERE pj2.employeeId = pj.employeeId "
 	    		    		+ "					AND pj2.employmentRecordNumber = pj.employmentRecordNumber "
@@ -1617,6 +1634,9 @@ public class PsJob implements Serializable {
 	/**
 	 * Replaces HR05-Get-Region and HR05-Get-Region
 	 * This procedure will get REG_REGION from PS_JOB
+	 * @param employeeId
+	 * @param employmentRecordNumber
+	 * @return
 	 */
 	public String findRegionByEmployeeIdAndEmploymentRecordNumber(String employeeId, Integer employmentRecordNumber) {
 		//Begin-Select
@@ -1642,6 +1662,11 @@ public class PsJob implements Serializable {
 	 * AD-Get-JobStart-Date
 	 * Gets the Job Start date from the job table.
 	 * Returns $ADJobStartDt as YYYYMMDD
+	 * @param employeeId
+	 * @param employmentRecordNumber
+	 * @param jobCode
+	 * @param effectiveDate
+	 * @return
 	 */
 	//TODO: check if $ADJobStartYr, $ADJobStartMnth, $ADJobStartDay, $PSJobStartDt are used in the calling file???
 	public String adGetJobStartDate(String employeeId, Integer employmentRecordNumber, String jobCode, Date effectiveDate) {
@@ -1672,113 +1697,25 @@ public class PsJob implements Serializable {
 	}
 	   
 	/**
-	 * Replaces Check-If-Contractor from ZHRI100A.SQR
-	 * Checks to see if the employee is a contractor       
-	 */
-	public static boolean employeeIsContractor(String employeeId) {
-//		Let $Found = 'N'
-//		Begin-Select
-//		'X'
-//		    Let $Found = 'Y'
-//		FROM PS_JOB RJ
-//		WHERE RJ.EMPLID = $PSEmplid
-//		  AND RJ.EMPL_CLASS = 'R'
-//		  AND RJ.EFFDT = (SELECT MAX(EFFDT)
-//		                    FROM  PS_JOB RJ2
-//		                   WHERE  RJ2.EMPLID = RJ.EMPLID
-//		                     AND  RJ2.EMPL_RCD = RJ.EMPL_RCD
-//		                     AND  RJ2.EFFDT <= $AsOfToday)
-//		  AND RJ.EFFSEQ = (SELECT MAX(EFFSEQ)
-//		                     FROM PS_JOB RJ3
-//		                    WHERE RJ3.EMPLID = RJ.EMPLID
-//		                     AND  RJ3.EMPL_RCD = RJ.EMPL_RCD
-//		                      AND RJ3.EFFDT = RJ.EFFDT)
-//		End-Select
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-		EntityManager em = emfactory.createEntityManager();
-	    try {
-	    	List<Date> resultList = em.createQuery("SELECT p FROM PsJob p WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-	    			+ "AND p.employeeClass = :employeeClass "
-    				+ "AND p.effectiveDate = (SELECT MAX(p2.effectiveDate) FROM PsJob p2 WHERE p2.employeeId = p.employeeId "
-    				+ "		AND p2.employmentRecordNumber = p.employmentRecordNumber AND p2.effectiveDate <= CURRENT_DATE) "
-    				+ "AND p.effectiveSequence = (SELECT MAX(p3.effectiveSequence) FROM PsJob p3 WHERE p3.employeeId = p.employeeId "
-    				+ "		AND p3.employmentRecordNumber = p.employmentRecordNumber AND p3.effectiveDate = p.effectiveDate) ",
-	    				Date.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-	    		    .setParameter("employeeClass", "R".toUpperCase())
-	    		    .getResultList();
-	    	if(resultList != null && resultList.size() > 0) {
-	    		return true;
-	    	}
-	    }
-	    catch (Exception e) {
-	       e.printStackTrace();
-	    } 
-	    return false;	
-	}
-		   
-	/**
-	 * Replaces Check-If-Contractor from ZHRI100A.SQR
-	 * Checks to see if the employee is a contractor       
-	 */
-	public static boolean employeeIsContractor(String employeeId, Date effectiveDate, Integer effectiveSequence) {
-//		Let $Found = 'N'
-//		Begin-Select
-//		'X'
-//		    Let $Found = 'Y'
-//		FROM PS_JOB RJ
-//		WHERE RJ.EMPLID = $PSEmplid
-//		  AND RJ.EMPL_CLASS = 'R'
-//		  AND RJ.EFFDT = (SELECT MAX(EFFDT)
-//		                    FROM  PS_JOB RJ2
-//		                   WHERE  RJ2.EMPLID = RJ.EMPLID
-//		                     AND  RJ2.EMPL_RCD = RJ.EMPL_RCD
-//		                     AND  RJ2.EFFDT <= $AsOfToday)
-//		  AND RJ.EFFSEQ = (SELECT MAX(EFFSEQ)
-//		                     FROM PS_JOB RJ3
-//		                    WHERE RJ3.EMPLID = RJ.EMPLID
-//		                     AND  RJ3.EMPL_RCD = RJ.EMPL_RCD
-//		                      AND RJ3.EFFDT = RJ.EFFDT)
-//		End-Select
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-		EntityManager em = emfactory.createEntityManager();
-	    try {
-	    	List<Date> resultList = em.createQuery("SELECT p FROM PsJob p "
-	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-	    				+ "AND p.effectiveDate = :effectiveDate "
-	    				+ "AND p.effectiveSequence = :effectiveSequence "
-	    				+ "AND p.employeeClass = :employeeClass ",
-	    				Date.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
-	    		    .setParameter("effectiveSequence", effectiveSequence)
-	    		    .setParameter("employeeClass", "R".toUpperCase())
-	    		    .getResultList();
-	    	if(resultList != null && resultList.size() > 0) {
-	    		return true;
-	    	}
-	    }
-	    catch (Exception e) {
-	       e.printStackTrace();
-	    } 
-	    return false;	
-	}
-	   
-	/**
+	 * 
+	 * @param employeeId
+	 * @param employmentRecordNumber
+	 * @param effectiveDate
+	 * @return
 	 */
 	public static Integer findMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate(String employeeId, Integer employmentRecordNumber, Date effectiveDate) {
-//		 EFFSEQ = (SELECT MAX(EFFSEQ)
-//        FROM PS_JOB RJ3
-//       WHERE RJ3.EMPLID = RJ.EMPLID
-//        AND  RJ3.EMPL_RCD = RJ.EMPL_RCD
-//         AND RJ3.EFFDT = RJ.EFFDT)
+		//EFFSEQ = (SELECT MAX(EFFSEQ)
+		//FROM PS_JOB RJ3
+		//WHERE RJ3.EMPLID = RJ.EMPLID
+		//AND RJ3.EMPL_RCD = RJ.EMPL_RCD
+		//AND RJ3.EFFDT = RJ.EFFDT)
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<Integer> resultList = em.createQuery("SELECT MAX(p.effectiveSequence) FROM PsJob p "
 	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
 	    				+ "AND p.employmentRecordNumber = :employmentRecordNumber "
-	    				+ "AND p.effectiveDate = :effectiveDate ",
+	    				+ "AND p.effectiveDate <= :effectiveDate ",
 	    				Integer.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .setParameter("employmentRecordNumber", employmentRecordNumber)
@@ -1795,13 +1732,17 @@ public class PsJob implements Serializable {
 	}
 	   
 	/**
+	 * 
+	 * @param employeeId
+	 * @param employmentRecordNumber
+	 * @return
 	 */
 	public static Date findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber(String employeeId, Integer employmentRecordNumber) {
-//		  EFFDT = (SELECT MAX(EFFDT)
-//        FROM  PS_JOB RJ2
-//       WHERE  RJ2.EMPLID = RJ.EMPLID
-//         AND  RJ2.EMPL_RCD = RJ.EMPL_RCD
-//         AND  RJ2.EFFDT <= $AsOfToday)
+		//EFFDT = (SELECT MAX(EFFDT)
+		//FROM PS_JOB RJ2
+		//WHERE RJ2.EMPLID = RJ.EMPLID
+		//AND RJ2.EMPL_RCD = RJ.EMPL_RCD
+		//AND RJ2.EFFDT <= $AsOfToday)
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -1823,13 +1764,19 @@ public class PsJob implements Serializable {
 	    return null;	
 	}
 
+	/**
+	 * 
+	 * @param employeeId
+	 * @param effectiveDate
+	 * @return
+	 */
 	public static List<PsJob> findByEmployeeIdAndEffectiveDate(String employeeId, java.util.Date effectiveDate) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PsJob> resultList = em.createQuery("SELECT p FROM PsJob p "
 	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-	    				+ "AND p.effectiveDate = :effectiveDate ",
+	    				+ "AND p.effectiveDate <= :effectiveDate ",
 	    				PsJob.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
@@ -1870,7 +1817,167 @@ public class PsJob implements Serializable {
 	
 	//TODO: Check-If-Correct102A
 	//TODO: findJobStartDateByEmployeeIdAndJobCodeAndEffectiveDateAndEffectiveSequence(String employeeId, String jobCode, Date effectiveDate, Integer effectiveSequence)
+	   
+	/**
+	 * Replaces Check-If-Contractor from ZHRI100A.SQR
+	 * Checks to see if the employee is a contractor       
+	 * @param employeeId
+	 * @return
+	 */
+	public static Boolean ZHRI100A_checkIfContractor(String employeeId) {
+		//BEGIN-PROCEDURE CHECK-IF-CONTRACTOR
+		//LET $Found = 'N'
+		//BEGIN-SELECT
+		//'X'
+		//LET $Found = 'Y'
+		//FROM PS_JOB RJ
+		//WHERE RJ.EMPLID = $PSEmplid
+		//		AND RJ.EMPL_CLASS = 'R'
+		//		AND RJ.EFFDT = 
+		//				(SELECT MAX(EFFDT) FROM PS_JOB RJ2
+		//					WHERE RJ2.EMPLID = RJ.EMPLID
+		//						AND RJ2.EMPL_RCD = RJ.EMPL_RCD
+		//						AND RJ2.EFFDT <= $AsOfToday)
+		//		AND RJ.EFFSEQ = 
+		//				(SELECT MAX(EFFSEQ) FROM PS_JOB RJ3
+		//					WHERE RJ3.EMPLID = RJ.EMPLID
+		//						AND RJ3.EMPL_RCD = RJ.EMPL_RCD
+		//						AND RJ3.EFFDT = RJ.EFFDT)
+		//END-SELECT
+		//END-PROCEDURE CHECK-IF-CONTRACTOR
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<Date> resultList = em.createQuery("SELECT p FROM PsJob p "
+	    			+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    			+ "AND p.employeeClass = 'R' "
+	    			+ "AND p.effectiveDate = "
+	    			+ "		(SELECT MAX(p2.effectiveDate) FROM PsJob p2 "
+	    			+ "			WHERE p2.employeeId = p.employeeId "
+	    			+ "				AND p2.employmentRecordNumber = p.employmentRecordNumber "
+	    			+ "				AND p2.effectiveDate <= :asOfToday) "
+	    			+ "AND p.effectiveSequence = "
+	    			+ "		(SELECT MAX(p3.effectiveSequence) FROM PsJob p3 "
+	    			+ "			WHERE p3.employeeId = p.employeeId "
+	    			+ "				AND p3.employmentRecordNumber = p.employmentRecordNumber "
+	    			+ "				AND p3.effectiveDate = p.effectiveDate) ",
+	    				Date.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("asOfToday", DateUtil.asOfToday(), TemporalType.DATE)
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return true;
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return false;	
+	}
+		   
+	/**
+	 * Replaces Check-If-Contractor from ZHRI100A.SQR
+	 * Checks to see if the employee is a contractor       
+	 * @param employeeId
+	 * @param effectiveDate
+	 * @param effectiveSequence
+	 * @return
+	 */
+	public static boolean employeeIsContractor(String employeeId, Date effectiveDate, Integer effectiveSequence) {
+		//BEGIN-PROCEDURE CHECK-IF-CONTRACTOR
+		//LET $Found = 'N'
+		//BEGIN-SELECT
+		//'X'
+		//LET $Found = 'Y'
+		//FROM PS_JOB RJ
+		//WHERE RJ.EMPLID = $PSEmplid
+		//		AND RJ.EMPL_CLASS = 'R'
+		//		AND RJ.EFFDT = 
+		//				(SELECT MAX(EFFDT) FROM PS_JOB RJ2
+		//					WHERE RJ2.EMPLID = RJ.EMPLID
+		//						AND RJ2.EMPL_RCD = RJ.EMPL_RCD
+		//						AND RJ2.EFFDT <= $AsOfToday)
+		//		AND RJ.EFFSEQ = 
+		//				(SELECT MAX(EFFSEQ) FROM PS_JOB RJ3
+		//					WHERE RJ3.EMPLID = RJ.EMPLID
+		//						AND RJ3.EMPL_RCD = RJ.EMPL_RCD
+		//						AND RJ3.EFFDT = RJ.EFFDT)
+		//END-SELECT
+		//END-PROCEDURE CHECK-IF-CONTRACTOR
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<PsJob> resultList = em.createQuery("SELECT p FROM PsJob p "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				+ "AND p.effectiveDate <= :effectiveDate "
+	    				+ "AND p.effectiveSequence = :effectiveSequence "
+	    				+ "AND p.employeeClass = :employeeClass ", PsJob.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
+	    		    .setParameter("effectiveSequence", effectiveSequence)
+	    		    .setParameter("employeeClass", "R".toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return true;
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return false;	
+	}
 
-	
-
+	/**
+	 * Check-If-Correct102A from ZHRI100A.SQR
+	 * Checks to see if 102A process has JOB row
+	 * @param psEmplId
+	 * @param psEffectiveDate
+	 * @param processName
+	 * @return true if corresponding PsJob record found
+	 */
+	public static Boolean ZHRI100A_checkIfCorrect102A(String employeeId, Date effectiveDate, String processName) {
+		System.out.println("********** ZHRI100A_checkIfCorrect102A");
+		System.out.println("************** employeeId: " + employeeId);
+		System.out.println("************** effectiveDate: " + effectiveDate);
+		System.out.println("************** processName: " + processName);
+		//BEGIN-PROCEDURE CHECK-IF-CORRECT102A
+		//LET $OK-To-Process = 'N'
+		//IF $WrkProcess = 'ZHRI102A'
+		Date dt102 = effectiveDate;
+		if("ZHRI102A".equalsIgnoreCase(processName)) {
+			//DO DTU-ADD-DAYS($PSEffDt, 1, $Dt102)
+			//add a day to current effective date
+			dt102 = DateUtil.addDays(effectiveDate, 1);
+		}
+		//!ELSE
+			//!LET $Dt102 = $PSEffdt
+			//*do nothing*
+		//END-IF
+		//BEGIN-SELECT
+		//'XX'
+		//LET $OK-To-Process = 'Y'
+		//FROM PS_JOB PS_JOB
+		//WHERE PS_JOB.EMPLID = $PSEmplId
+		//		AND TO_CHAR(PS_JOB.EFFDT, 'YYYY-MM-DD') = $Dt102
+		//END-SELECT
+		//END-PROCEDURE CHECK-IF-CORRECT102A
+		System.out.println("************** Dt102: " + dt102);
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<PsJob> resultList = em.createQuery("SELECT p FROM PsJob p "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				+ "AND p.effectiveDate <= :dt102 ", PsJob.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("dt102", dt102, TemporalType.DATE)
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return true;
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return false;	
+	}
 }

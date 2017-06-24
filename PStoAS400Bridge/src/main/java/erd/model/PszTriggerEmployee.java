@@ -74,29 +74,6 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    } 
 	    return null;	
     }
-
-	/**
-	 * Replaces Update-Trigger-Row from ZHRI100A.SQR
-	 * Updates the trigger file flag switch
-	 */
-	public static int setCompletionStatusBySequenceNumber(String completionStatus, Integer sequenceNumber) {
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-		EntityManager em = emfactory.createEntityManager();
-		int numberOfRecordsUpdated = 0;
-	    try {
-	    	em.getTransaction().begin();
-	    	numberOfRecordsUpdated = em.createQuery("UPDATE PszTriggerEmployee t SET t.completionStatus = :completionStatus "
-	    				+ "WHERE t.sequenceNumber = :sequenceNumber")
-	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
-	    		    .setParameter("sequenceNumber", sequenceNumber)
-	    		    .executeUpdate();
-	    	em.getTransaction().commit();
-	    }
-	    catch (Exception e) {
-	       e.printStackTrace();
-	    } 
-	    return numberOfRecordsUpdated;
-	}
 	
 	public static PszTriggerEmployee createMockTriggerForEmployeeTermination() {
 		String completionStatus = "P";
@@ -241,6 +218,29 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    catch (Exception e) {
 	       e.printStackTrace();
 	    }
+	    return numberOfRecordsUpdated;
+	}
+
+	/**
+	 * Replaces Update-Trigger-Row from ZHRI100A.SQR
+	 * Updates the trigger file flag switch
+	 */
+	public static int setCompletionStatusBySequenceNumber(String completionStatus, Integer sequenceNumber) {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		int numberOfRecordsUpdated = 0;
+	    try {
+	    	em.getTransaction().begin();
+	    	numberOfRecordsUpdated = em.createQuery("UPDATE PszTriggerEmployee t SET t.completionStatus = :completionStatus "
+	    				+ "WHERE t.sequenceNumber = :sequenceNumber")
+	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
+	    		    .setParameter("sequenceNumber", sequenceNumber)
+	    		    .executeUpdate();
+	    	em.getTransaction().commit();
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
 	    return numberOfRecordsUpdated;
 	}
 }

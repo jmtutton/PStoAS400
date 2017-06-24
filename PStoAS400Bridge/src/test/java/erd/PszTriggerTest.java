@@ -69,10 +69,10 @@ public class PszTriggerTest {
 //	}
 
 	@Test 
-	public void testUpdateCompletionStatus_TriggerEmployee() {
+	public void testSetCompletionStatusBySequenceNumber_TriggerEmployee() {
 		//TODO: don't have update privileges
-		final String STATUS = "P";	
-		final Integer SEQ_NUM = 9072090;
+		final String STATUS = "C";	
+		final Integer SEQ_NUM = 9073252;
 		int numUpdated = 0;
 		numUpdated = PszTriggerEmployee.setCompletionStatusBySequenceNumber(STATUS, SEQ_NUM);
 		assert(numUpdated > 0);

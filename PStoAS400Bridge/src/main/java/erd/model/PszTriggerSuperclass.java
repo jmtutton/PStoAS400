@@ -50,20 +50,17 @@ abstract class PszTriggerSuperclass implements Serializable {
 	@Column(name = "TASK_FLAG")
 	protected String completionStatus;  //TODO: make enum with values 'P', 'C', 'E'
 
-	public void setCompletionStatus(String status) {
-		this.completionStatus = status.trim();
-	}
 	public Integer getSequenceNumber() {
 		return sequenceNumber;
 	}
 	public String getCompletionStatus() {
-		return completionStatus.trim();
+		return completionStatus != null ? completionStatus.trim() :  completionStatus;
 	}
 	public String getOperatorId() {
-		return operatorId.trim();
+		return operatorId != null ? operatorId.trim() :  operatorId;
 	}
 	public String getEmployeeId() {
-		return employeeId.trim();
+		return employeeId != null ? employeeId.trim() :  employeeId;
 	}
 	public Date getEffectiveDate() {
 		return effectiveDate;
@@ -72,17 +69,17 @@ abstract class PszTriggerSuperclass implements Serializable {
 		return effectiveSequence;
 	}
 	public String getProcessName() {
-		return processName.trim();
+		return processName != null ? processName.trim() :  processName;
 	}
 	
 	public void setSequenceNumber(Integer sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 	}
 	public void setOperatorId(String operatorId) {
-		this.operatorId = operatorId;
+		this.operatorId = operatorId != null ? operatorId.trim() :  operatorId;
 	}
 	public void setEmployeeId(String employeeId) {
-		this.employeeId = employeeId;
+		this.employeeId = employeeId != null ? employeeId.trim() :  employeeId;
 	}
 	public void setEffectiveDate(Date effectiveDate) {
 		this.effectiveDate = effectiveDate;
@@ -91,7 +88,10 @@ abstract class PszTriggerSuperclass implements Serializable {
 		this.effectiveSequence = effectiveSequence;
 	}
 	public void setProcessName(String processName) {
-		this.processName = processName;
+		this.processName = processName != null ? processName.trim() :  processName;
+	}
+	public void setCompletionStatus(String completionStatus) {
+		this.completionStatus = completionStatus != null ? completionStatus.trim() :  completionStatus;
 	}
 	
 	//long count()
@@ -196,18 +196,6 @@ abstract class PszTriggerSuperclass implements Serializable {
 	    }
 	    return numberOfRecordsDeleted;
 	}
-	
-	@Override
-	public String toString() {
-		return "ENTITY_NAME: " + ENTITY_NAME + "\n" +
-				"SequenceNumber: " + getSequenceNumber() + "\n" +
-				"OperatorId: " + getOperatorId() + "\n" +
-				"EmployeeId: " + getEmployeeId() + "\n" +
-				"EffectiveDate: " + getEffectiveDate() + "\n" +
-				"EffectiveSequence: " + getEffectiveSequence() + "\n" +
-				"ProcessName: " + getProcessName() + "\n" +
-				"CompletionStatus: " + getCompletionStatus();
-	}
 
 	public static List<?> GetTriggerDataNonEmp() {
 //		!----------------------------------------------------------------------
@@ -294,6 +282,18 @@ abstract class PszTriggerSuperclass implements Serializable {
 	    public String description() {
 	        return description;
 	    }
+	}
+	
+	@Override
+	public String toString() {
+		return "ENTITY_NAME: " + ENTITY_NAME + "\n" +
+				"SequenceNumber: " + getSequenceNumber() + "\n" +
+				"OperatorId: " + getOperatorId() + "\n" +
+				"EmployeeId: " + getEmployeeId() + "\n" +
+				"EffectiveDate: " + getEffectiveDate() + "\n" +
+				"EffectiveSequence: " + getEffectiveSequence() + "\n" +
+				"ProcessName: " + getProcessName() + "\n" +
+				"CompletionStatus: " + getCompletionStatus();
 	}
 	
 }

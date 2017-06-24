@@ -8,6 +8,7 @@ import javax.persistence.*;
 
 /**
  * The persistent class for the PS_ZPTT_XLAT_TBL database table.
+ * @author John Tutton john@tutton.net
  */
 @Entity
 @Table(name="PS_ZPTT_XLAT_TBL")

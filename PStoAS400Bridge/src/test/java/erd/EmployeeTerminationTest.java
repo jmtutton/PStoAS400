@@ -6,7 +6,10 @@ import java.util.List;
 
 import org.junit.Test;
 
+import erd.controller.EmployeeTermination;
+import erd.controller.ZHRI100A;
 import erd.model.PszTriggerEmployee;
+import erd.model.Zhri100aFields;
 
 public class EmployeeTerminationTest {
 
@@ -16,9 +19,12 @@ public class EmployeeTerminationTest {
 		String processName = "ZHRI102A";
 		List<PszTriggerEmployee> triggerList = PszTriggerEmployee.findByCompletionStatusAndProcessName(completionStatus, processName);
 		assertNotNull(triggerList);
+		Zhri100aFields zhri100aFields = ZHRI100A.initializeMainProperties();
+		EmployeeTermination et = null;
+		PszTriggerEmployee trigger = null;
 		if(triggerList != null && !triggerList.isEmpty()) {
-//			TriggerEmployee trigger = triggerList.get(0);
-//			EmployeeTermination et = new EmployeeTermination(trigger, null);
+			trigger = triggerList.get(0);
+			et = new EmployeeTermination(trigger, zhri100aFields);
 		}
 		else {
 			System.out.println("triggerList either null or empty");
@@ -28,7 +34,7 @@ public class EmployeeTerminationTest {
 			String employeeId = "347940";
 			String operatorId = "OPSHR";
 			Integer sequenceNumber = 90727260;
-			PszTriggerEmployee trigger = new PszTriggerEmployee();
+			trigger = new PszTriggerEmployee();
 			trigger.setCompletionStatus(completionStatus);
 			trigger.setEffectiveDate(sqlDate);
 			trigger.setEffectiveSequence(effectiveSequence);
@@ -36,8 +42,12 @@ public class EmployeeTerminationTest {
 			trigger.setOperatorId(operatorId);
 			trigger.setProcessName(processName);
 			trigger.setSequenceNumber(sequenceNumber);
-//			EmployeeTermination et = new EmployeeTermination(trigger, null);
+			et = new EmployeeTermination(trigger, zhri100aFields);
 		}
+		completionStatus = et.HR02_processMain();
+		System.out.println("************** completionStatus: " + completionStatus);
+		trigger = PszTriggerEmployee.findBySequenceNumber(trigger.getSequenceNumber());
+		System.out.println("************** trigger.completionStatus: " + trigger.getCompletionStatus());
 	}
 
 }
