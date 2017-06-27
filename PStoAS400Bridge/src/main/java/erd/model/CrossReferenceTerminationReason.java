@@ -67,7 +67,7 @@ public class CrossReferenceTerminationReason implements Serializable {
 		this.legacyTerminationReason = legacyTerminationReason;
 	}
 
-	public CrossReferenceTerminationReason HR02GetActionReason(String employeeId) {
+	public CrossReferenceTerminationReason HR02_getActionReason(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR02-Get-Action-Reason
 //		! Desc:  This routine will determine if a termination was voluntary or

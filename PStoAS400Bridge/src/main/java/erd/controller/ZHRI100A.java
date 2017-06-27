@@ -1,14 +1,12 @@
 package erd.controller;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
-import erd.model.AS400Package;
 import erd.model.CrossReferenceEmployeeId;
 import erd.model.CrossReferenceMultipleEmployeeId;
 import erd.model.HR036P;
@@ -125,7 +123,7 @@ public class ZHRI100A {
 	 */
 	public static void ZHRI100A_ftpFile() {
 		System.out.println("********** ZHRI100A_ftpFile");
-		//BEGIN-PROCEDURE FTP-FILE !LJM-04/03/01-Rehost
+		//BEGIN-PROCEDURE FTP-FILE
 		//IF #status != 0
 		//END-IF
 		//END-PROCEDURE
@@ -141,7 +139,7 @@ public class ZHRI100A {
 	 */
 	public static String ZHRI100A_callPrograms(PszTriggerEmployee trigger, Zhri100aFields zhri100aFields) {
 		System.out.println("********** ZHRI100A_callPrograms");
-		String command = "";
+		String commandString = "";
 		//BEGIN-PROCEDURE CALL-PROGRAMS
 		//DO Initialize-AD-WrkFields
 		//LET $TrigTaskFlag = ''
@@ -288,7 +286,8 @@ public class ZHRI100A {
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 			ZHRI100A_prepareErrorParms(zhri100aFields);
 			//DO Call-Error-Routine
-			command = ZHRI100A_callErrorRoutine(trigger.getProcessName(), zhri100aFields);
+			zhri100aFields.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
 			//LET $WrkCriticalFlag = 'N'
 			zhri100aFields.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
@@ -306,7 +305,8 @@ public class ZHRI100A {
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 			ZHRI100A_prepareErrorParms(zhri100aFields);
 			//DO Call-Error-Routine
-			command = ZHRI100A_callErrorRoutine(trigger.getProcessName(), zhri100aFields);
+			zhri100aFields.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
 			//LET $WrkCriticalFlag = 'N'
 			zhri100aFields.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
@@ -324,7 +324,8 @@ public class ZHRI100A {
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 			ZHRI100A_prepareErrorParms(zhri100aFields);
 			//DO Call-Error-Routine
-			command = ZHRI100A_callErrorRoutine(trigger.getProcessName(), zhri100aFields);
+			zhri100aFields.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
 			//LET $WrkCriticalFlag = 'N'
 			zhri100aFields.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
@@ -342,7 +343,8 @@ public class ZHRI100A {
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 			ZHRI100A_prepareErrorParms(zhri100aFields);
 			//DO Call-Error-Routine
-			command = ZHRI100A_callErrorRoutine(trigger.getProcessName(), zhri100aFields);
+			zhri100aFields.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
 			//LET $WrkCriticalFlag = 'N'
 			zhri100aFields.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
@@ -360,7 +362,8 @@ public class ZHRI100A {
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 			ZHRI100A_prepareErrorParms(zhri100aFields);
 			//DO Call-Error-Routine
-			command = ZHRI100A_callErrorRoutine(trigger.getProcessName(), zhri100aFields);
+			zhri100aFields.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
 			//LET $WrkCriticalFlag = 'N'
 			zhri100aFields.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
@@ -378,7 +381,8 @@ public class ZHRI100A {
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 			ZHRI100A_prepareErrorParms(zhri100aFields);
 			//DO Call-Error-Routine
-			command = ZHRI100A_callErrorRoutine(trigger.getProcessName(), zhri100aFields);
+			zhri100aFields.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
 			//LET $WrkCriticalFlag = 'N'
 			zhri100aFields.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
@@ -396,7 +400,8 @@ public class ZHRI100A {
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 			ZHRI100A_prepareErrorParms(zhri100aFields);
 			//DO Call-Error-Routine
-			command = ZHRI100A_callErrorRoutine(trigger.getProcessName(), zhri100aFields);
+			zhri100aFields.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
 			//LET $WrkCriticalFlag = 'N'
 			zhri100aFields.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
@@ -503,7 +508,7 @@ public class ZHRI100A {
 	 * @param zhri100aFields
 	 * @return 0 if success, non-zero if error
 	 */
-	public static Integer ZHRI100A_callSystem(String command, Zhri100aFields zhri100aFields) {
+	public static Integer ZHRI100A_callSystem(String commandString, Zhri100aFields zhri100aFields) {
 		System.out.println("********** ZHRI100A_callSystem");
 		Integer status; //#Status
 //		String showCommand;
@@ -525,9 +530,9 @@ public class ZHRI100A {
 		//END-WHILE   !#SubstrStartPos <= #CommandLength
 //		}
 		//LET $Command = $RexecScript || ' ' || $Command || ' ' || $RMTSVR
-		command = zhri100aFields.getRemoteExecScript() + " " +  command + " " + zhri100aFields.getRemoteServerName();
+//		command = zhri100aFields.getRemoteExecScript() + " " +  command + " " + zhri100aFields.getRemoteServerName();
 		//Call System Using $Command #Status Wait  !Execute the command that was built on the command waiting until completion
-		status = callSystemUsingCommand(command, zhri100aFields);
+		status = callSystemUsingCommand(commandString, zhri100aFields);
 		//IF #status != 0
 		if(status != 0) {
 			//!error
@@ -544,13 +549,15 @@ public class ZHRI100A {
 			if(!zhri100aFields.getPoiFlag()) {
 				//DO Call-Error-Routine
 				//TODO: 
-				command = ZHRI100A_callErrorRoutine("HRZ100A", zhri100aFields);
+				zhri100aFields.setProcessName("HRZ100A");
+				commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
 			//ELSE
 			}
 			else {
 				//DO Call-Error-Routine-NonEmp
 				//TODO: 
-				command = ZHRI100A_callErrorRoutineNonEmp("HRZ100A", zhri100aFields);
+				zhri100aFields.setProcessName("HRZ100A");
+				commandString = ZHRI100A_callErrorRoutineNonEmp(zhri100aFields);
 			//END-IF
 			}
 			//LET $WrkCriticalFlag  = 'N'
@@ -611,30 +618,11 @@ public class ZHRI100A {
 	 * @param zhri100aFields
 	 * @return command text
 	 */
-	private static String ZHRI100A_callErrorRoutineNonEmp(String processName, Zhri100aFields zhri100aFields) {
+	private static String ZHRI100A_callErrorRoutineNonEmp(Zhri100aFields zhri100aFields) {
 		System.out.println("********** ZHRI100A_callErrorRoutineNonEmp");
-		String blankSpaceParameter = " ";
-		String criticalFlag = zhri100aFields.getCriticalFlag() != null && zhri100aFields.getCriticalFlag() ? "Y" : "N";
-		Calendar now = Calendar.getInstance();
-		String errorDateParameter =  now.get(Calendar.MONTH) + "/" + now.get(Calendar.DATE) + "/" + now.get(Calendar.YEAR);
-		String errorTimeParameter = now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND);
-		String yesOrNoParameter = "Y"; //TODO: What should this value really be called
-		//!Make Sure that the ErrorMessageParm is always 75 Characters long
-		String errorMessageParameter = String.format("%1$-75s", zhri100aFields.getErrorMessageParameter());
-		String command = "\"CALL " + zhri100aFields.getAs400Library() + "/" + processName + " "
-					+ "PARM("
-					+ "'" + zhri100aFields.getErrorProgramParameter() + "' "
-					+ "'" + zhri100aFields.getEmployeeId() + "' "
-					+ "'" + zhri100aFields.getIndexNumber() + "' "
-					+ "'" + blankSpaceParameter + "' "
-					+ "'" + errorMessageParameter + "' "
-					+ "'" + criticalFlag + "' "
-					+ "'" + errorDateParameter + "' "
-					+ "'" + errorTimeParameter + "' "
-					+ "'" + zhri100aFields.getOperatorId() + "' "
-					+ "'" + yesOrNoParameter + "')\" ";
-		System.out.println(command);
-		return command;
+		String commandString = composeCommandString(zhri100aFields, composeErrorParameterString(zhri100aFields), zhri100aFields.getProcessName());
+		System.out.println(commandString);
+		return commandString;
 	}
 
 	/**
@@ -643,54 +631,56 @@ public class ZHRI100A {
 	 * @param zhri100aFields
 	 * @return command text
 	 */
-	public static String ZHRI100A_callErrorRoutine(String processName, Zhri100aFields zhri100aFields) {
+	public static String ZHRI100A_callErrorRoutine(Zhri100aFields zhri100aFields) {
 		System.out.println("********** ZHRI100A_callErrorRoutine");
-		List<String> parameterList = new ArrayList<String>();
-		HashMap<String, String> parameterMap = new HashMap<String, String>();
-		String blankSpaceParameter = " ";
-		String criticalFlag = zhri100aFields.getCriticalFlag() != null && zhri100aFields.getCriticalFlag() ? "Y" : "N";
-		Calendar now = Calendar.getInstance();
-		String errorDateParameter =  now.get(Calendar.MONTH) + "/" + now.get(Calendar.DATE) + "/" + now.get(Calendar.YEAR);
-		String errorTimeParameter = now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND);
-		String yesOrNoParameter = "Y"; //TODO: What should this value really be called
-		//!Make Sure that the ErrorMessageParm is always 75 Characters long
-		String errorMessageParameter = String.format("%1$-75s", zhri100aFields.getErrorMessageParameter());
-		String command = "\"CALL " + zhri100aFields.getAs400Library() + "/" + processName + " "
-					+ "PARM("
-					+ "'" + zhri100aFields.getErrorProgramParameter() + "' "
-					+ "'" + zhri100aFields.getEmployeeId() + "' "
-					+ "'" + blankSpaceParameter + "' "
-					+ "'" + errorMessageParameter + "' "
-					+ "'" + criticalFlag + "' "
-					+ "'" + errorDateParameter + "' "
-					+ "'" + errorTimeParameter + "' "
-					+ "'" + zhri100aFields.getOperatorId() + "' "
-					+ "'" + yesOrNoParameter + "')\" ";
-		System.out.println(command);
-
-		parameterList.add("errorProgramParameter");
-		parameterList.add("employeeId");
-		parameterList.add("blankSpaceParameter");
-		parameterList.add("errorMessageParameter");
-		parameterList.add("criticalFlag");
-		parameterList.add("errorDateParameter");
-		parameterList.add("errorTimeParameter");
-		parameterList.add("opridErrorParameter");
-		parameterList.add("yesOrNoParameter");
-		
-		parameterMap.put("errorProgramParameter", zhri100aFields.getErrorProgramParameter());
-		parameterMap.put("employeeId", zhri100aFields.getEmployeeId());
-		parameterMap.put("blankSpaceParameter", blankSpaceParameter);
-		parameterMap.put("errorMessageParameter", errorMessageParameter);
-		parameterMap.put("criticalFlag", criticalFlag);
-		parameterMap.put("errorDateParameter", errorDateParameter);
-		parameterMap.put("errorTimeParameter", errorTimeParameter);
-		parameterMap.put("opridErrorParameter", zhri100aFields.getOperatorId());
-		parameterMap.put("yesOrNoParm", yesOrNoParameter);
-		
-		AS400Package as400Package = new AS400Package(processName, parameterList, parameterMap);
+		String commandString = composeCommandString(zhri100aFields, composeErrorParameterString(zhri100aFields), zhri100aFields.getProcessName());
+		System.out.println(commandString);
+		return commandString;
+//		List<String> parameterList = new ArrayList<String>();
+//		HashMap<String, String> parameterMap = new HashMap<String, String>();
+//		String blankSpaceParameter = " ";
+//		String criticalFlag = zhri100aFields.getCriticalFlag() != null && zhri100aFields.getCriticalFlag() ? "Y" : "N";
+//		Calendar now = Calendar.getInstance();
+//		String errorDateParameter =  now.get(Calendar.MONTH) + "/" + now.get(Calendar.DATE) + "/" + now.get(Calendar.YEAR);
+//		String errorTimeParameter = now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND);
+//		String yesOrNoParameter = "Y"; //TODO: What should this value really be called
+//		//!Make Sure that the ErrorMessageParm is always 75 Characters long
+//		String errorMessageParameter = String.format("%1$-75s", zhri100aFields.getErrorMessageParameter());
+//		String command = "\"CALL " + zhri100aFields.getAs400Library() + "/" + processName + " "
+//					+ "PARM("
+//					+ "'" + zhri100aFields.getErrorProgramParameter() + "' "
+//					+ "'" + zhri100aFields.getEmployeeId() + "' "
+//					+ "'" + blankSpaceParameter + "' "
+//					+ "'" + errorMessageParameter + "' "
+//					+ "'" + criticalFlag + "' "
+//					+ "'" + errorDateParameter + "' "
+//					+ "'" + errorTimeParameter + "' "
+//					+ "'" + zhri100aFields.getOperatorId() + "' "
+//					+ "'" + yesOrNoParameter + "')\" ";
+//		System.out.println(command);
+//
+//		parameterList.add("errorProgramParameter");
+//		parameterList.add("employeeId");
+//		parameterList.add("blankSpaceParameter");
+//		parameterList.add("errorMessageParameter");
+//		parameterList.add("criticalFlag");
+//		parameterList.add("errorDateParameter");
+//		parameterList.add("errorTimeParameter");
+//		parameterList.add("opridErrorParameter");
+//		parameterList.add("yesOrNoParameter");
+//		
+//		parameterMap.put("errorProgramParameter", zhri100aFields.getErrorProgramParameter());
+//		parameterMap.put("employeeId", zhri100aFields.getEmployeeId());
+//		parameterMap.put("blankSpaceParameter", blankSpaceParameter);
+//		parameterMap.put("errorMessageParameter", errorMessageParameter);
+//		parameterMap.put("criticalFlag", criticalFlag);
+//		parameterMap.put("errorDateParameter", errorDateParameter);
+//		parameterMap.put("errorTimeParameter", errorTimeParameter);
+//		parameterMap.put("opridErrorParameter", zhri100aFields.getOperatorId());
+//		parameterMap.put("yesOrNoParm", yesOrNoParameter);
+//		
+//		AS400Package as400Package = new AS400Package(processName, parameterList, parameterMap);
 //		return as400Package;
-		return command;
 	}
 
 
@@ -748,10 +738,10 @@ public class ZHRI100A {
 	 * @param zhri100aFields
 	 * @return legacyEmployeeId
 	 */
-	public static String ZHRI100A_getOprId(String employeeId, Integer indexNumber, Zhri100aFields zhri100aFields) {
+	public static String ZHRI100A_getOprId(String employeeId, BigDecimal indexNumber, Zhri100aFields zhri100aFields) {
 		return ZHRI100A_getOprId(employeeId, zhri100aFields, indexNumber, null); 
 	}
-	public static String ZHRI100A_getOprId(String employeeId, Zhri100aFields zhri100aFields, Integer indexNumber, Integer eidIndexNumber) {
+	public static String ZHRI100A_getOprId(String employeeId, Zhri100aFields zhri100aFields, BigDecimal indexNumber, BigDecimal eidIndexNumber) {
 		System.out.println("********** ZHRI100A_getOprId");
 		//BEGIN-PROCEDURE GET-OPRID
 		//LET $Found = 'N'
@@ -761,7 +751,7 @@ public class ZHRI100A {
 		//IF $PoiFlag = 'N'
 		if(!zhri100aFields.getPoiFlag()) {
 			//MOVE 0 TO #indexNum
-			indexNumber = 0;
+			indexNumber = new BigDecimal(0);
 		//END-IF
 		}
 		//IF #indexNum = 0
@@ -975,6 +965,7 @@ public class ZHRI100A {
 //		PszTriggerEmployee trigger = PszTriggerEmployee.createMockTriggerForEmployeeTermination();
 		List<PszTriggerEmployee> triggerList = PszTriggerEmployee.findByCompletionStatusAndProcessName("P", "ZHRI102A");
 		PszTriggerEmployee trigger = triggerList != null && !triggerList.isEmpty() ? triggerList.get(0) : PszTriggerEmployee.createMockTriggerForEmployeeTermination();
+		System.out.println("************************************************** trigger: \n" + trigger.toString());
 		Boolean adFound = false; //$AdFound  //TODO: where should this be set???
 		//BEGIN-PROCEDURE GET-TRIGGER-DATA
 		//LET $CompletionStatus = 'P'   !Initialize the CompletionStatus field
@@ -1009,8 +1000,9 @@ public class ZHRI100A {
 		//IF $file_open = 'N'
 		Boolean fileIsOpen = false;
 		if(!fileIsOpen) {
-			//!open $open_file1 as 1 for-append record=337
+			//!OPEN $open_file1 AS 1 FOR-APPEND RECORD=337
 			//!LET $file_open = 'Y'
+			fileIsOpen = true;
 			//do nothing
 		//END-IF
 		}
@@ -1018,7 +1010,8 @@ public class ZHRI100A {
 		zhri100aFields.setPoiFlag(false);
 		//DO Check-If-Contractor
 		Boolean isContractor = PsJob.ZHRI100A_checkIfContractor(trigger.getEmployeeId());
-		//IF $Found = 'N' AND  $PSEmplid <> ''  !Not a contractor and not a blank EmplId   !ZHR_MOD_ZHRI100A_110A
+		//IF $Found = 'N' AND  $PSEmplid <> ''  
+		//!Not a contractor and not a blank EmplId   !ZHR_MOD_ZHRI100A_110A
 		System.out.println("************** !isContractor && trigger.getEmployeeId() != null && !trigger.getEmployeeId().isEmpty(): " + (!isContractor && trigger.getEmployeeId() != null && !trigger.getEmployeeId().isEmpty()));
 		if(!isContractor && trigger.getEmployeeId() != null && !trigger.getEmployeeId().isEmpty()) {
 			//Added a check for 'ZHRI102A' - to see if corresponding row on JOB 
@@ -1081,8 +1074,8 @@ public class ZHRI100A {
 		}
 		//FROM PS_ZHRT_INTTRIGGER RZ ,PS_JOB JB
 		//WHERE RZ.TASK_FLAG = 'P'
-		//	AND (RZ.EFFDT <= $AsOfToday or RZ.PROC_NAME='ZHRI101A' OR  RZ.PROC_NAME='ZHRI106A')
-		//  AND (CASE WHEN PROC_NAME IN ('ZHRI101A', 'ZHRI106A') THEN SEQ_NBR ELSE SEQ_NBR*10 END) = 
+		//		AND (RZ.EFFDT <= $AsOfToday or RZ.PROC_NAME='ZHRI101A' OR  RZ.PROC_NAME='ZHRI106A')
+		//  	AND (CASE WHEN PROC_NAME IN ('ZHRI101A', 'ZHRI106A') THEN SEQ_NBR ELSE SEQ_NBR*10 END) = 
 		//  		(SELECT MIN(CASE WHEN PROC_NAME IN ('ZHRI101A', 'ZHRI106A') THEN SEQ_NBR ELSE SEQ_NBR*10 END)  
 		//      			FROM  PS_ZHRT_INTTRIGGER RZ2
 		//      			WHERE RZ2.EMPLID = RZ.EMPLID
@@ -1091,13 +1084,13 @@ public class ZHRI100A {
 		//								OR RZ2.PROC_NAME='ZHRI101A'
 		//								OR RZ2.PROC_NAME='ZHRI106A'))
 		//!Surya - TEMPMAST Added the below NOT IN to restrict the rows other than 101 to process when there is a delay
-		//	AND RZ.EMPLID NOT IN (SELECT I.EMPLID FROM PS_ZHRT_INTTRIGGER I WHERE I.EMPLID = RZ.EMPLID AND I.TASK_FLAG = 'W') 
-		//  AND JB.EMPLID = RZ.EMPLID
-		//  AND JB.EFFDT = 
+		//		AND RZ.EMPLID NOT IN (SELECT I.EMPLID FROM PS_ZHRT_INTTRIGGER I WHERE I.EMPLID = RZ.EMPLID AND I.TASK_FLAG = 'W') 
+		//  	AND JB.EMPLID = RZ.EMPLID
+		//  	AND JB.EFFDT = 
 		//			(SELECT MAX(JB2.EFFDT) FROM  PS_JOB JB2
 		//         			WHERE  JB2.EMPLID = JB.EMPLID
 		//          			AND  JB2.EMPL_RCD = JB.EMPL_RCD)
-		//  AND JB.EFFSEQ = 
+		//  	AND JB.EFFSEQ = 
 		//			(SELECT MAX(JB3.EFFSEQ) FROM PS_JOB JB3
 		//                	WHERE JB3.EMPLID = JB.EMPLID
 		//                 		AND  JB3.EMPL_RCD = JB.EMPL_RCD
@@ -1115,7 +1108,7 @@ public class ZHRI100A {
 	 * @param poiFlag
 	 * @return legacyEmployeeId
 	 */
-	public static String ZHRI100A_getLegacyOprId(String employeeId, Integer indexNumber, Boolean poiFlag) {
+	public static String ZHRI100A_getLegacyOprId(String employeeId, BigDecimal indexNumber, Boolean poiFlag) {
 		System.out.println("********** ZHRI100A_getLegacyOprId");
 		//Begin-Procedure Get-Legacy-Oprid                !sree**10/04/01
 		//LET $LegEmplid = ''
@@ -1132,7 +1125,7 @@ public class ZHRI100A {
 		//!Surya Added - TEMPMAST Start
 		//IF $PoiFlag = 'N'
 		if(!poiFlag) {
-			indexNumber = 0;
+			indexNumber = new BigDecimal(0);
 			//MOVE 0 TO #indexNum
 		//END-IF
 		}
@@ -1167,7 +1160,7 @@ public class ZHRI100A {
 				//!DO Insert-OprId  !Surya Added - TEMPMAST 
 				//!Surya Added - TEMPMAST Start
 				//IF #indexNum = 0
-		    	if(indexNumber == 0) {
+		    	if(new BigDecimal(0).equals(indexNumber)) {
 					//DO INSERT-OPRID
 		    		CrossReferenceMultipleEmployeeId.ZHRI100A_insertOprId(employeeId, legacyEmployeeId);
 		    	}
@@ -1184,5 +1177,45 @@ public class ZHRI100A {
     	}
     	return null;
 		//END-PROCEDURE GET-LEGACY-OPRID
+	}
+	
+	public static String composeCommandString(Zhri100aFields zhri100aFields, String parameterString, String processName) {
+		System.out.println("********** composeCommand()");
+		//LET $Part1 = '"CALL ' || $Library ||'/HRZ202A '
+		//LET $Part2 = 'Parm(''' || $PSauditEmpl || ''' ''' || $PSOprid || ''' ''' || $PSTermDate || ''')" '
+		//LET $Command = $Part1||$Part2
+		//LET $Command = $RexecScript || ' ' || $Command || ' ' || $RMTSVR
+		String commandString = 
+						zhri100aFields.getRemoteExecScript() + " " 
+						+  "\"CALL " + zhri100aFields.getAs400Library() 
+						+ "/" + processName + " " 
+						+ "Parm(" + parameterString + ")\""
+						+ zhri100aFields.getRemoteServerName();
+		System.out.println("$Command=> " + commandString);
+		return commandString;
+	}
+	
+	public static String composeErrorParameterString(Zhri100aFields zhri100aFields) {
+		System.out.println("********** composeErrorParameterString()");
+		String blankSpaceParameter = " ";
+		String criticalFlag = zhri100aFields.getCriticalFlag() != null && zhri100aFields.getCriticalFlag() ? "Y" : "N";
+		Calendar now = Calendar.getInstance();
+		String errorDateParameter =  now.get(Calendar.MONTH) + "/" + now.get(Calendar.DATE) + "/" + now.get(Calendar.YEAR);
+		String errorTimeParameter = now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND);
+		String yesOrNoParameter = "Y"; //TODO: What should this value really be called
+		//!Make Sure that the ErrorMessageParm is always 75 Characters long
+		String errorMessageParameter = String.format("%1$-75s", zhri100aFields.getErrorMessageParameter());
+		String parameterString = "'" + zhri100aFields.getErrorProgramParameter() + "' "
+					+ "'" + zhri100aFields.getEmployeeId() + "' "
+					+ "'" + zhri100aFields.getIndexNumber() + "' "
+					+ "'" + blankSpaceParameter + "' "
+					+ "'" + errorMessageParameter + "' "
+					+ "'" + criticalFlag + "' "
+					+ "'" + errorDateParameter + "' "
+					+ "'" + errorTimeParameter + "' "
+					+ "'" + zhri100aFields.getOperatorId() + "' "
+					+ "'" + yesOrNoParameter + "'";
+//		System.out.println(parameterString);
+		return parameterString;
 	}
 }

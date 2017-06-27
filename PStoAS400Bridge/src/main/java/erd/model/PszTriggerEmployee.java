@@ -1,5 +1,6 @@
 package erd.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -9,6 +10,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Table;
 import javax.persistence.TemporalType;
+
+import erd.DateUtil;
 
 /**
  * Entity implementation class for PS_ZHRT_INTTRIGGER PeopleSoft employee event triggers table 
@@ -24,13 +27,13 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 		ENTITY_NAME = "PszTriggerEmployee";
 	}
 
-	public static PszTriggerEmployee findBySequenceNumber(Integer sequenceNumber) {
+	public static PszTriggerEmployee findBySequenceNumber(BigDecimal bigDecimal) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PszTriggerEmployee> resultList = em.createQuery(
-	    		    "SELECT t FROM PszTriggerEmployee t WHERE t.sequenceNumber = :sequenceNumber", PszTriggerEmployee.class)
-	    		    .setParameter("sequenceNumber", sequenceNumber)
+	    		    "SELECT p FROM PszTriggerEmployee p WHERE p.sequenceNumber = :sequenceNumber", PszTriggerEmployee.class)
+	    		    .setParameter("sequenceNumber", bigDecimal)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList.get(0);
@@ -76,12 +79,13 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
     }
 	
 	public static PszTriggerEmployee createMockTriggerForEmployeeTermination() {
+		System.out.println("********** PszTriggerEmployee.createMockTriggerForEmployeeTermination()");
 		String completionStatus = "P";
 		String processName = "ZHRI102A";
 		String employeeId = "347940";
 		String operatorId = "OPSHR";
-		Integer effectiveSequence = 0;
-		Integer sequenceNumber = 90727260;
+		BigDecimal effectiveSequence = new BigDecimal(0);
+		BigDecimal sequenceNumber = new BigDecimal(90727260);
 		Date effectiveDate = new Date();
 		PszTriggerEmployee trigger = new PszTriggerEmployee();
 		trigger.setCompletionStatus(completionStatus);
@@ -96,7 +100,6 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	
 	//TODO: fix query
 	public static List<PszTriggerEmployee> findTriggerDataList() {
-		Date asOfToday = new Date();
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -148,7 +151,7 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    		    		+ "					AND pj3.employmentRecordNumber = pj.employmentRecordNumber "
 	    		    		+ "					AND pj3.effectiveDate = pj.effectiveDate) "
 	    			, PszTriggerEmployee.class)
-	    		    .setParameter("asOfToday", asOfToday, TemporalType.DATE)
+	    		    .setParameter("asOfToday", DateUtil.asOfToday(), TemporalType.DATE)
 //	    		    .setParameter("completionStatus", "P")
 	    		    .setParameter("completionStatus", "C")
 	    		    .getResultList();
@@ -162,19 +165,31 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 		return null;
 	}
 
-	public static List<Integer> caseTest() {
+	public static List<BigDecimal> caseTest() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<Integer> resultList = em.createQuery(""
-//	    			+ "SELECT "
-//	    			+ "(CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END) "
-//					+ "((CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END) = "
-					+ "SELECT pe.sequenceNumber FROM PszTriggerEmployee pe WHERE (MIN(CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END) = "
-	    			+ "(CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END)) "
-//					+ "SELECT MIN(CASE WHEN pe.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe.sequenceNumber ELSE pe.sequenceNumber*10 END) "
-//	    		    + "FROM PszTriggerEmployee pe"
-	    			, Integer.class)
+	    	List<BigDecimal> resultList = em.createQuery(""
+	    			+ "SELECT "
+//		    		+ "(SELECT CASE WHEN processName IN ('ZHRI101A', 'ZHRI106A') THEN sequenceNumber ELSE sequenceNumber*10 END FROM PszTriggerEmployee) = "
+//		    		+ "		(SELECT MIN(CASE WHEN processName IN ('ZHRI101A', 'ZHRI106A') THEN sequenceNumber ELSE sequenceNumber*10 END FROM PszTriggerEmployee) "
+	    			+ "(SELECT CASE WHEN pe2.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe2.sequenceNumber ELSE pe2.sequenceNumber*10 END "
+		    		+ "				FROM PszTriggerEmployee pe2 "
+		    		+ "				WHERE pe2.employeeId = '323506' "
+		    		+ "					AND pe2.completionStatus = 'P' "
+		    		+ "					AND (pe2.effectiveDate <= CURRENT_DATE "
+		    		+ "						OR pe2.processName = 'ZHRI101A' "
+		    		+ "						OR pe2.processName = 'ZHRI106A')) "
+//		    		+ " = "
+//					+ "(SELECT MIN(CASE WHEN pe3.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe3.sequenceNumber ELSE pe3.sequenceNumber*10 END) "
+//		    		+ "				FROM PszTriggerEmployee pe3 "
+//		    		+ "				WHERE pe3.employeeId = '323506' "
+//		    		+ "					AND pe3.completionStatus = 'P' "
+//		    		+ "					AND (pe3.effectiveDate <= CURRENT_DATE "
+//		    		+ "						OR pe3.processName = 'ZHRI101A' "
+//		    		+ "						OR pe3.processName = 'ZHRI106A')) "
+		    		+ "FROM PszTriggerEmployee pe "
+	    			, BigDecimal.class)
 	    		    .getResultList();
 	    	return resultList;
 	    }
@@ -225,7 +240,7 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	 * Replaces Update-Trigger-Row from ZHRI100A.SQR
 	 * Updates the trigger file flag switch
 	 */
-	public static int setCompletionStatusBySequenceNumber(String completionStatus, Integer sequenceNumber) {
+	public static int setCompletionStatusBySequenceNumber(String completionStatus, BigDecimal sequenceNumber) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		int numberOfRecordsUpdated = 0;

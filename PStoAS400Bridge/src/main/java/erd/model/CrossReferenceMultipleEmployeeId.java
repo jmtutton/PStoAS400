@@ -1,6 +1,8 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.sql.Timestamp;
@@ -13,7 +15,7 @@ import java.util.List;
  */
 @Entity
 @Table(name="PS_ZHRR_MULTPL_EID")
-@NamedQuery(name="CrossReferenceMultipleEmployeeId.findAll", query="SELECT p FROM CrossReferenceMultipleEmployeeId p")
+@NamedQuery(name="CrossReferenceMultipleEmployeeId.findAll", query="SELECT c FROM CrossReferenceMultipleEmployeeId c")
 public class CrossReferenceMultipleEmployeeId implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -35,7 +37,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	private Date effectiveDate;
 
 	@Column(name="EFFSEQ", nullable=false, precision=38)
-	private Integer effectiveSequence;
+	private BigDecimal effectiveSequence;
 
 	@Column(name="LASTUPDDTTM")
 	private Timestamp lastUpdatedDateAndTime;
@@ -44,7 +46,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	private String lastUpdatedUserId;
 
 	@Column(name="\"SEQUENCE\"", nullable=false, precision=38)
-	private Integer sequence;
+	private BigDecimal sequence;
 
 	@Column(name="ZHRF_ALT_EID_TYPE", nullable=false, length=2)
 	private String legacyAltEidType;
@@ -82,11 +84,11 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		this.effectiveDate = effectiveDate;
 	}
 
-	public Integer getEffectiveSequence() {
+	public BigDecimal getEffectiveSequence() {
 		return this.effectiveSequence;
 	}
 
-	public void setEffectiveSequence(Integer effectiveSequence) {
+	public void setEffectiveSequence(BigDecimal effectiveSequence) {
 		this.effectiveSequence = effectiveSequence;
 	}
 
@@ -114,11 +116,11 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		this.lastUpdatedUserId = lastUpdatedUserId;
 	}
 
-	public Integer getSequence() {
+	public BigDecimal getSequence() {
 		return this.sequence;
 	}
 
-	public void setSequence(Integer sequence) {
+	public void setSequence(BigDecimal sequence) {
 		this.sequence = sequence;
 	}
 
@@ -328,7 +330,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param employeeId
 	 * @param sequence
 	 */
-	public static String ZHRI100A_getLegIdForSeqNum(String employeeId, Integer sequence) {
+	public static String ZHRI100A_getLegIdForSeqNum(String employeeId, BigDecimal sequence) {
 //		!check if the multiple EID table has the EID!
 //		BEGIN-SELECT
 //		MULT.ZHRF_LEG_EMPL_ID
@@ -343,9 +345,9 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<String> resultList = em.createQuery("SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceEmployeeId c "
-	    			+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-	    			+ "AND sequence = :sequence", String.class)
+	    	List<String> resultList = em.createQuery("SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceMultipleEmployeeId c "
+	    			+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+	    			+ "AND c.sequence = :sequence", String.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .setParameter("sequence", sequence)
 	    		    .getResultList();
@@ -366,7 +368,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param legacyEmployeeId
 	 * @param sequence
 	 */
-	public static void ZHRI100A_updateOprId(String employeeId, String legacyEmployeeId, Integer sequence) {
+	public static void ZHRI100A_updateOprId(String employeeId, String legacyEmployeeId, BigDecimal sequence) {
 		//BEGIN-PROCEDURE UPDATE-OPRID
 		//LET $Update-Error-Flag = 'N'
 		//!Update the PS_ZHRR_MULTPL_EID table for Multiple EIDs 
@@ -382,7 +384,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    try {
 	    	List<CrossReferenceMultipleEmployeeId> resultList = em.createQuery(
 	    			"SELECT c FROM CrossReferenceMultipleEmployeeId c "
-	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
 	    					+ "AND sequence = :sequence", CrossReferenceMultipleEmployeeId.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .setParameter("sequence", sequence)

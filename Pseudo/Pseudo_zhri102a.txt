@@ -8,8 +8,8 @@
 !*  Tables Used:
 !*        TABLE                        DESCRIPTION                           ACCESS
 !*        -----                        -----------                           ------
-!*        PS_Job                       Job Table                             Input
-!*        PS_Action Reason             Action Reason Table                   Input
+!*        PS_JOB                       Job Table                             Input
+!*        PS_ACTION REASON             Action Reason Table                   Input
 !*        PS_ZHRT_TRMRS_CREF           Termntn Reason Cross Reference Table  Input
 !*********************************************************************
 ****************************************************************************

@@ -2,6 +2,8 @@ package erd;
 
 import static org.junit.Assert.*;
 
+import java.math.BigDecimal;
+
 import org.junit.Test;
 
 import erd.model.HR036P;
@@ -15,7 +17,7 @@ public class HR036PTest {
 	@Test
 	public void testGetLegacyOprId() {
 		Integer employeeNumber = 1137;
-		Integer indexNumber = 0;
+		BigDecimal indexNumber = new BigDecimal(0);
 		HR036P result = HR036P.findByEmployeeNumberAndIndexNumber(employeeNumber, indexNumber);
 		assertNotNull(result);
 		if(result != null) {

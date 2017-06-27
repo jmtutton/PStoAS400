@@ -1,5 +1,6 @@
 package erd.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Zhri100aFields {
@@ -17,12 +18,12 @@ public class Zhri100aFields {
 	private String auditOperatorId; //$PSAuditOperId
 	private String operatorId; //$PSOperId
 	private String employeeId; //PSEmpl
-	private Integer indexNumber;
+	private BigDecimal indexNumber;
 	private Date effectiveDate;
 	
 	private Boolean poiFlag; //$PoiFlag
 //	private Boolean runFlag; //#run_flag
-	private Boolean criticalFlag; //$WrkCriticalFlag
+	private Boolean criticalFlag = false; //$WrkCriticalFlag
 	
 	//from ZHRI100A.Call-Programs  //probably not used
 	private String actionCode;
@@ -101,10 +102,10 @@ public class Zhri100aFields {
 	public void setEmployeeId(String employeeId) {
 		this.employeeId = employeeId != null ? employeeId.trim() : employeeId;
 	}
-	public Integer getIndexNumber() {
+	public BigDecimal getIndexNumber() {
 		return indexNumber;
 	}
-	public void setIndexNumber(Integer indexNumber) {
+	public void setIndexNumber(BigDecimal indexNumber) {
 		this.indexNumber = indexNumber;
 	}
 	public Date getEffectiveDate() {

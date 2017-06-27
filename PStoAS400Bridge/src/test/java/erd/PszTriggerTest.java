@@ -2,6 +2,7 @@ package erd;
 
 import static org.junit.Assert.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.Test;
@@ -13,7 +14,7 @@ public class PszTriggerTest {
 	
 	@Test
 	public void testFindBySequenceNumber_TriggerEmployee() {
-		final Integer SEQ_NUM = 9072140;
+		final BigDecimal SEQ_NUM = new BigDecimal(9072140);
 		PszTriggerEmployee empTrig = (PszTriggerEmployee) PszTriggerEmployee.findBySequenceNumber(SEQ_NUM);
 		assertNotNull(empTrig);
 		assertEquals(empTrig.getSequenceNumber(), SEQ_NUM);
@@ -22,7 +23,7 @@ public class PszTriggerTest {
 
 	@Test
 	public void testFindBySequenceNumber_TriggerNonPerson() {
-		final Integer SEQ_NUM = 503;
+		final BigDecimal SEQ_NUM = new BigDecimal(503);
 		PszTriggerEmployee empTrig = (PszTriggerEmployee) PszTriggerEmployee.findBySequenceNumber(SEQ_NUM);
 		assertNotNull(empTrig);
 		assertEquals(empTrig.getSequenceNumber(), SEQ_NUM);
@@ -72,7 +73,7 @@ public class PszTriggerTest {
 	public void testSetCompletionStatusBySequenceNumber_TriggerEmployee() {
 		//TODO: don't have update privileges
 		final String STATUS = "C";	
-		final Integer SEQ_NUM = 9073252;
+		final BigDecimal SEQ_NUM = new BigDecimal(9073252);
 		int numUpdated = 0;
 		numUpdated = PszTriggerEmployee.setCompletionStatusBySequenceNumber(STATUS, SEQ_NUM);
 		assert(numUpdated > 0);
@@ -86,9 +87,9 @@ public class PszTriggerTest {
 
 	@Test 
 	public void testCaseTest() {
-		List<Integer> resultList = PszTriggerEmployee.caseTest();
+		List<BigDecimal> resultList = PszTriggerEmployee.caseTest();
 		assertNotNull(resultList);
-		for(Integer result : resultList) {
+		for(BigDecimal result : resultList) {
 			System.out.println("SequenceNumber: " + result);
 		}
 	}

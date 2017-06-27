@@ -1,7 +1,11 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+
 import javax.persistence.*;
+
+import org.eclipse.persistence.config.QueryHints;
 
 import erd.DateUtil;
 
@@ -1520,7 +1524,11 @@ public class PsJob implements Serializable {
 	 * @param effectiveSequence
 	 * @return single PsJob record
 	 */
-	public static PsJob HR02_getJob(String employeeId, Date effectiveDate, Integer effectiveSequence) {
+	public static PsJob getJob(String employeeId, Date effectiveDate, BigDecimal effectiveSequence) {
+		System.out.println("********** PsJob.getJob");
+		System.out.println("employeeId: " + employeeId);
+		System.out.println("effectiveDate: " + effectiveDate);
+		System.out.println("effectiveSequence: " + effectiveSequence);
 		//BEGIN-SELECT
 		//FROM PS_Job PS_Job
 		//WHERE PS_Job.Emplid = $PSEmplid
@@ -1533,23 +1541,30 @@ public class PsJob implements Serializable {
 	    try {
 	    	List<PsJob> resultList = em.createQuery("SELECT p FROM PsJob p "
 	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+//	    				+ "AND p.effectiveDate = :effectiveDate "
 	    				+ "AND p.effectiveSequence = :effectiveSequence "
 	    				+ "AND p.employmentRecordNumber = 0 "
-	    				+ "AND p.effectiveDate <= :effectiveDate "
+	    				
+	    				//***************************************************************
+	    				+ "AND p.action = 'TWB' "
+	    				//***************************************************************
+
+	    				
 	    				, PsJob.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
+//	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .setParameter("effectiveSequence", effectiveSequence)
+	    		    .setHint(QueryHints.REFRESH, true)
 	    		    .getResultList();
-    		System.out.println("HR02_getJob.resultList.size(): " + resultList.size());
+    		System.out.println("getJob.resultList.size(): " + resultList.size());
 	    	if(resultList != null && resultList.size() > 0) {
 	    		PsJob result0 = resultList.get(0);
 	    		for(PsJob result : resultList) {
-		    		System.out.println("HR02_getJob.result.getAction(): " + result.getAction());
-		    		System.out.println("HR02_getJob.result.getEmployeeId(): " + result.getEmployeeId());
-		    		System.out.println("HR02_getJob.result.getActionReason(): " + result.getActionReason());
-		    		System.out.println("HR02_getJob.result.getEffectiveDate(): " + result.getEffectiveDate());
-		    		System.out.println("HR02_getJob.result.getEffseq(): " + result.getEffseq());
+		    		System.out.println("getJob.result.getAction(): " + result.getAction());
+		    		System.out.println("getJob.result.getEmployeeId(): " + result.getEmployeeId());
+		    		System.out.println("getJob.result.getActionReason(): " + result.getActionReason());
+		    		System.out.println("getJob.result.getEffectiveDate(): " + result.getEffectiveDate());
+		    		System.out.println("getJob.result.getEffseq(): " + result.getEffseq());
 	    		}
 	    		return result0;
 	    	}

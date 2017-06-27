@@ -1,6 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -28,8 +29,8 @@ abstract class PszTriggerSuperclass implements Serializable {
 	protected static String ENTITY_NAME = "";
 
 	@Id
-	@Column(name = "SEQ_NBR", nullable = false, insertable = false)
-	protected Integer sequenceNumber;
+	@Column(name = "SEQ_NBR", nullable = false, insertable = false, precision = 38)
+	protected BigDecimal sequenceNumber;
 	   
 	@Column(name = "OPRID")
 	protected String operatorId;
@@ -41,8 +42,8 @@ abstract class PszTriggerSuperclass implements Serializable {
 	@Temporal(TemporalType.DATE)
 	protected Date effectiveDate;
 	   
-	@Column(name = "EFFSEQ")
-	protected Integer effectiveSequence;
+	@Column(name = "EFFSEQ", precision = 38)
+	protected BigDecimal effectiveSequence;
 	   
 	@Column(name = "PROC_NAME")
 	protected String processName;  //TODO: make enum
@@ -50,7 +51,7 @@ abstract class PszTriggerSuperclass implements Serializable {
 	@Column(name = "TASK_FLAG")
 	protected String completionStatus;  //TODO: make enum with values 'P', 'C', 'E'
 
-	public Integer getSequenceNumber() {
+	public BigDecimal getSequenceNumber() {
 		return sequenceNumber;
 	}
 	public String getCompletionStatus() {
@@ -65,14 +66,14 @@ abstract class PszTriggerSuperclass implements Serializable {
 	public Date getEffectiveDate() {
 		return effectiveDate;
 	}
-	public Integer getEffectiveSequence() {
+	public BigDecimal getEffectiveSequence() {
 		return effectiveSequence;
 	}
 	public String getProcessName() {
 		return processName != null ? processName.trim() :  processName;
 	}
 	
-	public void setSequenceNumber(Integer sequenceNumber) {
+	public void setSequenceNumber(BigDecimal sequenceNumber) {
 		this.sequenceNumber = sequenceNumber;
 	}
 	public void setOperatorId(String operatorId) {
@@ -84,7 +85,7 @@ abstract class PszTriggerSuperclass implements Serializable {
 	public void setEffectiveDate(Date effectiveDate) {
 		this.effectiveDate = effectiveDate;
 	}
-	public void setEffectiveSequence(Integer effectiveSequence) {
+	public void setEffectiveSequence(BigDecimal effectiveSequence) {
 		this.effectiveSequence = effectiveSequence;
 	}
 	public void setProcessName(String processName) {
