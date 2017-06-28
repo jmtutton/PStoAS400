@@ -14,7 +14,8 @@ import erd.model.PsEmployeeReview;
 import erd.model.PszTriggerEmployee;
 
 /**
- * ZHRI107A � Date � Employment Review, Accomplishment and Contract Data change
+ * ZHRI107A - Employee Date Change Process 
+ * Employment Review, Accomplishment and Contract Data change
  * @author John Tutton john@tutton.net
  *
  */
@@ -36,11 +37,10 @@ public class EmployeeDateChange {
 		//LET $LegacyUserEmplId = SUBSTR($AuditOprId,2,5)
 		//UPPERCASE $LegacyUserEmplId !Make sure it is in all caps in case ID has a letter in it
 		//END-PROCEDURE HR07-INITIALIZE-FIELDS
-		commonParameters.setAuditOperatorId(trigger.getOperatorId());
+		commonParameters.setOperatorId(trigger.getOperatorId());
 		if(trigger.getOperatorId() != null && trigger.getOperatorId().length() > 1) {
-			dateChangeProcessParameters.setLegacyUserEmployeeId(trigger.getOperatorId().substring(1).toUpperCase()); //strips the 'E' off of the employee id
+			dateChangeProcessParameters.setUserEmployeeId(trigger.getOperatorId().substring(1).toUpperCase()); //strips the 'E' off of the employee id
 		}
-		commonParameters.setErrorProgramParameter("HRZ107A");
 	}
 
 	/**
@@ -52,17 +52,24 @@ public class EmployeeDateChange {
 	public String HR07_processMain(PszTriggerEmployee trigger, CommonParameters commonParameters) {
 		commonParameters.setEmployeeId(trigger.getEmployeeId());
 		commonParameters.setEffectiveDate(trigger.getEffectiveDate());
+		commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
 		//BEGIN-PROCEDURE HR07-PROCESS-MAIN
 		//DO HR07-Initialize-Fields
 		DateChangeProcessParameters dateChangeProcessParameters = new ProcessParameters().new DateChangeProcessParameters();
+		commonParameters.setErrorProgramParameter("HRZ107A");
+		commonParameters.setOperatorId(trigger.getOperatorId());
+		if(trigger.getOperatorId() != null && trigger.getOperatorId().length() > 1) {
+			//!Remove leading 'E' from the PS employee operator ID to comply with the 5 long legacy format
+			dateChangeProcessParameters.setUserEmployeeId(trigger.getOperatorId().substring(1).toUpperCase()); //strips the 'E' off of the employee id
+		}
 		HR07_initializeFields(commonParameters, trigger, dateChangeProcessParameters);
 		//!call procedures to get necessary PeopleSoft changed values for legacy
 		//DO Get-OprId   !gets valid operator ID using code from ZHRI100A.sqr
-		String oprId = ZHRI100A.ZHRI100A_getOprId(trigger.getEmployeeId(), trigger.getEffectiveSequence(), commonParameters);
+		String oprId = ZHRI100A.ZHRI100A_getOprId(commonParameters);
 		//LET $LegacyEmplid = $PSOprid
-		dateChangeProcessParameters.setLegacyEmployeeId(oprId);
+		dateChangeProcessParameters.setEmployeeId(oprId);
 		//IF $LegacyEmplid <> '' AND $LegacyEmplid <> ' '  !New OprId not null or blank on return
-		if(dateChangeProcessParameters.getLegacyEmployeeId() != null && !dateChangeProcessParameters.getLegacyEmployeeId().isEmpty()) {
+		if(dateChangeProcessParameters.getEmployeeId() != null && !dateChangeProcessParameters.getEmployeeId().isEmpty()) {
 			//DO HR07-Get-Employee-Review
 			dateChangeProcessParameters = HR07_getEmployeeReview(dateChangeProcessParameters, commonParameters);
 			//DO HR07-Get-Accomplishments
@@ -98,13 +105,13 @@ public class EmployeeDateChange {
 		//LET $LegLastReviewDate = $LegEffdt
 		//!Format next review date and last review date so legacy will accept it (MM field, DD field and CCYY field)
 		//UNSTRING $PSNextReviewDate BY '-' INTO $LegNxtRevDtYear $LegNxtRevDtMonth $LegNxtRevDtDay
-		dateChangeProcessParameters.setLegacyNextReviewYear(new SimpleDateFormat("yyyy").format(psEmployeeReview.getNextReviewDt()));
-		dateChangeProcessParameters.setLegacyNextReviewMonth(new SimpleDateFormat("mm").format(psEmployeeReview.getNextReviewDt()));
-		dateChangeProcessParameters.setLegacyNextReviewDay(new SimpleDateFormat("dd").format(psEmployeeReview.getNextReviewDt()));
+		dateChangeProcessParameters.setNextReviewYear(new SimpleDateFormat("yyyy").format(psEmployeeReview.getNextReviewDt()));
+		dateChangeProcessParameters.setNextReviewMonth(new SimpleDateFormat("mm").format(psEmployeeReview.getNextReviewDt()));
+		dateChangeProcessParameters.setNextReviewDay(new SimpleDateFormat("dd").format(psEmployeeReview.getNextReviewDt()));
 		//UNSTRING $LegLastReviewDate BY '-' INTO $LegLstRevDtYear $LegLstRevDtMonth $LegLstRevDtDay
-		dateChangeProcessParameters.setLegacyLastReviewYear(new SimpleDateFormat("yyyy").format(psEmployeeReview.getEffectiveDate()));
-		dateChangeProcessParameters.setLegacyLastReviewMonth(new SimpleDateFormat("mm").format(psEmployeeReview.getEffectiveDate()));
-		dateChangeProcessParameters.setLegacyLastReviewDay(new SimpleDateFormat("dd").format(psEmployeeReview.getEffectiveDate()));
+		dateChangeProcessParameters.setLastReviewYear(new SimpleDateFormat("yyyy").format(psEmployeeReview.getEffectiveDate()));
+		dateChangeProcessParameters.setLastReviewMonth(new SimpleDateFormat("mm").format(psEmployeeReview.getEffectiveDate()));
+		dateChangeProcessParameters.setLastReviewDay(new SimpleDateFormat("dd").format(psEmployeeReview.getEffectiveDate()));
 		//FROM PS_Employee_Review CER7
 		//WHERE CER7.EmplId = $PSEMPLID
 			//AND CER7.EMPL_RCD = 0
@@ -134,9 +141,9 @@ public class EmployeeDateChange {
 			//WHEN = 'DRUGTST'
 			case "DRUGTST":
 				//LET $LegNegDrugTestDate = $PSIssueDate
-				dateChangeProcessParameters.setLegacyNegDrugTestYear(new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
-				dateChangeProcessParameters.setLegacyNegDrugTestMonth(new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
-				dateChangeProcessParameters.setLegacyNegDrugTestDay(new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
+				dateChangeProcessParameters.setNegDrugTestYear(new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
+				dateChangeProcessParameters.setNegDrugTestMonth(new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
+				dateChangeProcessParameters.setNegDrugTestDay(new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
 				//!Format negative drug test date so legacy will accept it (MM field, DD field and CCYY field)
 				//UNSTRING $PSIssueDate BY '-' INTO $LegNegDrugTstYear $LegNegDrugTstMonth $LegNegDrugTstDay
 				//BREAK                 !Exit the evaluate statement
@@ -147,9 +154,9 @@ public class EmployeeDateChange {
 			case "PHYS L4":
 				//LET $LegPhysical3TestDate = $PSIssueDate
 				//LET $LegPhysical4TestDate = $PSIssueDate
-				dateChangeProcessParameters.setLegacyPhysTestYear(new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
-				dateChangeProcessParameters.setLegacyPhysTestMonth(new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
-				dateChangeProcessParameters.setLegacyPhysTestDay(new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
+				dateChangeProcessParameters.setPhysTestYear(new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
+				dateChangeProcessParameters.setPhysTestMonth(new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
+				dateChangeProcessParameters.setPhysTestDay(new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
 				//!Format physical test date so legacy will accept it (MM field, DD field and CCYY field)
 				//UNSTRING $PSIssueDate BY '-' INTO $LegPhysTstYear $LegPhysTstMonth $LegPhysTstDay
 				//BREAK    !Exit the evaluate statement
@@ -179,9 +186,9 @@ public class EmployeeDateChange {
 		//LET $LegContractDate = &CCD7EFFDT
 		//!Format contract date so legacy will accept it (MM field, DD field and CCYY field)
 		//UNSTRING $LegContractDate BY '-' INTO $LegContractDtYear $LegContractDtMonth $LegContractDtDay
-		dateChangeProcessParameters.setLegacyContractYear(new SimpleDateFormat("yyyy").format(psContractData.getContractBeginDt()));
-		dateChangeProcessParameters.setLegacyContractMonth(new SimpleDateFormat("mm").format(psContractData.getContractBeginDt()));
-		dateChangeProcessParameters.setLegacyContractDay(new SimpleDateFormat("dd").format(psContractData.getContractBeginDt()));
+		dateChangeProcessParameters.setContractYear(new SimpleDateFormat("yyyy").format(psContractData.getContractBeginDt()));
+		dateChangeProcessParameters.setContractMonth(new SimpleDateFormat("mm").format(psContractData.getContractBeginDt()));
+		dateChangeProcessParameters.setContractDay(new SimpleDateFormat("dd").format(psContractData.getContractBeginDt()));
 		//!select the maximum contract date to get the most current one because an employee can have more than 1 active contract
 		//FROM PS_CONTRACT_DATA CCD7
 		//WHERE CCD7.Emplid = $PSEmplid
@@ -278,32 +285,32 @@ public class EmployeeDateChange {
 		//''' '''                             ||
 		//$LegCompanySeniorityYear            ||
 		//''')" '
-		String parameterString = "'" + dateChangeProcessParameters.getLegacyEmployeeId() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyEmployeeId() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyUserEmployeeId() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyHireMonth() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyHireYear() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyTerminationMonth() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyTerminationDay() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyTerminationYear() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyLastReviewMonth() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyLastReviewDay() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyLastReviewYear() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyNextReviewMonth() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyNextReviewDay() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyNextReviewYear() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyNegDrugTestMonth() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyNegDrugTestDay() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyNegDrugTestYear()+ "' "
-				+ "'" + dateChangeProcessParameters.getLegacyPhysTestMonth() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyPhysTestDay() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyContractMonth() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyContractDay() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyContractYear() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyCompanySeniorityMonth() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyCompanySeniorityDay() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyCompanySeniorityYear() + "' "
-				+ "'" + dateChangeProcessParameters.getLegacyEmployeeId() + "'";
+		String parameterString = "'" + dateChangeProcessParameters.getEmployeeId() + "' "
+				+ "'" + dateChangeProcessParameters.getEmployeeId() + "' "
+				+ "'" + dateChangeProcessParameters.getUserEmployeeId() + "' "
+				+ "'" + dateChangeProcessParameters.getHireMonth() + "' "
+				+ "'" + dateChangeProcessParameters.getHireYear() + "' "
+				+ "'" + dateChangeProcessParameters.getTerminationMonth() + "' "
+				+ "'" + dateChangeProcessParameters.getTerminationDay() + "' "
+				+ "'" + dateChangeProcessParameters.getTerminationYear() + "' "
+				+ "'" + dateChangeProcessParameters.getLastReviewMonth() + "' "
+				+ "'" + dateChangeProcessParameters.getLastReviewDay() + "' "
+				+ "'" + dateChangeProcessParameters.getLastReviewYear() + "' "
+				+ "'" + dateChangeProcessParameters.getNextReviewMonth() + "' "
+				+ "'" + dateChangeProcessParameters.getNextReviewDay() + "' "
+				+ "'" + dateChangeProcessParameters.getNextReviewYear() + "' "
+				+ "'" + dateChangeProcessParameters.getNegDrugTestMonth() + "' "
+				+ "'" + dateChangeProcessParameters.getNegDrugTestDay() + "' "
+				+ "'" + dateChangeProcessParameters.getNegDrugTestYear()+ "' "
+				+ "'" + dateChangeProcessParameters.getPhysTestMonth() + "' "
+				+ "'" + dateChangeProcessParameters.getPhysTestDay() + "' "
+				+ "'" + dateChangeProcessParameters.getContractMonth() + "' "
+				+ "'" + dateChangeProcessParameters.getContractDay() + "' "
+				+ "'" + dateChangeProcessParameters.getContractYear() + "' "
+				+ "'" + dateChangeProcessParameters.getCompanySeniorityMonth() + "' "
+				+ "'" + dateChangeProcessParameters.getCompanySeniorityDay() + "' "
+				+ "'" + dateChangeProcessParameters.getCompanySeniorityYear() + "' "
+				+ "'" + dateChangeProcessParameters.getEmployeeId() + "'";
 		return parameterString;
 	}
 

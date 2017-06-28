@@ -1526,9 +1526,9 @@ public class PsJob implements Serializable {
 	 */
 	public static PsJob getJob(String employeeId, Date effectiveDate, BigDecimal effectiveSequence) {
 		System.out.println("********** PsJob.getJob");
-		System.out.println("employeeId: " + employeeId);
-		System.out.println("effectiveDate: " + effectiveDate);
-		System.out.println("effectiveSequence: " + effectiveSequence);
+//		System.out.println("employeeId: " + employeeId);
+//		System.out.println("effectiveDate: " + effectiveDate);
+//		System.out.println("effectiveSequence: " + effectiveSequence);
 		//BEGIN-SELECT
 		//FROM PS_Job PS_Job
 		//WHERE PS_Job.Emplid = $PSEmplid
@@ -1541,37 +1541,34 @@ public class PsJob implements Serializable {
 	    try {
 	    	List<PsJob> resultList = em.createQuery("SELECT p FROM PsJob p "
 	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-//	    				+ "AND p.effectiveDate = :effectiveDate "
+	    				+ "AND p.effectiveDate = :effectiveDate "
 	    				+ "AND p.effectiveSequence = :effectiveSequence "
 	    				+ "AND p.employmentRecordNumber = 0 "
-	    				
-	    				//***************************************************************
-	    				+ "AND p.action = 'TWB' "
-	    				//***************************************************************
-
-	    				
 	    				, PsJob.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-//	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
+	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .setParameter("effectiveSequence", effectiveSequence)
 	    		    .setHint(QueryHints.REFRESH, true)
 	    		    .getResultList();
-    		System.out.println("getJob.resultList.size(): " + resultList.size());
+//    		System.out.println("getJob.resultList.size(): " + resultList.size());
 	    	if(resultList != null && resultList.size() > 0) {
 	    		PsJob result0 = resultList.get(0);
-	    		for(PsJob result : resultList) {
-		    		System.out.println("getJob.result.getAction(): " + result.getAction());
-		    		System.out.println("getJob.result.getEmployeeId(): " + result.getEmployeeId());
-		    		System.out.println("getJob.result.getActionReason(): " + result.getActionReason());
-		    		System.out.println("getJob.result.getEffectiveDate(): " + result.getEffectiveDate());
-		    		System.out.println("getJob.result.getEffseq(): " + result.getEffseq());
-	    		}
+//	    		for(PsJob result : resultList) {
+//		    		System.out.println("getJob.result.getAction(): " + result.getAction());
+//		    		System.out.println("getJob.result.getEmployeeId(): " + result.getEmployeeId());
+//		    		System.out.println("getJob.result.getActionReason(): " + result.getActionReason());
+//		    		System.out.println("getJob.result.getEffectiveDate(): " + result.getEffectiveDate());
+//		    		System.out.println("getJob.result.getEffseq(): " + result.getEffseq());
+//	    		}
 	    		return result0;
 	    	}
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 
@@ -1641,8 +1638,11 @@ public class PsJob implements Serializable {
 	    	}
 	    } 
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 		return null;
 	}
 
@@ -1741,8 +1741,11 @@ public class PsJob implements Serializable {
 	    	}
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 	   
@@ -1774,8 +1777,11 @@ public class PsJob implements Serializable {
 	    	}
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 
@@ -1801,8 +1807,11 @@ public class PsJob implements Serializable {
 	    	}
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 	   
@@ -1885,8 +1894,11 @@ public class PsJob implements Serializable {
 	    	}
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return false;	
 	}
 		   
@@ -1937,8 +1949,11 @@ public class PsJob implements Serializable {
 	    	}
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return false;	
 	}
 
@@ -1952,9 +1967,9 @@ public class PsJob implements Serializable {
 	 */
 	public static Boolean ZHRI100A_checkIfCorrect102A(String employeeId, Date effectiveDate, String processName) {
 		System.out.println("********** ZHRI100A_checkIfCorrect102A");
-		System.out.println("************** employeeId: " + employeeId);
-		System.out.println("************** effectiveDate: " + effectiveDate);
-		System.out.println("************** processName: " + processName);
+//		System.out.println("************** employeeId: " + employeeId);
+//		System.out.println("************** effectiveDate: " + effectiveDate);
+//		System.out.println("************** processName: " + processName);
 		//BEGIN-PROCEDURE CHECK-IF-CORRECT102A
 		//LET $OK-To-Process = 'N'
 		//IF $WrkProcess = 'ZHRI102A'
@@ -1976,7 +1991,7 @@ public class PsJob implements Serializable {
 		//		AND TO_CHAR(PS_JOB.EFFDT, 'YYYY-MM-DD') = $Dt102
 		//END-SELECT
 		//END-PROCEDURE CHECK-IF-CORRECT102A
-		System.out.println("************** Dt102: " + dt102);
+//		System.out.println("************** Dt102: " + dt102);
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -1991,8 +2006,11 @@ public class PsJob implements Serializable {
 	    	}
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return false;	
 	}
 }

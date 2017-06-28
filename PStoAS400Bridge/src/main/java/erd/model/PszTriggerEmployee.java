@@ -1,12 +1,15 @@
 package erd.model;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.Table;
 import javax.persistence.TemporalType;
@@ -28,6 +31,7 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	}
 
 	public static PszTriggerEmployee findBySequenceNumber(BigDecimal bigDecimal) {
+		System.out.println("PszTriggerEmployee.findBySequenceNumber()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -40,12 +44,16 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    	}
 	    } 
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 	
 	public static List<PszTriggerEmployee> findByCompletionStatusOrderBySequenceNumber(String completionStatus) {
+		System.out.println("PszTriggerEmployee.findByCompletionStatusOrderBySequenceNumber()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -57,12 +65,16 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    		    .getResultList();
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
     }
 	
 	public static List<PszTriggerEmployee> findByCompletionStatusAndProcessName(String completionStatus, String processName) {
+		System.out.println("PszTriggerEmployee.findByCompletionStatusAndProcessName()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -76,20 +88,30 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    		    .getResultList();
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
     }
 	
 	public static PszTriggerEmployee createMockTriggerForEmployeeTermination() {
 		System.out.println("********** PszTriggerEmployee.createMockTriggerForEmployeeTermination()");
-		String completionStatus = "P";
-		String processName = "ZHRI102A";
-		String employeeId = "347940";
-		String operatorId = "OPSHR";
-		BigDecimal effectiveSequence = new BigDecimal(0);
-		BigDecimal sequenceNumber = new BigDecimal(90727260);
+		BigDecimal sequenceNumber = new BigDecimal(9073256);
+		String operatorId = "E208T1";
+		String employeeId = "323506";
 		Date effectiveDate = new Date();
+		try {
+			effectiveDate = (new SimpleDateFormat("dd-MMM-yyyy")).parse("14-JUN-2017");
+		} 
+		catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		BigDecimal effectiveSequence = new BigDecimal(0);
+		String processName = "ZHRI102A";
+		String completionStatus = "P";
 		PszTriggerEmployee trigger = new PszTriggerEmployee();
 		trigger.setCompletionStatus(completionStatus);
 		trigger.setEffectiveDate(effectiveDate);
@@ -103,6 +125,7 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	
 	//TODO: fix query
 	public static List<PszTriggerEmployee> findTriggerDataList() {
+		System.out.println("PszTriggerEmployee.findTriggerDataList()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -163,12 +186,16 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    	}
 	    } 
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 		return null;
 	}
 
 	public static List<BigDecimal> caseTest() {
+		System.out.println("PszTriggerEmployee.caseTest()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -197,8 +224,11 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    	return resultList;
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;
 	}
 
@@ -209,60 +239,80 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	 * @param status
 	 * @return
 	 */
-	public static int updateCompletionStatus(Integer sequenceNumber, String completionStatus) {
-		//BEGIN-PROCEDURE UPDATE-TRIGGER-ROW
-		//BEGIN-SQL
-		//UPDATE PS_ZHRT_INTTRIGGER
-		//	SET TASK_FLAG = $CompletionStatus
-		//WHERE SEQ_NBR = #WRKSEQUENCE
-		//END-SQL
-		//LET $CompletionStatus = 'P'     !Reset the completion Status for next pass
-		//END-PROCEDURE UPDATE-TRIGGER-ROW
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-		EntityManager em = emfactory.createEntityManager();
-		int numberOfRecordsUpdated = 0;
-	    try {
-	    	em.getTransaction().begin();
-	    	numberOfRecordsUpdated = em.createQuery(
-	    		    "UPDATE PszTriggerEmployee "
-	    		    		+ "SET completionStatus = :completionStatus "
-	    		    		+ "WHERE sequenceNumber = :sequenceNumber")
-	    		    .setParameter("sequenceNumber", sequenceNumber)
-	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
-	    		    .executeUpdate();
-//				//alternatively:
-//		    	TriggerEmployee trigger = em.find(TriggerEmployee.class, 1);
-//		    	trigger.setCompletionStatus(status);
-	    	em.getTransaction().commit();
-	    }
-	    catch (Exception e) {
-	       e.printStackTrace();
-	    }
-	    return numberOfRecordsUpdated;
-	}
+//	public static int updateTriggerRow(Integer sequenceNumber, String completionStatus) {
+//		System.out.println("PszTriggerEmployee.updateTriggerRow()");
+//		//BEGIN-PROCEDURE UPDATE-TRIGGER-ROW
+//		//BEGIN-SQL
+//		//UPDATE PS_ZHRT_INTTRIGGER
+//		//	SET TASK_FLAG = $CompletionStatus
+//		//WHERE SEQ_NBR = #WRKSEQUENCE
+//		//END-SQL
+//		//LET $CompletionStatus = 'P'     !Reset the completion Status for next pass
+//		//END-PROCEDURE UPDATE-TRIGGER-ROW
+//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+//		EntityManager em = emfactory.createEntityManager();
+//    	EntityTransaction transaction = em.getTransaction();
+//		int numberOfRecordsUpdated = 0;
+//	    try {
+//	    	transaction.begin();
+//	    	numberOfRecordsUpdated = em.createQuery(
+//	    		    "UPDATE PszTriggerEmployee "
+//	    		    		+ "SET completionStatus = :completionStatus "
+//	    		    		+ "WHERE sequenceNumber = :sequenceNumber")
+//	    		    .setParameter("sequenceNumber", sequenceNumber)
+//	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
+//	    		    .executeUpdate();
+////				//alternatively:
+////		    	TriggerEmployee trigger = em.find(TriggerEmployee.class, 1);
+////		    	trigger.setCompletionStatus(status);
+//	    	transaction.commit();
+//	    }
+//	    catch (Exception e) {
+//	    	if(transaction.isActive()) {
+//	    		transaction.rollback();
+//	       	}
+//	       	e.printStackTrace();
+//	    }
+//	    finally {
+//	    	em.close();
+//	    }
+//	    return numberOfRecordsUpdated;
+//	}
 
 	/**
+	 * setCompletionStatusBySequenceNumber
 	 * Replaces Update-Trigger-Row from ZHRI100A.SQR
 	 * Updates the trigger file flag switch
+	 * @param completionStatus
+	 * @param sequenceNumber
+	 * @return
 	 */
 	public static int setCompletionStatusBySequenceNumber(String completionStatus, BigDecimal sequenceNumber) {
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-		EntityManager em = emfactory.createEntityManager();
+		System.out.println("PszTriggerEmployee.setCompletionStatusBySequenceNumber()");
 		int numberOfRecordsUpdated = 0;
-	    try {
-	    	em.getTransaction().begin();
-	    	numberOfRecordsUpdated = em.createQuery(
-	    			"UPDATE PszTriggerEmployee p "
-	    		    		+ "SET p.completionStatus = :completionStatus "
-	    		    		+ "WHERE p.sequenceNumber = :sequenceNumber")
-	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
-	    		    .setParameter("sequenceNumber", sequenceNumber)
-	    		    .executeUpdate();
-	    	em.getTransaction().commit();
-	    }
-	    catch (Exception e) {
-	       e.printStackTrace();
-	    } 
+//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+//		EntityManager em = emfactory.createEntityManager();
+//    	EntityTransaction transaction = em.getTransaction();
+//	    try {
+//	    	transaction.begin();
+//	    	numberOfRecordsUpdated = em.createQuery(
+//	    			"UPDATE PszTriggerEmployee p "
+//	    		    		+ "SET p.completionStatus = :completionStatus "
+//	    		    		+ "WHERE p.sequenceNumber = :sequenceNumber")
+//	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
+//	    		    .setParameter("sequenceNumber", sequenceNumber)
+//	    		    .executeUpdate();
+//	    	transaction.commit();
+//	    }
+//	    catch (Exception e) {
+//	    	if(transaction.isActive()) {
+//	    		transaction.rollback();
+//	    	}
+//	    	e.printStackTrace();
+//	    }
+//	    finally {
+//	    	em.close();
+//	    }
 	    return numberOfRecordsUpdated;
 	}
 }

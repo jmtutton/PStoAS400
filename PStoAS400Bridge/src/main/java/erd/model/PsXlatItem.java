@@ -144,8 +144,11 @@ public class PsXlatItem implements Serializable {
 		    	}
 		    }
 		    catch (Exception e) {
-		       e.printStackTrace();
+		    	e.printStackTrace();
 		    } 
+		    finally {
+		    	em.close();
+		    }
 		    return null;	
 		}
 		   
@@ -175,8 +178,11 @@ public class PsXlatItem implements Serializable {
 		    	}
 		    }
 		    catch (Exception e) {
-		       e.printStackTrace();
+		    	e.printStackTrace();
 		    } 
+		    finally {
+		    	em.close();
+		    }
 		    return null;	
 		}
 }

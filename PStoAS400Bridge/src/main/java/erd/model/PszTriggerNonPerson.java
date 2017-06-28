@@ -59,8 +59,11 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	    	}
 	    } 
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 	
@@ -81,8 +84,11 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	    		    .getResultList();
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
     }
 	
@@ -105,8 +111,11 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	    		    .getResultList();
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
     }
 
@@ -132,8 +141,11 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	    	em.getTransaction().commit();
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return numberOfRecordsUpdated;
 	}
 

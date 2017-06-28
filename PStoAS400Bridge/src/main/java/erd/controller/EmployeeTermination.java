@@ -22,10 +22,10 @@ import erd.model.ProcessParameters.CommonParameters;
 
 public class EmployeeTermination {
 	
-	PszTriggerEmployee trigger;
+//	PszTriggerEmployee trigger;
 	PsJob psJob;
-	CommonParameters commonParameters;
-	ProcessParameters processParameters;
+//	CommonParameters commonParameters;
+//	ProcessParameters processParameters;
 	
 	/**
 	 * ZHRI102A Termination Call to AS400
@@ -109,14 +109,16 @@ public class EmployeeTermination {
 	 * HR02-Initialize-Fields from ZHRI102A.SQC
 	 * Initialize the fields to ensure that that they all start out blank.
 	 */
-	private CommonParameters HR02_initializeFields(CommonParameters commonParameters) {
-		System.out.println("********** HR02_initializeFields");
-		//$PSAuditOperId = substr($PSAuditOperId,2,5)
-		commonParameters.setAuditOperatorId(trigger.getOperatorId().substring(1).toUpperCase()); //strips the 'E' off of the employee id
-		//$ErrorProgramParm = 'HRZ102A'
-		commonParameters.setErrorProgramParameter("HRZ102A");
-		return commonParameters;
-	}
+//	private CommonParameters HR02_initializeFields(PszTriggerEmployee trigger, CommonParameters commonParameters) {
+//		System.out.println("********** HR02_initializeFields");
+//		//$PSAuditOperId = substr($PSAuditOperId,2,5)
+//		if(trigger.getOperatorId() != null && trigger.getOperatorId().length() > 1) {
+//			commonParameters.setOperatorId(trigger.getOperatorId().substring(1).toUpperCase()); //strips the 'E' off of the employee id
+//		}
+//		//$ErrorProgramParm = 'HRZ102A'
+//		commonParameters.setErrorProgramParameter("HRZ102A");
+//		return commonParameters;
+//	}
 
 	/**
 	 * HR02-Process-Main from ZHRI102A.SQC
@@ -125,36 +127,30 @@ public class EmployeeTermination {
 	public String HR02_processMain(PszTriggerEmployee trigger, CommonParameters commonParameters) {
 		System.out.println("********** HR02_processMain");
 		TerminationProcessParameters terminationProcessParameters = new ProcessParameters().new TerminationProcessParameters();
-		commonParameters.setPoiFlag(false);
+		terminationProcessParameters.setEmployeeId(trigger.getEmployeeId());
+		terminationProcessParameters.setOperatorId(trigger.getOperatorId());
 		String completionStatus = "";
-		Date psDate = trigger.getEffectiveDate();
-		//DO HR02-Initialize-Fields
-		commonParameters = HR02_initializeFields(commonParameters);
-		//MOVE 1 to #NumberOfDays
-		//!Set the number of days to add to the passed date
-		Integer numberOfDays = 1;
-		//DO DTU-ADD-DAYS($PSDateIn, #NumberOfDays, $PSDate)
-		//!Add one day to the date
-		psDate = erd.DateUtil.addDays(trigger.getEffectiveDate(), numberOfDays);
 		//DO HR02-Get-Job
 //		System.out.println("************************************************** trigger: \n" + trigger.toString());
-		PsJob psJob = HR02_getJob(trigger.getEmployeeId(), psDate, trigger.getEffectiveSequence(), terminationProcessParameters);
+		PsJob psJob = HR02_getJob(terminationProcessParameters, commonParameters);
 		//DO ZHRI100A.Get-OprId
-		String psOprId = ZHRI100A.ZHRI100A_getOprId(trigger.getEmployeeId(), trigger.getEffectiveSequence(), commonParameters);
+		String employeeId = ZHRI100A.ZHRI100A_getOprId(commonParameters);
 		//ZHRI100A.psOprId = psOprId;
-		commonParameters.setOperatorId(psOprId);
-		//LET $ADLegOprid = $psOprId
-		commonParameters.setLegacyOperatorId(psOprId);
+//		commonParameters.setOperatorId(psOprId);
+//		//LET $ADLegOprid = $psOprId
+//		commonParameters.setLegacyOperatorId(psOprId);
 		//LET $PSEmpl = $psOprId
-		commonParameters.setEmployeeId(psOprId);
+		commonParameters.setEmployeeId(employeeId);
 		//IF $PSEmpl <> '' AND $PSEmpl <> ' '  
 		//!If the new OprId is not blank and it is not null on return
-		if(commonParameters.getEmployeeId() != null && !commonParameters.getEmployeeId().isEmpty()) {
+		if(commonParameters.getEmployeeId() != null 
+				&& !commonParameters.getEmployeeId().isEmpty()
+				&& psJob != null) {
 			//LET $PSDate = $PSDateIn
 			//!Move the original date back to PSDate.
-			psDate = trigger.getEffectiveDate();
+//			psDate = trigger.getEffectiveDate();
 			//DO HR02-Process-Data
-			completionStatus = HR02_processData(trigger.getEmployeeId(), psJob, terminationProcessParameters);
+			completionStatus = HR02_processData(psJob, terminationProcessParameters, commonParameters);
 		//END-IF    !$PSEmpl <> '' and $PSEmpl <> ' '
 		}
 //		makeAS400PackageForHRZ102AProcess(commonParameters, terminationProcessParameters);
@@ -169,7 +165,7 @@ public class EmployeeTermination {
 	 * @param psJob
 	 * @return
 	 */
-	private String HR02_processData(String employeeId, PsJob psJob, TerminationProcessParameters terminationProcessParameters) {
+	private String HR02_processData(PsJob psJob, TerminationProcessParameters terminationProcessParameters, CommonParameters commonParameters) {
 		System.out.println("********** HR02_processData");
 		String completionStatus = "E";
 		//LET $PSChange = 'N'
@@ -214,6 +210,7 @@ public class EmployeeTermination {
 //		String commandString = makeAS400PackageForHRZ102AProcess(commonParameters, terminationProcessParameters);
 		commonParameters.setProcessName("HRZ102A");
 		String commandString = ZHRI100A.composeCommandString(commonParameters, composeParameterStringForHrz102AProcess(terminationProcessParameters));
+//		System.out.println(terminationProcessParameters.toString());
 		//DO Call-System   !From ZHRI100A.SQR
 		Integer status = ZHRI100A.ZHRI100A_callSystem(commandString, commonParameters);
 		//IF (#Status = 0)
@@ -252,18 +249,26 @@ public class EmployeeTermination {
 	/**
 	 * HR02-Get-Job from ZHRI102A.SQC
 	 * This routine will the Job Data row for each of the employee numbers entered in the trigger file.
-	 * @param employeeId
-	 * @param effectiveDate
-	 * @param effectiveSequence
+	 * @param terminationProcessParameters
+	 * @param commonParameters
 	 * @return
 	 */
-	private PsJob HR02_getJob(String employeeId, Date effectiveDate, BigDecimal effectiveSequence, TerminationProcessParameters terminationProcessParameters) {
+	private PsJob HR02_getJob(TerminationProcessParameters terminationProcessParameters, CommonParameters commonParameters) {
 		System.out.println("********** HR02_getJob");
-		System.out.println("employeeId: " + employeeId);
-		System.out.println("effectiveDate: " + effectiveDate);
-		System.out.println("effectiveSequence: " + effectiveSequence);
-		PsJob psJob = PsJob.getJob("343526", new Date(), new BigDecimal(0));
-//		PsJob psJob = PsJob.HR02_getJob(employeeId, effectiveDate, effectiveSequence);
+//		System.out.println("commonParameters.employeeId: " + commonParameters.getEmployeeId());
+//		System.out.println("commonParameters.effectiveDate: " + commonParameters.getEffectiveDate());
+//		System.out.println("commonParameters.effectiveSequence: " + commonParameters.getEffectiveSequence());
+//		Date effectiveDatePlusOne = trigger.getEffectiveDate();
+		//DO HR02-Initialize-Fields
+//		commonParameters = HR02_initializeFields(trigger, commonParameters);
+		//MOVE 1 to #NumberOfDays
+		//!Set the number of days to add to the passed date
+//		Integer numberOfDays = 1;
+		//DO DTU-ADD-DAYS($PSDateIn, #NumberOfDays, $PSDate)
+		//!Add one day to the date
+//		effectiveDatePlusOne = erd.DateUtil.addDays(commonParameters.getEffectiveDate(), 1);
+//		PsJob psJob = PsJob.getJob("343526", new Date(), new BigDecimal(0));
+		PsJob psJob = PsJob.getJob(commonParameters.getEmployeeId(), erd.DateUtil.addDays(commonParameters.getEffectiveDate(), 1), commonParameters.getEffectiveSequence());
 		//LET $PSAction = &PS_Job.ACTION
 		//psAction = psJob.getAction();
 		//LET $PSAction_Reason = &PS_Job.ACTION_REASON
@@ -285,9 +290,10 @@ public class EmployeeTermination {
 		//LET $Wrk_AD_JobDataBuild = 'Y'
 		//wrkAdJobDataBuild = true;
 		//IF $PSAction <> 'REH'
+//		System.out.println("psJob.getAction(): " +  (psJob != null ? psJob.getAction() : "psJob == null"));
 		if(psJob != null && !"REH".equalsIgnoreCase(psJob.getAction())) {
 			//DO HR02-Get-Action-Reason
-			terminationProcessParameters = HR02_getActionReason(psJob, terminationProcessParameters);
+			terminationProcessParameters = HR02_getActionReason(psJob, terminationProcessParameters, commonParameters);
 		//END-IF    !$PSAction <> 'REH'
 		}
 		return psJob;
@@ -299,7 +305,7 @@ public class EmployeeTermination {
 	 * @param psJob
 	 * @return
 	 */
-	private TerminationProcessParameters HR02_getActionReason(PsJob psJob, TerminationProcessParameters terminationProcessParameters) {
+	private TerminationProcessParameters HR02_getActionReason(PsJob psJob, TerminationProcessParameters terminationProcessParameters, CommonParameters commonParameters) {
 		System.out.println("********** HR02_getActionReason");
 		//LET $Found = 'N'   !Initialize the record found variable
 		Boolean found = false;
@@ -481,7 +487,7 @@ public class EmployeeTermination {
 				+ "'" + terminationProcessParameters.getRehireYear() + "' "
 				+ "'" + terminationProcessParameters.getVoluntaryOrInvoluntary() + "' "
 				+ "'" + terminationProcessParameters.getTerminationCode() + "' "
-				+ "'" + terminationProcessParameters.getAuditOperatorId() + "' "
+				+ "'" + terminationProcessParameters.getOperatorId() + "' "
 				+ "'" + terminationProcessParameters.getTerminationReason() + "'";
 		return command;
 	}

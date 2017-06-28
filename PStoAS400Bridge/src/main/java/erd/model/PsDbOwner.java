@@ -47,8 +47,11 @@ public class PsDbOwner implements Serializable {
 	    	}
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
    

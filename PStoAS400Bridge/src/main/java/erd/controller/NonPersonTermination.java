@@ -70,6 +70,9 @@ public class NonPersonTermination {
 	 */
 	public String HR202_processMain(PszTriggerNonPerson trigger, CommonParameters commonParameters) {
 		System.out.println("********** HR202_processMain()");
+		commonParameters.setEmployeeId(trigger.getEmployeeId());
+		commonParameters.setEffectiveDate(trigger.getEffectiveDate());
+		commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
 		TerminationProcessParameters terminationProcessParameters = new ProcessParameters().new TerminationProcessParameters();
 		//BEGIN-PROCEDURE HR202-PROCESS-MAIN
 		//!SHOW '$PSAuditOperId: ' $PSAuditOperId
@@ -83,16 +86,16 @@ public class NonPersonTermination {
 		//LET $PSauditEmpl = LTRIM($PSauditEmpl,'E')  !Remove the leading 'E' from the employee ID
 		//UPPERCASE $PSauditEmpl  !Be sure in all CAPS
 		if(trigger.getOperatorId() != null && trigger.getOperatorId().length() > 1) {
-			commonParameters.setAuditOperatorId(trigger.getOperatorId().substring(1).toUpperCase()); //strips the 'E' off of the employee id
+			commonParameters.setOperatorId(trigger.getOperatorId().substring(1).toUpperCase()); //strips the 'E' off of the employee id
 		}
-		terminationProcessParameters.setAuditOperatorId(commonParameters.getAuditOperatorId());
+		terminationProcessParameters.setOperatorId(commonParameters.getOperatorId());
 		//!SHOW '$PSauditEmpl: ' $PSauditEmpl
 		//!DO HR202-Get-Term-Date
 		//LET $PSTermDate = DATETOSTR(STRTODATE($PSDateIn,'YYYY-MM-DD'),'YYYYMMDD')
 		terminationProcessParameters.setTerminationDate(trigger.getEffectiveDate());
 		//!SHOW '$PSTermDate: ' $PSTermDate
 		//DO Get-OprId
-		String psOprId = ZHRI100A.ZHRI100A_getOprId(trigger.getEmployeeId(), trigger.getEffectiveSequence(), commonParameters);
+		String psOprId = ZHRI100A.ZHRI100A_getOprId(commonParameters);
 		//LET $PSEmpl = $PSOprid
 		commonParameters.setEmployeeId(psOprId);
 		terminationProcessParameters.setEmployeeId(psOprId);
@@ -122,7 +125,7 @@ public class NonPersonTermination {
 		//				$PSTermDate     ||
 		//				''')" '
 		String terminationDate = new SimpleDateFormat("yyyyMMdd").format(terminationProcessParameters.getTerminationDate());
-		String parameterString = "'" + terminationProcessParameters.getAuditOperatorId() + "' "
+		String parameterString = "'" + terminationProcessParameters.getOperatorId() + "' "
 				+ "'" + terminationProcessParameters.getEmployeeId() + "' "
 				+ "'" + terminationDate + "'";
 		return parameterString;

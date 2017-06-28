@@ -178,8 +178,11 @@ public class PsActionReason implements Serializable {
 	    		return null;
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 
@@ -200,8 +203,11 @@ public class PsActionReason implements Serializable {
 	    	}
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 	
@@ -217,8 +223,11 @@ public class PsActionReason implements Serializable {
 	    	}
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 

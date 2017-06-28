@@ -126,6 +126,9 @@ public class CrossReferenceEmployeeId implements Serializable {
 	    catch (Exception e) {
 	       e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	}
 
 	/**
@@ -154,6 +157,9 @@ public class CrossReferenceEmployeeId implements Serializable {
 	    catch (Exception e) {
 	       e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 	
@@ -173,6 +179,9 @@ public class CrossReferenceEmployeeId implements Serializable {
 	    catch (Exception e) {
 	       e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 

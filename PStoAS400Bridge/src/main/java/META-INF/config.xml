@@ -3,4 +3,5 @@
 <config-paramters>
     <ORACLE_SID>PS90HRQA</ORACLE_SID>
     <PS_HOME>C:/people soft/</PS_HOME>
+    <SERVER_NAME>dev.corp.erac.com</SERVER_NAME>
 </config-paramters>

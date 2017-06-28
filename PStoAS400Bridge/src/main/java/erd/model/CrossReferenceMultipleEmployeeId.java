@@ -358,6 +358,9 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    catch (Exception e) {
 	       e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 
@@ -392,14 +395,18 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		CrossReferenceMultipleEmployeeId xrefEmployeeId = resultList.get(0);
 		    	xrefEmployeeId.setLegacyEmployeeId(legacyEmployeeId.toUpperCase().trim());
-		    	em.getTransaction().begin();
+		    	EntityTransaction entityTransaction = em.getTransaction();
+		    	entityTransaction.begin();
 		    	em.persist(xrefEmployeeId);
-		    	em.getTransaction().commit();
+		    	entityTransaction.commit();
 	    	}
 	    }
 	    catch (Exception e) {
 	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	}
 
 	public static Date findEffectiveDateByEmployeeIdAndSequence(String wrkEmplId, Integer wrkIndexNum, Date date) {
@@ -434,6 +441,9 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    catch (Exception e) {
 	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	}
 
 }

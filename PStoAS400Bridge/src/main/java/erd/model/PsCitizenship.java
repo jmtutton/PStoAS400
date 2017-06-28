@@ -135,8 +135,11 @@ public class PsCitizenship implements Serializable {
 	    		return null;
 	    }
 	    catch (Exception e) {
-	       e.printStackTrace();
+	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	    return null;	
 	}
 }

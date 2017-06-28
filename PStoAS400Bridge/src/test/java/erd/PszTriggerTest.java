@@ -14,7 +14,7 @@ public class PszTriggerTest {
 	
 	@Test
 	public void testFindBySequenceNumber_TriggerEmployee() {
-		final BigDecimal SEQ_NUM = new BigDecimal(9072140);
+		final BigDecimal SEQ_NUM = new BigDecimal(9073256);
 		PszTriggerEmployee empTrig = (PszTriggerEmployee) PszTriggerEmployee.findBySequenceNumber(SEQ_NUM);
 		assertNotNull(empTrig);
 		assertEquals(empTrig.getSequenceNumber(), SEQ_NUM);
@@ -73,7 +73,7 @@ public class PszTriggerTest {
 	public void testSetCompletionStatusBySequenceNumber_TriggerEmployee() {
 		//TODO: don't have update privileges
 		final String STATUS = "C";	
-		final BigDecimal SEQ_NUM = new BigDecimal(9073252);
+		final BigDecimal SEQ_NUM = new BigDecimal(9073256);
 		int numUpdated = 0;
 		numUpdated = PszTriggerEmployee.setCompletionStatusBySequenceNumber(STATUS, SEQ_NUM);
 		assert(numUpdated > 0);

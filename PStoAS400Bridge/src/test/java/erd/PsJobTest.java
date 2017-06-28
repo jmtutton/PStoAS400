@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.Date;
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import org.junit.Test;
 
@@ -62,10 +64,17 @@ public class PsJobTest {
 
 	@Test
 	public void testHr02GetJob() {
-		String employeeId = "343526";
+		String employeeId = "323506";
 		Date effectiveDate = new Date();
+		try {
+			effectiveDate = (new SimpleDateFormat("dd-MMM-yyyy")).parse("14-JUN-2017");
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Date effectiveDatePlusOne = erd.DateUtil.addDays(effectiveDate, 1);
 		BigDecimal effectiveSequence = new BigDecimal(0);
-		PsJob result = PsJob.getJob(employeeId, effectiveDate, effectiveSequence);
+		PsJob result = PsJob.getJob(employeeId, effectiveDatePlusOne, effectiveSequence);
 		assertNotNull(result);
 	}
 

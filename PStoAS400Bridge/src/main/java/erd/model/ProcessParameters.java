@@ -8,7 +8,7 @@ public class ProcessParameters {
 	public class CommonParameters {
 		private String processName;
 		private String completionStatus;
-		private String auditOperatorId; //$PSAuditOperId
+//		private String auditOperatorId; //$PSAuditOperId
 		private String operatorId; //$PSOperId
 		private String employeeId; //PSEmpl
 //		private BigDecimal indexNumber;
@@ -19,8 +19,8 @@ public class ProcessParameters {
 		private Boolean criticalFlag = false; //$WrkCriticalFlag
 		
 		//from ZHRI100A.Call-Programs  //probably not used
-		private String actionCode;
-		private String legacyOperatorId;
+//		private String actionCode; //$ADAction_Code
+//		private String legacyOperatorId; //$ADLegOprid
 		
 		private String errorProgramParameter;
 		private String errorMessageParameter;
@@ -28,12 +28,12 @@ public class ProcessParameters {
 		private String errorTimeParameter;
 		private BigDecimal effectiveSequence;
 		
-		public String getAuditOperatorId() {
-			return auditOperatorId != null ? auditOperatorId.trim() : auditOperatorId;
-		}
-		public void setAuditOperatorId(String auditOperatorId) {
-			this.auditOperatorId = auditOperatorId != null ? auditOperatorId.trim() : auditOperatorId;
-		}
+//		public String getAuditOperatorId() {
+//			return auditOperatorId != null ? auditOperatorId.trim() : auditOperatorId;
+//		}
+//		public void setAuditOperatorId(String auditOperatorId) {
+//			this.auditOperatorId = auditOperatorId != null ? auditOperatorId.trim() : auditOperatorId;
+//		}
 		public String getOperatorId() {
 			return operatorId != null ? operatorId.trim() : operatorId;
 		}
@@ -70,18 +70,18 @@ public class ProcessParameters {
 		public void setCriticalFlag(Boolean criticalFlag) {
 			this.criticalFlag = criticalFlag;
 		}
-		public String getActionCode() {
-			return actionCode != null ? actionCode.trim() : actionCode;
-		}
-		public void setActionCode(String actionCode) {
-			this.actionCode = actionCode != null ? actionCode.trim() : actionCode;
-		}
-		public String getLegacyOperatorId() {
-			return legacyOperatorId != null ? legacyOperatorId.trim() : legacyOperatorId;
-		}
-		public void setLegacyOperatorId(String legacyOperatorId) {
-			this.legacyOperatorId = legacyOperatorId != null ? legacyOperatorId.trim() : legacyOperatorId;
-		}
+//		public String getActionCode() {
+//			return actionCode != null ? actionCode.trim() : actionCode;
+//		}
+//		public void setActionCode(String actionCode) {
+//			this.actionCode = actionCode != null ? actionCode.trim() : actionCode;
+//		}
+//		public String getLegacyOperatorId() {
+//			return legacyOperatorId != null ? legacyOperatorId.trim() : legacyOperatorId;
+//		}
+//		public void setLegacyOperatorId(String legacyOperatorId) {
+//			this.legacyOperatorId = legacyOperatorId != null ? legacyOperatorId.trim() : legacyOperatorId;
+//		}
 		public String getErrorProgramParameter() {
 			return errorProgramParameter != null ? errorProgramParameter.trim() : errorProgramParameter;
 		}
@@ -124,11 +124,10 @@ public class ProcessParameters {
 		public BigDecimal getEffectiveSequence() {
 			return this.effectiveSequence;
 		}
-		
 		@Override
 		public String toString() {
-			return "\nZhri100aFields:\n"
-					+ "auditOperatorId: " + auditOperatorId + "\n" //$PSAuditOperId
+			return "\nCommonParameters values:\n"
+//					+ "auditOperatorId: " + auditOperatorId + "\n" //$PSAuditOperId
 					+ "operatorId: " + operatorId + "\n" //$PSOperId
 					+ "employeeId: " + employeeId + "\n" //PSEmpl
 					+ "effectiveSequence: " + effectiveSequence + "\n"
@@ -136,8 +135,8 @@ public class ProcessParameters {
 					+ "poiFlag: " + poiFlag + "\n"
 //					+ "runFlag: " + runFlag + "\n" //#run_flag
 					+ "criticalFlag: " + criticalFlag + "\n" //$WrkCriticalFlag
-					+ "actionCode: " + actionCode + "\n"
-					+ "legacyOperatorId: " + legacyOperatorId + "\n"
+//					+ "actionCode: " + actionCode + "\n"
+//					+ "legacyOperatorId: " + legacyOperatorId + "\n"
 					+ "errorProgramParameter: " + errorProgramParameter + "\n"
 					+ "errorMessageParameter: " + errorMessageParameter + "\n";
 		}
@@ -148,12 +147,12 @@ public class ProcessParameters {
 		private String terminationMonth = ""; //$PSTermMnth
 		private String terminationDay = ""; //$PsTermDay
 		private String terminationYear = ""; //$PSTermYr
-		private String rehireDay = ""; //$PSReHireMnth
-		private String rehireMonth = ""; //$PSReHireDay
-		private String rehireYear = ""; //$PSReHireYr
+		private String rehireMonth = ""; //$PSRehireMnth
+		private String rehireDay = ""; //$PSRehireDay
+		private String rehireYear = ""; //$PSRehireYr
 		private String voluntaryOrInvoluntary = ""; //$PSVolInvol
 		private String terminationCode = ""; //$PSTermCode
-		private String auditOperatorId = ""; //$PSAuditOperId
+		private String operatorId = ""; //$PSAuditOperId
 		private String terminationReason = ""; //$PSTermReason is at most 30 positions long, but HRZ102A receives it with a length of 35 positions; needs to be padded to 35
 		private Date terminationDate;
 		private Date rehireDate;
@@ -227,11 +226,11 @@ public class ProcessParameters {
 		public void setRehireDate(Date rehireDate) {
 			this.rehireDate = rehireDate;
 		}
-		public String getAuditOperatorId() {
-			return auditOperatorId;
+		public String getOperatorId() {
+			return operatorId;
 		}
-		public void setAuditOperatorId(String auditOperatorId) {
-			this.auditOperatorId = auditOperatorId != null ? auditOperatorId.trim() : auditOperatorId;
+		public void setOperatorId(String operatorId) {
+			this.operatorId = operatorId != null ? operatorId.trim() : operatorId;
 		}
 		public String getEmployeeId() {
 			return employeeId;
@@ -239,191 +238,205 @@ public class ProcessParameters {
 		public void setEmployeeId(String employeeId) {
 			this.employeeId = employeeId != null ? employeeId.trim() : employeeId;
 		}
+		@Override
+		public String toString() {
+			return "\nZhri100aFields:\n"
+					+ "employeeId: " + employeeId + "\n" //$PSEmpl
+					+ "terminationMonth: " + terminationMonth + "\n" //$PSTermMnth
+					+ "terminationDay: " + terminationDay + "\n" //$PsTermDay
+					+ "terminationYear: " + terminationYear + "\n" //$PSTermYr
+					+ "rehireMonth: " + rehireMonth + "\n" //$PSRehireMnth
+					+ "rehireDay: " + rehireDay + "\n" //$PSRehireDay
+					+ "rehireYear: " + rehireYear + "\n" //$PSRehireYr
+					+ "voluntaryOrInvoluntary: " + voluntaryOrInvoluntary + "\n" //$PSVolInvol
+					+ "terminationCode: " + terminationCode + "\n" //$PSTermCode
+					+ "operatorId: " + operatorId + "\n" //$PSAuditOperId
+					+ "terminationReason: " + terminationReason + "\n"; //$PSTermReason
+		}
 	}
 	
-	
 	public class DateChangeProcessParameters {
-		private String legacyEmployeeId = ""; //$LegacyEmplid
-		private String legacyUserEmployeeId = ""; //$LegacyUserEmplId
-		private String legacyHireDay = ""; //$LegHireDtDay
-		private String legacyHireMonth = ""; //$LegHireDtMonth
-		private String legacyHireYear = ""; //$LegHireDtYear
-		private String legacyTerminationMonth = ""; //$LegTermDtMonth
-		private String legacyTerminationDay = ""; //$LegTermDtDay
-		private String legacyTerminationYear = ""; //$LegTermDtYear
-		private String legacyLastReviewMonth = ""; //$LegLstRevDtMonth
-		private String legacyLastReviewDay = ""; //$LegLstRevDtDay
-		private String legacyLastReviewYear = ""; //$LegLstRevDtYear
-		private String legacyNextReviewMonth = ""; //$LegNxtRevDtMonth
-		private String legacyNextReviewDay = ""; //$LegNxtRevDtDay
-		private String legacyNextReviewYear = ""; //$LegNxtRevDtYear
-		private String legacyNegDrugTestMonth = ""; //$LegNegDrugTstMonth
-		private String legacyNegDrugTestDay = ""; //$LegNegDrugTstDay
-		private String legacyNegDrugTestYear = ""; //$LegNegDrugTstYear
-		private String legacyPhysTestMonth = ""; //$LegPhysTstMonth
-		private String legacyPhysTestDay = ""; //$LegPhysTstDay
-		private String legacyPhysTestYear = ""; //$LegPhysTstYear
-		private String legacyContractMonth = ""; //$LegContractDtMonth
-		private String legacyContractDay = ""; //$LegContractDtDay
-		private String legacyContractYear = ""; //$LegContractDtYear
-		private String legacyCompanySeniorityMonth = ""; //$LegCompanySeniorityMonth
-		private String legacyCompanySeniorityDay = ""; //$LegCompanySeniorityDay
-		private String legacyCompanySeniorityYear = ""; //$LegCompanySeniorityYear
-		public String getLegacyEmployeeId() {
-			return legacyEmployeeId;
+		private String employeeId = ""; //$LegacyEmplid
+		private String userEmployeeId = ""; //$LegacyUserEmplId
+		private String hireDay = ""; //$LegHireDtDay
+		private String hireMonth = ""; //$LegHireDtMonth
+		private String hireYear = ""; //$LegHireDtYear
+		private String terminationMonth = ""; //$LegTermDtMonth
+		private String terminationDay = ""; //$LegTermDtDay
+		private String terminationYear = ""; //$LegTermDtYear
+		private String lastReviewMonth = ""; //$LegLstRevDtMonth
+		private String lastReviewDay = ""; //$LegLstRevDtDay
+		private String lastReviewYear = ""; //$LegLstRevDtYear
+		private String nextReviewMonth = ""; //$LegNxtRevDtMonth
+		private String nextReviewDay = ""; //$LegNxtRevDtDay
+		private String nextReviewYear = ""; //$LegNxtRevDtYear
+		private String negDrugTestMonth = ""; //$LegNegDrugTstMonth
+		private String negDrugTestDay = ""; //$LegNegDrugTstDay
+		private String negDrugTestYear = ""; //$LegNegDrugTstYear
+		private String physTestMonth = ""; //$LegPhysTstMonth
+		private String physTestDay = ""; //$LegPhysTstDay
+		private String physTestYear = ""; //$LegPhysTstYear
+		private String contractMonth = ""; //$LegContractDtMonth
+		private String contractDay = ""; //$LegContractDtDay
+		private String contractYear = ""; //$LegContractDtYear
+		private String companySeniorityMonth = ""; //$LegCompanySeniorityMonth
+		private String companySeniorityDay = ""; //$LegCompanySeniorityDay
+		private String companySeniorityYear = ""; //$LegCompanySeniorityYear
+		public String getEmployeeId() {
+			return employeeId;
 		}
-		public void setLegacyEmployeeId(String legacyEmployeeId) {
-			this.legacyEmployeeId = legacyEmployeeId;
+		public void setEmployeeId(String employeeId) {
+			this.employeeId = employeeId;
 		}
-		public String getLegacyUserEmployeeId() {
-			return legacyUserEmployeeId;
+		public String getUserEmployeeId() {
+			return userEmployeeId;
 		}
-		public void setLegacyUserEmployeeId(String legacyUserEmployeeId) {
-			this.legacyUserEmployeeId = legacyUserEmployeeId;
+		public void setUserEmployeeId(String userEmployeeId) {
+			this.userEmployeeId = userEmployeeId;
 		}
-		public String getLegacyHireDay() {
-			return legacyHireDay;
+		public String getHireDay() {
+			return hireDay;
 		}
-		public void setLegacyHireDay(String legacyHireDay) {
-			this.legacyHireDay = legacyHireDay;
+		public void setHireDay(String hireDay) {
+			this.hireDay = hireDay;
 		}
-		public String getLegacyHireMonth() {
-			return legacyHireMonth;
+		public String getHireMonth() {
+			return hireMonth;
 		}
-		public void setLegacyHireMonth(String legacyHireMonth) {
-			this.legacyHireMonth = legacyHireMonth;
+		public void setHireMonth(String hireMonth) {
+			this.hireMonth = hireMonth;
 		}
-		public String getLegacyHireYear() {
-			return legacyHireYear;
+		public String getHireYear() {
+			return hireYear;
 		}
-		public void setLegacyHireYear(String legacyHireYear) {
-			this.legacyHireYear = legacyHireYear;
+		public void setHireYear(String hireYear) {
+			this.hireYear = hireYear;
 		}
-		public String getLegacyTerminationMonth() {
-			return legacyTerminationMonth;
+		public String getTerminationMonth() {
+			return terminationMonth;
 		}
-		public void setLegacyTerminationMonth(String legacyTerminationMonth) {
-			this.legacyTerminationMonth = legacyTerminationMonth;
+		public void setTerminationMonth(String terminationMonth) {
+			this.terminationMonth = terminationMonth;
 		}
-		public String getLegacyTerminationDay() {
-			return legacyTerminationDay;
+		public String getTerminationDay() {
+			return terminationDay;
 		}
-		public void setLegacyTerminationDay(String legacyTerminationDay) {
-			this.legacyTerminationDay = legacyTerminationDay;
+		public void setTerminationDay(String terminationDay) {
+			this.terminationDay = terminationDay;
 		}
-		public String getLegacyTerminationYear() {
-			return legacyTerminationYear;
+		public String getTerminationYear() {
+			return terminationYear;
 		}
-		public void setLegacyTerminationYear(String legacyTerminationYear) {
-			this.legacyTerminationYear = legacyTerminationYear;
+		public void setTerminationYear(String terminationYear) {
+			this.terminationYear = terminationYear;
 		}
-		public String getLegacyLastReviewMonth() {
-			return legacyLastReviewMonth;
+		public String getLastReviewMonth() {
+			return lastReviewMonth;
 		}
-		public void setLegacyLastReviewMonth(String legacyLastReviewMonth) {
-			this.legacyLastReviewMonth = legacyLastReviewMonth;
+		public void setLastReviewMonth(String lastReviewMonth) {
+			this.lastReviewMonth = lastReviewMonth;
 		}
-		public String getLegacyLastReviewDay() {
-			return legacyLastReviewDay;
+		public String getLastReviewDay() {
+			return lastReviewDay;
 		}
-		public void setLegacyLastReviewDay(String legacyLastReviewDay) {
-			this.legacyLastReviewDay = legacyLastReviewDay;
+		public void setLastReviewDay(String lastReviewDay) {
+			this.lastReviewDay = lastReviewDay;
 		}
-		public String getLegacyLastReviewYear() {
-			return legacyLastReviewYear;
+		public String getLastReviewYear() {
+			return lastReviewYear;
 		}
-		public void setLegacyLastReviewYear(String legacyLastReviewYear) {
-			this.legacyLastReviewYear = legacyLastReviewYear;
+		public void setLastReviewYear(String lastReviewYear) {
+			this.lastReviewYear = lastReviewYear;
 		}
-		public String getLegacyNextReviewMonth() {
-			return legacyNextReviewMonth;
+		public String getNextReviewMonth() {
+			return nextReviewMonth;
 		}
-		public void setLegacyNextReviewMonth(String legacyNextReviewMonth) {
-			this.legacyNextReviewMonth = legacyNextReviewMonth;
+		public void setNextReviewMonth(String nextReviewMonth) {
+			this.nextReviewMonth = nextReviewMonth;
 		}
-		public String getLegacyNextReviewDay() {
-			return legacyNextReviewDay;
+		public String getNextReviewDay() {
+			return nextReviewDay;
 		}
-		public void setLegacyNextReviewDay(String legacyNextReviewDay) {
-			this.legacyNextReviewDay = legacyNextReviewDay;
+		public void setNextReviewDay(String nextReviewDay) {
+			this.nextReviewDay = nextReviewDay;
 		}
-		public String getLegacyNextReviewYear() {
-			return legacyNextReviewYear;
+		public String getNextReviewYear() {
+			return nextReviewYear;
 		}
-		public void setLegacyNextReviewYear(String legacyNextReviewYear) {
-			this.legacyNextReviewYear = legacyNextReviewYear;
+		public void setNextReviewYear(String nextReviewYear) {
+			this.nextReviewYear = nextReviewYear;
 		}
-		public String getLegacyNegDrugTestMonth() {
-			return legacyNegDrugTestMonth;
+		public String getNegDrugTestMonth() {
+			return negDrugTestMonth;
 		}
-		public void setLegacyNegDrugTestMonth(String legacyNegDrugTestMonth) {
-			this.legacyNegDrugTestMonth = legacyNegDrugTestMonth;
+		public void setNegDrugTestMonth(String negDrugTestMonth) {
+			this.negDrugTestMonth = negDrugTestMonth;
 		}
-		public String getLegacyNegDrugTestDay() {
-			return legacyNegDrugTestDay;
+		public String getNegDrugTestDay() {
+			return negDrugTestDay;
 		}
-		public void setLegacyNegDrugTestDay(String legacyNegDrugTestDay) {
-			this.legacyNegDrugTestDay = legacyNegDrugTestDay;
+		public void setNegDrugTestDay(String negDrugTestDay) {
+			this.negDrugTestDay = negDrugTestDay;
 		}
-		public String getLegacyNegDrugTestYear() {
-			return legacyNegDrugTestYear;
+		public String getNegDrugTestYear() {
+			return negDrugTestYear;
 		}
-		public void setLegacyNegDrugTestYear(String legacyNegDrugTestYear) {
-			this.legacyNegDrugTestYear = legacyNegDrugTestYear;
+		public void setNegDrugTestYear(String negDrugTestYear) {
+			this.negDrugTestYear = negDrugTestYear;
 		}
-		public String getLegacyPhysTestMonth() {
-			return legacyPhysTestMonth;
+		public String getPhysTestMonth() {
+			return physTestMonth;
 		}
-		public void setLegacyPhysTestMonth(String legacyPhysTestMonth) {
-			this.legacyPhysTestMonth = legacyPhysTestMonth;
+		public void setPhysTestMonth(String physTestMonth) {
+			this.physTestMonth = physTestMonth;
 		}
-		public String getLegacyPhysTestDay() {
-			return legacyPhysTestDay;
+		public String getPhysTestDay() {
+			return physTestDay;
 		}
-		public void setLegacyPhysTestDay(String legacyPhysTestDay) {
-			this.legacyPhysTestDay = legacyPhysTestDay;
+		public void setPhysTestDay(String physTestDay) {
+			this.physTestDay = physTestDay;
 		}
-		public String getLegacyPhysTestYear() {
-			return legacyPhysTestYear;
+		public String getPhysTestYear() {
+			return physTestYear;
 		}
-		public void setLegacyPhysTestYear(String legacyPhysTestYear) {
-			this.legacyPhysTestYear = legacyPhysTestYear;
+		public void setPhysTestYear(String physTestYear) {
+			this.physTestYear = physTestYear;
 		}
-		public String getLegacyContractMonth() {
-			return legacyContractMonth;
+		public String getContractMonth() {
+			return contractMonth;
 		}
-		public void setLegacyContractMonth(String legacyContractMonth) {
-			this.legacyContractMonth = legacyContractMonth;
+		public void setContractMonth(String contractMonth) {
+			this.contractMonth = contractMonth;
 		}
-		public String getLegacyContractDay() {
-			return legacyContractDay;
+		public String getContractDay() {
+			return contractDay;
 		}
-		public void setLegacyContractDay(String legacyContractDay) {
-			this.legacyContractDay = legacyContractDay;
+		public void setContractDay(String contractDay) {
+			this.contractDay = contractDay;
 		}
-		public String getLegacyContractYear() {
-			return legacyContractYear;
+		public String getContractYear() {
+			return contractYear;
 		}
-		public void setLegacyContractYear(String legacyContractYear) {
-			this.legacyContractYear = legacyContractYear;
+		public void setContractYear(String contractYear) {
+			this.contractYear = contractYear;
 		}
-		public String getLegacyCompanySeniorityMonth() {
-			return legacyCompanySeniorityMonth;
+		public String getCompanySeniorityMonth() {
+			return companySeniorityMonth;
 		}
-		public void setLegacyCompanySeniorityMonth(String legacyCompanySeniorityMonth) {
-			this.legacyCompanySeniorityMonth = legacyCompanySeniorityMonth;
+		public void setCompanySeniorityMonth(String companySeniorityMonth) {
+			this.companySeniorityMonth = companySeniorityMonth;
 		}
-		public String getLegacyCompanySeniorityDay() {
-			return legacyCompanySeniorityDay;
+		public String getCompanySeniorityDay() {
+			return companySeniorityDay;
 		}
-		public void setLegacyCompanySeniorityDay(String legacyCompanySeniorityDay) {
-			this.legacyCompanySeniorityDay = legacyCompanySeniorityDay;
+		public void setCompanySeniorityDay(String companySeniorityDay) {
+			this.companySeniorityDay = companySeniorityDay;
 		}
-		public String getLegacyCompanySeniorityYear() {
-			return legacyCompanySeniorityYear;
+		public String getCompanySeniorityYear() {
+			return companySeniorityYear;
 		}
-		public void setLegacyCompanySeniorityYear(String legacyCompanySeniorityYear) {
-			this.legacyCompanySeniorityYear = legacyCompanySeniorityYear;
+		public void setCompanySeniorityYear(String companySeniorityYear) {
+			this.companySeniorityYear = companySeniorityYear;
 		}
 	}
 	

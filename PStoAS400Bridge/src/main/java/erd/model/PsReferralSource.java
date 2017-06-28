@@ -142,7 +142,6 @@ public class PsReferralSource implements Serializable {
 		this.specificReferralSource = specificReferralSource;
 	}
 
-
 	public PsDiversityEthnicity GetPersonalData(String employeeId) {
 //	!----------------------------------------------------------------------
 //	! Procedure:  HR01-Get-Personal-Data

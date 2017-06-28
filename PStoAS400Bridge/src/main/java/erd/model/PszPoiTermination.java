@@ -67,5 +67,8 @@ public class PszPoiTermination implements Serializable {
 	    catch (Exception e) {
 	    	e.printStackTrace();
 	    } 
+	    finally {
+	    	em.close();
+	    }
 	}
 }
