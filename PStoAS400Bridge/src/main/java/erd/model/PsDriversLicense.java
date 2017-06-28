@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * The persistent class for the PS_DRIVERS_LIC database table.
@@ -154,25 +155,40 @@ public class PsDriversLicense implements Serializable {
 		this.numberOfViolations = numberOfViolations;
 	}
 
-	public PsDriversLicense findByEmployeeId(String employeeId) {
-//	!----------------------------------------------------------------------
-//	! Procedure:  HR05-Get-Drivers-Lic
-//	! Desc:  This routine gets the driver license number and state and
-//	!        stores them in the legacy system format.
-//	!----------------------------------------------------------------------
-//	Begin-Procedure HR05-Get-Drivers-Lic
-//	begin-select
-//	CDL.DRIVERS_LIC_NBR
-//	CDL.State
-//	   Let $PSDRIVER_LIC = RTRIM(LTRIM(&CDL.DRIVERS_LIC_NBR,' '),' ')
-//	   Do Replace-Character($PSDriver_Lic,'''','''''',$PSDriver_Lic)    !From ZRmvSpcChr.sqc
-//	   Let $PSDLState = &CDL.State
-//	   Uppercase $PSDLState
-//	from PS_Drivers_Lic CDL
-//	where CDL.Emplid = $PSEmplid
-//	End-select
-//	End-Procedure HR05-Get-Drivers-Lic
-	return null;
+	/**
+	 * HR05-Get-Drivers-Lic from ZHRI105A.SQC
+	 * @param employeeId
+	 * @return PsDriversLicense record
+	 */
+	public static PsDriversLicense findByEmployeeId(String employeeId) {
+		//BEGIN-PROCEDURE HR05-GET-DRIVERS-LIC
+		//BEGIN-SELECT
+		//CDL.DRIVERS_LIC_NBR
+		//CDL.STATE
+		//LET $PSDRIVER_LIC = RTRIM(LTRIM(&CDL.DRIVERS_LIC_NBR, ' '), ' ')
+		//DO REPLACE-CHARACTER($PSDriver_Lic, '''', '''''', $PSDriver_Lic)    !From ZRmvSpcChr.sqc
+		//LET $PSDLState = &CDL.State
+		//UPPERCASE $PSDLState
+		//FROM PS_Drivers_Lic CDL
+		//WHERE CDL.Emplid = $PSEmplid
+		//END-SELECT
+		//END-PROCEDURE HR05-GET-DRIVERS-LIC
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<PsDriversLicense> resultList = em.createQuery(
+	    		    "SELECT p FROM PsDriversLicense p "
+	    		    		+ "WHERE p.employeeId = :employeeId ", PsDriversLicense.class)
+	    		    .setParameter("employeeId", employeeId)
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		return resultList.get(0);
+	    	}
+	    } 
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+		return null;
 }
 
 }

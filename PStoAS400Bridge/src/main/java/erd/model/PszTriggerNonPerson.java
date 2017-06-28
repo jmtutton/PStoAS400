@@ -1,5 +1,6 @@
 package erd.model;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.persistence.*;
@@ -20,7 +21,7 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	public Integer getEidIndexNumber() {
 		return eidIndexNumber;
 	}
-	   
+
 	public PszTriggerNonPerson() {
 		super();
 		PszTriggerNonPerson.ENTITY_NAME = "PszTriggerNonPerson";
@@ -28,24 +29,30 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	
 	@Override
 	public String toString() {
-		return "ENTITY_NAME: PszTriggerNonPerson\n" +
-				"SequenceNumber: " + getSequenceNumber() + "\n" +
-				"OperatorId: " + getOperatorId() + "\n" +
-				"EmployeeId: " + getEmployeeId() + "\n" +
-				"EffectiveDate: " + getEffectiveDate() + "\n" +
-				"EffectiveSequence: " + getEffectiveSequence() + "\n" +
-				"ProcessName: " + getProcessName() + "\n" +
-				"CompletionStatus: " + getCompletionStatus() + "\n" +
-				"EidIndexNumber: " + getEidIndexNumber();
+		return "ENTITY_NAME: PszTriggerNonPerson\n" 
+				+ "SequenceNumber: " + getSequenceNumber() + "\n"
+				+ "OperatorId: " + getOperatorId() + "\n"
+				+ "EmployeeId: " + getEmployeeId() + "\n"
+				+ "EffectiveDate: " + getEffectiveDate() + "\n"
+				+ "EffectiveSequence: " + getEffectiveSequence() + "\n"
+				+ "ProcessName: " + getProcessName() + "\n"
+				+ "CompletionStatus: " + getCompletionStatus() + "\n"
+				+ "EidIndexNumber: " + getEidIndexNumber()
+				;
 	}
 	
-	public static PszTriggerNonPerson findBySequenceNumber(Integer seqNum) {
+	/**
+	 * findBySequenceNumber
+	 * @param sequenceNumber
+	 * @return PszTriggerNonPerson
+	 */
+	public static PszTriggerNonPerson findBySequenceNumber(BigDecimal sequenceNumber) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PszTriggerNonPerson> resultList = em.createQuery(
-	    		    "SELECT t FROM PszTriggerNonPerson t WHERE t.sequenceNumber = :seqNum", PszTriggerNonPerson.class)
-	    		    .setParameter("seqNum", seqNum)
+	    		    "SELECT p FROM PszTriggerNonPerson p WHERE p.sequenceNumber = :sequenceNumber", PszTriggerNonPerson.class)
+	    		    .setParameter("sequenceNumber", sequenceNumber)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
@@ -57,13 +64,44 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	    return null;	
 	}
 	
+	/**
+	 * findByCompletionStatusOrderBySequenceNumber
+	 * @param completionStatus
+	 * @return List<PszTriggerNonPerson>
+	 */
 	public static List<PszTriggerNonPerson> findByCompletionStatusOrderBySequenceNumber(String completionStatus) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	return em.createQuery(
-	    		    "SELECT t FROM PszTriggerNonPerson t WHERE TRIM(UPPER(t.completionStatus)) = :completionStatus ORDER BY t.sequenceNumber", PszTriggerNonPerson.class)
+	    		    "SELECT p FROM PszTriggerNonPerson p "
+	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
+	    		    		+ "ORDER BY p.sequenceNumber", PszTriggerNonPerson.class)
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
+	    		    .getResultList();
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return null;	
+    }
+	
+	/**
+	 * findByCompletionStatusAndProcessName
+	 * @param completionStatus
+	 * @param processName
+	 * @return List<PszTriggerNonPerson>
+	 */
+	public static List<PszTriggerNonPerson> findByCompletionStatusAndProcessName(String completionStatus, String processName) {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	return em.createQuery(
+	    		    "SELECT p FROM PszTriggerNonPerson p WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
+	    		    		+ "AND TRIM(UPPER(p.processName)) = :processName "
+	    		    		+ "ORDER BY p.sequenceNumber", PszTriggerNonPerson.class)
+	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
+	    		    .setParameter("processName", processName.toUpperCase().trim())
 	    		    .getResultList();
 	    }
 	    catch (Exception e) {
@@ -73,17 +111,21 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
     }
 
 	/**
-	 * Replaces Update-Trigger-Row_NonEmp from ZHRI100A.SQR
-	 * Updates the trigger file flag switch
+	 * setCompletionStatusBySequenceNumber
+	 * @param completionStatus
+	 * @param sequenceNumber
+	 * @return numberOfRecordsUpdated
 	 */
-	public static int setCompletionStatusBySequenceNumber(String completionStatus, Integer sequenceNumber) {
+	public static int setCompletionStatusBySequenceNumber(String completionStatus, BigDecimal sequenceNumber) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		int numberOfRecordsUpdated = 0;
 	    try {
 	    	em.getTransaction().begin();
-	    	numberOfRecordsUpdated = em.createQuery("UPDATE PszTriggerNonPerson t SET t.completionStatus = :completionStatus "
-	    				+ "WHERE t.sequenceNumber = :sequenceNumber")
+	    	numberOfRecordsUpdated = em.createQuery(
+	    			"UPDATE PszTriggerEmployee p "
+	    		    		+ "SET p.completionStatus = :completionStatus "
+	    		    		+ "WHERE p.sequenceNumber = :sequenceNumber")
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .setParameter("sequenceNumber", sequenceNumber)
 	    		    .executeUpdate();
@@ -94,4 +136,5 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	    } 
 	    return numberOfRecordsUpdated;
 	}
+
 }

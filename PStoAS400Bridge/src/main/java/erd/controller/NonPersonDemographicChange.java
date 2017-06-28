@@ -1,8 +1,8 @@
 package erd.controller;
 
-import erd.model.ProcessParameters;
+import erd.model.ProcessParameters.CommonParameters;
+import erd.model.ProcessParameters.DemographicChangeParameters;
 import erd.model.PszTriggerNonPerson;
-import erd.model.Zhri100aFields;
 
 /**
  * ZHRI205A - Contingent Employee and Multiple EID Demographic Change
@@ -12,23 +12,11 @@ import erd.model.Zhri100aFields;
 
 public class NonPersonDemographicChange {
 	
-	PszTriggerNonPerson trigger;
-	Zhri100aFields zhri100aFields;
-	ProcessParameters processParameters;
-
-	public NonPersonDemographicChange(PszTriggerNonPerson trigger, Zhri100aFields zhri100aFields) {
-		System.out.println("********** NonPersonDemographicChange()");
-		this.trigger = trigger;
-		this.zhri100aFields = zhri100aFields;
-		System.out.println("\n" + trigger.toString() + "\n");
-		System.out.println(zhri100aFields.toString() + "\n");
-	}
-
-	public String HR205_processMain() {
+	public String HR205_processMain(PszTriggerNonPerson trigger, CommonParameters commonParameters) {
 		System.out.println("********** HR205_processMain()");
-		zhri100aFields.setPoiFlag(true);
+		commonParameters.setPoiFlag(true);
 		HR205_initializeFields();
-		HR205_callSystem(zhri100aFields);
+		HR205_callSystem(commonParameters);
 		return null;
 	}
 	
@@ -37,10 +25,58 @@ public class NonPersonDemographicChange {
 		
 	}
 
-	private String HR205_callSystem(Zhri100aFields zhri100aFields) {
+	private String HR205_callSystem(CommonParameters commonParameters) {
 		System.out.println("********** HR205_callSystem()");
 		return null;
 		
 	}
 
+	/**
+	 * 
+	 * @param groupTransferParameters
+	 */
+	private String composeParameterStringForHrz205AProcess(DemographicChangeParameters demographicChangeParameters) {
+		System.out.println("********** composeParameterStringForHrz109AProcess");
+		//Let $Part2 = 'Parm('''                 ||
+		// $PSAuditemp               ||
+		// ''' '''                   ||       
+		// $PSEmpl                   ||
+		// ''' '''                   ||
+		// $PSGroup                  ||
+		// ''' '''                   ||
+		// $PSbranch                 ||
+		// ''' '''                   ||
+		// $PSLName                  ||
+		// ''' '''                   ||
+		// $PSFName                  ||
+		// ''' '''                   ||
+		// $PSMName                  ||
+		// ''' '''                   ||
+		// $PSNickname               ||
+		// ''' '''                   ||
+		// $PSGender                 ||
+		// ''' '''                   ||
+		// $LegServiceDate           ||
+		// ''' '''                   ||
+		// $PSDeptid                 ||
+		// ''' '''                   ||
+		// $PSPosition               ||
+		// ''' '''                   ||
+		// $PSReferral_Source        ||
+		// ''' '''                   ||
+		// $PSAddress                ||
+		// ''' '''                   ||
+		// $PSCity                   ||
+		// ''')" '
+//		String paramaterString = "'" + demographicChangeParameters.getEmployeeId() + "' "
+//				+ "'" + demographicChangeParameters.getOperatorId() + "' "
+//				+ "'" + demographicChangeParameters.getEmployeeGroup() + "' "
+//				+ "'" + groupTransferParameters.getEmployeeBranch() + "' "
+//				+ "'" + groupTransferParameters.getNationalIdCountry() + "' "
+//				+ "'" + groupTransferParameters.getNationalId() + "' "
+//				+ "'" + groupTransferParameters.getEffectiveDate() + "'";
+//		return paramaterString;
+		return null;
+	}
+	
 }

@@ -50,7 +50,9 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	return em.createQuery(
-	    		    "SELECT t FROM PszTriggerEmployee t WHERE TRIM(UPPER(t.completionStatus)) = :completionStatus ORDER BY t.sequenceNumber", PszTriggerEmployee.class)
+	    		    "SELECT p FROM PszTriggerEmployee p "
+	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
+	    		    		+ "ORDER BY p.sequenceNumber", PszTriggerEmployee.class)
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .getResultList();
 	    }
@@ -65,9 +67,10 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	return em.createQuery(
-	    		    "SELECT t FROM PszTriggerEmployee t WHERE TRIM(UPPER(t.completionStatus)) = :completionStatus "
-	    		    		+ "AND TRIM(UPPER(t.processName)) = :processName "
-	    		    		+ "ORDER BY t.sequenceNumber", PszTriggerEmployee.class)
+	    		    "SELECT p FROM PszTriggerEmployee p "
+	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
+	    		    		+ "AND TRIM(UPPER(p.processName)) = :processName "
+	    		    		+ "ORDER BY p.sequenceNumber", PszTriggerEmployee.class)
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .setParameter("processName", processName.toUpperCase().trim())
 	    		    .getResultList();
@@ -221,9 +224,11 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    try {
 	    	em.getTransaction().begin();
 	    	numberOfRecordsUpdated = em.createQuery(
-	    		    "UPDATE " + ENTITY_NAME + " SET completionStatus = UPPER(:status) WHERE sequenceNumber = :sequenceNumber")
+	    		    "UPDATE PszTriggerEmployee "
+	    		    		+ "SET completionStatus = :completionStatus "
+	    		    		+ "WHERE sequenceNumber = :sequenceNumber")
 	    		    .setParameter("sequenceNumber", sequenceNumber)
-	    		    .setParameter("status", completionStatus)
+	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .executeUpdate();
 //				//alternatively:
 //		    	TriggerEmployee trigger = em.find(TriggerEmployee.class, 1);
@@ -246,8 +251,10 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 		int numberOfRecordsUpdated = 0;
 	    try {
 	    	em.getTransaction().begin();
-	    	numberOfRecordsUpdated = em.createQuery("UPDATE PszTriggerEmployee t SET t.completionStatus = :completionStatus "
-	    				+ "WHERE t.sequenceNumber = :sequenceNumber")
+	    	numberOfRecordsUpdated = em.createQuery(
+	    			"UPDATE PszTriggerEmployee p "
+	    		    		+ "SET p.completionStatus = :completionStatus "
+	    		    		+ "WHERE p.sequenceNumber = :sequenceNumber")
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .setParameter("sequenceNumber", sequenceNumber)
 	    		    .executeUpdate();

@@ -14,7 +14,7 @@ public class CrossReferenceTerminationReasonTest {
 		String actionReason = "";
 		String status = "A";
 		CrossReferenceTerminationReason result = CrossReferenceTerminationReason.findByActionAndActionReasonAndStatus(action, actionReason, status);
-		fail("Not yet implemented");
+		assertNotNull(result);
 	}
 
 }

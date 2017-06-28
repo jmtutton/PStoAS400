@@ -385,7 +385,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    	List<CrossReferenceMultipleEmployeeId> resultList = em.createQuery(
 	    			"SELECT c FROM CrossReferenceMultipleEmployeeId c "
 	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
-	    					+ "AND sequence = :sequence", CrossReferenceMultipleEmployeeId.class)
+	    					+ "AND c.sequence = :sequence", CrossReferenceMultipleEmployeeId.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .setParameter("sequence", sequence)
 	    		    .getResultList();

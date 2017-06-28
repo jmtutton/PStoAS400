@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * The persistent class for the PS_EMPLOYEE_REVIEW database table.
@@ -255,29 +256,39 @@ public class PsEmployeeReview implements Serializable {
 		this.totalEeSalPts = totalEeSalPts;
 	}
 
-	public PsEmployeeReview findByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate(String employeeId, Date effectiveDate) {
-//	!----------------------------------------------------------------------
-//	! Procedure:  HR07-Get-Employee-Review
-//	! Desc:  This procedure retrieves the Next Review Date and Last Review Date
-//	!        from the PeopleSoft Employee Review Table to send back to
-//	!        Option 7 of AAHR01 in legacy.
-//	!----------------------------------------------------------------------
-//	Begin-Procedure HR07-Get-Employee-Review
-//	begin-select
-//	to_char(CER7.NEXT_REVIEW_DT, 'YYYY-MM-DD')  &CER7NEXT_REVIEW_DT
-//	  Let $PSNextReviewDate = &CER7NEXT_REVIEW_DT
-//	  Let $LegNextReviewDate = $PSNextReviewDate
-//	CER7.EFFDT
-//	    Let $LegLastReviewDate = $LegEffdt
-//	  !Format next review date and last review date so legacy will accept it (MM field, DD field and CCYY field)
-//	  Unstring $PSNextReviewDate by '-' into $LegNxtRevDtYear $LegNxtRevDtMonth $LegNxtRevDtDay
-//	  Unstring $LegLastReviewDate by '-' into $LegLstRevDtYear $LegLstRevDtMonth $LegLstRevDtDay
-//	from PS_Employee_Review CER7
-//	where CER7.Emplid = $PSEMPLID
-//	  and CER7.EMPL_RCD = 0     !changed for v8.3
-//	  and to_char(CER7.EFFDT, 'YYYY-MM-DD') = $PSEFFDT
-//	end-select
-//	end-procedure HR07-Get-Employee-Review
+	/**
+	 * Select statement from HR07-Get-Employee-Review from ZHRI107A.SQC
+	 * This procedure retrieves the Next Review Date and Last Review Date from the 
+	 * PeopleSoft Employee Review Table to send back to Option 7 of AAHR01 in legacy.
+	 * @return
+	 */
+	public static PsEmployeeReview findByEmployeeIdAndEffectiveDateAndEmploymentRecordNumber(String employeeId, Date effectiveDate, BigDecimal employmentRecordNumber) {
+		//BEGIN-SELECT
+		//FROM PS_Employee_Review CER7
+		//WHERE CER7.EmplId = $PSEMPLID
+		//		AND CER7.EMPL_RCD = 0
+		//		AND TO_CHAR(CER7.EFFDT, 'YYYY-MM-DD') = $PSEFFDT
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<PsEmployeeReview> resultList = em.createQuery(
+	    			"SELECT p FROM PsEmployeeReview p "
+	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    					+ "AND employmentRecordNumber = :employmentRecordNumber "
+	    					+ "AND effectiveDate = :effectiveDate "
+	    					, PsEmployeeReview.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
+	    		    .setParameter("employmentRecordNumber", employmentRecordNumber)
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	        	return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
     	return null;
 	}
 

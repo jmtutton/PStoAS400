@@ -1,8 +1,7 @@
 package erd.controller;
 
-import erd.model.ProcessParameters;
 import erd.model.PszTriggerNonPerson;
-import erd.model.Zhri100aFields;
+import erd.model.ProcessParameters.CommonParameters;
 
 /**
  * ZHRI206A - Contingent Employee and Multiple EID Rehire
@@ -11,32 +10,21 @@ import erd.model.Zhri100aFields;
  */
 public class NonPersonRehire {
 	
-	PszTriggerNonPerson trigger;
-	Zhri100aFields zhri100aFields;
-	ProcessParameters processParameters;
-
-	public NonPersonRehire(PszTriggerNonPerson trigger, Zhri100aFields zhri100aFields) {
-		System.out.println("********** NonPersonRehire()");
-		this.trigger = trigger;
-		this.zhri100aFields = zhri100aFields;
-		System.out.println("\n" + trigger.toString() + "\n");
-		System.out.println(zhri100aFields.toString() + "\n");
-	}
-
-	public String HR206_processMain() {
+	public String HR206_processMain(PszTriggerNonPerson trigger, CommonParameters commonParameters) {
 		System.out.println("********** HR206_processMain()");
-		zhri100aFields.setPoiFlag(true);
-		HR206_initializeFields();
-		HR206_callSystem(zhri100aFields);
+		commonParameters.setPoiFlag(true);
+		commonParameters = HR206_initializeFields(commonParameters);
+		HR206_callSystem(commonParameters);
 		return null;
 	}
 	
-	private void HR206_initializeFields() {
+	private CommonParameters HR206_initializeFields(CommonParameters commonParameters) {
 		System.out.println("********** HR206_initializeFields");
+		return commonParameters;
 		
 	}
 
-	private String HR206_callSystem(Zhri100aFields zhri100aFields) {
+	private String HR206_callSystem(CommonParameters commonParameters) {
 		System.out.println("********** HR206_callSystem()");
 		return null;
 		

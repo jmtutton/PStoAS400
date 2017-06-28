@@ -4,16 +4,16 @@ import org.junit.Test;
 
 import erd.controller.NonPersonTermination;
 import erd.model.PszTriggerNonPerson;
-import erd.model.Zhri100aFields;
+import erd.model.ProcessParameters.CommonParameters;
 
 public class NonPersonTerminateTest {
 
 	@Test
 	public void testHr202ProcessMain() {
 		PszTriggerNonPerson trigger = null;
-		Zhri100aFields zhri100aFields = null;
-		NonPersonTermination nonPersonTermination = new NonPersonTermination(trigger, zhri100aFields);
-		nonPersonTermination.HR202_processMain();
+		CommonParameters commonParameters = null;
+		NonPersonTermination nonPersonTermination = new NonPersonTermination();
+		nonPersonTermination.HR202_processMain(trigger, commonParameters);
 	}
 
 }

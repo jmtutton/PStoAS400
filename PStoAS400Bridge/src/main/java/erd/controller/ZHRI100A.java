@@ -1,6 +1,5 @@
 package erd.controller;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -10,18 +9,18 @@ import java.util.List;
 import erd.model.CrossReferenceEmployeeId;
 import erd.model.CrossReferenceMultipleEmployeeId;
 import erd.model.HR036P;
+import erd.model.ProcessParameters;
+import erd.model.ProcessParameters.CommonParameters;
 import erd.model.PsDbOwner;
 import erd.model.PsJob;
 import erd.model.PszTriggerEmployee;
+import erd.model.PszTriggerNonPerson;
+import erd.model.PszTriggerSuperclass;
 import erd.model.PszVariable;
 import erd.model.PszXlat;
-import erd.model.Zhri100aFields;
+import erd.model.ServerProperties;
 
 public class ZHRI100A {
-
-//	public static String psEmpl; //$PSEmpl
-//	public static String psOprid; //$PSOprid
-//	public static String errorProgramParm = "HRZ102A"; //$ErrorProgramParm = 'HRZ102A'
 	
 	public static void main() {
 		System.out.println("********** ZHRI100A.main");
@@ -30,6 +29,7 @@ public class ZHRI100A {
 		//Init-DateTime  //sets a collection of variables that can be used by the other procedures in datetime.sqc that format dates or do date arithmetic
 		//Process-Main
 		try {
+			initializeServerProperties();
 			processMain();
 		} 
 		catch (InterruptedException e) {
@@ -79,20 +79,19 @@ public class ZHRI100A {
 	 */
 	public static void processMain() throws InterruptedException {
 		System.out.println("********** ZHRI100A.processMain");
-		Zhri100aFields zhri100aFields;
 		//Begin-Procedure Process-Main
 		//ZHRI100A.Get-Variable
-		zhri100aFields = initializeMainProperties();
+		CommonParameters commonParameters = initializeCommonParameters();
 		//LET $WrkCriticalFlag = 'N'
-		zhri100aFields.setCriticalFlag(false);
+		commonParameters.setCriticalFlag(false);
 		//LET #run_flag = 1
 		Boolean runFlag = true;
 		//while #run_flag = 1        !Never ending loop
 		while(runFlag == true) {
 			//ZHRI100A.Check-Interface-Runfile
-			runFlag = ZHRI100A_checkInterfaceRunFile(zhri100aFields.getOracleSystemId());
+			runFlag = ZHRI100A_checkInterfaceRunFile(ServerProperties.getOracleSystemId());
 			//ZHRI100A.Get-Trigger-Data       !Process the interface requests
-			ZHRI100A_getTriggerData(zhri100aFields);
+			ZHRI100A_getTriggerData(commonParameters);
 			//TRANCTRL.Commit-Transaction
 			//LET $Command = 'sleep 15'  !After interface run wait 15 seconds and do it again  !sree**rehost  !ZHR_MOD_ZHRI100A_sleep
 			//Call System Using $Command #status Wait  !sree**rehost  !ZHR_MOD_ZHRI100A_sleep
@@ -110,9 +109,10 @@ public class ZHRI100A {
 		//end-while   !1=1
 		}
 		//LET $Command = 'mv' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.stop' || ' ' || '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'
-		String command = "mv" + " " + "/usr/local/barch/" + zhri100aFields.getOracleSystemId() + "/work/hrinterface.stop" + " " + "/usr/local/barch/" + zhri100aFields.getOracleSystemId() + "/work/hrinterface.run";
+		String commandString = "mv" + " " + "/usr/local/barch/" + ServerProperties.getOracleSystemId() + "/work/hrinterface.stop" + " " 
+					+ "/usr/local/barch/" + ServerProperties.getOracleSystemId() + "/work/hrinterface.run";
 		//Show  + $Command in Process-Main: ' $Command
-		System.out.println("$Command in Process-Main: " + command);
+		System.out.println("$Command in Process-Main: " + commandString);
 		//Call System Using $Command #status Wait   !ZHR_MOD_ZHRI100A_sleep       
 		//End-Procedure Process-Main
 	}
@@ -134,10 +134,10 @@ public class ZHRI100A {
 	 * Call-Programs from ZHRI100A.SQR
 	 * Subroutine will call appropriate programs
 	 * @param trigger
-	 * @param zhri100aFields
+	 * @param commonParameters
 	 * @return
 	 */
-	public static String ZHRI100A_callPrograms(PszTriggerEmployee trigger, Zhri100aFields zhri100aFields) {
+	public static String ZHRI100A_callPrograms(PszTriggerSuperclass trigger, CommonParameters commonParameters) {
 		System.out.println("********** ZHRI100A_callPrograms");
 		String commandString = "";
 		//BEGIN-PROCEDURE CALL-PROGRAMS
@@ -145,281 +145,372 @@ public class ZHRI100A {
 		//LET $TrigTaskFlag = ''
 		
 		switch(trigger.getProcessName()) {
-		
 		case "ZHRI101A": //Process to hire employee
 			//WHEN = 'ZHRI101A'
 			//!Move fields to be used in the called SQC
 			//LET $Wrk_Oprid = $AuditOprid
-			zhri100aFields.setOperatorId(trigger.getOperatorId());
+			commonParameters.setOperatorId(trigger.getOperatorId());
 			//LET $Wrk_Emplid = $PSEmplid
-			zhri100aFields.setEmployeeId(trigger.getEmployeeId());
+			commonParameters.setEmployeeId(trigger.getEmployeeId());
 			//LET $Wrk_Effdt = $PSEffdt
-			zhri100aFields.setEffectiveDate(trigger.getEffectiveDate());
+			commonParameters.setEffectiveDate(trigger.getEffectiveDate());
 			//move #PSEffseq to #Wrk_Effseq
-			zhri100aFields.setIndexNumber(trigger.getEffectiveSequence());
+			commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
 			//LET $Wrk_Process_Name = $WrkProcess
-			zhri100aFields.setProcessName(trigger.getProcessName());
+			commonParameters.setProcessName(trigger.getProcessName());
 			//LET $TrigTaskFlag = $WrkTaskFlag      !Surya Added - TEMPMAST
-			zhri100aFields.setCompletionStatus(trigger.getCompletionStatus());
-			//LET $Wrk_Inf_ = ' '
+			commonParameters.setCompletionStatus(trigger.getCompletionStatus());
+			//LET $Wrk_Inf_ = ' ' //this value is not used
 			//LET $ADAction_Code = 'H'
-			zhri100aFields.setActionCode("H");
+//			commonParameters.setActionCode("H");
 			//LET $ADLegOprid = ''
-			zhri100aFields.setLegacyOperatorId("");
+//			commonParameters.setLegacyOperatorId("");
 			//DO HR01-Process-Main    !ZHRI101A.SQC
-			EmployeeNewHire employeeNewHire = new EmployeeNewHire(trigger, zhri100aFields);
-			zhri100aFields.setCompletionStatus(employeeNewHire.HR01_processMain());
+			EmployeeNewHire employeeNewHire = new EmployeeNewHire();
+			commonParameters.setCompletionStatus(employeeNewHire.HR01_processMain((PszTriggerEmployee) trigger, commonParameters));
 			//BREAK
 			break;
 		case "ZHRI102A": //Process to terminate an employee
+			commonParameters.setProcessName(trigger.getProcessName());
 			//WHEN = 'ZHRI102A'
 			//!Move fields to be used in the called SQC
 			//MOVE #Wrk_Sequence to #WrkSeqNbr
-			zhri100aFields.setIndexNumber(trigger.getEffectiveSequence());
+			commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
 			//LET $PSAuditOperId = $AuditOprId
-			zhri100aFields.setAuditOperatorId(trigger.getOperatorId());
+			commonParameters.setAuditOperatorId(trigger.getOperatorId());
+			commonParameters.setOperatorId(trigger.getOperatorId());
 	        //LET $PSDateIn = $PSEffDt
-			zhri100aFields.setEffectiveDate(trigger.getEffectiveDate());
+			commonParameters.setEffectiveDate(trigger.getEffectiveDate());
 	        //LET $Wrk_Emplid = $PSEmplId
-			zhri100aFields.setEmployeeId(trigger.getEmployeeId());
+			commonParameters.setEmployeeId(trigger.getEmployeeId());
 	        //LET $ADAction_Code = 'T'
-			zhri100aFields.setActionCode("T");
+//			commonParameters.setActionCode("T");
 	        //LET $ADLegOprid = ''
-			zhri100aFields.setLegacyOperatorId("");
+//			commonParameters.setLegacyOperatorId("");
 	        //DO HR02-Process-Main    !ZHRI102A.SQC
-			EmployeeTermination employeeTermination = new EmployeeTermination(trigger, zhri100aFields);
-			zhri100aFields.setCompletionStatus(employeeTermination.HR02_processMain());
+			EmployeeTermination employeeTermination = new EmployeeTermination();
+			commonParameters.setCompletionStatus(employeeTermination.HR02_processMain((PszTriggerEmployee) trigger, commonParameters));
 			//BREAK
 			break;
 		case "ZHRI104A": //Process for job status change
+			commonParameters.setProcessName(trigger.getProcessName());
 			//WHEN = 'ZHRI104A'
 			//!Move fields to be used in the called SQC
 			//LET $PSUserOprid = $AuditOprid
-			zhri100aFields.setOperatorId(trigger.getOperatorId());
+			commonParameters.setOperatorId(trigger.getOperatorId());
 			//LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
-			zhri100aFields.setEmployeeId(trigger.getEmployeeId());
+			commonParameters.setEmployeeId(trigger.getEmployeeId());
 			//Move #PSEffseq to #WrkEffseq
-			zhri100aFields.setIndexNumber(trigger.getEffectiveSequence());
+			commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
 			//LET $ADAction_Code = 'C'
-			zhri100aFields.setActionCode("C");
+//			commonParameters.setActionCode("C");
 			//LET $ADLegOprid = ''
-			zhri100aFields.setLegacyOperatorId("");
+//			commonParameters.setLegacyOperatorId("");
 			//DO HR04-Process-Main    !ZHRI104A.SQC
-			EmployeeJobProfileChange employeeJobProfileChange = new EmployeeJobProfileChange(trigger, zhri100aFields);
-			zhri100aFields.setCompletionStatus(employeeJobProfileChange.HR04_processMain());
+			EmployeeJobProfileChange employeeJobProfileChange = new EmployeeJobProfileChange();
+			commonParameters.setCompletionStatus(employeeJobProfileChange.HR04_processMain((PszTriggerEmployee) trigger, commonParameters));
 			//BREAK
 			break;
 		case "ZHRI105A": //Process for demographics change
+			commonParameters.setProcessName(trigger.getProcessName());
 			//WHEN = 'ZHRI105A'
 			//!Move fields to be used in the called SQC
 			//LET $PSemp = $AuditOprid
-			zhri100aFields.setOperatorId(trigger.getOperatorId());
+			commonParameters.setOperatorId(trigger.getOperatorId());
 			//LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
-			zhri100aFields.setEmployeeId(trigger.getEmployeeId());
+			commonParameters.setEmployeeId(trigger.getEmployeeId());
 			//LET $ADAction_Code = 'C'
-			zhri100aFields.setActionCode("C");
+//			commonParameters.setActionCode("C");
 			//LET $ADLegOprid = ''
-			zhri100aFields.setLegacyOperatorId("");
+//			commonParameters.setLegacyOperatorId("");
 			//LET $Wrk_ADCountryCdBuild = 'Y'                 !sree-UAAMOD
 			//DO HR05-Process-Main    !ZHRI105A.SQC
-			EmployeeDemographicChange employeeDemographicChange = new EmployeeDemographicChange(trigger, zhri100aFields);
-			zhri100aFields.setCompletionStatus(employeeDemographicChange.HR05_processMain());
+			EmployeeDemographicChange employeeDemographicChange = new EmployeeDemographicChange();
+			commonParameters.setCompletionStatus(employeeDemographicChange.HR05_processMain((PszTriggerEmployee) trigger, commonParameters));
 			//BREAK
 			break;
 		case "ZHRI106A": 
 			//WHEN = 'ZHRI106A'
 			//!Move fields to be used in the called SQC
 			//LET $Wrk_Oprid = $AuditOprid
-			zhri100aFields.setOperatorId(trigger.getOperatorId());
+			commonParameters.setOperatorId(trigger.getOperatorId());
 			//LET $Wrk_Emplid = $PSEmplid
-			zhri100aFields.setEmployeeId(trigger.getEmployeeId());
+			commonParameters.setEmployeeId(trigger.getEmployeeId());
 			//LET $Wrk_Effdt = $PSEffdt
-			zhri100aFields.setEffectiveDate(trigger.getEffectiveDate());
+			commonParameters.setEffectiveDate(trigger.getEffectiveDate());
 			//move #PSEffseq to #Wrk_Effseq
-			zhri100aFields.setIndexNumber(trigger.getEffectiveSequence());
+			commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
 			//LET $Wrk_Process_Name = $WrkProcess
-			zhri100aFields.setProcessName(trigger.getProcessName());
+			commonParameters.setProcessName(trigger.getProcessName());
 			//LET $ADAction_Code = 'R'
-			zhri100aFields.setActionCode("R");
+//			commonParameters.setActionCode("R");
 			//DO HR01-Process-Main       !ZHRI101A.SQC
 			//BREAK
 			break;
 		case "ZHRI107A": //Process for converting dates
+			commonParameters.setProcessName(trigger.getProcessName());
+			commonParameters.setOperatorId(trigger.getOperatorId());
 			//WHEN = 'ZHRI107A'
 			//LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
-			zhri100aFields.setEmployeeId(trigger.getEmployeeId());
+			commonParameters.setEmployeeId(trigger.getEmployeeId());
 			//LET $ADAction_Code = ''
-			zhri100aFields.setActionCode("");
+//			commonParameters.setActionCode("");
 			//LET $ADLegOprid = ''
-			zhri100aFields.setLegacyOperatorId("");
+//			commonParameters.setLegacyOperatorId("");
 			//DO HR07-Process-Main
-			EmployeeDateChange employeeDateChange = new EmployeeDateChange(trigger, zhri100aFields);
-			zhri100aFields.setCompletionStatus(employeeDateChange.HR07_processMain());
+			EmployeeDateChange employeeDateChange = new EmployeeDateChange();
+			commonParameters.setCompletionStatus(employeeDateChange.HR07_processMain((PszTriggerEmployee) trigger, commonParameters));
 			//BREAK
 			break;
 		case "ZHRI109A": //Process for group transfer
+			commonParameters.setProcessName(trigger.getProcessName());
 			//WHEN = 'ZHRI109A'
 			//!Move fields to be used in the called SQC
 			//LET $PSUserOprid = $AuditOprid
-			zhri100aFields.setOperatorId(trigger.getOperatorId());
+			commonParameters.setOperatorId(trigger.getOperatorId());
 			//LET $Wrk_Emplid = $PSEmplid                              !sree**10/04/01
-			zhri100aFields.setEmployeeId(trigger.getEmployeeId());
+			commonParameters.setEmployeeId(trigger.getEmployeeId());
 			//Move #PSEffseq to #WrkEffseq
-			zhri100aFields.setIndexNumber(trigger.getEffectiveSequence());
+			commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
 			//LET $ADAction_Code = 'C'
-			zhri100aFields.setActionCode("C");
+//			commonParameters.setActionCode("C");
 			//LET $ADLegOprid = ''
-			zhri100aFields.setLegacyOperatorId("");
+//			commonParameters.setLegacyOperatorId("");
 			//DO HR09-Process-Main        !ZHRI100A.SQC
-			EmployeeGroupTransfer employeeGroupTransfer = new EmployeeGroupTransfer(trigger, zhri100aFields);
-			zhri100aFields.setCompletionStatus(employeeGroupTransfer.HR09_processMain());
+			EmployeeGroupTransfer employeeGroupTransfer = new EmployeeGroupTransfer();
+			commonParameters.setCompletionStatus(employeeGroupTransfer.HR09_processMain((PszTriggerEmployee) trigger, commonParameters));
 			//BREAK
 			break;
-		case "ZHRI101D": 
+		case "ZHRI101D": //Row deleted on hire
+			commonParameters.setProcessName(trigger.getProcessName());
 			//WHEN = 'ZHRI101D'     !Row deleted on hire
 			//LET $ErrorProgramParm = 'HRZ101A'
-			zhri100aFields.setErrorProgramParameter("HRZ101A");
+			commonParameters.setErrorProgramParameter("HRZ101A");
 			//LET $ErrorMessageParm = 'A row was deleted on the hire process'
-			zhri100aFields.setErrorMessageParameter("A row was deleted on the hire process");
+			commonParameters.setErrorMessageParameter("A row was deleted on the hire process");
 			//LET $WrkCriticalFlag = 'Y'
-			zhri100aFields.setCriticalFlag(true);
+			commonParameters.setCriticalFlag(true);
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-			ZHRI100A_prepareErrorParms(zhri100aFields);
+			ZHRI100A_prepareErrorParms(commonParameters);
 			//DO Call-Error-Routine
-			zhri100aFields.setProcessName(trigger.getProcessName());
-			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
+			commonParameters.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(commonParameters);
 			//LET $WrkCriticalFlag = 'N'
-			zhri100aFields.setCriticalFlag(false);
+			commonParameters.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
-			zhri100aFields.setCompletionStatus("C");
+			commonParameters.setCompletionStatus("C");
 			//DO UPDATE-TRIGGER-ROW
 			break;
-		case "ZHRI102D": 
+		case "ZHRI102D": //Row deleted on term
+			commonParameters.setProcessName(trigger.getProcessName());
 			//WHEN = 'ZHRI102D'     !Row deleted on term
 			//LET $ErrorProgramParm = 'HRZ102A'
-			zhri100aFields.setErrorProgramParameter("HRZ102A");
+			commonParameters.setErrorProgramParameter("HRZ102A");
 			//LET $ErrorMessageParm = 'A row was deleted on the termination process'
-			zhri100aFields.setErrorMessageParameter("A row was deleted on the termination process");
+			commonParameters.setErrorMessageParameter("A row was deleted on the termination process");
 			//LET $WrkCriticalFlag = 'Y'
-			zhri100aFields.setCriticalFlag(true);
+			commonParameters.setCriticalFlag(true);
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-			ZHRI100A_prepareErrorParms(zhri100aFields);
+			ZHRI100A_prepareErrorParms(commonParameters);
 			//DO Call-Error-Routine
-			zhri100aFields.setProcessName(trigger.getProcessName());
-			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
+			commonParameters.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(commonParameters);
 			//LET $WrkCriticalFlag = 'N'
-			zhri100aFields.setCriticalFlag(false);
+			commonParameters.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
-			zhri100aFields.setCompletionStatus("C");
+			commonParameters.setCompletionStatus("C");
 			//DO UPDATE-TRIGGER-ROW
 			break;
-		case "ZHRI104D": 
+		case "ZHRI104D": //Row deleted on job status change
+			commonParameters.setProcessName(trigger.getProcessName());
 			//WHEN = 'ZHRI104D'     !Row deleted on job status change
 			//LET $ErrorProgramParm = 'HRZ104A'
-			zhri100aFields.setErrorProgramParameter("HRZ104A");
+			commonParameters.setErrorProgramParameter("HRZ104A");
 			//LET $ErrorMessageParm = 'A row was deleted on the job profile process'
-			zhri100aFields.setErrorMessageParameter("A row was deleted on the job profile process");
+			commonParameters.setErrorMessageParameter("A row was deleted on the job profile process");
 			//LET $WrkCriticalFlag = 'Y'
-			zhri100aFields.setCriticalFlag(true);
+			commonParameters.setCriticalFlag(true);
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-			ZHRI100A_prepareErrorParms(zhri100aFields);
+			ZHRI100A_prepareErrorParms(commonParameters);
 			//DO Call-Error-Routine
-			zhri100aFields.setProcessName(trigger.getProcessName());
-			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
+			commonParameters.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(commonParameters);
 			//LET $WrkCriticalFlag = 'N'
-			zhri100aFields.setCriticalFlag(false);
+			commonParameters.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
-			zhri100aFields.setCompletionStatus("C");
+			commonParameters.setCompletionStatus("C");
 			//DO UPDATE-TRIGGER-ROW
 			break;
-		case "ZHRI105D": 
+		case "ZHRI105D": //Row deleted on demographics change
+			commonParameters.setProcessName(trigger.getProcessName());
 			//WHEN = 'ZHRI105D'     !Row deleted on demographics change
 			//LET $ErrorProgramParm = 'HRZ105A'
-			zhri100aFields.setErrorProgramParameter("HRZ105A");
+			commonParameters.setErrorProgramParameter("HRZ105A");
 			//LET $ErrorMessageParm = 'A row was deleted on the demographics process'
-			zhri100aFields.setErrorMessageParameter("A row was deleted on the demographics process");
+			commonParameters.setErrorMessageParameter("A row was deleted on the demographics process");
 			//LET $WrkCriticalFlag = 'Y'
-			zhri100aFields.setCriticalFlag(true);
+			commonParameters.setCriticalFlag(true);
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-			ZHRI100A_prepareErrorParms(zhri100aFields);
+			ZHRI100A_prepareErrorParms(commonParameters);
 			//DO Call-Error-Routine
-			zhri100aFields.setProcessName(trigger.getProcessName());
-			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
+			commonParameters.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(commonParameters);
 			//LET $WrkCriticalFlag = 'N'
-			zhri100aFields.setCriticalFlag(false);
+			commonParameters.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
-			zhri100aFields.setCompletionStatus("C");
+			commonParameters.setCompletionStatus("C");
 			//DO UPDATE-TRIGGER-ROW
 			break;
-		case "ZHRI106D": 
+		case "ZHRI106D": //Row deleted on rehire
+			commonParameters.setProcessName(trigger.getProcessName());
 			//WHEN = 'ZHRI106D'     !Row deleted on rehire
 			//LET $ErrorProgramParm = 'HRZ101A'
-			zhri100aFields.setErrorProgramParameter("HRZ101A");
+			commonParameters.setErrorProgramParameter("HRZ101A");
 			//LET $ErrorMessageParm = 'A row was deleted on the re-hire process'
-			zhri100aFields.setErrorMessageParameter("A row was deleted on the re-hire process");
+			commonParameters.setErrorMessageParameter("A row was deleted on the re-hire process");
 			//LET $WrkCriticalFlag = 'Y'
-			zhri100aFields.setCriticalFlag(true);
+			commonParameters.setCriticalFlag(true);
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-			ZHRI100A_prepareErrorParms(zhri100aFields);
+			ZHRI100A_prepareErrorParms(commonParameters);
 			//DO Call-Error-Routine
-			zhri100aFields.setProcessName(trigger.getProcessName());
-			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
+			commonParameters.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(commonParameters);
 			//LET $WrkCriticalFlag = 'N'
-			zhri100aFields.setCriticalFlag(false);
+			commonParameters.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
-			zhri100aFields.setCompletionStatus("C");
+			commonParameters.setCompletionStatus("C");
 			//DO UPDATE-TRIGGER-ROW
 			break;
-		case "ZHRI107D": 
-			//WHEN = 'ZHRI107D'     !Row deleted on
+		case "ZHRI107D": //Row deleted on the dates process
+			commonParameters.setProcessName(trigger.getProcessName());
+			//WHEN = 'ZHRI107D'     !Row deleted on the dates process
 			//LET $ErrorProgramParm = 'HRZ107A'
-			zhri100aFields.setErrorProgramParameter("HRZ107A");
+			commonParameters.setErrorProgramParameter("HRZ107A");
 			//LET $ErrorMessageParm = 'A row was deleted on the dates process'
-			zhri100aFields.setErrorMessageParameter("A row was deleted on the dates process");
+			commonParameters.setErrorMessageParameter("A row was deleted on the dates process");
 			//LET $WrkCriticalFlag = 'Y'
-			zhri100aFields.setCriticalFlag(true);
+			commonParameters.setCriticalFlag(true);
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-			ZHRI100A_prepareErrorParms(zhri100aFields);
+			ZHRI100A_prepareErrorParms(commonParameters);
 			//DO Call-Error-Routine
-			zhri100aFields.setProcessName(trigger.getProcessName());
-			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
+			commonParameters.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(commonParameters);
 			//LET $WrkCriticalFlag = 'N'
-			zhri100aFields.setCriticalFlag(false);
+			commonParameters.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
-			zhri100aFields.setCompletionStatus("C");
+			commonParameters.setCompletionStatus("C");
 			//DO UPDATE-TRIGGER-ROW
 			break;
-		case "ZHRI109D": 
+		case "ZHRI109D": //Row deleted on the group transfer process
+			commonParameters.setProcessName(trigger.getProcessName());
 			//WHEN = 'ZHRI109D'
 			//LET $ErrorProgramParm = 'HRZ109A'
-			zhri100aFields.setErrorProgramParameter("HRZ109A");
+			commonParameters.setErrorProgramParameter("HRZ109A");
 			//LET $ErrorMessageParm = 'A row was deleted on the group transfer process'
-			zhri100aFields.setErrorMessageParameter("A row was deleted on the group transfer process");
+			commonParameters.setErrorMessageParameter("A row was deleted on the group transfer process");
 			//LET $WrkCriticalFlag = 'Y'
-			zhri100aFields.setCriticalFlag(true);
+			commonParameters.setCriticalFlag(true);
 			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-			ZHRI100A_prepareErrorParms(zhri100aFields);
+			ZHRI100A_prepareErrorParms(commonParameters);
 			//DO Call-Error-Routine
-			zhri100aFields.setProcessName(trigger.getProcessName());
-			commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
+			commonParameters.setProcessName(trigger.getProcessName());
+			commandString = ZHRI100A_callErrorRoutine(commonParameters);
 			//LET $WrkCriticalFlag = 'N'
-			zhri100aFields.setCriticalFlag(false);
+			commonParameters.setCriticalFlag(false);
 			//LET $CompletionStatus = 'C'
-			zhri100aFields.setCompletionStatus("C");
+			commonParameters.setCompletionStatus("C");
 			//DO UPDATE-TRIGGER-ROW
 			break;
-		default:
-			//WHEN-OTHER
-			//LET $CompletionStatus = 'E'     !update to an E to prevent looping and to mark the record in error
-			zhri100aFields.setCompletionStatus("E");
-			//DO UPDATE-TRIGGER-ROW
+		case "ZHRI201A": //Non-person new hire
+			//WHEN = 'ZHRI201A'
+			//!Move fields to be used in the called SQC
+			//LET $Wrk_Oprid = $NAuditOprid
+			commonParameters.setOperatorId(trigger.getOperatorId());
+			//LET $Wrk_Emplid = $NPSEmplid
+			commonParameters.setEmployeeId(trigger.getEmployeeId());
+			//LET $Wrk_Effdt = $NPSEffdt
+			commonParameters.setEffectiveDate(trigger.getEffectiveDate());
+			//MOVE #NPSEffseq to #Wrk_Effseq
+			commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
+			//LET $Wrk_indexNum = to_char(#indexNum)
+			commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
+			//LET $Wrk_Process_Name = $NWrkProcess
+			commonParameters.setProcessName(trigger.getProcessName());
+			//DO HR201-Process-Main    !ZHRI201A.SQC
+			NonPersonNewHire nonPersonNewHire = new NonPersonNewHire();
+			commonParameters.setCompletionStatus(nonPersonNewHire.HR201_processMain((PszTriggerNonPerson) trigger, commonParameters));
 			//BREAK
 			break;
-
+		case "ZHRI202A": //Non-person termination
+			commonParameters.setProcessName(trigger.getProcessName());
+			//WHEN = 'ZHRI202A'
+			//!Move fields to be used in the called SQC
+			//LET $PSAuditOperId = $NAuditOprid
+			commonParameters.setAuditOperatorId(trigger.getOperatorId());
+			commonParameters.setOperatorId(trigger.getOperatorId());
+			//LET $PSDateIn = $NPSEffdt
+			commonParameters.setEffectiveDate(trigger.getEffectiveDate());
+			//LET $Wrk_Emplid = $NPSEmplid 
+			commonParameters.setEmployeeId(trigger.getEmployeeId());
+			//LET $Wrk_indexNum = to_char(#indexNum)                   
+			commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
+			//DO HR202-Process-Main    !ZHRI202A.SQC
+			NonPersonTermination nonPersonTermination = new NonPersonTermination();
+			commonParameters.setCompletionStatus(nonPersonTermination.HR202_processMain((PszTriggerNonPerson) trigger, commonParameters));
+			//BREAK
+			break;
+		case "ZHRI205A":
+			commonParameters.setProcessName(trigger.getProcessName());
+			//WHEN = 'ZHRI205A'
+			//!Move fields to be used in the called SQC
+			//LET $PSAuditemp = $NAuditOprId
+			commonParameters.setAuditOperatorId(trigger.getOperatorId());
+			commonParameters.setOperatorId(trigger.getOperatorId());
+			//LET $Wrk_Emplid = $NPSEmplid                              
+			commonParameters.setEmployeeId(trigger.getEmployeeId());
+			//LET $Wrk_indexNum = to_char(#indexNum)
+			commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
+			//LET $PSEffdt =  $NPSEffdt     
+			commonParameters.setEffectiveDate(trigger.getEffectiveDate());
+			//DO HR205-Process-Main    !ZHRI105A.SQC
+			NonPersonDemographicChange nonPersonDemographicChange = new NonPersonDemographicChange();
+			commonParameters.setCompletionStatus(nonPersonDemographicChange.HR205_processMain((PszTriggerNonPerson) trigger, commonParameters));
+			//BREAK
+			break;
+		case "ZHRI206A": //Non-person 
+			//WHEN = 'ZHRI206A'
+			//!Move fields to be used in the called SQC
+			//LET $Wrk_Oprid = $NAuditOprid
+			commonParameters.setOperatorId(trigger.getOperatorId());			
+			//LET $Wrk_Emplid = $NPSEmplid
+			commonParameters.setEmployeeId(trigger.getEmployeeId());
+			//LET $Wrk_Effdt = $NPSEffdt
+			commonParameters.setEffectiveDate(trigger.getEffectiveDate());
+			//MOVE #NPSEffseq to #Wrk_Effseq
+			commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
+			//LET $Wrk_indexNum = to_char(#indexNum)
+			commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
+			//LET $Wrk_Process_Name = $NWrkProcess
+			commonParameters.setProcessName(trigger.getProcessName());
+			//DO HR201-Process-Main       !ZHRI201A.SQC
+			NonPersonNewHire nonPersonNewHire2 = new NonPersonNewHire();
+			commonParameters.setCompletionStatus(nonPersonNewHire2.HR201_processMain((PszTriggerNonPerson) trigger, commonParameters));
+			//BREAK
+			break;
+		default: //ERROR
+			//WHEN-OTHER
+			//LET $CompletionStatus = 'E'
+			//!update to an E to prevent looping and to mark the record in error
+			commonParameters.setCompletionStatus("E");
+			//DO UPDATE-TRIGGER-ROW
+			//DO UPDATE-TRIGGER-ROW-NONEMP  !Surya Added - TEMPMAST 
+			//BREAK
+			break;
 		//END-EVALUATE
 		}
-	//END-PROCEDURE CALL-PROGRAMS
-		return zhri100aFields.getCompletionStatus();
+		System.out.println("Command => " + commandString);
+		return commonParameters.getCompletionStatus();
+		//END-PROCEDURE CALL-PROGRAMS
 	}
 
 	/**
@@ -505,10 +596,10 @@ public class ZHRI100A {
 	 * Call-System from ZHRI100A.SQR
 	 * Executes a command line statement stored in the $Command Variable
 	 * @param command
-	 * @param zhri100aFields
+	 * @param commonParameters
 	 * @return 0 if success, non-zero if error
 	 */
-	public static Integer ZHRI100A_callSystem(String commandString, Zhri100aFields zhri100aFields) {
+	public static Integer ZHRI100A_callSystem(String commandString, CommonParameters commonParameters) {
 		System.out.println("********** ZHRI100A_callSystem");
 		Integer status; //#Status
 //		String showCommand;
@@ -530,38 +621,38 @@ public class ZHRI100A {
 		//END-WHILE   !#SubstrStartPos <= #CommandLength
 //		}
 		//LET $Command = $RexecScript || ' ' || $Command || ' ' || $RMTSVR
-//		command = zhri100aFields.getRemoteExecScript() + " " +  command + " " + zhri100aFields.getRemoteServerName();
+//		command = commonParameters.getRemoteExecScript() + " " +  command + " " + commonParameters.getRemoteServerName();
 		//Call System Using $Command #Status Wait  !Execute the command that was built on the command waiting until completion
-		status = callSystemUsingCommand(commandString, zhri100aFields);
+		status = callSystemUsingCommand(commandString, commonParameters);
 		//IF #status != 0
 		if(status != 0) {
 			//!error
 			//LET $ErrorProgramParm = 'ZHRI100A'
-			zhri100aFields.setErrorProgramParameter("ZHRI100A");
+			commonParameters.setErrorProgramParameter("ZHRI100A");
 			//LET $ErrorMessageParm = ' '
 			//LET $ErrorMessageParm = 'Error executing Call System command, contact HR-PeopleSoft On-Call'
-			zhri100aFields.setErrorMessageParameter("Error executing Call System command, contact HR-PeopleSoft On-Call");
+			commonParameters.setErrorMessageParameter("Error executing Call System command, contact HR-PeopleSoft On-Call");
 			//LET $WrkCriticalFlag = 'Y'
-			zhri100aFields.setCriticalFlag(true);
+			commonParameters.setCriticalFlag(true);
 			//DO Prepare-Error-Parms
-			ZHRI100A_prepareErrorParms(zhri100aFields);
+			ZHRI100A_prepareErrorParms(commonParameters);
 			//IF $PoiFlag = 'N'
-			if(!zhri100aFields.getPoiFlag()) {
+			if(!commonParameters.getPoiFlag()) {
 				//DO Call-Error-Routine
 				//TODO: 
-				zhri100aFields.setProcessName("HRZ100A");
-				commandString = ZHRI100A_callErrorRoutine(zhri100aFields);
+				commonParameters.setProcessName("HRZ100A");
+				commandString = ZHRI100A_callErrorRoutine(commonParameters);
 			//ELSE
 			}
 			else {
 				//DO Call-Error-Routine-NonEmp
 				//TODO: 
-				zhri100aFields.setProcessName("HRZ100A");
-				commandString = ZHRI100A_callErrorRoutineNonEmp(zhri100aFields);
+				commonParameters.setProcessName("HRZ100A");
+				commandString = ZHRI100A_callErrorRoutineNonEmp(commonParameters);
 			//END-IF
 			}
 			//LET $WrkCriticalFlag  = 'N'
-			zhri100aFields.setCriticalFlag(false);
+			commonParameters.setCriticalFlag(false);
 		}
 		//END-IF
 		return status;
@@ -571,18 +662,18 @@ public class ZHRI100A {
 	/**
 	 * Prepare-Error-Parms from ZHRI100A.SQR
 	 * Makes sure that the parms are the correct length for the error routine RPG program to recieve them
-	 * @param zhri100aFields
+	 * @param commonParameters
 	 */
-	private static void ZHRI100A_prepareErrorParms(Zhri100aFields zhri100aFields) {
+	private static void ZHRI100A_prepareErrorParms(CommonParameters commonParameters) {
 		System.out.println("********** ZHRI100A_prepareErrorParms");
 		//BEGIN-PROCEDURE PREPARE-ERROR-PARMS
 		//!Prepare the date and time parms
 		//DO Get-Current-DateTime                                 !Get the current date and time
 		Calendar now = Calendar.getInstance();
 		//LET $AddDateErrorParm = DATETOSTR(STRTODATE($AsOfToday,'DD-MON-YYYY'),'YYYYMMDD') !sree**rehost
-		zhri100aFields.setErrorDateParameter(now.get(Calendar.MONTH) + "/" + now.get(Calendar.DATE) + "/" + now.get(Calendar.YEAR));
+		commonParameters.setErrorDateParameter(now.get(Calendar.MONTH) + "/" + now.get(Calendar.DATE) + "/" + now.get(Calendar.YEAR));
 		//LET $AddTimeErrorParm =    substr($Out,10,2)    ||    substr($Out,13,2)    ||    substr($Out,16,2)
-		zhri100aFields.setErrorTimeParameter(now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND));
+		commonParameters.setErrorTimeParameter(now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND));
 		//LET $OprIdErrorParm   =    Substr($AuditOprid,2,5)
 		//END-PROCEDURE PREPARE-ERROR-PARMS
 	}
@@ -591,11 +682,11 @@ public class ZHRI100A {
 	 * Call System Using $Command #Status Wait
 	 * Execute the command that was built on the command waiting until completion
 	 * @param command
-	 * @param zhri100aFields
+	 * @param commonParameters
 	 * @return 0 if success, non-zero if error
 	 */
 	//TODO: build it
-	private static Integer callSystemUsingCommand(String command, Zhri100aFields zhri100aFields) {
+	private static Integer callSystemUsingCommand(String command, CommonParameters commonParameters) {
 		System.out.println("********** callSystemUsingCommand");
 		//SHOW '$Command=> ' $Command
 		System.out.println("************************************************************");
@@ -607,7 +698,7 @@ public class ZHRI100A {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy_hh:mm:ss.SSSSSS_a");
 		String currentDate = sdf.format(new Date()).toUpperCase();
 		System.out.println("Calling Command at: " + currentDate);
-//		System.out.println(zhri100aFields.toString());
+//		System.out.println(commonParameters.toString());
 		return 0;
 	}
 
@@ -615,12 +706,12 @@ public class ZHRI100A {
 	 * Call-Error-Routine-NonEmp from ZHRI100A.SQR
 	 * Builds the command and calls the error routine
 	 * @param processName
-	 * @param zhri100aFields
+	 * @param commonParameters
 	 * @return command text
 	 */
-	private static String ZHRI100A_callErrorRoutineNonEmp(Zhri100aFields zhri100aFields) {
-		System.out.println("********** ZHRI100A_callErrorRoutineNonEmp");
-		String commandString = composeCommandString(zhri100aFields, composeErrorParameterString(zhri100aFields), zhri100aFields.getProcessName());
+	private static String ZHRI100A_callErrorRoutineNonEmp(CommonParameters commonParameters) {
+		System.out.println("********** ZHRI100A_callErrorRoutineNonEmp()");
+		String commandString = composeCommandString(commonParameters, composeErrorParameterString(commonParameters));
 		System.out.println(commandString);
 		return commandString;
 	}
@@ -628,34 +719,34 @@ public class ZHRI100A {
 	/**
 	 * Call-Error-Routine from ZHRI100A.SQR
 	 * @param processName
-	 * @param zhri100aFields
+	 * @param commonParameters
 	 * @return command text
 	 */
-	public static String ZHRI100A_callErrorRoutine(Zhri100aFields zhri100aFields) {
-		System.out.println("********** ZHRI100A_callErrorRoutine");
-		String commandString = composeCommandString(zhri100aFields, composeErrorParameterString(zhri100aFields), zhri100aFields.getProcessName());
+	public static String ZHRI100A_callErrorRoutine(CommonParameters commonParameters) {
+		System.out.println("********** ZHRI100A_callErrorRoutine()");
+		String commandString = composeCommandString(commonParameters, composeErrorParameterString(commonParameters));
 		System.out.println(commandString);
 		return commandString;
 //		List<String> parameterList = new ArrayList<String>();
 //		HashMap<String, String> parameterMap = new HashMap<String, String>();
 //		String blankSpaceParameter = " ";
-//		String criticalFlag = zhri100aFields.getCriticalFlag() != null && zhri100aFields.getCriticalFlag() ? "Y" : "N";
+//		String criticalFlag = commonParameters.getCriticalFlag() != null && commonParameters.getCriticalFlag() ? "Y" : "N";
 //		Calendar now = Calendar.getInstance();
 //		String errorDateParameter =  now.get(Calendar.MONTH) + "/" + now.get(Calendar.DATE) + "/" + now.get(Calendar.YEAR);
 //		String errorTimeParameter = now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND);
 //		String yesOrNoParameter = "Y"; //TODO: What should this value really be called
 //		//!Make Sure that the ErrorMessageParm is always 75 Characters long
-//		String errorMessageParameter = String.format("%1$-75s", zhri100aFields.getErrorMessageParameter());
-//		String command = "\"CALL " + zhri100aFields.getAs400Library() + "/" + processName + " "
+//		String errorMessageParameter = String.format("%1$-75s", commonParameters.getErrorMessageParameter());
+//		String command = "\"CALL " + commonParameters.getAs400Library() + "/" + processName + " "
 //					+ "PARM("
-//					+ "'" + zhri100aFields.getErrorProgramParameter() + "' "
-//					+ "'" + zhri100aFields.getEmployeeId() + "' "
+//					+ "'" + commonParameters.getErrorProgramParameter() + "' "
+//					+ "'" + commonParameters.getEmployeeId() + "' "
 //					+ "'" + blankSpaceParameter + "' "
 //					+ "'" + errorMessageParameter + "' "
 //					+ "'" + criticalFlag + "' "
 //					+ "'" + errorDateParameter + "' "
 //					+ "'" + errorTimeParameter + "' "
-//					+ "'" + zhri100aFields.getOperatorId() + "' "
+//					+ "'" + commonParameters.getOperatorId() + "' "
 //					+ "'" + yesOrNoParameter + "')\" ";
 //		System.out.println(command);
 //
@@ -669,14 +760,14 @@ public class ZHRI100A {
 //		parameterList.add("opridErrorParameter");
 //		parameterList.add("yesOrNoParameter");
 //		
-//		parameterMap.put("errorProgramParameter", zhri100aFields.getErrorProgramParameter());
-//		parameterMap.put("employeeId", zhri100aFields.getEmployeeId());
+//		parameterMap.put("errorProgramParameter", commonParameters.getErrorProgramParameter());
+//		parameterMap.put("employeeId", commonParameters.getEmployeeId());
 //		parameterMap.put("blankSpaceParameter", blankSpaceParameter);
 //		parameterMap.put("errorMessageParameter", errorMessageParameter);
 //		parameterMap.put("criticalFlag", criticalFlag);
 //		parameterMap.put("errorDateParameter", errorDateParameter);
 //		parameterMap.put("errorTimeParameter", errorTimeParameter);
-//		parameterMap.put("opridErrorParameter", zhri100aFields.getOperatorId());
+//		parameterMap.put("opridErrorParameter", commonParameters.getOperatorId());
 //		parameterMap.put("yesOrNoParm", yesOrNoParameter);
 //		
 //		AS400Package as400Package = new AS400Package(processName, parameterList, parameterMap);
@@ -691,7 +782,7 @@ public class ZHRI100A {
 	 * @return SQL where clause
 	 */
 	public static String ZHRI100A_buildGroupWhereClause(String whereClause) {
-		System.out.println("********** ZHRI100A_buildGroupWhereClause");
+		System.out.println("********** ZHRI100A_buildGroupWhereClause()");
 		String alias = ""; //TODO: I can't find where this value is set
 		String selectGroup = ""; //TODO: I can't find where this value is set
 		//BEGIN-PROCEDURE BUILD-GROUP-WHERE-CLAUSE
@@ -735,21 +826,21 @@ public class ZHRI100A {
 	 * This routine gets the operator id from the operator definition table
 	 * @param employeeId
 	 * @param indexNumber
-	 * @param zhri100aFields
+	 * @param commonParameters
 	 * @return legacyEmployeeId
 	 */
-	public static String ZHRI100A_getOprId(String employeeId, BigDecimal indexNumber, Zhri100aFields zhri100aFields) {
-		return ZHRI100A_getOprId(employeeId, zhri100aFields, indexNumber, null); 
+	public static String ZHRI100A_getOprId(String employeeId, BigDecimal indexNumber, CommonParameters commonParameters) {
+		return ZHRI100A_getOprId(employeeId, commonParameters, indexNumber, null); 
 	}
-	public static String ZHRI100A_getOprId(String employeeId, Zhri100aFields zhri100aFields, BigDecimal indexNumber, BigDecimal eidIndexNumber) {
-		System.out.println("********** ZHRI100A_getOprId");
+	public static String ZHRI100A_getOprId(String employeeId, CommonParameters commonParameters, BigDecimal indexNumber, BigDecimal eidIndexNumber) {
+		System.out.println("********** ZHRI100A_getOprId()");
 		//BEGIN-PROCEDURE GET-OPRID
 		//LET $Found = 'N'
 		Boolean found = false;
 		//LET $PSOprId = ''
 		String psOprId;
 		//IF $PoiFlag = 'N'
-		if(!zhri100aFields.getPoiFlag()) {
+		if(!commonParameters.getPoiFlag()) {
 			//MOVE 0 TO #indexNum
 			indexNumber = new BigDecimal(0);
 		//END-IF
@@ -773,7 +864,7 @@ public class ZHRI100A {
 		if(!found) {
 			//DO GET-LEGACY-OPRID                  !sree**10/04/01
 			//LET $PSOprId = $LegEmplid
-			psOprId = ZHRI100A_getLegacyOprId(employeeId, indexNumber, zhri100aFields.getPoiFlag());
+			psOprId = ZHRI100A_getLegacyOprId(employeeId, indexNumber, commonParameters.getPoiFlag());
 		//END-IF  !$Found = 'N'
 		}
 		//END-PROCEDURE GET-OPRID
@@ -871,28 +962,37 @@ public class ZHRI100A {
 	//!----------------------------------------------------------------------
 
 	//!----------------------------------------------------------------------
-	//! Procedure:  Intialize-AD-WrkFields
+	//! Procedure:  Initialize-AD-WrkFields
 	//!----------------------------------------------------------------------
 	/**
 	 * 
 	 * @return
 	 */
-	public static Zhri100aFields initializeMainProperties() {
-		System.out.println("********** initializeMainProperties");
-		Zhri100aFields zhri100aFields = new Zhri100aFields();
+	public static CommonParameters initializeCommonParameters() {
+		System.out.println("********** initializeCommonParameters()");
+		CommonParameters commonParameters = new ProcessParameters().new CommonParameters();
+		return commonParameters;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public static void initializeServerProperties() {
+		System.out.println("********** initializeServerProperties()");
 		String processName = "ZHRI100A";
-		zhri100aFields.setDbName(PsDbOwner.findDbName());
+		ServerProperties.setDbName(PsDbOwner.findDbName());
 		//LET $PS_HOME = getenv('PS_HOME')  !This gets the oracle_sid
-//		zhri100aFields.setPeopleSoftHomePath(System.getenv("PS_HOME")); //TODO: ********
-		zhri100aFields.setPeopleSoftHomePath("C:/people soft/");
+//		commonParameters.setPeopleSoftHomePath(System.getenv("PS_HOME")); //TODO: ********
+		ServerProperties.setPeopleSoftHomePath("C:/people soft/");
 		//LET $AD_HOME = $PS_HOME || '/data/activedir/'  !Path for Active Directory
-//		zhri100aFields.setActiveDirectoryHomePath(zhri100aFields.peopleSoftHomePath + "/data/activedir/"); //TODO: where is this used???
+//		commonParameters.setActiveDirectoryHomePath(commonParameters.peopleSoftHomePath + "/data/activedir/"); //TODO: where is this used???
 		//LET $ORACLE_SID = getenv('ORACLE_SID') 
-//		zhri100aFields.setOracleSystemId(System.getenv("ORACLE_SID")); //TODO: ********
-		zhri100aFields.setOracleSystemId("PS90HRQA");
-		if(zhri100aFields.getOracleSystemId() != null) {
+//		commonParameters.setOracleSystemId(System.getenv("ORACLE_SID")); //TODO: ********
+		ServerProperties.setOracleSystemId("PS90HRQA");
+		if(ServerProperties.getOracleSystemId() != null) {
 			//UPPERCASE $ORACLE_SID                  
-			zhri100aFields.setOracleSystemId(zhri100aFields.getOracleSystemId().toUpperCase());
+			ServerProperties.setOracleSystemId(ServerProperties.getOracleSystemId().toUpperCase());
 		}
 		//!Returns name of AS/400 machine for use in zbas002b.sh
 		//LET $Variable_Needed = ' '            
@@ -900,25 +1000,24 @@ public class ZHRI100A {
 		//DO  Get-Variable                      
 		//LET $RMTSVR = $PSZPTT_VARIABLE_VAL      
 		//Show '$RMTSVR: ' $RMTSVR                                                            
-		zhri100aFields.setRemoteServerName(PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(processName, zhri100aFields.getDbName(), "RMTSVR")); //TODO: where is this used???
+		ServerProperties.setRemoteServerName(PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(processName, ServerProperties.getDbName(), "RMTSVR")); //TODO: where is this used???
 		//LET $RexecScript = '/usr/local/barch/' || $ORACLE_SID || '/scripts/zbas002b.sh'     
 		//Show '$RexecScript: ' $RexecScript                                                  
-		zhri100aFields.setRemoteExecScript("/usr/local/barch/" + zhri100aFields.getOracleSystemId() + "/scripts/zbas002b.sh"); //TODO: where is this used???
+		ServerProperties.setRemoteExecScript("/usr/local/barch/" + ServerProperties.getOracleSystemId() + "/scripts/zbas002b.sh"); //TODO: where is this used???
 		//!Returns library name on AS/400 where programs reside
 		//LET $Variable_Needed = ' '            
 		//LET $Variable_Needed = 'AS400library' 
 		//DO  Get-Variable                      
 		//LET $Library = $PSZPTT_VARIABLE_VAL   
 		//Show '$Library: ' $Library                                                          
-		zhri100aFields.setAs400Library(PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(processName, zhri100aFields.getDbName(), "AS400library"));
+		ServerProperties.setAs400Library(PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(processName, ServerProperties.getDbName(), "AS400library"));
 		//!Returns IP address of NT server
 		//LET $Variable_Needed = ' '             
 		//LET $Variable_Needed = 'RMTNTADSVR'    
 		//DO Get-Variable                        
 		//LET $RMTNTADSVR = $PSZPTT_VARIABLE_VAL 
 		//Show '$RMTNTADSVR: ' $RMTNTADSVR                                                    
-		zhri100aFields.setRemoteAdServerName(PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(processName, zhri100aFields.getDbName(), "RMTNTADSVR")); //TODO: where is this used???
-		return zhri100aFields;
+		ServerProperties.setRemoteAdServerName(PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(processName, ServerProperties.getDbName(), "RMTNTADSVR")); //TODO: where is this used???
 	}
 
 	/**
@@ -928,13 +1027,14 @@ public class ZHRI100A {
 	 * @return true if run file does not exist
 	 */
 	public static Boolean ZHRI100A_checkInterfaceRunFile(String oracleSystemId) {
-		System.out.println("********** ZHRI100A_checkInterfaceRunFile");
+		System.out.println("********** ZHRI100A_checkInterfaceRunFile()");
 		Boolean runFlag = false;
-		String runFilePath;
+//		String runFilePath;
 		//LET $RUN_FILEPATH = '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'  //concatenate
-		runFilePath = "/usr/local/barch/" + oracleSystemId + "/work/hrinterface.run";
+//		runFilePath = "/usr/local/barch/" + oracleSystemId + "/work/hrinterface.run";
 		//LET #file_exists = exists($RUN_FILEPATH)
-		Boolean fileExists = (new File(runFilePath)).exists();
+//		Boolean fileExists = (new File(runFilePath)).exists();
+		Boolean fileExists = true;  //TODO: 
 		//IF #file_exists = 0
 		if(fileExists == false) {
 			//LET #run_flag = 1
@@ -945,20 +1045,19 @@ public class ZHRI100A {
 			runFlag = false;
 		//END-IF
 		}
-//		return runFlag;
-		return true;
+		return runFlag;
 	}
 	
 	/**
 	 * Get-Trigger-Data from ZHRI100A.SQR
 	 * This procedure will get the trigger data that needs to be interfaced
-	 * @param zhri100aFields
+	 * @param commonParameters
 	 */
 	//TODO
 	//TODO
 	//TODO
-	public static void ZHRI100A_getTriggerData(Zhri100aFields zhri100aFields) {
-		System.out.println("********** ZHRI100A_getTriggerData");
+	public static void ZHRI100A_getTriggerData(CommonParameters commonParameters) {
+		System.out.println("********** ZHRI100A_getTriggerData()");
 		//asOfToday
 		//sysDate
 		//fileOpen
@@ -981,22 +1080,22 @@ public class ZHRI100A {
 		//LET $WrkProcess= ''
 		//LET $WrkTaskFlag = ''
 		//BEGIN-SELECT LOOPS=150
-		//	RZ.SEQ_NBR
-		//	MOVE &RZ.SEQ_NBR TO #WrkSequence
-		//	RZ.OPRID
-		//	LET $AuditOprid = LTRIM(RTRIM(&RZ.OPRID,' '),' ')
-		//	RZ.EMPLID
-		//	LET $PSEmplid = LTRIM(RTRIM(&RZ.EMPLID,' '),' ')
-		//	MOVE $PSEmplid TO #Wrk_EmplID1
-		//	LET $Wrk_Emplid2 =  EDIT(#Wrk_EmplID1,'099999999')
-		//	TO_CHAR(RZ.EFFDT, 'YYYY-MM-DD') &RZEFFDT
-		//	LET $PSEffdt = &RZEFFDT
-		//	RZ.EFFSEQ
-		//	MOVE &RZ.EFFSEQ TO #PSEffSeq
-		//	RZ.PROC_NAME
-		//	LET $WrkProcess = LTRIM(RTRIM(&RZ.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
-		//	RZ.TASK_FLAG                                                        !Surya Added - TEMPMAST 
-		//	LET $WrkTaskFlag = LTRIM(RTRIM(&RZ.TASK_FLAG,' '),' ')          !Surya Added - TEMPMAST 
+		//RZ.SEQ_NBR
+		//MOVE &RZ.SEQ_NBR TO #WrkSequence
+		//RZ.OPRID
+		//LET $AuditOprid = LTRIM(RTRIM(&RZ.OPRID,' '),' ')
+		//RZ.EMPLID
+		//LET $PSEmplid = LTRIM(RTRIM(&RZ.EMPLID,' '),' ')
+		//MOVE $PSEmplid TO #Wrk_EmplID1
+		//LET $Wrk_Emplid2 =  EDIT(#Wrk_EmplID1,'099999999')
+		//TO_CHAR(RZ.EFFDT, 'YYYY-MM-DD') &RZEFFDT
+		//LET $PSEffdt = &RZEFFDT
+		//RZ.EFFSEQ
+		//MOVE &RZ.EFFSEQ TO #PSEffSeq
+		//RZ.PROC_NAME
+		//LET $WrkProcess = LTRIM(RTRIM(&RZ.PROC_NAME,' '),' ')           !Remove leading and trailing blanks
+		//RZ.TASK_FLAG                                                        !Surya Added - TEMPMAST 
+		//LET $WrkTaskFlag = LTRIM(RTRIM(&RZ.TASK_FLAG,' '),' ')          !Surya Added - TEMPMAST 
 		//IF $file_open = 'N'
 		Boolean fileIsOpen = false;
 		if(!fileIsOpen) {
@@ -1007,7 +1106,7 @@ public class ZHRI100A {
 		//END-IF
 		}
 		//LET $PoiFlag = 'N'  !Surya Added - TEMPMAST 
-		zhri100aFields.setPoiFlag(false);
+		commonParameters.setPoiFlag(false);
 		//DO Check-If-Contractor
 		Boolean isContractor = PsJob.ZHRI100A_checkIfContractor(trigger.getEmployeeId());
 		//IF $Found = 'N' AND  $PSEmplid <> ''  
@@ -1023,7 +1122,7 @@ public class ZHRI100A {
 				//IF $OK-to-process = 'Y'
 				if(isOkToProcess) {
 					//DO Call-Programs
-					ZHRI100A_callPrograms(trigger, zhri100aFields);
+					ZHRI100A_callPrograms(trigger, commonParameters);
 				}
 				//ELSE                                                           
 				else {
@@ -1055,8 +1154,8 @@ public class ZHRI100A {
 		}
 		//IF $CompletionStatus <> 'P'
 		if(!"P".equalsIgnoreCase(completionStatus)) {
-		//	IF ($ADAction_Code <> '') AND ($ADLegOprid <> '')
-			if(!zhri100aFields.getActionCode().isEmpty() && !zhri100aFields.getLegacyOperatorId().isEmpty()) {
+		//IF ($ADAction_Code <> '') AND ($ADLegOprid <> '')
+			if(!commonParameters.getActionCode().isEmpty() && !commonParameters.getLegacyOperatorId().isEmpty()) {
 				//!DO Check-EffDt-Transaction
 				//do nothing
 				//IF $AdFound = 'N'
@@ -1109,7 +1208,7 @@ public class ZHRI100A {
 	 * @return legacyEmployeeId
 	 */
 	public static String ZHRI100A_getLegacyOprId(String employeeId, BigDecimal indexNumber, Boolean poiFlag) {
-		System.out.println("********** ZHRI100A_getLegacyOprId");
+		System.out.println("********** ZHRI100A_getLegacyOprId()");
 		//Begin-Procedure Get-Legacy-Oprid                !sree**10/04/01
 		//LET $LegEmplid = ''
 		String legacyEmployeeId;
@@ -1134,7 +1233,7 @@ public class ZHRI100A {
 		//CHR36.H36NAM                                               !Rakesh***08/02/2004
 		//CHR36.H36EMP                                               !Rakesh***08/02/2004
 		//CHR36.H36EM#                                               !Rakesh***08/02/2004
-		//from HR036P CHR36 where CHR36.H36EM# = #wrk_emplid and CHR36.H36INX = #indexNum 
+		//FROM HR036P CHR36 WHERE CHR36.H36EM# = #wrk_emplid AND CHR36.H36INX = #indexNum 
 		//UNION SELECT ' ', ' ' , 9999999999 FROM DUAL
 		//END-SELECT
 		HR036P hr036P = HR036P.findByEmployeeNumberAndIndexNumber(employeeNumber, indexNumber);
@@ -1179,41 +1278,41 @@ public class ZHRI100A {
 		//END-PROCEDURE GET-LEGACY-OPRID
 	}
 	
-	public static String composeCommandString(Zhri100aFields zhri100aFields, String parameterString, String processName) {
-		System.out.println("********** composeCommand()");
+	public static String composeCommandString(CommonParameters commonParameters, String parameterString) {
+		System.out.println("********** composeCommandString()");
 		//LET $Part1 = '"CALL ' || $Library ||'/HRZ202A '
 		//LET $Part2 = 'Parm(''' || $PSauditEmpl || ''' ''' || $PSOprid || ''' ''' || $PSTermDate || ''')" '
 		//LET $Command = $Part1||$Part2
 		//LET $Command = $RexecScript || ' ' || $Command || ' ' || $RMTSVR
 		String commandString = 
-						zhri100aFields.getRemoteExecScript() + " " 
-						+  "\"CALL " + zhri100aFields.getAs400Library() 
-						+ "/" + processName + " " 
+				ServerProperties.getRemoteExecScript() + " " 
+						+  "\"CALL " + ServerProperties.getAs400Library() 
+						+ "/" + commonParameters.getProcessName() + " " 
 						+ "Parm(" + parameterString + ")\""
-						+ zhri100aFields.getRemoteServerName();
+						+ ServerProperties.getRemoteServerName();
 		System.out.println("$Command=> " + commandString);
 		return commandString;
 	}
 	
-	public static String composeErrorParameterString(Zhri100aFields zhri100aFields) {
+	public static String composeErrorParameterString(CommonParameters commonParameters) {
 		System.out.println("********** composeErrorParameterString()");
 		String blankSpaceParameter = " ";
-		String criticalFlag = zhri100aFields.getCriticalFlag() != null && zhri100aFields.getCriticalFlag() ? "Y" : "N";
+		String criticalFlag = commonParameters.getCriticalFlag() != null && commonParameters.getCriticalFlag() ? "Y" : "N";
 		Calendar now = Calendar.getInstance();
 		String errorDateParameter =  now.get(Calendar.MONTH) + "/" + now.get(Calendar.DATE) + "/" + now.get(Calendar.YEAR);
 		String errorTimeParameter = now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND);
 		String yesOrNoParameter = "Y"; //TODO: What should this value really be called
 		//!Make Sure that the ErrorMessageParm is always 75 Characters long
-		String errorMessageParameter = String.format("%1$-75s", zhri100aFields.getErrorMessageParameter());
-		String parameterString = "'" + zhri100aFields.getErrorProgramParameter() + "' "
-					+ "'" + zhri100aFields.getEmployeeId() + "' "
-					+ "'" + zhri100aFields.getIndexNumber() + "' "
+		String errorMessageParameter = String.format("%1$-75s", commonParameters.getErrorMessageParameter());
+		String parameterString = "'" + commonParameters.getErrorProgramParameter() + "' "
+					+ "'" + commonParameters.getEmployeeId() + "' "
+					+ "'" + commonParameters.getEffectiveSequence() + "' "
 					+ "'" + blankSpaceParameter + "' "
 					+ "'" + errorMessageParameter + "' "
 					+ "'" + criticalFlag + "' "
 					+ "'" + errorDateParameter + "' "
 					+ "'" + errorTimeParameter + "' "
-					+ "'" + zhri100aFields.getOperatorId() + "' "
+					+ "'" + commonParameters.getOperatorId() + "' "
 					+ "'" + yesOrNoParameter + "'";
 //		System.out.println(parameterString);
 		return parameterString;

@@ -2,8 +2,12 @@ package erd.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import erd.DateUtil;
+
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * The persistent class for the PS_CONTRACT_DATA database table.
@@ -399,27 +403,55 @@ public class PsContractData implements Serializable {
 		this.yearSw = yearSw;
 	}
 
-	public PsContractData findByEmployeeIdAndContractBeginDate(String employeeId) {
-//	!----------------------------------------------------------------------
-//	! Procedure:  HR07-Get-Contract-Data
-//	! Desc:  This procedure retrieves the contract date from the PeopleSoft
-//	!        Contract Data Table to send back to Option 7 of AAHR01.
-//	!----------------------------------------------------------------------
-//	Begin-Procedure HR07-Get-Contract-Data
-//	Begin-Select
-//	to_char(CCD7.CONTRACT_BEGIN_DT, 'YYYY-MM-DD')  &CCD7EFFDT
-//	   Let $LegContractDate = &CCD7EFFDT
-//	    !Format contract date so legacy will accept it (MM field, DD field and CCYY field)
-//	    Unstring $LegContractDate by '-' into $LegContractDtYear $LegContractDtMonth $LegContractDtDay
-//	 !select the maximum contract date to get the most current one because an employee can have more than 1 active contract
-//	from PS_CONTRACT_DATA CCD7
-//	where CCD7.Emplid = $PSEmplid
-//	  and CCD7.CONTRACT_BEGIN_DT = (select MAX(CONTRACT_BEGIN_DT) from PS_CONTRACT_DATA CCD8
-//	                     WHERE CCD8.EMPLID = CCD7.EMPLID
-//	                       AND CCD8.CONTRACT_BEGIN_DT <= $AsofToday)
-//	End-Select
-//	End-Procedure HR07-Get-Contract-Data
-		return null;
+	/**
+	 * from HR07-Get-Contract-Data from ZHRI107A.SQC
+	 * This procedure retrieves the contract date from the PeopleSoft Contract Data Table to send back to Option 7 of AAHR01.
+	 * @param employeeId
+	 * @return PsContractData
+	 */
+	public static PsContractData findByEmployeeId(String employeeId) {
+		System.out.println("PsContractData.findByEmployeeIdAndAccomplishmentCodes()");
+		Date asofToday = DateUtil.asOfToday();
+		//BEGIN-PROCEDURE HR07-GET-CONTRACT-DATA
+		//BEGIN-SELECT
+		//TO_CHAR(CCD7.CONTRACT_BEGIN_DT, 'YYYY-MM-DD')  &CCD7EFFDT
+		//LET $LegContractDate = &CCD7EFFDT
+		//!Format contract date so legacy will accept it (MM field, DD field and CCYY field)
+		//UNSTRING $LegContractDate BY '-' INTO $LegContractDtYear $LegContractDtMonth $LegContractDtDay
+		//!select the maximum contract date to get the most current one because an employee can have more than 1 active contract
+		//FROM PS_CONTRACT_DATA CCD7
+		//WHERE CCD7.Emplid = $PSEmplid
+		//		AND CCD7.CONTRACT_BEGIN_DT = 
+		//			(SELECT MAX(CONTRACT_BEGIN_DT) 
+		//				FROM PS_CONTRACT_DATA CCD8
+		//				WHERE CCD8.EMPLID = CCD7.EMPLID
+		//					AND CCD8.CONTRACT_BEGIN_DT <= $AsofToday)
+		//END-SELECT
+		//END-PROCEDURE HR07-GET-CONTRACT-DATA
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<PsContractData> resultList = (List<PsContractData>) em.createQuery("SELECT p FROM PsContractData p "
+    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+    				+ "AND p.contractBeginDate = "
+    				+ 		"(SELECT MAX(p2.contractBeginDate) "
+    				+ 			"FROM PsContractData p2 "
+	            	+ 			"WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
+	            	+ 				"AND p2.contractBeginDate <= :asofToday)"
+	             	, PsContractData.class)
+    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+    		    .setParameter("asofToday", asofToday, TemporalType.DATE)
+    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    	else 
+	    		return null;
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return null;	
 	}
 	
 }

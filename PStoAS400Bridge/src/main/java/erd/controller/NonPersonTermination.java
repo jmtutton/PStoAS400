@@ -1,11 +1,12 @@
 package erd.controller;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 
 import erd.model.ProcessParameters;
 import erd.model.PszPoiTermination;
 import erd.model.PszTriggerNonPerson;
-import erd.model.Zhri100aFields;
+import erd.model.ProcessParameters.CommonParameters;
 import erd.model.ProcessParameters.TerminationProcessParameters;
 
 /**
@@ -16,30 +17,17 @@ import erd.model.ProcessParameters.TerminationProcessParameters;
 
 public class NonPersonTermination {
 	
-	PszTriggerNonPerson trigger;
-	Zhri100aFields zhri100aFields;
-	ProcessParameters processParameters;
-	TerminationProcessParameters terminationProcessParameters;
-	
-	public NonPersonTermination(PszTriggerNonPerson trigger, Zhri100aFields zhri100aFields) {
-		System.out.println("********** NonPersonTermination()");
-		this.trigger = trigger;
-		this.zhri100aFields = zhri100aFields;
-		System.out.println("\n" + trigger.toString() + "\n");
-		System.out.println(zhri100aFields.toString() + "\n");
-	}
-	
 	/**
 	 * HR02-Initialize-Fields from ZHRI202A.SQC
 	 * Initialize the fields to ensure that that they all start out blank.
 	 */
-	private void HR202_initializeFields() {
+	private void HR202_initializeFields(CommonParameters commonParameters) {
 		System.out.println("********** HR202_initializeFields()");
 		//Begin-Procedure HR202-Initialize-Fields
 		//LET $PSEmpl = ' '
 		//LET $PSTermDate = ' '
 		//Let $ErrorProgramParm = 'HRZ202A'
-		zhri100aFields.setErrorProgramParameter("HRZ202A");
+		commonParameters.setErrorProgramParameter("HRZ202A");
 		//End-Procedure HR202-Initialize-Fields
 	}
 	
@@ -48,29 +36,23 @@ public class NonPersonTermination {
 	 * This routine calls the Legacy system
 	 * @return
 	 */
-	private String HR202_callSystem(Zhri100aFields zhri100aFields) {
+	private String HR202_callSystem(CommonParameters commonParameters, TerminationProcessParameters terminationProcessParameters) {
 		System.out.println("********** HR202_callSystem()");
 		String completionStatus = "E";
 		//BEGIN-PROCEDURE HR202-CALL-SYSTEM
-		//LET $Part1 = '"CALL ' || $Library ||'/HRZ202A '
-		//LET $Part2 = 'Parm(''' || $PSauditEmpl || ''' ''' || $PSOprid || ''' ''' || $PSTermDate || ''')" '
-		//LET $Command = $Part1||$Part2
-		String command = "\"CALL " + zhri100aFields.getAs400Library() + "/HRZ202A "
-				+ "Parm('" + zhri100aFields.getAuditOperatorId() + "' '" 
-				+ zhri100aFields.getOperatorId() + "' '" 
-				+ zhri100aFields.getEffectiveDate() + "')" ;
+		String commandString = ZHRI100A.composeCommandString(commonParameters, composeParameterStringForHrz202AProcess(terminationProcessParameters));
 		//DO Call-System   !From ZHRI100A.SQR
-		Integer status = ZHRI100A.ZHRI100A_callSystem(command, zhri100aFields);
+		Integer status = ZHRI100A.ZHRI100A_callSystem(commandString, commonParameters);
 		//!SHOW 'Command : ' $Command
-		System.out.println("Command : " + command);
+		System.out.println("$Command=> " + commandString);
 		//IF (#Status = 0)
 		if(status == 0) {
 			//LET $NCompletionStatus = 'C'   !Completed Normally
 			completionStatus = "C";
 			//IF $Wrk_indexNum = '0'   !Insert only if it is a POI Term
-			if(new BigDecimal(0).equals(zhri100aFields.getIndexNumber())) {
+			if(new BigDecimal(0).equals(commonParameters.getEffectiveSequence())) {
 				//DO HR202-Insert-Timestamp
-				PszPoiTermination.HR202_insertTimestamp(zhri100aFields.getEmployeeId());
+				PszPoiTermination.HR202_insertTimestamp(commonParameters.getEmployeeId());
 			//END-IF
 			}
 		//END-IF    !#Status = 0
@@ -82,29 +64,42 @@ public class NonPersonTermination {
 	/**
 	 * HR202-Process-Main from ZHRI202A.SQC
 	 * This is the main processing procedure
+	 * @param trigger
+	 * @param commonParameters
+	 * @return
 	 */
-	public String HR202_processMain() {
+	public String HR202_processMain(PszTriggerNonPerson trigger, CommonParameters commonParameters) {
 		System.out.println("********** HR202_processMain()");
-		zhri100aFields.setPoiFlag(true);
+		TerminationProcessParameters terminationProcessParameters = new ProcessParameters().new TerminationProcessParameters();
 		//BEGIN-PROCEDURE HR202-PROCESS-MAIN
+		//!SHOW '$PSAuditOperId: ' $PSAuditOperId
+		//!SHOW '$PSDateIn: '  $PSDateIn
+		//!SHOW '$PSDateIn: ' $PSDateIn
+		//!SHOW '#indexNum: ' #indexNum
 		//DO HR202-Initialize-Fields   !Execute a routine that will move blanks to all of the parms on the SBMRMTCMD
-		HR202_initializeFields();
-		//!Format the legacy employee ID from the PeopleSoft OprId for audit field
-		//LET $PSauditEmpl = LTRIM(RTRIM($PSAuditOperId,' '),' ')   !Remove leading and trailing Blanks
+		HR202_initializeFields(commonParameters);
+		//!Format the legacy employee ID from the PeopleSoft Oprid for audit field
+		//LET $PSauditEmpl = LTRIM(RTRIM($PSAuditOperId,' '),' ')  !Remove leading and trailing Blanks
 		//LET $PSauditEmpl = LTRIM($PSauditEmpl,'E')  !Remove the leading 'E' from the employee ID
-		//UPPERCASE $PSauditEmpl    !Be sure in all CAPS
-		zhri100aFields.setAuditOperatorId(trigger.getOperatorId().substring(1).toUpperCase()); //strips the 'E' off of the employee id
-		//!DO HR202-get-term-date
+		//UPPERCASE $PSauditEmpl  !Be sure in all CAPS
+		if(trigger.getOperatorId() != null && trigger.getOperatorId().length() > 1) {
+			commonParameters.setAuditOperatorId(trigger.getOperatorId().substring(1).toUpperCase()); //strips the 'E' off of the employee id
+		}
+		terminationProcessParameters.setAuditOperatorId(commonParameters.getAuditOperatorId());
+		//!SHOW '$PSauditEmpl: ' $PSauditEmpl
+		//!DO HR202-Get-Term-Date
 		//LET $PSTermDate = DATETOSTR(STRTODATE($PSDateIn,'YYYY-MM-DD'),'YYYYMMDD')
 		terminationProcessParameters.setTerminationDate(trigger.getEffectiveDate());
-		//DO ZHRI100A.Get-OprId
-		String psOprId = ZHRI100A.ZHRI100A_getOprId(trigger.getEmployeeId(), trigger.getEffectiveSequence(), zhri100aFields);
+		//!SHOW '$PSTermDate: ' $PSTermDate
+		//DO Get-OprId
+		String psOprId = ZHRI100A.ZHRI100A_getOprId(trigger.getEmployeeId(), trigger.getEffectiveSequence(), commonParameters);
 		//LET $PSEmpl = $PSOprid
-		zhri100aFields.setEmployeeId(psOprId);
-		//IF $PSEmpl <> '' AND $PSEmpl <> ' '   !If the new OprId is not blank and it is not null on return
-		if(zhri100aFields.getEmployeeId() != null && !(zhri100aFields.getEmployeeId()).isEmpty()) {
+		commonParameters.setEmployeeId(psOprId);
+		terminationProcessParameters.setEmployeeId(psOprId);
+		//IF $PSEmpl <> '' AND $PSEmpl <> ' '  !If the new oprid is not blank and it is not null on return
+		if(commonParameters.getEmployeeId() != null && !(commonParameters.getEmployeeId()).isEmpty()) {
 			//DO HR202-Call-System
-			HR202_callSystem(zhri100aFields);
+			HR202_callSystem(commonParameters, terminationProcessParameters);
 		//END-IF   !$PSEmpl <> '' and $PSEmpl <> ' '
 		}
 		//END-PROCEDURE HR202-PROCESS-MAIN
@@ -114,23 +109,23 @@ public class NonPersonTermination {
 	
 	/**
 	 * 
-	 * @param zhri100aFields
-	 * @param actionFields
+	 * @param terminationProcessParameters
 	 */
-	private String composeParameterStringForHrz102AProcess(TerminationProcessParameters terminationProcessParameters) {
-		System.out.println("********** makeAS400PackageForHRZ102AProcess");
-		String command = "'" + zhri100aFields.getEmployeeId() + "' "
-				+ "'" + terminationProcessParameters.getTerminationMonth() + "' "
-				+ "'" + terminationProcessParameters.getTerminationDay() + "' "
-				+ "'" + terminationProcessParameters.getTerminationYear() + "' "
-				+ "'" + terminationProcessParameters.getRehireMonth() + "' "
-				+ "'" + terminationProcessParameters.getRehireDay() + "' "
-				+ "'" + terminationProcessParameters.getRehireYear() + "' "
-				+ "'" + terminationProcessParameters.getVoluntaryOrInvoluntary() + "' "
-				+ "'" + terminationProcessParameters.getTerminationCode() + "' "
-				+ "'" + zhri100aFields.getAuditOperatorId() + "' "
-				+ "'" + terminationProcessParameters.getTerminationReason() + "'";
-		return command;
+	private String composeParameterStringForHrz202AProcess(TerminationProcessParameters terminationProcessParameters) {
+		System.out.println("********** composeParameterStringForHrz202AProcess");
+		//LET $PSTermDate = DATETOSTR(STRTODATE($PSDateIn,'YYYY-MM-DD'),'YYYYMMDD')
+		//LET $Part2 = 'Parm('''       ||
+		//				$PSauditEmpl    ||
+		//				''' '''         ||
+		//				$PSOprid        ||
+		//				''' '''         ||
+		//				$PSTermDate     ||
+		//				''')" '
+		String terminationDate = new SimpleDateFormat("yyyyMMdd").format(terminationProcessParameters.getTerminationDate());
+		String parameterString = "'" + terminationProcessParameters.getAuditOperatorId() + "' "
+				+ "'" + terminationProcessParameters.getEmployeeId() + "' "
+				+ "'" + terminationDate + "'";
+		return parameterString;
 	}
 	
 }

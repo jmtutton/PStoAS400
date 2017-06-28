@@ -2,6 +2,9 @@ package erd.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import erd.DateUtil;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -692,89 +695,56 @@ public class PsAccomplishment implements Serializable {
 	}
 	
 	/**
-	 * This procedure retrieves the Negative Drug Test Date and Physical Test 
-	 * Date from the PeopleSoft Accomplishments Table to send back to 
-	 * Option 7 of AAHR01.
-	 * 
-	 */
-	public PsAccomplishment HR07GetAccomplishments(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR07-Get-Accomplishments
-//		! Desc:  This procedure retrieves the Negative Drug Test Date and Physical
-//		!        Test Date from the PeopleSoft Accomplishments Table to send
-//		!        back to Option 7 of AAHR01.
-		//TODO: split into findDRUGTST, findPHYSL3, findPHYSL4
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR07-Get-Accomplishments
-//		begin-select
-		//get issue date
-//		to_char(CA7.DT_ISSUED, 'YYYY-MM-DD')  &CA7DT_ISSUED  //doesn't need to be formatted, since it is being passed to DB2 via JPA
-//		    Let $PSIssueDate = &CA7DT_ISSUED
-//		CA7.ACCOMPLISHMENT
-		//trim accomplishmentCode value
-//		    Let $SelectAccomplishment = Ltrim(Rtrim(&CA7.ACCOMPLISHMENT,' '),' ')
-//		    !select the correct accomplishmentCode to pull in the correct date
-		//swutch on accomplishmentCode
-//		    evaluate $SelectAccomplishment
-//		        !when accomplishmentCode is equal to negative drug test
-//		        when = 'DRUGTST'
-//		            Let $LegNegDrugTestDate = $PSIssueDate
-//		            !Format negative drug test date so legacy will accept it (MM field, DD field and CCYY field)
-//		            Unstring $PSIssueDate by '-' into $LegNegDrugTstYear $LegNegDrugTstMonth $LegNegDrugTstDay
-//		            break                 !Exit the evaluate statement
-//		        !when accomplishmentCode is equal to physical test date for level 3
-//		        when = 'PHYS L3'
-//		            Let $LegPhysical3TestDate = $PSIssueDate
-//		            !Format physical test date so legacy will accept it (MM field, DD field and CCYY field)
-//		            Unstring $PSIssueDate by '-' into $LegPhysTstYear $LegPhysTstMonth $LegPhysTstDay
-//		            break                 !Exit the evaluate statement
-//		        !when accomplishmentCode is equal to physical test date for level 4
-//		        when = 'PHYS L4'
-//		            Let $LegPhysical4TestDate = $PSIssueDate
-//		            !Format physical test date so legacy will accept it (MM field, DD field and CCYY field)
-//		            Unstring $PSIssueDate by '-' into $LegPhysTstYear $LegPhysTstMonth $LegPhysTstDay
-//		            break                 !Exit the evaluate statement
-//		        !when equal to anything else, do not get issue date
-//		        when-other
-//		            break                 !Exit the evaluate statement
-//		    end-evaluate   !$SelectAccomplishment
-//		 !select the maximum issue date in order to get the most current physical/drug test date because an employee could have multiple rows
-//		from PS_ACCOMPLISHMENTS CA7
-//		where CA7.Emplid = $PSEMPLID
-//		    and CA7.ACCOMPLISHMENT in ('DRUGTST', 'PHYS L3', 'PHYS L4')
-//		    and CA7.DT_ISSUED = (select max(CA72.DT_ISSUED)
-//		                           from PS_ACCOMPLISHMENTS CA72
-//		                          where CA72.EMPLID = CA7.EMPLID
-//		                            and CA72.ACCOMPLISHMENT = CA7.ACCOMPLISHMENT
-//		                            and CA72.DT_ISSUED <= $AsofToday)
-//		End-select
-//		End-Procedure HR07-Get-Accomplishments
-		return null;
-	}
-
-	/**
 	 * Replaces SQC procedure HR07-Get-Accomplishments in ZHRI107A.SQC
 	 * This procedure retrieves the PsAccomplishment record for the Negative Drug Test or Physical Test, 
 	 * with matching employeeId and the latest dateIssued value up to today, from the PeopleSoft Accomplishments Table 
 	 * to send back to Option 7 of AAHR01.
+	 * @param employeeId
+	 * @param accomplishmentCodeList
+	 * @return
 	 */
-	//TODO: verify that CURRENT_DATE is equivalent to $AsofToday
-	public static PsAccomplishment findByEmployeeIdAndAccomplishmentCode(String employeeId, String accomplishmentCode) {
+	public static PsAccomplishment findByEmployeeIdAndAccomplishmentCodes(String employeeId, List<String> accomplishmentCodeList) {
+		System.out.println("PsAccomplishment.findByEmployeeIdAndAccomplishmentCodes()");
+		Date asofToday = DateUtil.asOfToday();
+		//BEGIN-PROCEDURE HR07-GET-ACCOMPLISHMENTS
+		//BEGIN-SELECT
+		//!select the maximum issue date in order to get the most current physical/drug test date because an employee could have multiple rows
+		//FROM PS_ACCOMPLISHMENTS CA7
+		//WHERE CA7.EMPLID = $PSEMPLID
+		//		AND CA7.ACCOMPLISHMENT IN ('DRUGTST', 'PHYS L3', 'PHYS L4')
+		//    	AND CA7.DT_ISSUED = 
+		//			(SELECT MAX(CA72.DT_ISSUED)
+		//        		FROM PS_ACCOMPLISHMENTS CA72
+		//        		WHERE CA72.EMPLID = CA7.EMPLID
+		//            		AND CA72.ACCOMPLISHMENT = CA7.ACCOMPLISHMENT
+		//              	AND CA72.DT_ISSUED <= $AsofToday)
+		//END-SELECT
+		//END-PROCEDURE HR07-GET-ACCOMPLISHMENTS
+		String accomplishmentCodeListCsv = "";
+		//concatenate list of accomplishment codes into comma separated values 
+		for(String accomplishmentCode : accomplishmentCodeList) {
+			accomplishmentCodeListCsv += "'" + accomplishmentCode.toUpperCase().trim() + "'" + ",";
+		}
+		if (accomplishmentCodeListCsv != null && accomplishmentCodeListCsv.endsWith(",")) {
+			//remove last comma
+			accomplishmentCodeListCsv = accomplishmentCodeListCsv.substring(0, accomplishmentCodeListCsv.length() - 1);
+		}
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PsAccomplishment> resultList = (List<PsAccomplishment>) em.createQuery("SELECT p FROM PsAccomplishment p "
-	    				+ "WHERE p.employeeId = :employeeId "
-	    				+ "AND UPPER(TRIM(p.accomplishmentCode)) = :accomplishmentCode "
-	    				+ "AND p.dateIssued = "
-	    				+ 		"(SELECT MAX(p2.dateIssued) "
-	    				+ 		"FROM PsAccomplishment p2 "
-		            	+ 		"WHERE p2.employeeId = :employeeId "
-		             	+ 		"AND UPPER(TRIM(p2.accomplishmentCode)) = :accomplishmentCode "
-		            	+ 		"AND p2.dateIssued <= CURRENT_DATE)", PsAccomplishment.class)
-	    		    .setParameter("employeeId", employeeId)
-	    		    .setParameter("accomplishmentCode", accomplishmentCode.toUpperCase())
-	    		    .getResultList();
+    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+    				+ "AND UPPER(TRIM(p.accomplishmentCode)) IN (" + accomplishmentCodeListCsv + ") "
+    				+ "AND p.dateIssued = "
+    				+ 		"(SELECT MAX(p2.dateIssued) "
+    				+ 			"FROM PsAccomplishment p2 "
+	            	+ 			"WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
+	             	+ 				"AND UPPER(TRIM(p2.accomplishmentCode)) = UPPER(TRIM(p.accomplishmentCode)) "
+	            	+ 				"AND p2.dateIssued <= :asofToday)"
+	             	, PsAccomplishment.class)
+    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+    		    .setParameter("asofToday", asofToday, TemporalType.DATE)
+    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
 	    	}
