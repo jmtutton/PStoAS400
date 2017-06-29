@@ -35,4 +35,11 @@ public class ZHRI100ATest {
 		ZHRI100A.callSystemUsingCommand(commandString, commonParameters);
 		
 	}
+	
+	@Test
+	public void testJavaRexec() {
+		String commandString = "ls -l";
+		ZHRI100A.javaRexec2(commandString);
+		
+	}
 }

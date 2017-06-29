@@ -3,7 +3,9 @@ package erd.controller;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -26,6 +28,10 @@ import erd.model.ServerProperties;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+
+import java.io.IOException;
+import org.apache.commons.net.bsd.RExecClient;
+import org.apache.commons.io.IOUtils;
 
 
 public class ZHRI100A {
@@ -1268,11 +1274,14 @@ public class ZHRI100A {
 		//LET $Command = $Part1||$Part2
 		//LET $Command = $RexecScript || ' ' || $Command || ' ' || $RMTSVR
 		String commandString = 
-				ServerProperties.getRemoteExecScript() + " " 
-						+  "\"CALL " + ServerProperties.getAs400Library() 
+//				ServerProperties.getRemoteExecScript() + " " 
+//						+  "\"CALL " + ServerProperties.getAs400Library() 
+//						+ "/" + commonParameters.getProcessName() + " " 
+//						+ "PARM(" + parameterString + ")\" "
+//						+ ServerProperties.getRemoteServerName();
+						"CALL " + ServerProperties.getAs400Library() 
 						+ "/" + commonParameters.getProcessName() + " " 
-						+ "PARM(" + parameterString + ")\" "
-						+ ServerProperties.getRemoteServerName();
+						+ "PARM(" + parameterString + ")";
 //		System.out.println("$Command=> " + commandString);
 		return commandString;
 	}
@@ -1385,5 +1394,164 @@ public class ZHRI100A {
 			System.err.println("Error: " + e);
 		}
 	    return 0;
+	}
+	
+	public static void javaRexec(String commandString) {
+        String hostname, username, password;
+        RExecClient client;
+        String res = null;
+        InputStream is = null;
+
+        client = new RExecClient();
+
+        hostname = "dev.corp.erac.com";
+        username = "PSHRINT";
+        password = "SMRHET01";
+
+        try {
+            client.connect(hostname);
+        }
+        catch (IOException e) {
+            System.err.println("Could not connect to server.");
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        try {
+            client.rexec(username, password, commandString);
+        }
+        catch (IOException e) {
+            try  {
+                client.disconnect();
+            }
+            catch (IOException f) {
+            	
+            }
+            e.printStackTrace();
+            System.err.println("Could not execute command.");
+            System.exit(1);
+        }
+//        IOUtil.readWrite(client.getInputStream(), client.getOutputStream(),
+//                         System.in, System.out);
+
+        try {
+            client.disconnect();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        System.exit(0);
+	}
+	
+	public static void javaRexec2(String commandString) {
+//	    final int portNumber = 512;
+//	    final int portNumber = 22;
+	    RExecClient client = new RExecClient();
+	    String hostname = "dev.corp.erac.com";
+	    String username = "PSHRINT";
+	    String password = "SMRHET01";
+
+//	    commandString = "CALL HRZ102A";
+	    commandString = "CALL EHRHRMS06#/HRZ101A Parm('840S4' '06' '20' '2017' '' '' '' 'V' 'O' '349NV' 'VOLUN  DISSATISFIED WHOURS         ')";
+        String results = null;
+        InputStream inputStream = null;
+        try {
+//          client.connect(hostname, portNumber);
+			client.connect(hostname);
+            if (!client.isConnected()) {
+                System.err.println("The RLogin client is not connected to " + hostname);
+            }
+//            System.out.println("client.isConnected() = " + client.isConnected());
+            try {
+                client.rexec(username, password, commandString);
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+                System.err.println("Could not execute command.");
+            }
+            catch (Exception e) {
+    			e.printStackTrace();
+    		}
+            readWrite(client.getInputStream(), client.getOutputStream(), System.in, System.out);
+            inputStream = client.getInputStream();
+            if (inputStream != null && inputStream.available() > 0) {
+            	results = IOUtils.toString(inputStream);
+                System.out.println("results:\n" + results);
+            } 
+            else {
+                System.err.println("InputStream is not available!");
+            }
+        } 
+        catch (SocketException e1) {
+			e1.printStackTrace();
+		} 
+        catch (IOException e1) {
+			e1.printStackTrace();
+		}
+        catch (Exception e1) {
+			e1.printStackTrace();
+		}
+        finally {
+            IOUtils.closeQuietly(inputStream);
+            try {
+				client.disconnect();
+			} 
+            catch (IOException e) {
+				e.printStackTrace();
+			}
+            catch (Exception e) {
+    			e.printStackTrace();
+    		}
+        } 
+	}
+	
+	public static final  void readWrite(InputStream remoteInput, OutputStream remoteOutput, InputStream localInput, OutputStream localOutput) {
+			Thread reader, writer;
+	        reader = new Thread() {
+	        	public void run() {
+	        		int ch;
+	        		try {
+	        			while (!interrupted() && (ch = localInput.read()) != -1) {
+	        				remoteOutput.write(ch);
+	        				remoteOutput.flush();
+	        			}
+	        		}
+	        		catch (IOException e) {
+	        			e.printStackTrace();
+	        		}
+	                catch (Exception e) {
+	        			e.printStackTrace();
+	        		}
+	        	}
+	        };
+	        writer = new Thread() {
+	        	public void run() {
+	        		try {
+	        			org.apache.commons.net.io.Util.copyStream(remoteInput, localOutput);
+	        		}
+	        		catch (IOException e) {
+	        			e.printStackTrace();
+	        			System.exit(1);
+	        		}
+	                catch (Exception e) {
+	        			e.printStackTrace();
+	        		}
+	        	}
+	        };
+	        writer.setPriority(Thread.currentThread().getPriority() + 1);
+	        writer.start();
+	        reader.setDaemon(true);
+	        reader.start();
+	        try {
+	        	writer.join();
+	            reader.interrupt();
+	        }
+	        catch (InterruptedException e) {
+				e.printStackTrace();
+	        }
+            catch (Exception e) {
+    			e.printStackTrace();
+    		}
 	}
 }
