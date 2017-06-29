@@ -1,0 +1,127 @@
+  5600 - RTVSYS EMULATION(N) RETURN(&$#SYNM)
+  6300 - RCVF DEV(*FILE) RCDFMT(*FILE) WAIT(*YES) OPNID(*NONE)          /* File name is HR110P. */
+  6600 - RTVINVSTK LVOSR(*PGMSRCH) LEVEL(0) PGMNAM('HRZ101A') RTVPGMLIB(&LIB)
+  5500 - CALL PGM(RTVINVST)          /* The CALL command contains parameters */
+  5500 - CALL PGM(RTVINVST)          /* The CALL command contains parameters */
+  5500 - CALL PGM(RTVINVST)          /* The CALL command contains parameters */
+  5500 - CALL PGM(RTVINVST)          /* The CALL command contains parameters */
+  5500 - CALL PGM(RTVINVST)          /* The CALL command contains parameters */
+  5500 - CALL PGM(RTVINVST)          /* The CALL command contains parameters */
+  5500 - CALL PGM(RTVINVST)          /* The CALL command contains parameters */
+Object domain or storage protection error for offset  in object QTMXSRVR.
+  8400 - RCVMSG PGMQ(*SAME (*)) MSGQ(*PGMQ) MSGTYPE(*LAST) RMV(*YES)
+  8900 - RCVMSG PGMQ(*SAME (*)) MSGQ(*PGMQ) MSGTYPE(*LAST) RMV(*YES)
+       - RETURN        /* RETURN due to end of CL program */
+  6300 - RCVF DEV(*FILE) RCDFMT(*FILE) WAIT(*YES) OPNID(*NONE)          /* File name is HR110P. */
+  6600 - RTVINVSTK LVOSR(*PGMSRCH) LEVEL(0) PGMNAM('HRZ102A') RTVPGMLIB(&LIB)
+  5500 - CALL PGM(RTVINVST)          /* The CALL command contains parameters */
+  5500 - CALL PGM(RTVINVST)          /* The CALL command contains parameters */
+  5500 - CALL PGM(RTVINVST)          /* The CALL command contains parameters */
+  5500 - CALL PGM(RTVINVST)          /* The CALL command contains parameters */
+  8400 - RCVMSG PGMQ(*SAME (*)) MSGQ(*PGMQ) MSGTYPE(*LAST) RMV(*YES)
+  8900 - RCVMSG PGMQ(*SAME (*)) MSGQ(*PGMQ) MSGTYPE(*LAST) RMV(*YES)
+       - RETURN        /* RETURN due to end of CL program */
+  7400 - ADDLIBLE LIB(EHRHRMS06#) POSITION(*FIRST)
+Library EHRHRMS06# added to library list.
+  8200 - ADDLIBLE LIB(EHRHRMS06) POSITION(*FIRST)
+Library EHRHRMS06 added to library list.
+  8800 - ADDLIBLE LIB(TUXAPP) POSITION(*LAST)
+Library TUXAPP added to library list.
+  9000 - ADDLIBLE LIB(TUXLIB65B) POSITION(*LAST)
+Library TUXLIB65B added to library list.
+  9300 - ENDMCHE
+Object ME_QTCP in QGPL type *DTAARA deleted.
+Machine emulation ended for user QTCP.
+  9500 - STRMCHE MACHEMUL(SOUTH)
+Object ME_QTCP in library QGPL not found.
+Ownership of object ME_QTCP in QGPL type *DTAARA changed.
+Data area ME_QTCP created in library QGPL.
+Machine emulation started as SOUTH, with the lock state of *ON
+       - RETURN        /* RETURN due to end of CL program */
+Open of member CUSTTRN1 was changed to SEQONLY(*NO).
+  2900 - RTVJOBA USRLIBL(&CURLIBL)
+  3400 - RTVENVVAR ENVVAR('TUXCONFIG') VALUE(&CURVAR)
+  3900 - ADDENVVAR ENVVAR('TUXCONFIG') VALUE('/home/tux/GOCLT/tuxconfig')
+Environment variable added.
+       - RETURN        /* RETURN due to end of CL program */
+  2900 - RTVJOBA USRLIBL(&CURLIBL)
+  3400 - RTVENVVAR ENVVAR('TUXDIR') VALUE(&CURVAR)
+  3900 - ADDENVVAR ENVVAR('TUXDIR') VALUE('/tuxdir509')
+Environment variable added.
+       - RETURN        /* RETURN due to end of CL program */
+  2900 - RTVJOBA USRLIBL(&CURLIBL)
+  3400 - RTVENVVAR ENVVAR('VIEWDIR32') VALUE(&CURVAR)
+  3900 - ADDENVVAR ENVVAR('VIEWDIR32') VALUE('/buffers/view32')
+Environment variable name exists.
+  4600 - CHGENVVAR ENVVAR('VIEWDIR32') VALUE('/buffers/view32')
+Environment variable changed.
+       - RETURN        /* RETURN due to end of CL program */
+  2900 - RTVJOBA USRLIBL(&CURLIBL)
+  3400 - RTVENVVAR ENVVAR('VIEWFILES32') VALUE(&CURVAR)
+  3900 - ADDENVVAR ENVVAR('VIEWFILES32') VALUE('ELOGINFO.VV')
+Environment variable name exists.
+  4600 - CHGENVVAR ENVVAR('VIEWFILES32') VALUE('ELOGINFO.VV')
+Environment variable changed.
+       - RETURN        /* RETURN due to end of CL program */
+Library list changed.
+Printer device PRT01 not found. Output queue changed to QPRINT in library QGPL.
+Library list changed.
+Environment variable removed.
+Environment variable removed.
+Environment variable changed.
+Environment variable changed.
+  2900 - RTVJOBA USRLIBL(&CURLIBL)
+  3400 - RTVENVVAR ENVVAR('TUXCONFIG') VALUE(&CURVAR)
+  3900 - ADDENVVAR ENVVAR('TUXCONFIG') VALUE('/home/tux/GOCLT/tuxconfig')
+Environment variable added.
+       - RETURN        /* RETURN due to end of CL program */
+  2900 - RTVJOBA USRLIBL(&CURLIBL)
+  3400 - RTVENVVAR ENVVAR('TUXDIR') VALUE(&CURVAR)
+  3900 - ADDENVVAR ENVVAR('TUXDIR') VALUE('/tuxdir509')
+Environment variable added.
+       - RETURN        /* RETURN due to end of CL program */
+  2900 - RTVJOBA USRLIBL(&CURLIBL)
+  3400 - RTVENVVAR ENVVAR('VIEWDIR32') VALUE(&CURVAR)
+  3900 - ADDENVVAR ENVVAR('VIEWDIR32') VALUE('/buffers/view32')
+Environment variable name exists.
+  4600 - CHGENVVAR ENVVAR('VIEWDIR32') VALUE('/buffers/view32')
+Environment variable changed.
+       - RETURN        /* RETURN due to end of CL program */
+  2900 - RTVJOBA USRLIBL(&CURLIBL)
+  3400 - RTVENVVAR ENVVAR('VIEWFILES32') VALUE(&CURVAR)
+  3900 - ADDENVVAR ENVVAR('VIEWFILES32') VALUE('ELOGINFO.VV')
+Environment variable name exists.
+  4600 - CHGENVVAR ENVVAR('VIEWFILES32') VALUE('ELOGINFO.VV')
+Environment variable changed.
+       - RETURN        /* RETURN due to end of CL program */
+Library list changed.
+Library list changed.
+Environment variable removed.
+Environment variable removed.
+Environment variable changed.
+Environment variable changed.
+Open of member HR100P00 was changed to SEQONLY(*NO).
+ 12300 - RTVNETA SYSNAME(&NETA)
+ 12400 - RTVEMCHA $#SYNM(&SYSNAME)
+ 12700 - RTVJOBA DATFMT(&DATFMT)
+ 16600 - ADDLIBLE LIB(ELPRD)
+Library ELPRD added to library list.
+ 17300 - CALL PGM(SNDEMSGR)          /* The CALL command contains parameters */
+ 18100 - RMVLIBLE LIB(ELPRD)
+Library ELPRD removed from library list.
+ 19200 - RETURN
+  4800 - RTVJOBA LOGCLPGM(&LOGCL)
+  4900 - CHGJOB LOGCLPGM(*NO)
+  9000 - RETURN
+File TMTERM in library PACIFIC not found or inline data file missing.
+Open of member HR100P00 was changed to SEQONLY(*NO).
+ 12300 - RTVNETA SYSNAME(&NETA)
+ 12400 - RTVEMCHA $#SYNM(&SYSNAME)
+ 12700 - RTVJOBA DATFMT(&DATFMT)
+ 16600 - ADDLIBLE LIB(ELPRD)
+Library ELPRD added to library list.
+ 17300 - CALL PGM(SNDEMSGR)          /* The CALL command contains parameters */
+ 18100 - RMVLIBLE LIB(ELPRD)
+Library ELPRD removed from library list.
+ 19200 - RETURN
+Unable to process spooled file QPRINT number 1.

@@ -1,0 +1,2514 @@
+Pointer not set for location referenced.
+  6000 - CALL PGM(RTVSYS)          /* The CALL command contains parameters */
+  6100 - RTVJOBA JOB(&JOBNAM) USER(&JOBUSR) NBR(&JOBNBR)
+  6600 - RTVJOBA JOB(&JOB) USER(&USER) NBR(&JOBNBR) TYPE(&JOBTYPE)
+  7200 - SNDPGMMSG MSG('Pgm name?') TOPGMQ(*SAME) MSGTYPE(*RQS) KEYVAR(&MSGKEY)
+  7400 - RCVMSG PGMQ(*SAME) MSGKEY(X'0000005A') SENDER(&SENDER)
+  7900 - CHGJOB LOG(4 0 *SECLVL)
+ 10100 - SNDRCVF DEV(*FILE) RCDFMT(FMTA) WAIT(*NO) OPNID(*NONE)      /* File name is  QRGXMSG. */
+Device *REQUESTER not found while opening file QRGXMSG in library ELSYSOVR.
+ 31800 - SNDPGMMSG MSG('Unable to use device: QTRXC00004.  Job Terminated.') TOMSGQ(QHELP)
+ 32900 - RETURN
+RPG status 00000 caused procedure HRZ101A in program EHRHRMS06#/HRZ101A to stop.
+Application error.  RNX9001 unmonitored by HRZ101A at statement *N, instruction X'0000'.
+                                                                                                                           Page    1
+ ILE RPG FORMATTED DUMP
+ Program Status Area:
+ Procedure Name . . . . . . . . . . . . :   HRZ101A
+ Program Name . . . . . . . . . . . . . :   HRZ101A
+    Library . . . . . . . . . . . . . . :   EHRHRMS06#
+ Module Name. . . . . . . . . . . . . . :   HRZ101A
+ Program Status . . . . . . . . . . . . :   00000
+ Previous Status  . . . . . . . . . . . :   00222
+              Pointer or parameter error (C G D F).
+ Statement in Error . . . . . . . . . . :   00003915
+ RPG Routine  . . . . . . . . . . . . . :   *DETC
+ Number of Parameters . . . . . . . . . :   011
+ Message Type . . . . . . . . . . . . . :   MCH
+ Additional Message Info  . . . . . . . :   3601
+ Message Data . . . . . . . . . . . . . :
+              Pointer not set for location referenced.
+ Status that caused RNX9001 . . . . . . :
+ Last File Used . . . . . . . . . . . . :
+ Last File Status . . . . . . . . . . . :
+ Last File Operation  . . . . . . . . . :
+ Last File Routine  . . . . . . . . . . :
+ Last File Statement  . . . . . . . . . :
+ Last File Record Name  . . . . . . . . :
+ Job Name . . . . . . . . . . . . . . . :   QTRXC00004
+ User Name  . . . . . . . . . . . . . . :   QTCP
+ Job Number . . . . . . . . . . . . . . :   851150
+ Date Entered System  . . . . . . . . . :   06282017
+    Century . . . . . . . . . . . . . . :   20
+ Date Started . . . . . . . . . . . . . :   062817
+ Time Started . . . . . . . . . . . . . :   185133
+ Compile Date . . . . . . . . . . . . . :   050317
+ Compile Time . . . . . . . . . . . . . :   072340
+ Compiler Level . . . . . . . . . . . . :   0001
+ Source File  . . . . . . . . . . . . . :   QRPGLESRC
+    Library . . . . . . . . . . . . . . :   ELCJW
+ Member . . . . . . . . . . . . . . . . :   HRZ101A
+                                                                                                                           Page    2
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   TEMPTRAN
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page    3
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR036P02
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page    4
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   CUSTTRN1
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page    5
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   CUSTAUX
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page    6
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   TEMPMAST
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page    7
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR130P00
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page    8
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR010P00
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page    9
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR031P00
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   10
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR030P00
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   11
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR006P00
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   12
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR999P01
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   13
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   XCMUM
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   14
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   CMUM
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   15
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   XUNITMAS
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   16
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   UNITMAST
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   17
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   CUSTMAST
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   18
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR036P01
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   19
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR002P07
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   20
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   ZLIFM#1
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   21
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   TM002P01
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   22
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   TM001P01
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   23
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR018P01
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   24
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR016P01
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   25
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR013P01
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   26
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR011P01
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   27
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR006P14
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   28
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR006P02
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   29
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   SUBDMAST
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   30
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR004P02
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   31
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   OFFDRB
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   32
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR009P01
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   33
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   IS003P02
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   34
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HC000P00
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   35
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR022P01
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   36
+ ILE RPG FORMATTED DUMP
+ INFDS FILE FEEDBACK
+ File . . . . . . . . . . . . . . . . . :   HR003P01
+ File Open  . . . . . . . . . . . . . . :   NO
+ File at EOF  . . . . . . . . . . . . . :   YES
+ File Status  . . . . . . . . . . . . . :   00000
+ File Operation . . . . . . . . . . . . :
+ File Routine . . . . . . . . . . . . . :
+ Statement Number . . . . . . . . . . . :          0
+ Record Name  . . . . . . . . . . . . . :
+ Message Identifier . . . . . . . . . . :
+                                                                                                                           Page   37
+ ILE RPG FORMATTED DUMP
+ Module Name. . . . . . . . . . . . . . :   HRZ101A
+ Optimization Level . . . . . . . . . . :   *NONE
+ Halt Indicators:
+ H1 '0'    H2 '0'    H3 '0'    H4 '0'    H5 '0'    H6 '0'    H7 '0'    H8 '0'    H9 '0'
+ Command/Function Key Indicators:
+ KA '0'    KB '0'    KC '0'    KD '0'    KE '0'    KF '0'    KG '0'    KH '0'    KI '0'    KJ '0'
+ KK '0'    KL '0'    KM '0'    KN '0'    KP '0'    KQ '0'    KR '0'    KS '0'    KT '0'    KU '0'
+ KV '0'    KW '0'    KX '0'    KY '0'
+ Control Level Indicators:
+ L1 '0'    L2 '0'    L3 '0'    L4 '0'    L5 '0'    L6 '0'    L7 '0'    L8 '0'    L9 '0'
+ Overflow Indicators:
+ OA '0'    OB '0'    OC '0'    OD '0'    OE '0'    OF '0'    OG '0'    OV '0'
+ External Indicators:
+ U1 '0'    U2 '0'    U3 '0'    U4 '0'    U5 '0'    U6 '0'    U7 '0'    U8 '0'
+ General Indicators:
+ 01 '0'    02 '0'    03 '0'    04 '0'    05 '0'    06 '0'    07 '0'    08 '0'    09 '0'    10 '0'
+ 11 '0'    12 '0'    13 '0'    14 '0'    15 '0'    16 '0'    17 '0'    18 '0'    19 '0'    20 '0'
+ 21 '0'    22 '0'    23 '0'    24 '0'    25 '0'    26 '0'    27 '0'    28 '0'    29 '0'    30 '0'
+ 31 '0'    32 '0'    33 '0'    34 '0'    35 '0'    36 '0'    37 '0'    38 '0'    39 '0'    40 '0'
+ 41 '0'    42 '0'    43 '0'    44 '0'    45 '0'    46 '0'    47 '0'    48 '0'    49 '0'    50 '0'
+ 51 '0'    52 '0'    53 '0'    54 '0'    55 '0'    56 '0'    57 '0'    58 '0'    59 '0'    60 '0'
+ 61 '0'    62 '0'    63 '0'    64 '0'    65 '0'    66 '0'    67 '0'    68 '0'    69 '0'    70 '0'
+ 71 '0'    72 '0'    73 '0'    74 '0'    75 '0'    76 '0'    77 '0'    78 '0'    79 '0'    80 '0'
+ 81 '0'    82 '0'    83 '0'    84 '0'    85 '0'    86 '0'    87 '0'    88 '0'    89 '0'    90 '0'
+ 91 '0'    92 '0'    93 '0'    94 '0'    95 '0'    96 '0'    97 '0'    98 '0'    99 '0'
+ Internal Indicators:
+ LR '0'    MR '0'    RT '0'    1P '0'
+ NAME                  ATTRIBUTES           VALUE
+                       INT(20)              0
+                       VALUE IN HEX         '0000000000000000'X
+                       DS
+   $PBTHCY             ZONED(4,0)               .            '40404040'X
+   $PBTHDD             ZONED(2,0)             .              '4040'X
+   $PBTHDT             ZONED(8,0)                   .        '4040404040404040'X
+   $PBTHMM             ZONED(2,0)             .              '4040'X
+   $PEARCD             CHAR(3)              '   '            '404040'X
+   $PEMPCY             ZONED(4,0)           0000.            'F0F0F0F0'X
+   $PEMPDD             ZONED(2,0)           00.              'F0F0'X
+   $PEMPMD             ZONED(4,0)           0000.            'F0F0F0F0'X
+   $PEMPMM             ZONED(2,0)           00.              'F0F0'X
+   $PEPHON             CHAR(7)              '       '        '40404040404040'X
+   $PHPHON             CHAR(7)              '       '        '40404040404040'X
+   $PHRACD             CHAR(3)              '   '            '404040'X
+   $POARCD             CHAR(3)              '   '            '404040'X
+   $POPHON             CHAR(7)              '       '        '40404040404040'X
+   $PRHPHON            CHAR(10)             '          '     '40404040404040404040'X
+   $PROPHON            CHAR(10)             '          '     '40404040404040404040'X
+   $PRVDCY             ZONED(4,0)           0000.            'F0F0F0F0'X
+   $PRVDDD             ZONED(2,0)           00.              'F0F0'X
+   $PRVDMM             ZONED(2,0)           00.              'F0F0'X
+   $PRZIP              CHAR(9)              '         '      '404040404040404040'X
+   $PRZP1              CHAR(5)              '     '          '4040404040'X
+   $PRZP2              CHAR(4)              '    '           '40404040'X
+   $WAUDITDAT          ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   $WAUDITMD           ZONED(4,0)           0000.            'F0F0F0F0'X
+   $WAUDITTIM          ZONED(6,0)           000000.          'F0F0F0F0F0F0'X
+   $WBTMD              ZONED(4,0)               .            '40404040'X
+   $WCURENTMD          ZONED(4,0)           0000.            'F0F0F0F0'X
+   $WCURNTDAT          ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   $WMFEMP             CHAR(5)              '     '          '4040404040'X
+   $WMTEMP             CHAR(5)              '     '          '4040404040'X
+                                                                                                                           Page   38
+ ILE RPG FORMATTED DUMP
+   $WTEXT1             CHAR(7)              'FRMEMP('        'C6D9D4C5D4D74D'X
+   $WTEXT2             CHAR(1)              ')'              '5D'X
+   $WTEXT3             CHAR(6)              'TOEMP('         'E3D6C5D4D74D'X
+   $WTEXT4             CHAR(1)              ')'              '5D'X
+   $WTIMEDATE          ZONED(14,0)          00000000000000.
+                       VALUE IN HEX         'F0F0F0F0F0F0F0F0F0F0F0F0F0F0'X
+   ADTDAT              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   ADTMD               ZONED(4,0)           0000.            'F0F0F0F0'X
+   ADTTIM              ZONED(6,0)           000000.          'F0F0F0F0F0F0'X
+   CURMD               ZONED(4,0)           0000.            'F0F0F0F0'X
+   HRA4CY              ZONED(4,0)           0000.            'F0F0F0F0'X
+   HRA4DT              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   HRA4MD              ZONED(4,0)           0000.            'F0F0F0F0'X
+   MEDECY              ZONED(4,0)           0000.            'F0F0F0F0'X
+   MEDED               ZONED(2,0)           00.              'F0F0'X
+   MEDEDT              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   MEDEM               ZONED(2,0)           00.              'F0F0'X
+   MVR                 ZONED(4,0)           0000.            'F0F0F0F0'X
+   MVRMO               ZONED(2,0)           00.              'F0F0'X
+   MVRYR               ZONED(2,0)           00.              'F0F0'X
+   NXRVDT              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   PART2               CHAR(13)             'FRMEMP(     )'
+                       VALUE IN HEX         'C6D9D4C5D4D74D40404040405D'X
+   PART3               CHAR(12)             'TOEMP(     )'
+                       VALUE IN HEX         'E3D6C5D4D74D40404040405D'X
+   PART4               CHAR(38)             'SUBJECT('NEW EMPLOYEE UPDATE CODE')   '
+                       VALUE IN HEX         'E2E4C2D1C5C3E34D7DD5C5E640C5D4D7D3D6E8C5C540E4D7C4C1E3C540C3D6C4C57D5D404040'X
+   PART5               CHAR(75)             'Operator ID E      and Update Code                                         '
+                       VALUE IN HEX         'D697859981A3969940C9C440C540404040404081958440E4978481A38540C3968485404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+   PART5A              CHAR(13)             'Operator ID E'
+                       VALUE IN HEX         'D697859981A3969940C9C440C5'X
+   PART5B              CHAR(5)              '     '          '4040404040'X
+   PART5C              CHAR(17)             ' and Update Code '
+                       VALUE IN HEX         '4081958440E4978481A38540C396848540'X
+   PART5D              CHAR(10)             '          '     '40404040404040404040'X
+   PART6               CHAR(75)             'has been created for Employee                                              '
+                       VALUE IN HEX         '8881A240828585954083998581A385844086969940C594979396A885854040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+   PART6A              CHAR(30)             'has been created for Employee '
+                       VALUE IN HEX         '8881A240828585954083998581A385844086969940C594979396A8858540'X
+   PART6B              CHAR(34)             '                                  '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040'X
+   REDATE              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   REMPH               CHAR(10)             '          '     '40404040404040404040'X
+   SUB                 CHAR(38)             'SUBJECT('NEW EMPLOYEE UPDATE CODE')   '
+                       VALUE IN HEX         'E2E4C2D1C5C3E34D7DD5C5E640C5D4D7D3D6E8C5C540E4D7C4C1E3C540C3D6C4C57D5D404040'X
+   TIMDAT              ZONED(14,0)          00000000000000.
+                       VALUE IN HEX         'F0F0F0F0F0F0F0F0F0F0F0F0F0F0'X
+ $CUSTERROR            CHAR(1)              'N'              'D5'X
+ $ERADT                CHAR(8)              '        '       '4040404040404040'X
+ $ERATM                CHAR(6)              '      '         '404040404040'X
+ $ERCRF                CHAR(1)              ' '              '40'X
+ $ERCST                CHAR(1)              ' '              '40'X
+ $EREAD                CHAR(5)              '     '          '4040404040'X
+ $EREM#                CHAR(9)              '         '      '404040404040404040'X
+ $EREMP                CHAR(5)              '     '          '4040404040'X
+ $ERMSG                CHAR(75)             '                                                                           '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ $ERPGM                CHAR(10)             '          '     '40404040404040404040'X
+ $EUSERID              CHAR(5)              NOT ADDRESSABLE
+                                                                                                                           Page   39
+ ILE RPG FORMATTED DUMP
+ $FEXIT                CHAR(1)              '1'              'F1'X
+ $FITERATE             CHAR(1)              '0'              'F0'X
+ $F1                   CHAR(34)             '                                  '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040'X
+ $F2                   CHAR(34)             '                                  '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040'X
+ $F3                   PACKED(2,0)          00.              '000F'X
+ $F4                   CHAR(34)             '                                  '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040'X
+ $HPHONERR             CHAR(1)              NOT ADDRESSABLE
+ $LENGTH               PACKED(15,5)         0000000080.00000
+                       VALUE IN HEX         '000000008000000F'X
+ $LFEMP                CHAR(5)              '     '          '4040404040'X
+ $LFMTM                CHAR(8)              '        '       '4040404040404040'X
+ $OLDCUS               CHAR(7)              '       '        '40404040404040'X
+ $OPHONERR             CHAR(1)              NOT ADDRESSABLE
+ $PASACC               CHAR(3)              '   '            '404040'X
+ $PASCLS               CHAR(3)              '   '            '404040'X
+ $PASPLN               CHAR(5)              '     '          '4040404040'X
+ $PASZIP               CHAR(3)              '   '            '404040'X
+ $PBRN                 CHAR(2)              '20'             'F2F0'X
+ $PBTHCY1              CHAR(4)              NOT ADDRESSABLE
+ $PBTHDD1              CHAR(2)              NOT ADDRESSABLE
+ $PBTHMM1              CHAR(2)              NOT ADDRESSABLE
+ $PCMD                 CHAR(1000)           '                                                                                '
+                         81                 '                                                                                '
+                         161                '                                                                                '
+                         241                '                                                                                '
+                         321                '                                                                                '
+                         401                '                                                                                '
+                         481                '                                                                                '
+                         561                '                                                                                '
+                         641                '                                                                                '
+                         721                '                                                                                '
+                         801                '                                                                                '
+                         881                '                                                                                '
+                         961                '                                        '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         81                 '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         121                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         161                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         201                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         241                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         281                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         321                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         361                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         401                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         441                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         481                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         521                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         561                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         601                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         641                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         681                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         721                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         761                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         801                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         841                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         881                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         921                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         961                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                                                                                                                           Page   40
+ ILE RPG FORMATTED DUMP
+ $PCNTCD               CHAR(2)              NOT ADDRESSABLE
+ $PCTZ                 CHAR(2)              '  '             '4040'X
+ $PDEPT                CHAR(5)              NOT ADDRESSABLE
+ $PEARCD1              CHAR(3)              '   '            '404040'X
+ $PEMP                 CHAR(5)              '     '          '4040404040'X
+ $PEMPCY1              CHAR(4)              NOT ADDRESSABLE
+ $PEMPDD1              CHAR(2)              NOT ADDRESSABLE
+ $PEMPMM1              CHAR(2)              NOT ADDRESSABLE
+ $PEMSG                CHAR(75)             '                                                                           '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ $PEPHON1              CHAR(7)              '       '        '40404040404040'X
+ $PFIRST               CHAR(12)             '            '
+                       VALUE IN HEX         '404040404040404040404040'X
+ $PFLG                 CHAR(1)              NOT ADDRESSABLE
+ $PGPCODE              CHAR(2)              '  '             '4040'X
+ $PHARCD1              CHAR(3)              '   '            '404040'X
+ $PHPHON1              CHAR(7)              NOT ADDRESSABLE
+ $PHRACD1              CHAR(3)              NOT ADDRESSABLE
+ $PHRMVR               CHAR(1)              ' '              '40'X
+ $PJSTAT               CHAR(5)              '349NV'          'F3F4F9D5E5'X
+ $PLAST                CHAR(18)             '                  '
+                       VALUE IN HEX         '404040404040404040404040404040404040'X
+ $PLEN                 PACKED(15,5)         0000000000.00000
+                       VALUE IN HEX         '000000000000000F'X
+ $PMI                  CHAR(1)              ' '              '40'X
+ $PNID                 CHAR(20)             NOT ADDRESSABLE
+ $PNNID                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ $POARCD1              CHAR(3)              NOT ADDRESSABLE
+ $PONID                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ $POPHON1              CHAR(7)              NOT ADDRESSABLE
+ $PPOS                 CHAR(5)              NOT ADDRESSABLE
+ $PRACE                CHAR(1)              NOT ADDRESSABLE
+ $PRCITY               CHAR(17)             NOT ADDRESSABLE
+ $PRCODE               CHAR(1)              NOT ADDRESSABLE
+ $PRCONTY              CHAR(5)              '     '          '4040404040'X
+ $PREID                CHAR(5)              '     '          '4040404040'X
+ $PREMERG              CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+ $PRGP                 CHAR(2)              '20'             'F2F0'X
+ $PRGRDYR              PACKED(4,0)          0000.            '00000F'X
+ $PRGRDYR1             CHAR(5)              '     '          '4040404040'X
+ $PRHPHON1             CHAR(10)             '          '     '40404040404040404040'X
+ $PRLICNO              CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ $PRLICST              CHAR(2)              '  '             '4040'X
+ $PRMAJOR              CHAR(25)             '                         '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040'X
+ $PRMAR                CHAR(1)              'V'              'E5'X
+ $PRNKNM               CHAR(20)             'O                   '
+                       VALUE IN HEX         'D640404040404040404040404040404040404040'X
+ $PROGRAMNM            CHAR(6)              '      '         '404040404040'X
+ $PROPHON1             CHAR(10)             '          '     '40404040404040404040'X
+ $PRRELAT              CHAR(12)             '            '
+                       VALUE IN HEX         '404040404040404040404040'X
+ $PRSEX                CHAR(1)              'V'              'E5'X
+ $PRSPOUS              CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ $PRST                 CHAR(2)              NOT ADDRESSABLE
+ $PRSTRT               CHAR(30)             NOT ADDRESSABLE
+                                                                                                                           Page   41
+ ILE RPG FORMATTED DUMP
+ $PRTTL                CHAR(3)              NOT ADDRESSABLE
+ $PRVDCY1              CHAR(4)              '    '           '40404040'X
+ $PRVDDD1              CHAR(2)              '  '             '4040'X
+ $PRVDMM1              CHAR(2)              '  '             '4040'X
+ $PRZIP1               CHAR(9)              NOT ADDRESSABLE
+ $PSBDPT               CHAR(2)              NOT ADDRESSABLE
+ $PS000                DS
+   $PCCD2              CHAR(2)              '  '             '4040'X
+   $PDPT2              CHAR(5)              '     '          '4040404040'X
+   $PEMP2              CHAR(5)              '     '          '4040404040'X
+   $PENM2              CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+   $PMSG2              CHAR(75)             '                                                                           '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+   $PNBR2              CHAR(2)              '  '             '4040'X
+   $PNGP2              CHAR(2)              '  '             '4040'X
+   $PNHM2              CHAR(8)              '        '       '4040404040404040'X
+   $PNTD2              PACKED(8,0)          00000000.        '000000000F'X
+   $POBR2              CHAR(2)              '  '             '4040'X
+   $POGP2              CHAR(2)              '  '             '4040'X
+   $POHM2              CHAR(8)              '        '       '4040404040404040'X
+   $POTD2              PACKED(8,0)          00000000.        '000000000F'X
+   $PPGM2              CHAR(10)             '          '     '40404040404040404040'X
+   $PPOS2              CHAR(5)              '     '          '4040404040'X
+   $PSYS2              CHAR(8)              '        '       '4040404040404040'X
+   $PUEM2              CHAR(5)              '     '          '4040404040'X
+ $PS100                DS
+   $PCCD               CHAR(2)              '  '             '4040'X
+   $PCTC               CHAR(5)              '     '          '4040404040'X
+   $PEMPC              CHAR(5)              '     '          '4040404040'X
+   $PPST1              CHAR(1)              ' '              '40'X
+   $PRTNC              CHAR(1)              ' '              '40'X
+   $PSTAT              CHAR(2)              '  '             '4040'X
+   $PSYSN              CHAR(8)              '        '       '4040404040404040'X
+   $PTYPE              CHAR(1)              ' '              '40'X
+ $PTCODE               CHAR(1)              ' '              '40'X
+ $PTMCRD               CHAR(1)              NOT ADDRESSABLE
+ $PTRESUL              PACKED(3,0)          000.             '000F'X
+ $PTRESUL1             CHAR(3)              '   '            '404040'X
+ $PUNION               CHAR(1)              NOT ADDRESSABLE
+ $PUSERGP              CHAR(2)              '  '             '4040'X
+ $PUSERID              CHAR(5)              '840S4'          'F8F4F0E2F4'X
+ $PWSRCCL              CHAR(40)             '                                        '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+ $PWSRCSN              CHAR(35)             NOT ADDRESSABLE
+ $TYPE                 CHAR(1)              ' '              '40'X
+ $WACTIVE              CHAR(5)              'A    '          'C140404040'X
+ $WAGE                 PACKED(5,0)          00000.           '00000F'X
+ $WCAPUSER             CHAR(1)              ' '              '40'X
+ $WCRITICAL            CHAR(1)              'N'              'D5'X
+ $WEFFDATE             DATE(10)             '0001-01-01'     'F0F0F0F160F0F160F0F1'X
+ $WFINT                CHAR(1)              ' '              '40'X
+ $WFLAG                CHAR(1)              ' '              '40'X
+ $WHERE                PACKED(2,0)          00.              '000F'X
+ $WHLDDAT              PACKED(6,0)          000000.          '0000000F'X
+ $WK4N                 PACKED(4,0)          0000.            '00000F'X
+ $WK5N                 PACKED(5,0)          00000.           '00000F'X
+ $WK6N                 PACKED(6,0)          000000.          '0000000F'X
+ $WLINT                CHAR(1)              ' '              '40'X
+ $WLOOP                PACKED(3,0)          000.             '000F'X
+ $WPRMRSP              CHAR(2)              '  '             '4040'X
+                                                                                                                           Page   42
+ ILE RPG FORMATTED DUMP
+ $WPROGRAM             CHAR(10)             '          '     '40404040404040404040'X
+ $WRK6A                CHAR(6)              '      '         '404040404040'X
+ $WSYSNM               CHAR(8)              '        '       '4040404040404040'X
+ $WWAITTIME            PACKED(5,0)          00000.           '00000F'X
+ _QRNL_PRMCPY_$EUSERID POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$HPHONERR...
+                       POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$OPHONERR...
+                       POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PBRN    POINTER              SPP:E9EB252DAD0016A9
+ _QRNL_PRMCPY_$PBTHCY1 POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PBTHDD1 POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PBTHMM1 POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PCNTCD  POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PDEPT   POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PEMPCY1 POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PEMPDD1 POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PEMPMM1 POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PFIRST  POINTER              SPP:E9EB252DAD0016EB
+ _QRNL_PRMCPY_$PFLG    POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PHPHON1 POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PHRACD1 POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PJSTAT  POINTER              SPP:E9EB252DAD00176F
+ _QRNL_PRMCPY_$PLAST   POINTER              SPP:E9EB252DAD0016CA
+ _QRNL_PRMCPY_$PMI     POINTER              SPP:E9EB252DAD00170C
+ _QRNL_PRMCPY_$PNID    POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$POARCD1 POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$POPHON1 POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PPOS    POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PRACE   POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PRCITY  POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PRCODE  POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PRGP    POINTER              SPP:E9EB252DAD001688
+ _QRNL_PRMCPY_$PRMAR   POINTER              SPP:E9EB252DAD00172D
+ _QRNL_PRMCPY_$PRNKNM  POINTER              SPP:E9EB252DAD00174E
+ _QRNL_PRMCPY_$PRSEX   POINTER              SPP:E9EB252DAD001790
+ _QRNL_PRMCPY_$PRST    POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PRSTRT  POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PRTTL   POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PRZIP1  POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PSBDPT  POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PTMCRD  POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PUNION  POINTER              SPP:*NULL
+ _QRNL_PRMCPY_$PUSERID POINTER              SPP:E9EB252DAD001646
+ _QRNL_PRMCPY_$PWSRCSN POINTER              SPP:*NULL
+ _QRNL_PRMCPY_@EMPID   POINTER              SPP:E9EB252DAD001667
+ _QRNL_PSTR_$EUSERID   POINTER              SPP:*NULL
+ _QRNL_PSTR_$HPHONERR  POINTER              SPP:*NULL
+ _QRNL_PSTR_$OPHONERR  POINTER              SPP:*NULL
+ _QRNL_PSTR_$PBRN      POINTER              SPP:E9EB252DAD0016A9
+ _QRNL_PSTR_$PBTHCY1   POINTER              SPP:*NULL
+ _QRNL_PSTR_$PBTHDD1   POINTER              SPP:*NULL
+ _QRNL_PSTR_$PBTHMM1   POINTER              SPP:*NULL
+ _QRNL_PSTR_$PCNTCD    POINTER              SPP:*NULL
+ _QRNL_PSTR_$PDEPT     POINTER              SPP:*NULL
+ _QRNL_PSTR_$PEMPCY1   POINTER              SPP:*NULL
+ _QRNL_PSTR_$PEMPDD1   POINTER              SPP:*NULL
+ _QRNL_PSTR_$PEMPMM1   POINTER              SPP:*NULL
+ _QRNL_PSTR_$PFIRST    POINTER              SPP:E9EB252DAD0016EB
+ _QRNL_PSTR_$PFLG      POINTER              SPP:*NULL
+ _QRNL_PSTR_$PHPHON1   POINTER              SPP:*NULL
+ _QRNL_PSTR_$PHRACD1   POINTER              SPP:*NULL
+                                                                                                                           Page   43
+ ILE RPG FORMATTED DUMP
+ _QRNL_PSTR_$PJSTAT    POINTER              SPP:E9EB252DAD00176F
+ _QRNL_PSTR_$PLAST     POINTER              SPP:E9EB252DAD0016CA
+ _QRNL_PSTR_$PMI       POINTER              SPP:E9EB252DAD00170C
+ _QRNL_PSTR_$PNID      POINTER              SPP:*NULL
+ _QRNL_PSTR_$POARCD1   POINTER              SPP:*NULL
+ _QRNL_PSTR_$POPHON1   POINTER              SPP:*NULL
+ _QRNL_PSTR_$PPOS      POINTER              SPP:*NULL
+ _QRNL_PSTR_$PRACE     POINTER              SPP:*NULL
+ _QRNL_PSTR_$PRCITY    POINTER              SPP:*NULL
+ _QRNL_PSTR_$PRCODE    POINTER              SPP:*NULL
+ _QRNL_PSTR_$PRGP      POINTER              SPP:E9EB252DAD001688
+ _QRNL_PSTR_$PRMAR     POINTER              SPP:E9EB252DAD00172D
+ _QRNL_PSTR_$PRNKNM    POINTER              SPP:E9EB252DAD00174E
+ _QRNL_PSTR_$PRSEX     POINTER              SPP:E9EB252DAD001790
+ _QRNL_PSTR_$PRST      POINTER              SPP:*NULL
+ _QRNL_PSTR_$PRSTRT    POINTER              SPP:*NULL
+ _QRNL_PSTR_$PRTTL     POINTER              SPP:*NULL
+ _QRNL_PSTR_$PRZIP1    POINTER              SPP:*NULL
+ _QRNL_PSTR_$PSBDPT    POINTER              SPP:*NULL
+ _QRNL_PSTR_$PTMCRD    POINTER              SPP:*NULL
+ _QRNL_PSTR_$PUNION    POINTER              SPP:*NULL
+ _QRNL_PSTR_$PUSERID   POINTER              SPP:E9EB252DAD001646
+ _QRNL_PSTR_$PWSRCSN   POINTER              SPP:*NULL
+ _QRNL_PSTR_@EMPID     POINTER              SPP:E9EB252DAD001667
+ ##ACTION              CHAR(6)              '      '         '404040404040'X
+ ##BEENHERE            CHAR(1)              '1'              'F1'X
+ ##RAINFADE            CHAR(1)              '0'              'F0'X
+ @EMPID                CHAR(9)              '06       '      'F0F640404040404040'X
+ @EMPID1               PACKED(9,0)          000000000.       '000000000F'X
+ @MSG                  CHAR(75)             '                                                                           '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ @PFLG                 CHAR(1)              ' '              '40'X
+ @PWREHIRE             CHAR(1)              '0'              'F0'X
+ AKAGD3                PACKED(8,0)          00000000.        '000000000F'X
+ AKAHD3                PACKED(8,0)          00000000.        '000000000F'X
+ AKDNS3                CHAR(1)              ' '              '40'X
+ AKDUS3                CHAR(1)              ' '              '40'X
+ AKGRTX                CHAR(10)             '          '     '40404040404040404040'X
+ AKGSTX                CHAR(10)             '          '     '40404040404040404040'X
+ AKHBN4                CHAR(5)              '     '          '4040404040'X
+ AKHNT1                PACKED(6,0)          000000.          '0000000F'X
+ AKHOT1                PACKED(6,0)          000000.          '0000000F'X
+ AKHPN4                PACKED(11,0)         00000000000.
+                       VALUE IN HEX         '00000000000F'X
+ AKJ9C3                CHAR(5)              '     '          '4040404040'X
+ AKO5T1                CHAR(35)             '                                   '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ AKQRNB                CHAR(5)              '     '          '4040404040'X
+ AKQSNB                CHAR(5)              '     '          '4040404040'X
+ AMAGD3                PACKED(8,0)          00000000.        '000000000F'X
+ AMAHD3                PACKED(8,0)          00000000.        '000000000F'X
+ AMDNS3                CHAR(1)              ' '              '40'X
+ AMGRTX                CHAR(10)             '          '     '40404040404040404040'X
+ AMGSTX                CHAR(10)             '          '     '40404040404040404040'X
+ AMHNT1                PACKED(6,0)          000000.          '0000000F'X
+ AMHOT1                PACKED(6,0)          000000.          '0000000F'X
+ AMKGC3                CHAR(5)              '     '          '4040404040'X
+ AMORT                 PACKED(5,3)          00.000           '00000F'X
+ AMO9T1                CHAR(35)             '                                   '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ AMQRNB                CHAR(5)              '     '          '4040404040'X
+                                                                                                                           Page   44
+ ILE RPG FORMATTED DUMP
+ AMQSNB                CHAR(5)              '     '          '4040404040'X
+ ARAGD3                PACKED(8,0)          00000000.        '000000000F'X
+ ARAHD3                PACKED(8,0)          00000000.        '000000000F'X
+ ARA1                  CHAR(3)              '   '            '404040'X
+ ARA10                 CHAR(3)              '   '            '404040'X
+ ARA2                  CHAR(3)              '   '            '404040'X
+ ARA3                  CHAR(3)              '   '            '404040'X
+ ARA4                  CHAR(3)              '   '            '404040'X
+ ARA5                  CHAR(3)              '   '            '404040'X
+ ARA6                  CHAR(3)              '   '            '404040'X
+ ARA7                  CHAR(3)              '   '            '404040'X
+ ARA8                  CHAR(3)              '   '            '404040'X
+ ARA9                  CHAR(3)              '   '            '404040'X
+ ARDNS3                CHAR(1)              ' '              '40'X
+ ARGRTX                CHAR(10)             '          '     '40404040404040404040'X
+ ARGSTX                CHAR(10)             '          '     '40404040404040404040'X
+ ARHNT1                PACKED(6,0)          000000.          '0000000F'X
+ ARHOT1                PACKED(6,0)          000000.          '0000000F'X
+ ARJ7C3                CHAR(5)              '     '          '4040404040'X
+ ARKHC3                CHAR(5)              '     '          '4040404040'X
+ ARPCT1                CHAR(8)              '        '       '4040404040404040'X
+ ARPDT1                CHAR(35)             '                                   '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ ARQRNB                CHAR(5)              '     '          '4040404040'X
+ ARQSNB                CHAR(5)              '     '          '4040404040'X
+ ASAGD3                PACKED(8,0)          00000000.        '000000000F'X
+ ASAHD3                PACKED(8,0)          00000000.        '000000000F'X
+ ASDNS3                CHAR(1)              ' '              '40'X
+ ASDVST                CHAR(1)              ' '              '40'X
+ ASGRTX                CHAR(10)             '          '     '40404040404040404040'X
+ ASGSTX                CHAR(10)             '          '     '40404040404040404040'X
+ ASHNT1                PACKED(6,0)          000000.          '0000000F'X
+ ASHOT1                PACKED(6,0)          000000.          '0000000F'X
+ ASKFC3                CHAR(5)              '     '          '4040404040'X
+ ASKGC3                CHAR(5)              '     '          '4040404040'X
+ ASQRNB                CHAR(5)              '     '          '4040404040'X
+ ASQSNB                CHAR(5)              '     '          '4040404040'X
+ BALAMT                PACKED(7,2)          00000.00         '0000000F'X
+ BALDAT                PACKED(5,0)          00000.           '00000F'X
+ BC2                   PACKED(1,0)          0.               '0F'X
+ BC3                   PACKED(1,0)          0.               '0F'X
+ BC4                   PACKED(1,0)          0.               '0F'X
+ BD                    PACKED(2,0)          00.              '000F'X
+ BENEFPARMS            DS
+   HC4ADT              ZONED(8,0)                   .        '4040404040404040'X
+   HC4AEM              CHAR(5)              '     '          '4040404040'X
+   HC4AIS              CHAR(1)              ' '              '40'X
+   HC4APG              CHAR(10)             '          '     '40404040404040404040'X
+   HC4ATC              CHAR(6)              '      '         '404040404040'X
+   HC4ATM              ZONED(6,0)                 .          '404040404040'X
+   HC4CCD              CHAR(2)              '  '             '4040'X
+   HC4CDT              ZONED(8,0)                   .        '4040404040404040'X
+   HC4CEM              CHAR(5)              '     '          '4040404040'X
+   HC4CPG              CHAR(10)             '          '     '40404040404040404040'X
+   HC4CTM              ZONED(6,0)                 .          '404040404040'X
+   HC4DCC              CHAR(2)              '  '             '4040'X
+   HC4EMP              CHAR(5)              '     '          '4040404040'X
+   HC4EVD              ZONED(8,0)                   .        '4040404040404040'X
+   HC4EVT              CHAR(5)              '     '          '4040404040'X
+   HC4FDN              ZONED(8,0)                   .        '4040404040404040'X
+   HC4FDO              ZONED(8,0)                   .        '4040404040404040'X
+   HC4FND              CHAR(1)              ' '              '40'X
+                                                                                                                           Page   45
+ ILE RPG FORMATTED DUMP
+   HC4GRP              CHAR(2)              '  '             '4040'X
+   HC4HIP              CHAR(5)              '     '          '4040404040'X
+   HC4HIS              CHAR(1)              ' '              '40'X
+   HC4MSG              CHAR(75)             '                                                                           '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+   HC4PSC              CHAR(5)              '     '          '4040404040'X
+   HC4RGN              CHAR(1)              ' '              '40'X
+   HC4ST               CHAR(2)              '  '             '4040'X
+   HC4TOD              ZONED(8,0)                   .        '4040404040404040'X
+   HC4ZIP              CHAR(3)              '   '            '404040'X
+ BOOK                  CHAR(1)              ' '              '40'X
+ BPHONE                CHAR(10)             '          '     '40404040404040404040'X
+ CAPEMP                CHAR(1)              ' '              '40'X
+ CCARAT                PACKED(5,2)          000.00           '00000F'X
+ CCEXP                 PACKED(7,2)          00000.00         '0000000F'X
+ CCOST                 PACKED(7,2)          00000.00         '0000000F'X
+ CHGDAT                PACKED(5,0)          00000.           '00000F'X
+ CMD                   CHAR(80)             '                                                                                '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+ COMDT1                PACKED(5,0)          00000.           '00000F'X
+ COMDT2                PACKED(5,0)          00000.           '00000F'X
+ COMDUE                PACKED(4,0)          0000.            '00000F'X
+ COM1                  CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+ COM2                  CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+ CONCOD                CHAR(1)              ' '              '40'X
+ CSNUM                 PACKED(5,0)          00000.           '00000F'X
+ CSTDIF                PACKED(7,2)          00000.00         '0000000F'X
+ CS01                  PACKED(5,0)          00000.           '00000F'X
+ CUID                  CHAR(16)             '                '
+                       VALUE IN HEX         '40404040404040404040404040404040'X
+ CUST                  CHAR(7)              '       '        '40404040404040'X
+ DATPRM                DS
+   DTACCD              CHAR(1)              ' '              '40'X
+   DTDAYS              ZONED(7,0)                  .         '40404040404040'X
+   DTFMTD              CHAR(10)             '          '     '40404040404040404040'X
+   DTFRDT              ZONED(8,0)                   .        '4040404040404040'X
+   DTFRFT              ZONED(1,0)            .               '40'X
+   DTMNTH              CHAR(9)              '         '      '404040404040404040'X
+   DTMSID              CHAR(7)              '       '        '40404040404040'X
+   DTMSTX              CHAR(80)             '                                                                                '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+   DTSEP               CHAR(1)              ' '              '40'X
+   DTSTNG              CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+   DTTODT              ZONED(8,0)                   .        '4040404040404040'X
+   DTTOFT              ZONED(1,0)            .               '40'X
+   DTWKDY              CHAR(9)              '         '      '404040404040404040'X
+ DATTN                 CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ DCITY                 CHAR(17)             '                 '
+                       VALUE IN HEX         '4040404040404040404040404040404040'X
+ DEALER                CHAR(10)             '          '     '40404040404040404040'X
+ DEDHI                 PACKED(4,0)          0000.            '00000F'X
+ DEDLO                 PACKED(4,0)          0000.            '00000F'X
+ DELCOD                CHAR(1)              ' '              '40'X
+ DELDAT                PACKED(7,0)          0000000.         '0000000F'X
+ DELFEE                PACKED(7,2)          00000.00         '0000000F'X
+                                                                                                                           Page   46
+ ILE RPG FORMATTED DUMP
+ DELINC                PACKED(7,2)          00000.00         '0000000F'X
+ DELIV                 PACKED(6,0)          000000.          '0000000F'X
+ DEPBDT                PACKED(8,0)          00000000.        '000000000F'X
+ DEPDAT                PACKED(5,0)          00000.           '00000F'X
+ DEPDED                PACKED(8,0)          00000000.        '000000000F'X
+ DEPDEF                PACKED(8,0)          00000000.        '000000000F'X
+ DEPDTA                PACKED(8,0)          00000000.        '000000000F'X
+ DEPDTC                PACKED(8,0)          00000000.        '000000000F'X
+ DEPEMA                CHAR(5)              '     '          '4040404040'X
+ DEPEMC                CHAR(5)              '     '          '4040404040'X
+ DEPEMP                CHAR(5)              '     '          '4040404040'X
+ DEPFNM                CHAR(10)             '          '     '40404040404040404040'X
+ DEPGND                CHAR(1)              ' '              '40'X
+ DEPLNM                CHAR(15)             '               '
+                       VALUE IN HEX         '404040404040404040404040404040'X
+ DEPMED                PACKED(8,0)          00000000.        '000000000F'X
+ DEPMI                 CHAR(1)              ' '              '40'X
+ DEPNID                CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ DEPPGA                CHAR(10)             '          '     '40404040404040404040'X
+ DEPPGC                CHAR(10)             '          '     '40404040404040404040'X
+ DEPREL                CHAR(3)              '   '            '404040'X
+ DEPSEQ                PACKED(3,0)          000.             '000F'X
+ DEPSTS                CHAR(1)              ' '              '40'X
+ DEPTTA                PACKED(6,0)          000000.          '0000000F'X
+ DEPTTC                PACKED(6,0)          000000.          '0000000F'X
+ DHP                   CHAR(10)             '          '     '40404040404040404040'X
+ DLTERR                CHAR(1)              ' '              '40'X
+ DLTMLG                PACKED(5,0)          00000.           '00000F'X
+ DMGD                  CHAR(1)              ' '              '40'X
+ DNAME                 CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+ DOP                   CHAR(10)             '          '     '40404040404040404040'X
+ DPRPCT                PACKED(3,2)          0.00             '000F'X
+ DPRRES                PACKED(7,2)          00000.00         '0000000F'X
+ DRDATE                PACKED(6,0)          000000.          '0000000F'X
+ DRDEPR                PACKED(7,2)          00000.00         '0000000F'X
+ DRDOC                 PACKED(6,0)          000000.          '0000000F'X
+ DRLOC                 CHAR(4)              '    '           '40404040'X
+ DRLOCD                CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ DRMILE                PACKED(5,0)          00000.           '00000F'X
+ DSCUSTMAST            DS
+   CMACAD              CHAR(3)              '   '            '404040'X
+   CMADDR              CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+   CMATTN              CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+   CMBD                ZONED(2,0)             .              '4040'X
+   CMBFQ               CHAR(1)              ' '              '40'X
+   CMBRN               CHAR(2)              '  '             '4040'X
+   CMBSH               CHAR(1)              ' '              '40'X
+   CMCITY              CHAR(17)             '                 '
+                       VALUE IN HEX         '4040404040404040404040404040404040'X
+   CMCNBL              CHAR(1)              ' '              '40'X
+   CMCUST              CHAR(7)              '       '        '40404040404040'X
+   CMCWK6              CHAR(2)              '  '             '4040'X
+   CMDLTC              CHAR(1)              ' '              '40'X
+   CMDTYP              CHAR(1)              ' '              '40'X
+   CMEBCD              CHAR(1)              ' '              '40'X
+   CMECDR              CHAR(1)              ' '              '40'X
+   CMEGPB              CHAR(4)              '    '           '40404040'X
+                                                                                                                           Page   47
+ ILE RPG FORMATTED DUMP
+   CMEMSG              CHAR(12)             '            '
+                       VALUE IN HEX         '404040404040404040404040'X
+   CMEPOM              ZONED(1,0)            .               '40'X
+   CMFPC               CHAR(1)              ' '              '40'X
+   CMGP                CHAR(2)              '  '             '4040'X
+   CMHPHN              CHAR(10)             '          '     '40404040404040404040'X
+   CMLIM               ZONED(3,0)              .             '404040'X
+   CMNAME              CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+   CMNOLC              CHAR(1)              ' '              '40'X
+   CMNOLS              CHAR(1)              ' '              '40'X
+   CMNOPD              CHAR(1)              ' '              '40'X
+   CMNTIR              ZONED(1,0)            .               '40'X
+   CMNUNT              ZONED(4,0)               .            '40404040'X
+   CMOPHN              CHAR(10)             '          '     '40404040404040404040'X
+   CMPLAN              CHAR(1)              ' '              '40'X
+   CMPRCD              CHAR(1)              ' '              '40'X
+   CMPRLS              CHAR(1)              ' '              '40'X
+   CMSCP1              ZONED(1,0)            .               '40'X
+   CMSCP2              ZONED(1,0)            .               '40'X
+   CMSCP3              ZONED(1,0)            .               '40'X
+   CMSCP4              ZONED(1,0)            .               '40'X
+   CMSCP5              ZONED(1,0)            .               '40'X
+   CMSCP6              ZONED(1,0)            .               '40'X
+   CMSCP7              ZONED(1,0)            .               '40'X
+   CMSCP8              ZONED(1,0)            .               '40'X
+   CMSCP9              ZONED(1,0)            .               '40'X
+   CMSLS               CHAR(3)              '   '            '404040'X
+   CMST                CHAR(2)              '  '             '4040'X
+   CMSTAT              CHAR(1)              ' '              '40'X
+   CMTAXE              CHAR(1)              ' '              '40'X
+   CMTTL               CHAR(3)              '   '            '404040'X
+   CMTYPE              CHAR(1)              ' '              '40'X
+   CMWK1X              CHAR(1)              ' '              '40'X
+   CMWK18              CHAR(18)             '                  '
+                       VALUE IN HEX         '404040404040404040404040404040404040'X
+   CMWK3               CHAR(7)              '       '        '40404040404040'X
+   CMWK3X              CHAR(3)              '   '            '404040'X
+   CMWK4               CHAR(6)              '      '         '404040404040'X
+   CMWK6A              CHAR(4)              '    '           '40404040'X
+   CMZIP               CHAR(5)              '     '          '4040404040'X
+   CMZIP2              CHAR(4)              '    '           '40404040'X
+   CM2200              CHAR(1)              ' '              '40'X
+ DSCUSTTRAN            DS
+   CMTACA              CHAR(3)              '   '            '404040'X
+   CMTADR              CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+   CMTATT              CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+   CMTBD               ZONED(2,0)             .              '4040'X
+   CMTBFQ              CHAR(1)              ' '              '40'X
+   CMTBRN              CHAR(2)              '  '             '4040'X
+   CMTBSH              CHAR(1)              ' '              '40'X
+   CMTCIT              CHAR(17)             '                 '
+                       VALUE IN HEX         '4040404040404040404040404040404040'X
+   CMTCNB              CHAR(1)              ' '              '40'X
+   CMTCUS              CHAR(7)              '       '        '40404040404040'X
+   CMTDAT              ZONED(6,0)                 .          '404040404040'X
+   CMTDES              CHAR(1)              ' '              '40'X
+   CMTDLT              CHAR(1)              ' '              '40'X
+   CMTEBC              CHAR(1)              ' '              '40'X
+   CMTECD              CHAR(1)              ' '              '40'X
+                                                                                                                           Page   48
+ ILE RPG FORMATTED DUMP
+   CMTEGP              CHAR(4)              '    '           '40404040'X
+   CMTEMS              CHAR(12)             '            '
+                       VALUE IN HEX         '404040404040404040404040'X
+   CMTEPO              ZONED(1,0)            .               '40'X
+   CMTFPC              CHAR(1)              ' '              '40'X
+   CMTGP               CHAR(2)              '  '             '4040'X
+   CMTHPH              CHAR(10)             '          '     '40404040404040404040'X
+   CMTLIM              ZONED(3,0)              .             '404040'X
+   CMTMCH              CHAR(1)              ' '              '40'X
+   CMTNAM              CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+   CMTNOC              CHAR(1)              ' '              '40'X
+   CMTNOL              CHAR(1)              ' '              '40'X
+   CMTNOP              CHAR(1)              ' '              '40'X
+   CMTNS1              ZONED(1,0)            .               '40'X
+   CMTNS2              ZONED(1,0)            .               '40'X
+   CMTNS3              ZONED(1,0)            .               '40'X
+   CMTNS4              ZONED(1,0)            .               '40'X
+   CMTNS5              ZONED(1,0)            .               '40'X
+   CMTNS6              ZONED(1,0)            .               '40'X
+   CMTNS7              ZONED(1,0)            .               '40'X
+   CMTNS8              ZONED(1,0)            .               '40'X
+   CMTNS9              ZONED(1,0)            .               '40'X
+   CMTNTI              ZONED(1,0)            .               '40'X
+   CMTOPH              CHAR(10)             '          '     '40404040404040404040'X
+   CMTPLA              CHAR(1)              ' '              '40'X
+   CMTPRC              CHAR(1)              ' '              '40'X
+   CMTPRL              CHAR(1)              ' '              '40'X
+   CMTSLS              CHAR(3)              '   '            '404040'X
+   CMTSRC              CHAR(1)              ' '              '40'X
+   CMTST               CHAR(2)              '  '             '4040'X
+   CMTSTA              CHAR(1)              ' '              '40'X
+   CMTSYS              CHAR(8)              '        '       '4040404040404040'X
+   CMTTIM              ZONED(6,0)                 .          '404040404040'X
+   CMTTTL              CHAR(3)              '   '            '404040'X
+   CMTTXE              CHAR(1)              ' '              '40'X
+   CMTTYP              CHAR(1)              ' '              '40'X
+   CMTUNT              ZONED(4,0)               .            '40404040'X
+   CMTWK2              CHAR(1)              ' '              '40'X
+   CMTWK3              CHAR(7)              '       '        '40404040404040'X
+   CMTWK4              CHAR(6)              '      '         '404040404040'X
+   CMTWK5              CHAR(18)             '                  '
+                       VALUE IN HEX         '404040404040404040404040404040404040'X
+   CMTWK6              CHAR(2)              '  '             '4040'X
+   CMTWK7              CHAR(4)              '    '           '40404040'X
+   CMTWK8              CHAR(3)              '   '            '404040'X
+   CMTXPL              CHAR(1)              ' '              '40'X
+   CMTZIP              CHAR(5)              '     '          '4040404040'X
+   CMTZP2              CHAR(4)              '    '           '40404040'X
+   CMT220              CHAR(1)              ' '              '40'X
+ DSPGMSTS              DS
+   $W#OFPARMS          ZONED(3,0)           011.             'F0F1F1'X
+   $WCENTURY           CHAR(2)              '20'             'F2F0'X
+   $WCMPLRLVL          CHAR(4)              '0001'           'F0F0F0F1'X
+   $WCRTNDATE          CHAR(6)              '050317'         'F0F5F0F3F1F7'X
+   $WCRTNTIME          CHAR(6)              '072340'         'F0F7F2F3F4F0'X
+   $WCURSTSCD          ZONED(5,0)           00000.           'F0F0F0F0F0'X
+   $WERFILSTS          CHAR(35)             '                                   '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040404040404040404040404040404040'X
+   $WERRFILE           CHAR(8)              '        '       '4040404040404040'X
+   $WEXCPTID           CHAR(4)              '    '           '40404040'X
+   $WEXCPTNBR          CHAR(4)              '3601'           'F3F6F0F1'X
+                                                                                                                           Page   49
+ ILE RPG FORMATTED DUMP
+   $WEXCPTTYP          CHAR(3)              'MCH'            'D4C3C8'X
+   $WJOBNAME           CHAR(10)             'QTRXC00004'     'D8E3D9E7C3F0F0F0F0F4'X
+   $WJOBNBR            ZONED(6,0)           851150.          'F8F5F1F1F5F0'X
+   $WMCHINS#           CHAR(4)              '0000'           'F0F0F0F0'X
+   $WMESSAGE           CHAR(75)             'Pointer not set for location referenced.                                   '
+                       VALUE IN HEX         'D7968995A38599409596A340A285A3408696994093968381A389969540998586859985958385844B'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+   $WPGMLIB            CHAR(10)             'EHRHRMS06#'     'C5C8D9C8D9D4E2F0F67B'X
+   $WPGMLINE#          CHAR(8)              '00003915'       'F0F0F0F0F3F9F1F5'X
+   $WPGMNAME           CHAR(10)             'HRZ101A   '     'C8D9E9F1F0F1C1404040'X
+   $WPRVSTSCD          ZONED(5,0)           00222.           'F0F0F2F2F2'X
+   $WSOURCFIL          CHAR(10)             'QRPGLESRC '     'D8D9D7C7D3C5E2D9C340'X
+   $WSOURCLIB          CHAR(10)             'ELCJW     '     'C5D3C3D1E64040404040'X
+   $WSOURCMBR          CHAR(10)             'HRZ101A   '     'C8D9E9F1F0F1C1404040'X
+   $WSTRTDATE          ZONED(6,0)           062817.          'F0F6F2F8F1F7'X
+   $WSUBINERR          CHAR(8)              '*DETC   '       '5CC4C5E3C3404040'X
+   $WTIME              ZONED(6,0)           185133.          'F1F8F5F1F3F3'X
+   $WUDATE             ZONED(6,0)           062817.          'F0F6F2F8F1F7'X
+   $WUSRNAME           CHAR(10)             'QTCP      '     'D8E3C3D7404040404040'X
+   $WWRKMSGAR          CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ DST                   CHAR(2)              '  '             '4040'X
+ DSTRT                 CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ DTHLSE                CHAR(1)              ' '              '40'X
+ DTITLE                CHAR(3)              '   '            '404040'X
+ DTLEDT                PACKED(8,0)          00000000.        '000000000F'X
+ DWK1                  CHAR(1)              ' '              '40'X
+ DWK1A                 CHAR(1)              ' '              '40'X
+ DZIP                  CHAR(5)              '     '          '4040404040'X
+ DZP2                  CHAR(4)              '    '           '40404040'X
+ ECDRVR                CHAR(1)              ' '              '40'X
+ ECGPB                 CHAR(4)              '    '           '40404040'X
+ ECLIM                 PACKED(3,0)          000.             '000F'X
+ ECMSG                 CHAR(12)             '            '
+                       VALUE IN HEX         '404040404040404040404040'X
+ ECPOMS                PACKED(1,0)          0.               '0F'X
+ ECSECR                CHAR(1)              ' '              '40'X
+ ECTAX                 CHAR(1)              ' '              '40'X
+ ECTIR                 PACKED(1,0)          0.               '0F'X
+ ECTYPE                CHAR(1)              ' '              '40'X
+ EMPNON                CHAR(1)              ' '              '40'X
+ EPD                   CHAR(1)              ' '              '40'X
+ EQUIP                 CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ ERECON                PACKED(7,2)          00000.00         '0000000F'X
+ ERR                   CHAR(75)             DIM(100)
+                         (1)                'EHI already exists, use option 6 - Rehire.                            00001'
+                         VALUE IN HEX       'C5C8C940819399858184A84085A789A2A3A26B40A4A285409697A389969540F6406040D985888999'X
+                         41                 '854B40404040404040404040404040404040404040404040404040404040F0F0F0F0F1'X
+                         (2)                'Cannot Rehire - Must Reinstate - Termination date is < 30 days.       00002'
+                         VALUE IN HEX       'C381959596A340D98588899985406040D4A4A2A340D9858995A2A381A385406040E3859994899581'X
+                         41                 'A3899695408481A3854089A2404C40F3F0408481A8A24B40404040404040F0F0F0F0F2'X
+                         (3)                'Group entered is not valid.                                           00003'
+                         VALUE IN HEX       'C79996A497408595A3859985844089A2409596A340A5819389844B40404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F0F3'X
+                         (4)                'Cannot rehire - Alternate PeopleSoft ID does not exist                00004'
+                         VALUE IN HEX       'C381959596A340998588899985406040C193A385999581A38540D78596979385E29686A340C9C440'X
+                         41                 '849685A2409596A34085A789A2A340404040404040404040404040404040F0F0F0F0F4'X
+                         (5)                'Cannot rehire employee, employee is not currently terminated.         00005'
+                         VALUE IN HEX       'C381959596A340998588899985408594979396A885856B408594979396A885854089A2409596A340'X
+                         41                 '83A499998595A393A840A3859994899581A385844B404040404040404040F0F0F0F0F5'X
+                                                                                                                           Page   50
+ ILE RPG FORMATTED DUMP
+                         (6)                'Cannot rehire employee. HR036P/HR006P EID sync error.                 00006'
+                         VALUE IN HEX       'C381959596A340998588899985408594979396A885854B40C8D9F0F3F6D761C8D9F0F0F6D740C5C9'X
+                         41                 'C440A2A895834085999996994B4040404040404040404040404040404040F0F0F0F0F6'X
+                         (7)                'Group/Branch combination entered is not valid.                        00007'
+                         VALUE IN HEX       'C79996A49761C299819583884083969482899581A3899695408595A3859985844089A2409596A340'X
+                         41                 'A5819389844B404040404040404040404040404040404040404040404040F0F0F0F0F7'X
+                         (8)                'Invalid Job Status.                                                   00008'
+                         VALUE IN HEX       'C995A58193898440D1968240E2A381A3A4A24B404040404040404040404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F0F8'X
+                         (9)                'Valid gender codes are M & F.                                         00009'
+                         VALUE IN HEX       'E581938984408785958485994083968485A24081998540D4405040C64B4040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F0F9'X
+                         (10)               'Cannot rehire. Active temp employee.                                  00010'
+                         VALUE IN HEX       'C381959596A3409985888999854B40C183A389A58540A3859497408594979396A885854B40404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F1F0'X
+                         (11)               'Invalid Job Profile combination entered.  Does not exist in HR009P.   00011'
+                         VALUE IN HEX       'C995A58193898440D1968240D79996868993854083969482899581A3899695408595A3859985844B'X
+                         41                 '4040C49685A2409596A34085A789A2A340899540C8D9F0F0F9D74B404040F0F0F0F1F1'X
+                         (12)               'Error generating update code.  Contack Help Desk.                     00012'
+                         VALUE IN HEX       'C59999969940878595859981A389958740A4978481A38540839684854B4040C39695A381839240C8'X
+                         41                 '85939740C485A2924B404040404040404040404040404040404040404040F0F0F0F1F2'X
+                         (13)               'Time card flag must be Y or N.                                        00013'
+                         VALUE IN HEX       'E3899485408381998440869381874094A4A2A340828540E840969940D54B40404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F1F3'X
+                         (14)               'Valid marital status codes are S,M,D,W,C.                             00014'
+                         VALUE IN HEX       'E5819389844094819989A3819340A2A381A3A4A24083968485A24081998540E26BD46BC46BE66BC3'X
+                         41                 '4B4040404040404040404040404040404040404040404040404040404040F0F0F0F1F4'X
+                         (15)               'Recruitment source entered is not valid.                              00015'
+                         VALUE IN HEX       'D9858399A489A3948595A340A296A4998385408595A3859985844089A2409596A340A5819389844B'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F1F5'X
+                         (16)               'Last name must be entered.                                            00016'
+                         VALUE IN HEX       'D381A2A340958194854094A4A2A3408285408595A3859985844B4040404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F1F6'X
+                         (17)               'Service date must be entered.                                         00017'
+                         VALUE IN HEX       'E28599A5898385408481A3854094A4A2A3408285408595A3859985844B4040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F1F7'X
+                         (18)               'Birth date must be entered.                                           00018'
+                         VALUE IN HEX       'C28999A388408481A3854094A4A2A3408285408595A3859985844B40404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F1F8'X
+                         (19)               'Duplicate Alternate Employee Number entered into PeopleSoft.          00019'
+                         VALUE IN HEX       'C4A49793898381A38540C193A385999581A38540C594979396A8858540D5A494828599408595A385'X
+                         41                 '998584408995A39640D78596979385E29686A34B40404040404040404040F0F0F0F1F9'X
+                         (20)               'Invalid State.                                                        00020'
+                         VALUE IN HEX       'C995A58193898440E2A381A3854B4040404040404040404040404040404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F2F0'X
+                         (21)               'Address information is incomplete.                                    00021'
+                         VALUE IN HEX       'C184849985A2A24089958696999481A38996954089A2408995839694979385A3854B404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F2F1'X
+                         (22)               'User cannot hire to group entered.                                    00022'
+                         VALUE IN HEX       'E4A28599408381959596A3408889998540A39640879996A497408595A3859985844B404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F2F2'X
+                         (23)               'Service date cannot be greater than todays date.                      00023'
+                         VALUE IN HEX       'E28599A5898385408481A385408381959596A34082854087998581A3859940A388819540A3968481'X
+                         41                 'A8A2408481A3854B40404040404040404040404040404040404040404040F0F0F0F2F3'X
+                         (24)               'Subdepartment entered is not valid.                                   00024'
+                         VALUE IN HEX       'E2A4828485978199A3948595A3408595A3859985844089A2409596A340A5819389844B4040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F2F4'X
+                         (25)               'Capital user can only hire employees to a Capital group.              00025'
+                         VALUE IN HEX       'C3819789A3819340A4A285994083819540969593A84088899985408594979396A88585A240A39640'X
+                         41                 '8140C3819789A3819340879996A4974B4040404040404040404040404040F0F0F0F2F5'X
+                         (26)               'Alternate Employee Number exists - select rehire.                     00026'
+                         VALUE IN HEX       'C193A385999581A38540C594979396A8858540D5A4948285994085A789A2A3A2406040A285938583'X
+                                                                                                                           Page   51
+ ILE RPG FORMATTED DUMP
+                         41                 'A3409985888999854B404040404040404040404040404040404040404040F0F0F0F2F6'X
+                         (27)               'PSID/Index=00000 duplicate found in HR036P, contact Interface Team.   00027'
+                         VALUE IN HEX       'D7E2C9C461C9958485A77EF0F0F0F0F04084A49793898381A385408696A4958440899540C8D9F0F3'X
+                         41                 'F6D76B40839695A38183A340C995A385998681838540E38581944B404040F0F0F0F2F7'X
+                         (28)               'HR036P EID not same as incoming EID                                   00028'
+                         VALUE IN HEX       'C8D9F0F3F6D740C5C9C4409596A340A28194854081A240899583969489958740C5C9C44040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F2F8'X
+                         (29)               'EID cannot be blank                                                   00029'
+                         VALUE IN HEX       'C5C9C4408381959596A3408285408293819592404040404040404040404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F2F9'X
+                         (30)               'Cannot hire - EID exists.                                             00030'
+                         VALUE IN HEX       'C381959596A34088899985406040C5C9C44085A789A2A3A24B404040404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F3F0'X
+                         (31)               '                                                                           '
+                         VALUE IN HEX       '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+                         (32)               'Position entered is not valid.                                        00032'
+                         VALUE IN HEX       'D796A289A3899695408595A3859985844089A2409596A340A5819389844B40404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F3F2'X
+                         (33-35)            '                                                                           '
+                         VALUE IN HEX       '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+                         (36)               'Birth date must be more than                                          00036'
+                         VALUE IN HEX       'C28999A388408481A3854094A4A2A3408285409496998540A3888195404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F3F6'X
+                         (37)               'Union flag must be Y or N.                                            00037'
+                         VALUE IN HEX       'E49589969540869381874094A4A2A340828540E840969940D54B4040404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F3F7'X
+                         (38-45)            '                                                                           '
+                         VALUE IN HEX       '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+                         (46)               'Valid punctuation in address = #,.-/.                                 00046'
+                         VALUE IN HEX       'E5819389844097A49583A3A481A3899695408995408184849985A2A2407E407B6B4B60614B404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F4F6'X
+                         (47)               'Invalid punctuation in city.                                          00047'
+                         VALUE IN HEX       'C995A5819389844097A49583A3A481A3899695408995408389A3A84B404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F4F7'X
+                         (48)               'First name must be entered.                                           00048'
+                         VALUE IN HEX       'C68999A2A340958194854094A4A2A3408285408595A3859985844B40404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F4F8'X
+                         (49)               'Union employee not allowed for job status entered.                    00049'
+                         VALUE IN HEX       'E495899695408594979396A88585409596A34081939396A68584408696994091968240A2A381A3A4'X
+                         41                 'A2408595A3859985844B4040404040404040404040404040404040404040F0F0F0F4F9'X
+                         (50)               'years from service date.                                              00050'
+                         VALUE IN HEX       'A8858199A2408699969440A28599A5898385408481A3854B40404040404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F5F0'X
+                         (51)               '                                                                           '
+                         VALUE IN HEX       '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+                         (52)               'Error on call to CCHR30, contact Interface Team.                      00052'
+                         VALUE IN HEX       'C599999699409695408381939340A39640C3C3C8D9F3F06B40839695A38183A340C995A385998681'X
+                         41                 '838540E38581944B40404040404040404040404040404040404040404040F0F0F0F5F2'X
+                         (53)               '                                                                           '
+                         VALUE IN HEX       '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+                         (54)               'Error on call to CCHR23, contact Interface Team.                      00054'
+                         VALUE IN HEX       'C599999699409695408381939340A39640C3C3C8D9F2F36B40839695A38183A340C995A385998681'X
+                         41                 '838540E38581944B40404040404040404040404040404040404040404040F0F0F0F5F4'X
+                         (55)               '                                                                           '
+                         VALUE IN HEX       '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+                         (56)               'Invalid Department.                                                   00056'
+                                                                                                                           Page   52
+ ILE RPG FORMATTED DUMP
+                         VALUE IN HEX       'C995A58193898440C485978199A3948595A34B404040404040404040404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F5F6'X
+                         (57)               'Error - Update/Delete on Consolidated Customer file.                       '
+                         VALUE IN HEX       'C599999699406040E4978481A38561C4859385A38540969540C39695A29693898481A3858440C3A4'X
+                         41                 'A2A39694859940868993854B4040404040404040404040404040404040404040404040'X
+                         (58)               'Error on call to CCDATE, contact Interface Team.                      00058'
+                         VALUE IN HEX       'C599999699409695408381939340A39640C3C3C4C1E3C56B40839695A38183A340C995A385998681'X
+                         41                 '838540E38581944B40404040404040404040404040404040404040404040F0F0F0F5F8'X
+                         (59)               '                                                                      00059'
+                         VALUE IN HEX       '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F5F9'X
+                         (60)               '                                                                      00060'
+                         VALUE IN HEX       '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F6F0'X
+                         (61-63)            '                                                                           '
+                         VALUE IN HEX       '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+                         (64)               'Invalid Recruiter Employee ID.                                        00064'
+                         VALUE IN HEX       'C995A58193898440D9858399A489A3859940C594979396A8858540C9C44B40404040404040404040'X
+                         41                 '404040404040404040404040404040404040404040404040404040404040F0F0F0F6F4'X
+                         (65)               '                                                                           '
+                         VALUE IN HEX       '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+                         (66)               'Employee cannot be assigned to a spread branch.                       00066'
+                         VALUE IN HEX       'C594979396A88585408381959596A34082854081A2A2898795858440A396408140A2979985818440'X
+                         41                 '8299819583884B4040404040404040404040404040404040404040404040F0F0F0F6F6'X
+                         (67-100)           '                                                                           '
+                         VALUE IN HEX       '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ FACCD1                CHAR(10)             '          '     '40404040404040404040'X
+ FACCD2                CHAR(10)             '          '     '40404040404040404040'X
+ FACCD3                CHAR(10)             '          '     '40404040404040404040'X
+ FACCD4                CHAR(10)             '          '     '40404040404040404040'X
+ FACCD5                CHAR(10)             '          '     '40404040404040404040'X
+ FBAGTS                CHAR(1)              ' '              '40'X
+ FBAHDT                PACKED(8,0)          00000000.        '000000000F'X
+ FBAHTS                PACKED(6,0)          000000.          '0000000F'X
+ FBAITS                PACKED(6,0)          000000.          '0000000F'X
+ FBCSID                PACKED(5,0)          00000.           '00000F'X
+ FBGRTX                CHAR(10)             '          '     '40404040404040404040'X
+ FBGSTX                CHAR(10)             '          '     '40404040404040404040'X
+ FBGUT1                CHAR(3)              '   '            '404040'X
+ FBGVT1                CHAR(3)              '   '            '404040'X
+ FBGWT1                CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ FBGXT1                CHAR(1)              ' '              '40'X
+ FBGYT1                CHAR(1)              ' '              '40'X
+ FBGZT1                CHAR(1)              ' '              '40'X
+ FBG0T1                CHAR(1)              ' '              '40'X
+ FBG1T1                CHAR(1)              ' '              '40'X
+ FBG2T1                CHAR(5)              '     '          '4040404040'X
+ FBG3T1                CHAR(10)             '          '     '40404040404040404040'X
+ FBG4T1                CHAR(3)              '   '            '404040'X
+ FBG5T1                CHAR(10)             '          '     '40404040404040404040'X
+ FBG6T1                CHAR(3)              '   '            '404040'X
+ FBG7T1                CHAR(10)             '          '     '40404040404040404040'X
+ FBG8T1                CHAR(3)              '   '            '404040'X
+ FBG9T1                CHAR(3)              '   '            '404040'X
+ FBHAT1                CHAR(2)              '  '             '4040'X
+ FBHBT1                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ FBHCT1                CHAR(15)             '               '
+                                                                                                                           Page   53
+ ILE RPG FORMATTED DUMP
+                       VALUE IN HEX         '404040404040404040404040404040'X
+ FBHDT1                CHAR(8)              '        '       '4040404040404040'X
+ FBHET1                CHAR(1)              ' '              '40'X
+ FBHFT1                CHAR(10)             '          '     '40404040404040404040'X
+ FBHGT1                CHAR(1)              ' '              '40'X
+ FBH4N3                PACKED(1,0)          0.               '0F'X
+ FBI7TX                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ FBLCS2                CHAR(1)              ' '              '40'X
+ FBNOXX                CHAR(1)              ' '              '40'X
+ FBOHST                CHAR(1)              ' '              '40'X
+ FBQRNB                CHAR(5)              '     '          '4040404040'X
+ FBQSNB                CHAR(5)              '     '          '4040404040'X
+ FBSRTL                CHAR(10)             '          '     '40404040404040404040'X
+ FBSRTS                CHAR(10)             '          '     '40404040404040404040'X
+ FBTIMF                CHAR(2)              '  '             '4040'X
+ FBTIMS                CHAR(1)              ' '              '40'X
+ FBURNB                PACKED(8,0)          00000000.        '000000000F'X
+ FBUSNB                PACKED(8,0)          00000000.        '000000000F'X
+ FBUTCD                CHAR(3)              '   '            '404040'X
+ FBUUCD                CHAR(3)              '   '            '404040'X
+ FBYESX                CHAR(1)              ' '              '40'X
+ FBYVCD                CHAR(2)              '  '             '4040'X
+ FBYXCD                CHAR(2)              '  '             '4040'X
+ FINCO                 CHAR(4)              '    '           '40404040'X
+ FLT                   CHAR(1)              ' '              '40'X
+ GAADJ                 PACKED(5,2)          000.00           '00000F'X
+ GMAC                  PACKED(5,3)          00.000           '00000F'X
+ GP                    CHAR(2)              '  '             '4040'X
+ GRPBRN                CHAR(4)              '    '           '40404040'X
+ HCIBSH                CHAR(1)              ' '              '40'X
+ HCPARMS               DS
+   HC0ANM              CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+   HC0ARA              CHAR(2)              '  '             '4040'X
+   HC0BCF              CHAR(1)              ' '              '40'X
+   HC0BDT              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   HC0BRN              CHAR(2)              '  '             '4040'X
+   HC0CCD              CHAR(2)              '  '             '4040'X
+   HC0COD              CHAR(5)              '     '          '4040404040'X
+   HC0CRP              CHAR(1)              ' '              '40'X
+   HC0CTC              CHAR(5)              '     '          '4040404040'X
+   HC0DAT              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   HC0DFC              ZONED(1,0)           0.               'F0'X
+   HC0DPT              CHAR(5)              '     '          '4040404040'X
+   HC0DSR              CHAR(1)              ' '              '40'X
+   HC0DTA              CHAR(256)            '                                                                                '
+                         81                 '                                                                                '
+                         161                '                                                                                '
+                         241                '                '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         81                 '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         121                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         161                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         201                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         241                '40404040404040404040404040404040'X
+   HC0EM#              PACKED(9,0)          000000000.       '000000000F'X
+   HC0EMP              CHAR(5)              '     '          '4040404040'X
+   HC0FKY              CHAR(2)              '  '             '4040'X
+   HC0FLG              CHAR(1)              ' '              '40'X
+   HC0GRP              CHAR(2)              '  '             '4040'X
+                                                                                                                           Page   54
+ ILE RPG FORMATTED DUMP
+   HC0HDT              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   HC0JIN              CHAR(26)             '                          '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040404040404040'X
+   HC0JSC              CHAR(5)              '     '          '4040404040'X
+   HC0LVL              CHAR(5)              '     '          '4040404040'X
+   HC0MED              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   HC0MSG              CHAR(75)             '                                                                           '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+   HC0NAM              CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+   HC0NID              CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+   HC0NIF              CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+   HC0PGN              CHAR(10)             '          '     '40404040404040404040'X
+   HC0POS              CHAR(5)              '     '          '4040404040'X
+   HC0PST              CHAR(1)              ' '              '40'X
+   HC0RED              CHAR(1)              ' '              '40'X
+   HC0RGN              CHAR(1)              ' '              '40'X
+   HC0SYN              CHAR(8)              '        '       '4040404040404040'X
+   HC0TCF              CHAR(1)              ' '              '40'X
+   HC0UBR              CHAR(2)              '  '             '4040'X
+   HC0UEM              CHAR(5)              '840S4'          'F8F4F0E2F4'X
+   HC0UGP              CHAR(2)              '  '             '4040'X
+   HC0UNF              CHAR(1)              ' '              '40'X
+   HC0UNM              CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+   HC0URG              CHAR(1)              ' '              '40'X
+   HC04DT              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+ HCRSP                 CHAR(2)              '  '             '4040'X
+ HCUACAD               CHAR(3)              '   '            '404040'X
+ HCUADDR               CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ HCUAD2                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ HCUATTN               CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ HCUBD                 PACKED(2,0)          00.              '000F'X
+ HCUBFQ                CHAR(1)              ' '              '40'X
+ HCUBRN                CHAR(2)              '  '             '4040'X
+ HCUCITY               CHAR(17)             '                 '
+                       VALUE IN HEX         '4040404040404040404040404040404040'X
+ HCUCNBL               CHAR(1)              ' '              '40'X
+ HCUCNS                CHAR(10)             '          '     '40404040404040404040'X
+ HCUCUS                CHAR(7)              '       '        '40404040404040'X
+ HCUCUST               CHAR(7)              '       '        '40404040404040'X
+ HCUCWK6               CHAR(2)              '  '             '4040'X
+ HCUDLTC               CHAR(1)              ' '              '40'X
+ HCUDTA                PACKED(8,0)          00000000.        '000000000F'X
+ HCUDTC                PACKED(8,0)          00000000.        '000000000F'X
+ HCUDTYP               CHAR(1)              ' '              '40'X
+ HCUEBCD               CHAR(1)              ' '              '40'X
+ HCUECDR               CHAR(1)              ' '              '40'X
+ HCUECP                CHAR(14)             '              '
+                       VALUE IN HEX         '4040404040404040404040404040'X
+ HCUECT                CHAR(1)              ' '              '40'X
+ HCUEGPB               CHAR(4)              '    '           '40404040'X
+ HCUEMA                CHAR(5)              '     '          '4040404040'X
+ HCUEMC                CHAR(5)              '     '          '4040404040'X
+ HCUEMP                CHAR(10)             '          '     '40404040404040404040'X
+ HCUEMS                CHAR(2)              '  '             '4040'X
+                                                                                                                           Page   55
+ ILE RPG FORMATTED DUMP
+ HCUEMSG               CHAR(12)             '            '
+                       VALUE IN HEX         '404040404040404040404040'X
+ HCUEPOM               PACKED(1,0)          0.               '0F'X
+ HCUEXD                PACKED(8,0)          00000000.        '000000000F'X
+ HCUFPC                CHAR(1)              ' '              '40'X
+ HCUGP                 CHAR(2)              '  '             '4040'X
+ HCUHPHN               CHAR(10)             '          '     '40404040404040404040'X
+ HCUHPN                CHAR(14)             '              '
+                       VALUE IN HEX         '4040404040404040404040404040'X
+ HCULIM                PACKED(3,0)          000.             '000F'X
+ HCUMST                CHAR(2)              '  '             '4040'X
+ HCUNAME               CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+ HCUNOLC               CHAR(1)              ' '              '40'X
+ HCUNOLS               CHAR(1)              ' '              '40'X
+ HCUNOPD               CHAR(1)              ' '              '40'X
+ HCUNTIR               PACKED(1,0)          0.               '0F'X
+ HCUNUNT               PACKED(4,0)          0000.            '00000F'X
+ HCUOPHN               CHAR(10)             '          '     '40404040404040404040'X
+ HCUOPN                CHAR(14)             '              '
+                       VALUE IN HEX         '4040404040404040404040404040'X
+ HCUPBR                CHAR(4)              '    '           '40404040'X
+ HCUPGA                CHAR(10)             '          '     '40404040404040404040'X
+ HCUPGC                CHAR(10)             '          '     '40404040404040404040'X
+ HCUPLAN               CHAR(1)              ' '              '40'X
+ HCUPRCD               CHAR(1)              ' '              '40'X
+ HCUPRGN               CHAR(10)             '          '     '40404040404040404040'X
+ HCUPRLS               CHAR(1)              ' '              '40'X
+ HCUSCP1               PACKED(1,0)          0.               '0F'X
+ HCUSCP2               PACKED(1,0)          0.               '0F'X
+ HCUSCP3               PACKED(1,0)          0.               '0F'X
+ HCUSCP4               PACKED(1,0)          0.               '0F'X
+ HCUSCP5               PACKED(1,0)          0.               '0F'X
+ HCUSCP6               PACKED(1,0)          0.               '0F'X
+ HCUSCP7               PACKED(1,0)          0.               '0F'X
+ HCUSCP8               PACKED(1,0)          0.               '0F'X
+ HCUSCP9               PACKED(1,0)          0.               '0F'X
+ HCUSLS                CHAR(3)              '   '            '404040'X
+ HCUSTA                CHAR(1)              ' '              '40'X
+ HCUSYN                CHAR(10)             '          '     '40404040404040404040'X
+ HCUTAT                CHAR(1)              ' '              '40'X
+ HCUTAXE               CHAR(1)              ' '              '40'X
+ HCUTTA                PACKED(6,0)          000000.          '0000000F'X
+ HCUTTC                PACKED(6,0)          000000.          '0000000F'X
+ HCUTTL                CHAR(3)              '   '            '404040'X
+ HCUTYPE               CHAR(1)              ' '              '40'X
+ HCUTYPS               CHAR(1)              ' '              '40'X
+ HCUWK18               CHAR(18)             '                  '
+                       VALUE IN HEX         '404040404040404040404040404040404040'X
+ HCUWK3                CHAR(7)              '       '        '40404040404040'X
+ HCUWK3X               CHAR(3)              '   '            '404040'X
+ HCUWK4                CHAR(6)              '      '         '404040404040'X
+ HCUWK6A               CHAR(4)              '    '           '40404040'X
+ HCUXK1X               CHAR(1)              ' '              '40'X
+ HCUZIP                CHAR(5)              '     '          '4040404040'X
+ HCUZIP2               CHAR(4)              '    '           '40404040'X
+ HCU2200               CHAR(1)              ' '              '40'X
+ HC9CCD                CHAR(2)              '  '             '4040'X
+ HC9SID                CHAR(2)              '  '             '4040'X
+ HIRECR                CHAR(1)              ' '              '40'X
+ HISTPARMS             DS
+   HC1ADT              ZONED(8,0)                   .        '4040404040404040'X
+                                                                                                                           Page   56
+ ILE RPG FORMATTED DUMP
+   HC1AEM              CHAR(5)              '     '          '4040404040'X
+   HC1AIS              CHAR(1)              ' '              '40'X
+   HC1APG              CHAR(10)             '          '     '40404040404040404040'X
+   HC1ATM              ZONED(6,0)                 .          '404040404040'X
+   HC1BRN              CHAR(2)              '  '             '4040'X
+   HC1CCD              CHAR(2)              '  '             '4040'X
+   HC1CDT              ZONED(8,0)                   .        '4040404040404040'X
+   HC1CEM              CHAR(5)              '     '          '4040404040'X
+   HC1CPG              CHAR(10)             '          '     '40404040404040404040'X
+   HC1CTC              CHAR(5)              '     '          '4040404040'X
+   HC1CTM              ZONED(6,0)                 .          '404040404040'X
+   HC1DPT              CHAR(5)              '     '          '4040404040'X
+   HC1EMP              CHAR(5)              '     '          '4040404040'X
+   HC1FDN              ZONED(8,0)                   .        '4040404040404040'X
+   HC1FDO              ZONED(8,0)                   .        '4040404040404040'X
+   HC1FND              CHAR(1)              ' '              '40'X
+   HC1GRP              CHAR(2)              '  '             '4040'X
+   HC1JSC              CHAR(5)              '     '          '4040404040'X
+   HC1LVL              CHAR(5)              '     '          '4040404040'X
+   HC1MSG              CHAR(75)             '                                                                           '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+   HC1NID              CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+   HC1POS              CHAR(5)              '     '          '4040404040'X
+   HC1PSC              CHAR(5)              '     '          '4040404040'X
+   HC1RGN              CHAR(1)              ' '              '40'X
+   HC1SDP              CHAR(2)              '  '             '4040'X
+   HC1TCF              CHAR(1)              ' '              '40'X
+   HC1TOD              ZONED(8,0)                   .        '4040404040404040'X
+   HC1UNF              CHAR(1)              ' '              '40'X
+   HC1WKS              CHAR(5)              '     '          '4040404040'X
+ HMRADT                CHAR(14)             '              '
+                       VALUE IN HEX         '4040404040404040404040404040'X
+ HMRATN                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ HMRBDT                PACKED(8,0)          00000000.        '000000000F'X
+ HMRBRN                CHAR(2)              '  '             '4040'X
+ HMRCCD                CHAR(2)              '  '             '4040'X
+ HMRCCL                CHAR(40)             '                                        '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+ HMRCTC                CHAR(5)              '     '          '4040404040'X
+ HMRCTY                CHAR(17)             '                 '
+                       VALUE IN HEX         '4040404040404040404040404040404040'X
+ HMRCTZ                CHAR(2)              '  '             '4040'X
+ HMRDLN                CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ HMRDLS                CHAR(2)              '  '             '4040'X
+ HMRDPT                CHAR(5)              '     '          '4040404040'X
+ HMREM#                PACKED(9,0)          000000000.       '000000000F'X
+ HMREMC                CHAR(5)              '     '          '4040404040'X
+ HMREMP                CHAR(5)              '     '          '4040404040'X
+ HMRENM                CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+ HMREPH                CHAR(10)             '          '     '40404040404040404040'X
+ HMRERL                CHAR(12)             '            '
+                       VALUE IN HEX         '404040404040404040404040'X
+ HMRGND                CHAR(1)              ' '              '40'X
+ HMRGP                 CHAR(2)              '  '             '4040'X
+ HMRGPS                CHAR(2)              '  '             '4040'X
+ HMRGYR                PACKED(4,0)          0000.            '00000F'X
+ HMRHDT                PACKED(8,0)          00000000.        '000000000F'X
+                                                                                                                           Page   57
+ ILE RPG FORMATTED DUMP
+ HMRHIR                CHAR(1)              ' '              '40'X
+ HMRHPH                CHAR(10)             '          '     '40404040404040404040'X
+ HMRJSC                CHAR(5)              '     '          '4040404040'X
+ HMRLTD                PACKED(8,0)          00000000.        '000000000F'X
+ HMRLVL                CHAR(5)              '     '          '4040404040'X
+ HMRMGE                CHAR(1)              ' '              '40'X
+ HMRMJR                CHAR(25)             '                         '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040'X
+ HMRNAM                CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+ HMRNID                CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ HMRNKN                CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ HMRNXA                PACKED(8,0)          00000000.        '000000000F'X
+ HMRNXA1               PACKED(8,0)          00000000.        '000000000F'X
+ HMROPH                CHAR(10)             '          '     '40404040404040404040'X
+ HMROVR                PACKED(3,0)          000.             '000F'X
+ HMRPGM                CHAR(10)             '          '     '40404040404040404040'X
+ HMRPOS                CHAR(5)              '     '          '4040404040'X
+ HMRRCE                CHAR(1)              ' '              '40'X
+ HMRREI                CHAR(5)              '     '          '4040404040'X
+ HMRRGN                CHAR(1)              ' '              '40'X
+ HMRRHR                CHAR(1)              ' '              '40'X
+ HMRRSC                CHAR(1)              ' '              '40'X
+ HMRRSL                CHAR(35)             '                                   '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ HMRRSN                CHAR(35)             '                                   '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ HMRSPS                CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ HMRST                 CHAR(2)              '  '             '4040'X
+ HMRSTR                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ HMRTRC                CHAR(1)              ' '              '40'X
+ HMRTSC                CHAR(1)              ' '              '40'X
+ HMRTSR                PACKED(3,0)          000.             '000F'X
+ HMRTTL                CHAR(3)              '   '            '404040'X
+ HMRUNF                CHAR(1)              ' '              '40'X
+ HMRVOI                CHAR(1)              ' '              '40'X
+ HMRWKS                CHAR(5)              '     '          '4040404040'X
+ HMRWRK                CHAR(6)              '      '         '404040404040'X
+ HMRZIP                CHAR(9)              '         '      '404040404040404040'X
+ HNSACC                CHAR(3)              '   '            '404040'X
+ HNSACD                PACKED(8,0)          00000000.        '000000000F'X
+ HNSACH                PACKED(8,0)          00000000.        '000000000F'X
+ HNSADC                CHAR(1)              ' '              '40'X
+ HNSCCD                PACKED(8,0)          00000000.        '000000000F'X
+ HNSCLS                CHAR(3)              '   '            '404040'X
+ HNSDCC                CHAR(2)              '  '             '4040'X
+ HNSDCD                PACKED(8,0)          00000000.        '000000000F'X
+ HNSDTA                PACKED(8,0)          00000000.        '000000000F'X
+ HNSDTC                PACKED(8,0)          00000000.        '000000000F'X
+ HNSEMA                CHAR(5)              '     '          '4040404040'X
+ HNSEMC                CHAR(5)              '     '          '4040404040'X
+ HNSEMP                CHAR(5)              '     '          '4040404040'X
+ HNSIDC                CHAR(1)              ' '              '40'X
+ HNSPGA                CHAR(10)             '          '     '40404040404040404040'X
+ HNSPGC                CHAR(10)             '          '     '40404040404040404040'X
+ HNSTTA                PACKED(6,0)          000000.          '0000000F'X
+ HNSTTC                PACKED(6,0)          000000.          '0000000F'X
+ HPWR                  PACKED(5,2)          000.00           '00000F'X
+                                                                                                                           Page   58
+ ILE RPG FORMATTED DUMP
+ HRAADT                PACKED(8,0)          00000000.        '000000000F'X
+ HRAAEM                CHAR(5)              '     '          '4040404040'X
+ HRAAPG                CHAR(10)             '          '     '40404040404040404040'X
+ HRAATM                PACKED(6,0)          000000.          '0000000F'X
+ HRACDT                PACKED(8,0)          00000000.        '000000000F'X
+ HRACEM                CHAR(5)              '     '          '4040404040'X
+ HRACPG                CHAR(10)             '          '     '40404040404040404040'X
+ HRACTC                CHAR(5)              '     '          '4040404040'X
+ HRACTM                PACKED(6,0)          000000.          '0000000F'X
+ HRAEMP                CHAR(5)              '     '          '4040404040'X
+ HRALIP                PACKED(5,2)          000.00           '00000F'X
+ HRAPDT                PACKED(8,0)          00000000.        '000000000F'X
+ HRA401                CHAR(1)              ' '              '40'X
+ HRCCCD                CHAR(2)              '  '             '4040'X
+ HRCCRQ                CHAR(1)              ' '              '40'X
+ HRCDES                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ HRCDTA                PACKED(8,0)          00000000.        '000000000F'X
+ HRCDTC                PACKED(8,0)          00000000.        '000000000F'X
+ HRCEMA                CHAR(5)              '     '          '4040404040'X
+ HRCEMC                CHAR(5)              '     '          '4040404040'X
+ HRCLST                CHAR(6)              '      '         '404040404040'X
+ HRCNUM                CHAR(2)              '  '             '4040'X
+ HRCPGA                CHAR(10)             '          '     '40404040404040404040'X
+ HRCPGC                CHAR(10)             '          '     '40404040404040404040'X
+ HRCSTC                CHAR(2)              '  '             '4040'X
+ HRCTTA                PACKED(6,0)          000000.          '0000000F'X
+ HRCTTC                PACKED(6,0)          000000.          '0000000F'X
+ HRZADT                PACKED(8,0)          00000000.        '000000000F'X
+ HRZAEM                CHAR(5)              '     '          '4040404040'X
+ HRZAPG                CHAR(10)             '          '     '40404040404040404040'X
+ HRZATM                PACKED(6,0)          000000.          '0000000F'X
+ HRZBRN                CHAR(2)              '  '             '4040'X
+ HRZCCD                CHAR(2)              '  '             '4040'X
+ HRZCDT                PACKED(8,0)          00000000.        '000000000F'X
+ HRZCEM                CHAR(5)              '     '          '4040404040'X
+ HRZCPG                CHAR(10)             '          '     '40404040404040404040'X
+ HRZCTM                PACKED(6,0)          000000.          '0000000F'X
+ HRZGP                 CHAR(2)              '  '             '4040'X
+ HRZJSC                CHAR(5)              '     '          '4040404040'X
+ HRZRGN                CHAR(1)              ' '              '40'X
+ HRZSTS                CHAR(1)              ' '              '40'X
+ HRZTYP                CHAR(5)              '     '          '4040404040'X
+ HRZUOM                CHAR(5)              '     '          '4040404040'X
+ HRZVAL                CHAR(5)              '     '          '4040404040'X
+ HRZVCD                CHAR(5)              '     '          '4040404040'X
+ HSCACT                CHAR(1)              ' '              '40'X
+ HSCADT                PACKED(8,0)          00000000.        '000000000F'X
+ HSCAEM                CHAR(5)              '     '          '4040404040'X
+ HSCAPG                CHAR(10)             '          '     '40404040404040404040'X
+ HSCATM                PACKED(6,0)          000000.          '0000000F'X
+ HSCCCD                CHAR(2)              '  '             '4040'X
+ HSCCDT                PACKED(8,0)          00000000.        '000000000F'X
+ HSCCEM                CHAR(5)              '     '          '4040404040'X
+ HSCCPG                CHAR(10)             '          '     '40404040404040404040'X
+ HSCCTM                PACKED(6,0)          000000.          '0000000F'X
+ HSCFCH                CHAR(3)              '   '            '404040'X
+ HSCFDP                CHAR(3)              '   '            '404040'X
+ HSCFSP                CHAR(3)              '   '            '404040'X
+ HSCPLN                CHAR(5)              '     '          '4040404040'X
+ HSCSTS                CHAR(1)              ' '              '40'X
+ HSCTCH                CHAR(3)              '   '            '404040'X
+                                                                                                                           Page   59
+ ILE RPG FORMATTED DUMP
+ HSCTDP                CHAR(3)              '   '            '404040'X
+ HSCTSP                CHAR(3)              '   '            '404040'X
+ HSCTXT                CHAR(35)             '                                   '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ H36EM#                PACKED(9,0)          000000000.       '000000000F'X
+ H36EMP                CHAR(5)              '     '          '4040404040'X
+ H36INX                PACKED(5,0)          00000.           '00000F'X
+ H36NAM                CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+ IGNKEY                CHAR(10)             '          '     '40404040404040404040'X
+ ITC                   CHAR(1)              ' '              '40'X
+ ITCAMT                PACKED(7,2)          00000.00         '0000000F'X
+ ITCRPT                CHAR(1)              ' '              '40'X
+ IWBLS2                CHAR(1)              ' '              '40'X
+ IWBYN2                PACKED(8,0)          00000000.        '000000000F'X
+ IWBZN2                PACKED(6,0)          000000.          '0000000F'X
+ IWB0N2                PACKED(8,0)          00000000.        '000000000F'X
+ IWB1N2                PACKED(6,0)          000000.          '0000000F'X
+ IWHCC1                CHAR(10)             '          '     '40404040404040404040'X
+ IWHDC1                CHAR(5)              '     '          '4040404040'X
+ IWHEC1                CHAR(10)             '          '     '40404040404040404040'X
+ IWHFC1                CHAR(5)              '     '          '4040404040'X
+ IWRNTX                CHAR(35)             '                                   '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ LASTCHR               PACKED(2,0)          00.              '000F'X
+ LCPCT                 PACKED(3,2)          0.00             '000F'X
+ LDPADT                PACKED(8,0)          00000000.        '000000000F'X
+ LDPAEM                CHAR(5)              '     '          '4040404040'X
+ LDPAPG                CHAR(10)             '          '     '40404040404040404040'X
+ LDPATM                PACKED(6,0)          000000.          '0000000F'X
+ LDPCDT                PACKED(8,0)          00000000.        '000000000F'X
+ LDPCEM                CHAR(5)              '     '          '4040404040'X
+ LDPCPG                CHAR(10)             '          '     '40404040404040404040'X
+ LDPCTC                CHAR(5)              '     '          '4040404040'X
+ LDPCTM                PACKED(6,0)          000000.          '0000000F'X
+ LDPDPT                CHAR(5)              '     '          '4040404040'X
+ LDPJSC                CHAR(5)              '     '          '4040404040'X
+ LDPLVL                CHAR(5)              '     '          '4040404040'X
+ LDPPOS                CHAR(5)              '     '          '4040404040'X
+ LDPSTS                CHAR(1)              ' '              '40'X
+ LFMARS                PACKED(5,2)          000.00           '00000F'X
+ LFMBLS                CHAR(1)              ' '              '40'X
+ LFMBLW                PACKED(5,2)          000.00           '00000F'X
+ LFMBRN                CHAR(2)              '  '             '4040'X
+ LFMDED                PACKED(8,0)          00000000.        '000000000F'X
+ LFMGP                 CHAR(2)              '  '             '4040'X
+ LFMLNB                CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ LFMLST                CHAR(2)              '  '             '4040'X
+ LFMMED                PACKED(8,0)          00000000.        '000000000F'X
+ LFMMVD                PACKED(4,0)          0000.            '00000F'X
+ LFMNAM                CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+ LFMPWD                CHAR(5)              '     '          '4040404040'X
+ LFMRGN                CHAR(1)              ' '              '40'X
+ LFMSDS                PACKED(3,0)          000.             '000F'X
+ LFMSEX                CHAR(1)              ' '              '40'X
+ LFMSSN                CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ LFMSUP                CHAR(1)              ' '              '40'X
+ LFMTMI                CHAR(10)             '          '     '40404040404040404040'X
+ LFMUCM                PACKED(2,0)          00.              '000F'X
+                                                                                                                           Page   60
+ ILE RPG FORMATTED DUMP
+ LFMUCY                PACKED(2,0)          00.              '000F'X
+ LICDAT                PACKED(4,0)          0000.            '00000F'X
+ LICHGR                CHAR(1)              ' '              '40'X
+ LICNO                 CHAR(9)              '         '      '404040404040404040'X
+ LIMITS                PACKED(7,0)          0000000.         '0000000F'X
+ LMTDSC                CHAR(11)             '           '
+                       VALUE IN HEX         '4040404040404040404040'X
+ LOANCR                CHAR(1)              ' '              '40'X
+ LOC                   PACKED(11,2)         000000000.00
+                       VALUE IN HEX         '00000000000F'X
+ LSDATE                PACKED(6,0)          000000.          '0000000F'X
+ LSTDAT                PACKED(5,0)          00000.           '00000F'X
+ LT                    CHAR(1)              ' '              '40'X
+ M                     PACKED(1,0)          0.               '0F'X
+ MAKE                  CHAR(4)              '    '           '40404040'X
+ MARKUP                PACKED(4,0)          0000.            '00000F'X
+ MED5PY                CHAR(1)              ' '              '40'X
+ MILACT                PACKED(5,0)          00000.           '00000F'X
+ MILDAT                PACKED(7,0)          0000000.         '0000000F'X
+ MLIM1                 PACKED(5,0)          00000.           '00000F'X
+ MLIM2                 PACKED(5,0)          00000.           '00000F'X
+ MNTEXP                PACKED(7,2)          00000.00         '0000000F'X
+ MNTMGT                CHAR(1)              ' '              '40'X
+ MNTRES                PACKED(7,2)          00000.00         '0000000F'X
+ MNTSTS                CHAR(1)              ' '              '40'X
+ MODL                  CHAR(4)              '    '           '40404040'X
+ MONMNT                PACKED(5,2)          000.00           '00000F'X
+ MONTH                 CHAR(2)              '  '             '4040'X
+ MON1                  PACKED(2,0)          00.              '000F'X
+ MON10                 PACKED(2,0)          00.              '000F'X
+ MON2                  PACKED(2,0)          00.              '000F'X
+ MON3                  PACKED(2,0)          00.              '000F'X
+ MON4                  PACKED(2,0)          00.              '000F'X
+ MON5                  PACKED(2,0)          00.              '000F'X
+ MON6                  PACKED(2,0)          00.              '000F'X
+ MON7                  PACKED(2,0)          00.              '000F'X
+ MON8                  PACKED(2,0)          00.              '000F'X
+ MON9                  PACKED(2,0)          00.              '000F'X
+ MVRAPP                CHAR(1)              ' '              '40'X
+ NEXTUC                CHAR(2)              '  '             '4040'X
+ NOERR                 CHAR(1)              ' '              '40'X
+ NOJ044                CHAR(1)              ' '              '40'X
+ NOTAMT                PACKED(7,2)          00000.00         '0000000F'X
+ NOTBAL                PACKED(7,2)          00000.00         '0000000F'X
+ NOTDUE                PACKED(2,0)          00.              '000F'X
+ NOTFIR                PACKED(5,0)          00000.           '00000F'X
+ NOTNO                 CHAR(10)             '          '     '40404040404040404040'X
+ NOTPCT                PACKED(5,3)          00.000           '00000F'X
+ NOTPMT                PACKED(7,2)          00000.00         '0000000F'X
+ NOTTRM                PACKED(2,0)          00.              '000F'X
+ OC                    CHAR(2)              '  '             '4040'X
+ OCMTYPE               CHAR(1)              ' '              '40'X
+ OC1                   PACKED(3,3)          .000             '000F'X
+ OC2                   PACKED(3,3)          .000             '000F'X
+ ODATE                 PACKED(6,0)          000000.          '0000000F'X
+ ODBADD                PACKED(8,0)          00000000.        '000000000F'X
+ ODBAHP                CHAR(1)              ' '              '40'X
+ ODBAHR                CHAR(1)              ' '              '40'X
+ ODBAIR                CHAR(3)              '   '            '404040'X
+ ODBARE                CHAR(3)              '   '            '404040'X
+ ODBA1M                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+                                                                                                                           Page   61
+ ILE RPG FORMATTED DUMP
+ ODBA1S                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ ODBBAC                CHAR(1)              ' '              '40'X
+ ODBBAD                CHAR(1)              ' '              '40'X
+ ODBBCP                CHAR(1)              ' '              '40'X
+ ODBBDR                CHAR(1)              ' '              '40'X
+ ODBBLE                CHAR(1)              ' '              '40'X
+ ODBBMC                CHAR(1)              ' '              '40'X
+ ODBBR                 CHAR(2)              '  '             '4040'X
+ ODBBSE                CHAR(1)              ' '              '40'X
+ ODBBUC                CHAR(1)              ' '              '40'X
+ ODBBWH                CHAR(1)              ' '              '40'X
+ ODBBX2                CHAR(1)              ' '              '40'X
+ ODBBX3                CHAR(1)              ' '              '40'X
+ ODBBX4                CHAR(1)              ' '              '40'X
+ ODBBX5                CHAR(1)              ' '              '40'X
+ ODBBX6                CHAR(1)              ' '              '40'X
+ ODBBX7                CHAR(1)              ' '              '40'X
+ ODBCYM                CHAR(17)             '                 '
+                       VALUE IN HEX         '4040404040404040404040404040404040'X
+ ODBCYS                CHAR(17)             '                 '
+                       VALUE IN HEX         '4040404040404040404040404040404040'X
+ ODBEWR                PACKED(4,0)          0000.            '00000F'X
+ ODBFRC                PACKED(4,0)          0000.            '00000F'X
+ ODBFRO                PACKED(4,0)          0000.            '00000F'X
+ ODBGP                 CHAR(2)              '  '             '4040'X
+ ODBMID                CHAR(8)              '        '       '4040404040404040'X
+ ODBMOC                PACKED(4,0)          0000.            '00000F'X
+ ODBMOO                PACKED(4,0)          0000.            '00000F'X
+ ODBNMA                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ ODBNMC                CHAR(8)              '        '       '4040404040404040'X
+ ODBNME                CHAR(15)             '               '
+                       VALUE IN HEX         '404040404040404040404040404040'X
+ ODBNML                CHAR(51)             '                                                   '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040'X
+ ODBNMM                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ ODBNMS                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ ODBPAH                PACKED(10,0)         0000000000.      '00000000000F'X
+ ODBPFX                PACKED(10,0)         0000000000.      '00000000000F'X
+ ODBPOA                PACKED(3,0)          000.             '000F'X
+ ODBPOE                PACKED(3,0)          000.             '000F'X
+ ODBPON                PACKED(4,0)          0000.            '00000F'X
+ ODBPPP                CHAR(1)              ' '              '40'X
+ ODBSAC                PACKED(4,0)          0000.            '00000F'X
+ ODBSAO                PACKED(4,0)          0000.            '00000F'X
+ ODBSAT                CHAR(1)              ' '              '40'X
+ ODBSFE                PACKED(3,0)          000.             '000F'X
+ ODBSTA                CHAR(1)              ' '              '40'X
+ ODBSTM                CHAR(2)              '  '             '4040'X
+ ODBSTS                CHAR(2)              '  '             '4040'X
+ ODBSUC                PACKED(4,0)          0000.            '00000F'X
+ ODBSUO                PACKED(4,0)          0000.            '00000F'X
+ ODBTHC                PACKED(4,0)          0000.            '00000F'X
+ ODBTHO                PACKED(4,0)          0000.            '00000F'X
+ ODBTSD                PACKED(6,0)          000000.          '0000000F'X
+ ODBTSP                CHAR(10)             '          '     '40404040404040404040'X
+ ODBTST                PACKED(6,0)          000000.          '0000000F'X
+ ODBTUC                PACKED(4,0)          0000.            '00000F'X
+                                                                                                                           Page   62
+ ILE RPG FORMATTED DUMP
+ ODBTUO                PACKED(4,0)          0000.            '00000F'X
+ ODBUC                 CHAR(1)              ' '              '40'X
+ ODBWEC                PACKED(4,0)          0000.            '00000F'X
+ ODBWEO                PACKED(4,0)          0000.            '00000F'X
+ ODBWK3                CHAR(37)             '                                     '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040'X
+ ODBZM                 CHAR(9)              '         '      '404040404040404040'X
+ ODBZS                 CHAR(9)              '         '      '404040404040404040'X
+ OFF                   CHAR(1)              '0'              'F0'X
+ OLDUC                 CHAR(2)              '  '             '4040'X
+ ON                    CHAR(1)              '1'              'F1'X
+ ORDDAT                PACKED(6,0)          000000.          '0000000F'X
+ OVR                   CHAR(75)             DIM(5)
+                         (1)                'CALL ELLIB/HRK100A                                                         '
+                         VALUE IN HEX       'C3C1D3D340C5D3D3C9C261C8D9D2F1F0F0C140404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+                         (2)                'OVRDBF FILE(XCMUM)  TOFILE(                                                '
+                         VALUE IN HEX       'D6E5D9C4C2C640C6C9D3C54DE7C3D4E4D45D4040E3D6C6C9D3C54D40404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+                         (3)                '/CMUM)                                                                     '
+                         VALUE IN HEX       '61C3D4E4D45D40404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+                         (4)                'OVRDBF FILE(XUNITMAST)  TOFILE(                                            '
+                         VALUE IN HEX       'D6E5D9C4C2C640C6C9D3C54DE7E4D5C9E3D4C1E2E35D4040E3D6C6C9D3C54D404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+                         (5)                '/UNITMAST)                                                                 '
+                         VALUE IN HEX       '61E4D5C9E3D4C1E2E35D404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ P@MSG                 CHAR(45)             '                                             '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040'X
+ PAG                   CHAR(2)              '  '             '4040'X
+ PART56                CHAR(200)            '                                                                                '
+                         81                 '                                                                                '
+                         161                '                                        '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         81                 '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         121                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         161                '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+ PASREC                DS
+   $PRHISTS            CHAR(1)              ' '              '40'X
+   $WNAME              CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+   ARREAR              PACKED(5,2)          000.00           '00000F'X
+   BRN                 CHAR(2)              '20'             'F2F0'X
+   DATA1               CHAR(254)            '                                         V                                     0'
+                         81                 '00020  20       0000          0000000000000000                           0000000'
+                         161                '0000000000000000000000000000000000000000000000000   00000000       0000000000000'
+                         241                '0             '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '40E540000F4040404000000F404040404040404040404040404040404040404040404040404040F0'X
+                         81                 'F0F0F0F2F04040F2F000000F000F4040F0F0F0F040404040404040404040F0F0F0F0F0F0F0F0F0F0'X
+                         121                'F0F0F0F0F0F000000F404040404040404040404040404040404040404040404040F0F0F0F0F0F0F0'X
+                         161                'F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0'X
+                         201                'F0F0F0F0F0F0F0F0F0404040F0F0F0F0F0F0F0F040404040404040F0F0F0F0F0F0F0F0F0F0F0F0F0'X
+                         241                'F040404040404040404040404040'X
+   DATA2               CHAR(31)             '  00000000000000               '
+                       VALUE IN HEX         '4040F0F0F0F0F0F0F0F0F0F0F0F0F0F0404040404040404040404040404040'X
+   DLEDT               ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   HIWH                PACKED(5,2)          000.00           '00000F'X
+   LFMAUT              CHAR(4)              '    '           '40404040'X
+                                                                                                                           Page   63
+ ILE RPG FORMATTED DUMP
+   LFMBDT              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   LFMCDL              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   LFMDPT              CHAR(1)              ' '              '40'X
+   LFMDSP              PACKED(5,2)          000.00           '00000F'X
+   LFMDTA              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   LFMDTC              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   LFMECY              ZONED(4,0)           0000.            'F0F0F0F0'X
+   LFMEDT              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   LFMEMA              CHAR(5)              '     '          '4040404040'X
+   LFMEMC              CHAR(5)              '     '          '4040404040'X
+   LFMEMD              ZONED(4,0)           0000.            'F0F0F0F0'X
+   LFMEMP              CHAR(5)              '     '          '4040404040'X
+   LFMHRS              CHAR(1)              ' '              '40'X
+   LFMINT              CHAR(3)              '   '            '404040'X
+   LFMJSC              CHAR(1)              ' '              '40'X
+   LFMLND              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   LFMLPD              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   LFMLRD              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   LFMLVL              CHAR(1)              ' '              '40'X
+   LFMMVR              CHAR(1)              ' '              '40'X
+   LFMPFR              CHAR(2)              '  '             '4040'X
+   LFMPGA              CHAR(10)             '          '     '40404040404040404040'X
+   LFMPGC              CHAR(10)             '          '     '40404040404040404040'X
+   LFMPOS              PACKED(3,0)          000.             '000F'X
+   LFMPTP              CHAR(1)              ' '              '40'X
+   LFMSDP              CHAR(2)              '  '             '4040'X
+   LFMSTS              CHAR(1)              ' '              '40'X
+   LFMTCF              CHAR(1)              ' '              '40'X
+   LFMTMA              ZONED(6,0)           000000.          'F0F0F0F0F0F0'X
+   LFMTMC              ZONED(6,0)           000000.          'F0F0F0F0F0F0'X
+   LFMTMD              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   LFMTRS              CHAR(1)              ' '              '40'X
+   LFMTSS              CHAR(1)              ' '              '40'X
+   LFMTTD              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   LFMUNF              CHAR(1)              ' '              '40'X
+   LFM285              CHAR(1)              ' '              '40'X
+   MDEDT               ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   MVRDUE              ZONED(4,0)           0000.            'F0F0F0F0'X
+   ODBRGN              CHAR(1)              ' '              '40'X
+   PWEXMO              ZONED(2,0)           00.              'F0F0'X
+   PWEXYR              ZONED(2,0)           00.              'F0F0'X
+   RGP                 CHAR(2)              '20'             'F2F0'X
+   RLICNO              CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+   RLICST              CHAR(2)              '  '             '4040'X
+   RSEX                CHAR(1)              'V'              'E5'X
+   STDIST              PACKED(3,0)          000.             '000F'X
+   ZSSN                CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ PCMD                  CHAR(75)             '                                                                           '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '4040404040404040404040404040404040404040404040404040404040404040404040'X
+ PDATE                 PACKED(7,0)          0000000.         '0000000F'X
+ PLEN                  PACKED(15,5)         0000000000.00000
+                       VALUE IN HEX         '000000000000000F'X
+ PPTAX                 PACKED(7,2)          00000.00         '0000000F'X
+ PRINST                CHAR(1)              ' '              '40'X
+ PRINWK                PACKED(9,2)          0000000.00       '000000000F'X
+ PRMCDE                CHAR(2)              '  '             '4040'X
+ PRMCMDS               DS
+   PMACAD              CHAR(3)              '   '            '404040'X
+   PMADDR              CHAR(30)             '                              '
+                                                                                                                           Page   64
+ ILE RPG FORMATTED DUMP
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+   PMATTN              CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+   PMBD                ZONED(2,0)           00.              'F0F0'X
+   PMBFQ               CHAR(1)              ' '              '40'X
+   PMBRN               CHAR(2)              '  '             '4040'X
+   PMBSH               CHAR(1)              ' '              '40'X
+   PMCITY              CHAR(17)             '                 '
+                       VALUE IN HEX         '4040404040404040404040404040404040'X
+   PMCNBL              CHAR(1)              ' '              '40'X
+   PMCUST              CHAR(7)              '       '        '40404040404040'X
+   PMCWK6              CHAR(2)              '  '             '4040'X
+   PMDLTC              CHAR(1)              ' '              '40'X
+   PMDTYP              CHAR(1)              ' '              '40'X
+   PMEBCD              CHAR(1)              ' '              '40'X
+   PMECDR              CHAR(1)              ' '              '40'X
+   PMEGPB              CHAR(4)              '    '           '40404040'X
+   PMEMSG              CHAR(12)             '            '
+                       VALUE IN HEX         '404040404040404040404040'X
+   PMEPOM              ZONED(1,0)           0.               'F0'X
+   PMFPC               CHAR(1)              ' '              '40'X
+   PMGP                CHAR(2)              '  '             '4040'X
+   PMHPHN              CHAR(10)             '          '     '40404040404040404040'X
+   PMLIM               ZONED(3,0)           000.             'F0F0F0'X
+   PMNAME              CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+   PMNOLC              CHAR(1)              ' '              '40'X
+   PMNOLS              CHAR(1)              ' '              '40'X
+   PMNOPD              CHAR(1)              ' '              '40'X
+   PMNTIR              ZONED(1,0)           0.               'F0'X
+   PMNUNT              ZONED(4,0)           0000.            'F0F0F0F0'X
+   PMOPHN              CHAR(10)             '          '     '40404040404040404040'X
+   PMPLAN              CHAR(1)              ' '              '40'X
+   PMPRCD              CHAR(1)              ' '              '40'X
+   PMPRLS              CHAR(1)              ' '              '40'X
+   PMSCP1              ZONED(1,0)           0.               'F0'X
+   PMSCP2              ZONED(1,0)           0.               'F0'X
+   PMSCP3              ZONED(1,0)           0.               'F0'X
+   PMSCP4              ZONED(1,0)           0.               'F0'X
+   PMSCP5              ZONED(1,0)           0.               'F0'X
+   PMSCP6              ZONED(1,0)           0.               'F0'X
+   PMSCP7              ZONED(1,0)           0.               'F0'X
+   PMSCP8              ZONED(1,0)           0.               'F0'X
+   PMSCP9              ZONED(1,0)           0.               'F0'X
+   PMSLS               CHAR(3)              '   '            '404040'X
+   PMST                CHAR(2)              '  '             '4040'X
+   PMSTAT              CHAR(1)              ' '              '40'X
+   PMTAXE              CHAR(1)              ' '              '40'X
+   PMTTL               CHAR(3)              '   '            '404040'X
+   PMTYPE              CHAR(1)              ' '              '40'X
+   PMWK1X              CHAR(1)              ' '              '40'X
+   PMWK18              CHAR(18)             '                  '
+                       VALUE IN HEX         '404040404040404040404040404040404040'X
+   PMWK3               CHAR(7)              '       '        '40404040404040'X
+   PMWK3X              CHAR(3)              '   '            '404040'X
+   PMWK4               CHAR(6)              '      '         '404040404040'X
+   PMWK6A              CHAR(4)              '    '           '40404040'X
+   PMZIP               CHAR(5)              '     '          '4040404040'X
+   PMZIP2              CHAR(4)              '    '           '40404040'X
+   PM2200              CHAR(1)              ' '              '40'X
+ PRMCXDS               DS
+   PMGPBR              CHAR(4)              '    '           '40404040'X
+                                                                                                                           Page   65
+ ILE RPG FORMATTED DUMP
+   PMTECT              CHAR(1)              ' '              '40'X
+   PMTEXD              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   PMXAD2              CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+   PMXCNS              CHAR(10)             '          '     '40404040404040404040'X
+   PMXCUS              CHAR(7)              '       '        '40404040404040'X
+   PMXDTA              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   PMXDTC              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   PMXECP              CHAR(14)             '              '
+                       VALUE IN HEX         '4040404040404040404040404040'X
+   PMXEMA              CHAR(5)              '     '          '4040404040'X
+   PMXEMC              CHAR(5)              '     '          '4040404040'X
+   PMXEMS              CHAR(2)              '  '             '4040'X
+   PMXHPN              CHAR(14)             '              '
+                       VALUE IN HEX         '4040404040404040404040404040'X
+   PMXOPN              CHAR(14)             '              '
+                       VALUE IN HEX         '4040404040404040404040404040'X
+   PMXPGA              CHAR(10)             '          '     '40404040404040404040'X
+   PMXPGC              CHAR(10)             '          '     '40404040404040404040'X
+   PMXSTA              CHAR(1)              ' '              '40'X
+   PMXTTA              ZONED(6,0)           000000.          'F0F0F0F0F0F0'X
+   PMXTTC              ZONED(6,0)           000000.          'F0F0F0F0F0F0'X
+ PRMEMP                CHAR(10)             '          '     '40404040404040404040'X
+ PRMRSPID1             CHAR(2)              '  '             '4040'X
+ PRMRSPID2             CHAR(2)              '  '             '4040'X
+ PRMRSPID3             CHAR(2)              '  '             '4040'X
+ PRMSYN                CHAR(10)             '          '     '40404040404040404040'X
+ PRORAT                CHAR(1)              ' '              '40'X
+ PSINDEX               PACKED(5,0)          00000.           '00000F'X
+ PWBNPH                PACKED(13,0)         0000000000000.
+                       VALUE IN HEX         '0000000000000F'X
+ PWCNTY                CHAR(2)              '  '             '4040'X
+ PWEMID                CHAR(10)             '          '     '40404040404040404040'X
+ PWFSNM                CHAR(15)             '               '
+                       VALUE IN HEX         '404040404040404040404040404040'X
+ PWGPBR                CHAR(4)              '    '           '40404040'X
+ PWHRDT                PACKED(8,0)          00000000.        '000000000F'X
+ PWJBST                CHAR(5)              '     '          '4040404040'X
+ PWLSNM                CHAR(15)             '               '
+                       VALUE IN HEX         '404040404040404040404040404040'X
+ PWLVCD                CHAR(5)              '     '          '4040404040'X
+ PWMDIN                CHAR(1)              ' '              '40'X
+ PWNKNM                CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ PWNTID                CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+ PWPSCD                CHAR(5)              '     '          '4040404040'X
+ PWREHR                CHAR(1)              ' '              '40'X
+ PWUPCD                CHAR(10)             '          '     '40404040404040404040'X
+ PWUSID                CHAR(10)             '          '     '40404040404040404040'X
+ RACDUP                CHAR(1)              ' '              '40'X
+ RACODE                CHAR(1)              ' '              '40'X
+ RCCAMP                CHAR(5)              '     '          '4040404040'X
+ RCNO                  PACKED(1,0)          0.               '0F'X
+ REBILL                PACKED(2,0)          00.              '000F'X
+ RECON                 PACKED(7,2)          00000.00         '0000000F'X
+ REPLAC                CHAR(6)              '      '         '404040404040'X
+ RSTAT                 CHAR(1)              ' '              '40'X
+ RTNCDE                CHAR(3)              '   '            '404040'X
+ SALVG                 PACKED(5,0)          00000.           '00000F'X
+ SAVTMD                PACKED(8,0)          00000000.        '000000000F'X
+ SDATE                 PACKED(7,0)          0000000.         '0000000F'X
+                                                                                                                           Page   66
+ ILE RPG FORMATTED DUMP
+ SDMACT                PACKED(4,0)          0000.            '00000F'X
+ SDMDPT                CHAR(1)              ' '              '40'X
+ SDMDTA                PACKED(8,0)          00000000.        '000000000F'X
+ SDMDTC                PACKED(8,0)          00000000.        '000000000F'X
+ SDMEMA                CHAR(5)              '     '          '4040404040'X
+ SDMEMC                CHAR(5)              '     '          '4040404040'X
+ SDMNAM                CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+ SDMPGA                CHAR(10)             '          '     '40404040404040404040'X
+ SDMPGC                CHAR(10)             '          '     '40404040404040404040'X
+ SDMSBD                CHAR(2)              '  '             '4040'X
+ SDMSNM                CHAR(8)              '        '       '4040404040404040'X
+ SDMTTA                PACKED(6,0)          000000.          '0000000F'X
+ SDMTTC                PACKED(6,0)          000000.          '0000000F'X
+ SERS                  CHAR(4)              '    '           '40404040'X
+ SLS                   CHAR(3)              '   '            '404040'X
+ SLSREF                CHAR(24)             '                        '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040'X
+ SN                    CHAR(15)             '               '
+                       VALUE IN HEX         '404040404040404040404040404040'X
+ SNL6                  CHAR(6)              '      '         '404040404040'X
+ SN2                   CHAR(3)              '   '            '404040'X
+ SOLDMY                PACKED(4,0)          0000.            '00000F'X
+ ST                    CHAR(2)              '  '             '4040'X
+ STARTD1               PACKED(8,0)          00000000.        '000000000F'X
+ STATUM                CHAR(1)              ' '              '40'X
+ STDFLT                CHAR(1)              ' '              '40'X
+ STRDAT                CHAR(4)              '    '           '40404040'X
+ STRDAT1               CHAR(8)              '        '       '4040404040404040'X
+ TC                    PACKED(2,0)          00.              '000F'X
+ TCD                   CHAR(1)              DIM(7)
+                         (1)                'A'              'C1'X
+                         (2)                'B'              'C2'X
+                         (3)                'C'              'C3'X
+                         (4)                'D'              'C4'X
+                         (5)                'E'              'C5'X
+                         (6)                'F'              'C6'X
+                         (7)                'N'              'D5'X
+ TERM                  PACKED(2,0)          00.              '000F'X
+ TMPCXDS               DS
+   CAGPBR              CHAR(4)              '    '           '40404040'X
+   CATECT              CHAR(1)              ' '              '40'X
+   CATEXD              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   CAXAD2              CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+   CAXCNS              CHAR(10)             '          '     '40404040404040404040'X
+   CAXCUS              CHAR(7)              '       '        '40404040404040'X
+   CAXDTA              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   CAXDTC              ZONED(8,0)           00000000.        'F0F0F0F0F0F0F0F0'X
+   CAXECP              CHAR(14)             '              '
+                       VALUE IN HEX         '4040404040404040404040404040'X
+   CAXEMA              CHAR(5)              '     '          '4040404040'X
+   CAXEMC              CHAR(5)              '     '          '4040404040'X
+   CAXEMS              CHAR(2)              '  '             '4040'X
+   CAXHPN              CHAR(14)             '              '
+                       VALUE IN HEX         '4040404040404040404040404040'X
+   CAXOPN              CHAR(14)             '              '
+                       VALUE IN HEX         '4040404040404040404040404040'X
+   CAXPGA              CHAR(10)             '          '     '40404040404040404040'X
+   CAXPGC              CHAR(10)             '          '     '40404040404040404040'X
+   CAXSTA              CHAR(1)              ' '              '40'X
+   CAXTTA              ZONED(6,0)           000000.          'F0F0F0F0F0F0'X
+                                                                                                                           Page   67
+ ILE RPG FORMATTED DUMP
+   CAXTTC              ZONED(6,0)           000000.          'F0F0F0F0F0F0'X
+ TM1DPT                CHAR(5)              '     '          '4040404040'X
+ TM1DTA                PACKED(8,0)          00000000.        '000000000F'X
+ TM1DTC                PACKED(8,0)          00000000.        '000000000F'X
+ TM1EMA                CHAR(5)              '     '          '4040404040'X
+ TM1EMC                CHAR(5)              '     '          '4040404040'X
+ TM1LVL                CHAR(5)              '     '          '4040404040'X
+ TM1PGA                CHAR(10)             '          '     '40404040404040404040'X
+ TM1PGC                CHAR(10)             '          '     '40404040404040404040'X
+ TM1POS                CHAR(5)              '     '          '4040404040'X
+ TM1SDP                CHAR(2)              '  '             '4040'X
+ TM1TTA                PACKED(6,0)          000000.          '0000000F'X
+ TM1TTC                PACKED(6,0)          000000.          '0000000F'X
+ TM2CCD                CHAR(2)              '  '             '4040'X
+ TM2DPT                CHAR(5)              '     '          '4040404040'X
+ TM2DTA                PACKED(8,0)          00000000.        '000000000F'X
+ TM2DTC                PACKED(8,0)          00000000.        '000000000F'X
+ TM2EMA                CHAR(5)              '     '          '4040404040'X
+ TM2EMC                CHAR(5)              '     '          '4040404040'X
+ TM2FLG                CHAR(1)              ' '              '40'X
+ TM2LVL                CHAR(5)              '     '          '4040404040'X
+ TM2PGA                CHAR(10)             '          '     '40404040404040404040'X
+ TM2PGC                CHAR(10)             '          '     '40404040404040404040'X
+ TM2POS                CHAR(5)              '     '          '4040404040'X
+ TM2TTA                PACKED(6,0)          000000.          '0000000F'X
+ TM2TTC                PACKED(6,0)          000000.          '0000000F'X
+ TPMDTA                PACKED(8,0)          00000000.        '000000000F'X
+ TPMDTC                PACKED(8,0)          00000000.        '000000000F'X
+ TPMEMA                CHAR(5)              '     '          '4040404040'X
+ TPMEMC                CHAR(5)              '     '          '4040404040'X
+ TPMPGA                CHAR(10)             '          '     '40404040404040404040'X
+ TPMPGC                CHAR(10)             '          '     '40404040404040404040'X
+ TPMTMA                PACKED(6,0)          000000.          '0000000F'X
+ TPMTMC                PACKED(6,0)          000000.          '0000000F'X
+ TRFDAT                PACKED(6,0)          000000.          '0000000F'X
+ TRKKEY                CHAR(10)             '          '     '40404040404040404040'X
+ TRS                   PACKED(3,0)          DIM(7)
+                         (1)                160.             '160F'X
+                         (2)                050.             '050F'X
+                         (3)                130.             '130F'X
+                         (4)                015.             '015F'X
+                         (5)                020.             '020F'X
+                         (6)                035.             '035F'X
+                         (7)                000.             '000F'X
+ TTREC                 DS
+   TPMBRN              CHAR(2)              '  '             '4040'X
+   TPMCMT              CHAR(50)             '                                                  '
+                       VALUE IN HEX         '40404040404040404040404040404040404040404040404040404040404040404040404040404040'X
+                         41                 '40404040404040404040'X
+   TPMDPT              CHAR(1)              ' '              '40'X
+   TPMEA1              CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+   TPMEA2              CHAR(30)             '                              '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040'X
+   TPMECN              CHAR(10)             '          '     '40404040404040404040'X
+   TPMECT              CHAR(17)             '                 '
+                       VALUE IN HEX         '4040404040404040404040404040404040'X
+   TPMEDT              ZONED(8,0)                   .        '4040404040404040'X
+   TPMEMP              CHAR(5)              '     '          '4040404040'X
+   TPMEPH              CHAR(14)             '              '
+                       VALUE IN HEX         '4040404040404040404040404040'X
+   TPMEST              CHAR(2)              '  '             '4040'X
+                                                                                                                           Page   68
+ ILE RPG FORMATTED DUMP
+   TPMGP               CHAR(2)              '  '             '4040'X
+   TPMINT              CHAR(3)              '   '            '404040'X
+   TPMNAM              CHAR(33)             '                                 '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040'X
+   TPMNNM              CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+   TPMPOS              PACKED(3,0)          404.             '4040'X
+   TPMPWD              CHAR(5)              '     '          '4040404040'X
+   TPMRGN              CHAR(1)              ' '              '40'X
+   TPMSEX              CHAR(1)              ' '              '40'X
+   TPMSSN              CHAR(20)             '                    '
+                       VALUE IN HEX         '4040404040404040404040404040404040404040'X
+   TPMSTS              CHAR(1)              ' '              '40'X
+   TPMTMD              ZONED(8,0)                   .        '4040404040404040'X
+   TPMTMI              CHAR(10)             '          '     '40404040404040404040'X
+   TPMZIP              CHAR(9)              '         '      '404040404040404040'X
+   TPTMCH              CHAR(1)              ' '              '40'X
+   TPTTDT              ZONED(8,0)                   .        '4040404040404040'X
+   TPTTEM              CHAR(5)              '     '          '4040404040'X
+   TPTTPG              CHAR(10)             '          '     '40404040404040404040'X
+   TPTTTM              ZONED(6,0)                 .          '404040404040'X
+   TPTTTY              CHAR(1)              ' '              '40'X
+   TPTXPL              CHAR(1)              ' '              '40'X
+ UC                    CHAR(2)              '  '             '4040'X
+ UCMKUP                PACKED(7,2)          00000.00         '0000000F'X
+ UCODE                 CHAR(10)             '          '     '40404040404040404040'X
+ UCOST                 PACKED(7,2)          00000.00         '0000000F'X
+ UMLIA                 CHAR(1)              ' '              '40'X
+ UMWRK1                CHAR(1)              ' '              '40'X
+ UMWRK2                CHAR(10)             '          '     '40404040404040404040'X
+ UMWRK3                CHAR(2)              '  '             '4040'X
+ UMWRK4                CHAR(4)              '    '           '40404040'X
+ UMWRK5                CHAR(2)              '  '             '4040'X
+ UMWRK6                CHAR(36)             '                                    '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040404040'X
+ UM27                  PACKED(6,0)          000000.          '0000000F'X
+ UNIT                  CHAR(6)              '      '         '404040404040'X
+ UTXCOD                CHAR(1)              ' '              '40'X
+ UTXPCT                PACKED(5,2)          000.00           '00000F'X
+ VRL                   CHAR(1)              ' '              '40'X
+ VRLAMT                PACKED(4,2)          00.00            '00000F'X
+ WHOLRE                CHAR(1)              ' '              '40'X
+ WORKAB                CHAR(1)              ' '              '40'X
+ WORKB                 CHAR(12)             '            '
+                       VALUE IN HEX         '404040404040404040404040'X
+ WORK1A                CHAR(1)              ' '              '40'X
+ WORK10                CHAR(9)              '         '      '404040404040404040'X
+ WORK11                CHAR(16)             '                '
+                       VALUE IN HEX         '40404040404040404040404040404040'X
+ WORK3                 CHAR(3)              '   '            '404040'X
+ WORK9                 CHAR(36)             '                                    '
+                       VALUE IN HEX         '404040404040404040404040404040404040404040404040404040404040404040404040'X
+ WRKSPC                CHAR(9)              '         '      '404040404040404040'X
+ WRTDWN                PACKED(5,0)          00000.           '00000F'X
+ X                     PACKED(5,0)          00000.           '00000F'X
+ YR                    CHAR(2)              '  '             '4040'X
+             * * * * *   E N D   O F   R P G   D U M P   * * * * *
+InputStream is not available!
+Picked up _JAVA_OPTIONS: -Djava.net.preferIPv4Stack=true
