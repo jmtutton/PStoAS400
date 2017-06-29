@@ -691,11 +691,11 @@ public class ZHRI100A {
 		//!Prepare the date and time parms
 		//DO Get-Current-DateTime                                 !Get the current date and time
 		Calendar now = Calendar.getInstance();
-		//LET $AddDateErrorParm = DATETOSTR(STRTODATE($AsOfToday,'DD-MON-YYYY'),'YYYYMMDD') !sree**rehost
-		commonParameters.setErrorDateParameter(now.get(Calendar.MONTH) + "/" + now.get(Calendar.DATE) + "/" + now.get(Calendar.YEAR));
-		//LET $AddTimeErrorParm =    substr($Out,10,2)    ||    substr($Out,13,2)    ||    substr($Out,16,2)
-		commonParameters.setErrorTimeParameter(now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND));
-		//LET $OprIdErrorParm   =    Substr($AuditOprid,2,5)
+		//LET $AddDateErrorParm = DATETOSTR(STRTODATE($AsOfToday,'DD-MON-YYYY'),'YYYYMMDD')
+		commonParameters.setErrorDateParameter(now.get(Calendar.YEAR) + "" + now.get(Calendar.MONTH) + "" + now.get(Calendar.DATE));
+		//LET $AddTimeErrorParm = substr($Out,10,2) || substr($Out,13,2) || substr($Out,16,2)
+		commonParameters.setErrorTimeParameter(now.get(Calendar.HOUR_OF_DAY) + "" + now.get(Calendar.MINUTE) + "" + now.get(Calendar.SECOND));
+		//LET $OprIdErrorParm = Substr($AuditOprid,2,5)
 		//END-PROCEDURE PREPARE-ERROR-PARMS
 	}
 
@@ -1129,7 +1129,8 @@ public class ZHRI100A {
 					//LET $CompletionStatus = 'C'                                 
 					completionStatus = "C";
 					//DO UPDATE-TRIGGER-ROW                                       
-					int numberOfRecordsUpdated = PszTriggerEmployee.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
+//					int numberOfRecordsUpdated = PszTriggerEmployee.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
+					PszTriggerEmployee.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
 					System.out.println("isOkToProcess = " + isOkToProcess);
 					completionStatus = "P";     //!Reset the completion Status for next pass
 				//END-IF                                                         
@@ -1155,7 +1156,8 @@ public class ZHRI100A {
 		//IF $CompletionStatus <> 'P'
 		if(!"P".equalsIgnoreCase(completionStatus)) {
 			//DO UPDATE-TRIGGER-ROW
-			int numberOfRecordsUpdated = PszTriggerEmployee.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
+//			int numberOfRecordsUpdated = PszTriggerEmployee.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
+			PszTriggerEmployee.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
 //			System.out.println("numberOfRecordsUpdated: " + numberOfRecordsUpdated);
 		//END-IF  !$CompletionStatus <> 'P'
 		}
@@ -1396,64 +1398,63 @@ public class ZHRI100A {
 	    return 0;
 	}
 	
-	public static void javaRexec(String commandString) {
-        String hostname, username, password;
-        RExecClient client;
-        String res = null;
-        InputStream is = null;
-
-        client = new RExecClient();
-
-        hostname = "dev.corp.erac.com";
-        username = "PSHRINT";
-        password = "SMRHET01";
-
-        try {
-            client.connect(hostname);
-        }
-        catch (IOException e) {
-            System.err.println("Could not connect to server.");
-            e.printStackTrace();
-            System.exit(1);
-        }
-
-        try {
-            client.rexec(username, password, commandString);
-        }
-        catch (IOException e) {
-            try  {
-                client.disconnect();
-            }
-            catch (IOException f) {
-            	
-            }
-            e.printStackTrace();
-            System.err.println("Could not execute command.");
-            System.exit(1);
-        }
-//        IOUtil.readWrite(client.getInputStream(), client.getOutputStream(),
-//                         System.in, System.out);
-
-        try {
-            client.disconnect();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        System.exit(0);
-	}
+//	public static void javaRexec(String commandString) {
+//        String hostname, username, password;
+//        RExecClient client;
+//        String res = null;
+//        InputStream is = null;
+//
+//        client = new RExecClient();
+//
+//        hostname = "dev.corp.erac.com";
+//        username = "PSHRINT";
+//        password = "SMRHET01";
+//
+//        try {
+//            client.connect(hostname);
+//        }
+//        catch (IOException e) {
+//            System.err.println("Could not connect to server.");
+//            e.printStackTrace();
+//            System.exit(1);
+//        }
+//
+//        try {
+//            client.rexec(username, password, commandString);
+//        }
+//        catch (IOException e) {
+//            try  {
+//                client.disconnect();
+//            }
+//            catch (IOException f) {
+//            	
+//            }
+//            e.printStackTrace();
+//            System.err.println("Could not execute command.");
+//            System.exit(1);
+//        }
+////        IOUtil.readWrite(client.getInputStream(), client.getOutputStream(),
+////                         System.in, System.out);
+//
+//        try {
+//            client.disconnect();
+//        }
+//        catch (IOException e) {
+//            e.printStackTrace();
+//            System.exit(1);
+//        }
+//        System.exit(0);
+//	}
 	
-	public static void javaRexec2(String commandString) {
-//	    final int portNumber = 512;
-//	    final int portNumber = 22;
+	public static void javaRexec() {
 	    RExecClient client = new RExecClient();
 	    String hostname = "dev.corp.erac.com";
 	    String username = "PSHRINT";
 	    String password = "SMRHET01";
+	    String commandString = "";
 
-//	    commandString = "CALL HRZ102A";
-	    commandString = "CALL EHRHRMS06#/HRZ101A Parm('840S4' '06' '20' '2017' '' '' '' 'V' 'O' '349NV' 'VOLUN  DISSATISFIED WHOURS         ')";
+//	    commandString = "CALL EHRHRMS06#/HRZ101A PARM('840S4' '06' '20' '2017' '' '' '' 'V' 'O' '349NV' 'VOLUN  DISSATISFIED WHOURS         ')";
+	    commandString = "CALL EHRHRMS06#/HRZ100A PARM('HRZ102A' '859V1' ' ' '" + String.format("%1$-75s", "Error Message Parameter") + "' 'N' '20170628' '101706' '859V1' 'Y')";
         String results = null;
         InputStream inputStream = null;
         try {
@@ -1462,7 +1463,7 @@ public class ZHRI100A {
             if (!client.isConnected()) {
                 System.err.println("The RLogin client is not connected to " + hostname);
             }
-//            System.out.println("client.isConnected() = " + client.isConnected());
+            System.out.println("client.isConnected() = " + client.isConnected());
             try {
                 client.rexec(username, password, commandString);
             }

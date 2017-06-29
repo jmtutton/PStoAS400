@@ -38,8 +38,7 @@ public class ZHRI100ATest {
 	
 	@Test
 	public void testJavaRexec() {
-		String commandString = "ls -l";
-		ZHRI100A.javaRexec2(commandString);
+		ZHRI100A.javaRexec();
 		
 	}
 }
