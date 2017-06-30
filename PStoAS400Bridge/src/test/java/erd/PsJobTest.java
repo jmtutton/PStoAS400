@@ -74,7 +74,7 @@ public class PsJobTest {
 		}
 		Date effectiveDatePlusOne = erd.DateUtil.addDays(effectiveDate, 1);
 		BigDecimal effectiveSequence = new BigDecimal(0);
-		PsJob result = PsJob.getJob(employeeId, effectiveDatePlusOne, effectiveSequence);
+		PsJob result = PsJob.findJobByEmployeeIdAndEffectiveDateAndEffectiveSequence(employeeId, effectiveDatePlusOne, effectiveSequence);
 		assertNotNull(result);
 	}
 

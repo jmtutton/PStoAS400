@@ -104,7 +104,7 @@ public class CrossReferenceTerminationReason implements Serializable {
 	/**
 	 * Replaces SQC procedure HR02-Get-Action-Reason from ZHRI102A.SQC
 	 * This routine will determine if a termination was voluntary or involuntary based on Action and Action Reason codes.
-	 * @see ZHRI102A.SQC
+	 * @see HR02-Get-Action-Reason in ZHRI102A.SQC
 	 */
 	public static CrossReferenceTerminationReason findByActionAndActionReasonAndStatus(String action, String actionReason, String status) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");

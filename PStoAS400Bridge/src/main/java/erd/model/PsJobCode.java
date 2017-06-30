@@ -1461,8 +1461,10 @@ public class PsJobCode implements Serializable {
 	}
 
 	/**
-	 * Replaces AD-Get-Job-Description from ZHRI100A.SQR
 	 * Gets the job description for Active Directory File Build
+	 * @see AD-Get-Job-Description in ZHRI100A.SQR
+	 * @param jobCode
+	 * @return
 	 */
 	public String findJobDescriptionByJobCode(String jobCode) {
 //		Begin-Select

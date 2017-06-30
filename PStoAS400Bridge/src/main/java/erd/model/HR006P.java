@@ -25,6 +25,8 @@ public class HR006P implements Serializable {
 	@Column(name = "HMREM#")
 	private Integer employeeNumber;
 	
+//"HMRCCD", "HMRNID", "HMREMP", "HMRNAM", "HMRATN", "HMRSTR", "HMRCTY", "HMRST", "HMRWRK", "HMRMGE", "HMRENM", "HMREPH", "HMRERL", "HMRTTL", "HMRGPS", "HMRRSC", "HMRCCL", "HMRTSC", "HMRTSR", "HMRTRC", "HMRRSL", "HMRVOI", "HMROVR", "HMRNXA", "HMRDLN", "HMRDLS", "HMRGND", "HMRBDT", "HMRGP", "HMRBRN", "HMRRGN", "HMRHPH", "HMROPH", "HMRRSN", "HMRGYR", "HMRMJR", "HMRRCE", "HMRZIP", "HMRNKN", "HMRHDT", "HMRLTD", "HMRCTZ", "HMRHIR", "HMRSPS", "HMRRHR", "HMRREI", "HMRCTC", "HMRDPT", "HMRPOS", "HMRLVL", "HMRJSC", "HMRWKS", "HMRUNF", "HMREM#", "HMRADT", "HMRPGM", "HMREMC"	
+	
 	public HR006P() {
 		super();
 	}

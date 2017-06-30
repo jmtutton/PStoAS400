@@ -10,15 +10,15 @@ import erd.model.ProcessParameters.CommonParameters;
 import erd.model.ProcessParameters.TerminationProcessParameters;
 
 /**
- * ZHRI202A Non-Person Termination
- * PeopleCode filename ZHRI202A.SQC
+ * Non-Person Termination Process
+ * @see ZHRI202A.SQC
  * @author John Tutton john@tutton.net
  */
 
 public class NonPersonTermination {
 	
 	/**
-	 * HR02-Initialize-Fields from ZHRI202A.SQC
+	 * @see HR02-Initialize-Fields in ZHRI202A.SQC
 	 * Initialize the fields to ensure that that they all start out blank.
 	 */
 	private void HR202_initializeFields(CommonParameters commonParameters) {
@@ -32,7 +32,7 @@ public class NonPersonTermination {
 	}
 	
 	/**
-	 * HR202-Call-System from ZHRI202A.SQC
+	 * @see HR202-Call-System in ZHRI202A.SQC
 	 * This routine calls the Legacy system
 	 * @return
 	 */
@@ -42,7 +42,7 @@ public class NonPersonTermination {
 		//BEGIN-PROCEDURE HR202-CALL-SYSTEM
 		String commandString = ZHRI100A.composeAs400RexecCommandString(commonParameters.getProcessName(), composeParameterStringForHrz202AProcess(terminationProcessParameters));
 		//DO Call-System   !From ZHRI100A.SQR
-		Integer status = ZHRI100A.executeCommand(commandString, commonParameters);
+		Integer status = ZHRI100A.executeRemoteCommand(commandString, commonParameters);
 		//!SHOW 'Command : ' $Command
 		System.out.println("$Command=> " + commandString);
 		//IF (#Status = 0)
@@ -62,7 +62,7 @@ public class NonPersonTermination {
 	}
 
 	/**
-	 * HR202-Process-Main from ZHRI202A.SQC
+	 * @see HR202-Process-Main in ZHRI202A.SQC
 	 * This is the main processing procedure
 	 * @param trigger
 	 * @param commonParameters

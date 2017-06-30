@@ -114,6 +114,10 @@ public class PsCitizenship implements Serializable {
 	 * This procedure retrieves a record from the Citizenship table 
 	 * with matching Employee ID and Country Code, plus the corresponding 
 	 * two letter country abbreviation from the Country table.
+	 * @see HR05-Get-Citizenship in ZHRI105A.SQC
+	 * @param employeeId
+	 * @param countryCode
+	 * @return
 	 */
 	public static PsCitizenship findByEmployeeIdAndCountryCode(String employeeId, String countryCode) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");

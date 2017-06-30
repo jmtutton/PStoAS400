@@ -14,7 +14,8 @@ import erd.model.PsEmployeeReview;
 import erd.model.PszTriggerEmployee;
 
 /**
- * ZHRI107A - Employee Date Change Process 
+ * Employee Date Change Process
+ * @see ZHRI107A.SQC
  * Employment Review, Accomplishment and Contract Data change
  * @author John Tutton john@tutton.net
  *
@@ -22,7 +23,7 @@ import erd.model.PszTriggerEmployee;
 public class EmployeeDateChange {
 
 	/**
-	 * HR07-Initialize-Fields from ZHRI107A.SQC
+	 * @see HR07-Initialize-Fields in ZHRI107A.SQC
 	 * This will initialize the fields at each call.
 	 * @param commonParameters
 	 * @param trigger
@@ -44,7 +45,7 @@ public class EmployeeDateChange {
 	}
 
 	/**
-	 * HR07-Process-Main from ZHRI107A.SQC
+	 * @see HR07-Process-Main in ZHRI107A.SQC
 	 * @param trigger
 	 * @param commonParameters
 	 * @return
@@ -85,7 +86,7 @@ public class EmployeeDateChange {
 	}
 
 	/**
-	 * HR07-Get-Employee-Review from ZHRI107A.SQC
+	 * @see HR07-Get-Employee-Review in ZHRI107A.SQC
 	 * This procedure retrieves the Next Review Date and Last Review Date from the 
 	 * PeopleSoft Employee Review Table to send back to Option 7 of AAHR01 in legacy.
 	 * @param dateChangeProcessParameters
@@ -122,7 +123,7 @@ public class EmployeeDateChange {
 	}
 
 	/**
-	 * HR07-Get-Accomplishments from ZHRI107A.SQC
+	 * @see HR07-Get-Accomplishments in ZHRI107A.SQC
 	 * This procedure retrieves the Negative Drug Test Date and Physical Test Date from the 
 	 * PeopleSoft Accomplishments Table to send back to Option 7 of AAHR01.
 	 * @param dateChangeProcessParameters
@@ -172,7 +173,7 @@ public class EmployeeDateChange {
 	}
 
 	/**
-	 * HR07-Get-Contract-Data from ZHRI107A.SQC
+	 * @see HR07-Get-Contract-Data in ZHRI107A.SQC
 	 * This procedure retrieves the contract date from the PeopleSoft Contract Data Table to send back to Option 7 of AAHR01.
 	 * @param dateChangeProcessParameters
 	 * @param commonParameters
@@ -202,7 +203,7 @@ public class EmployeeDateChange {
 	}
 
 	/**
-	 * HR07-Call-RPG from ZHRI107A.SQC
+	 * @see HR07-Call-RPG in ZHRI107A.SQC
 	 * This procedure calls the RPG program to update the legacy files/fields needed by Option 7 of AAHR01.
 	 * @param dateChangeProcessParameters
 	 * @return
@@ -213,7 +214,7 @@ public class EmployeeDateChange {
 		String parameterString = composeParameterStringForHrz107AProcess(dateChangeProcessParameters);
 		String commandString = ZHRI100A.composeAs400RexecCommandString(commonParameters.getProcessName(), parameterString);
 		//DO Call-System    !Do a remote call to the RPG program, HRZ107A, in order to pass the parms from code in ZHRI100A.sqr
-		Integer status = ZHRI100A.executeCommand(commandString, commonParameters);
+		Integer status = ZHRI100A.executeRemoteCommand(commandString, commonParameters);
 		//IF (#STATUS = 0)
 		if(status == 0) {
 			//LET $CompletionStatus = 'C'

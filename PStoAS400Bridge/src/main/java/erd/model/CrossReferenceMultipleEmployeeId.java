@@ -158,11 +158,12 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 
 
 	/**
-	 * HR205-Get-Emp-Data from ZHRI205A.SQC
+	 * @see HR205-Get-Emp-Data in ZHRI205A.SQC
 	 * Gets the employees data from the POI table that needs to be interfaced to the legacy system
 	 * @param employeeId
 	 */
 	public CrossReferenceMultipleEmployeeId HR205_getEmpData(String employeeId) {
+		System.out.println("*** CrossReferenceMultipleEmployeeId.HR205_getEmpData() ***");
 //		BEGIN-PROCEDURE HR205-GET-EMP-DATA
 //		BEGIN-SELECT
 //		EMP5.ZHRF_GRP_NBR,
@@ -195,6 +196,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	public CrossReferenceMultipleEmployeeId MainSqlEmp(String employeeId) {
+		System.out.println("*** CrossReferenceMultipleEmployeeId.MainSqlEmp() ***");
 //		!******************************
 //		!get the max effdt for every employee
 //		!  -store the last inactive row before the max effdt into s_dt. If null, use dummy date.
@@ -224,6 +226,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	public CrossReferenceMultipleEmployeeId getMinEffdtEmp(String employeeId) {
+		System.out.println("*** CrossReferenceMultipleEmployeeId.getMinEffdtEmp() ***");
 		//!****************************
 		//begin-procedure get-min-effdt-emp
 		//LET $LegServiceDate =''
@@ -241,6 +244,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	public CrossReferenceMultipleEmployeeId getLastInactiveDtEmp(String employeeId) {
+		System.out.println("*** CrossReferenceMultipleEmployeeId.getLastInactiveDtEmp() ***");
 		//!*************************************
 		//begin-procedure get-last-inactive-dt-emp
 		//begin-select
@@ -256,11 +260,12 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	/**
-	 * HR202-Get-Term-Date from ZHRI202A.SQC
+	 * @see HR202-Get-Term-Date in ZHRI202A.SQC
 	 * Gets the term date for POI/EMP
 	 * @param employeeId
 	 */
 	public CrossReferenceMultipleEmployeeId HR202_getTermDate(String employeeId) {
+		System.out.println("*** CrossReferenceMultipleEmployeeId.HR202_getTermDate() ***");
 		//Begin-Procedure HR202-get-term-date
 		//Begin-Select
 		//POI2.EFFDT
@@ -287,11 +292,12 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	/**
-	 * HR201-Get-Emp-Data from ZHRI201A.SQC
+	 * @see HR201-Get-Emp-Data in ZHRI201A.SQC
 	 * Gets the employees data from the POI table that needs to be interfaced to the legacy system
 	 * @param employeeId
 	 */
 	public CrossReferenceMultipleEmployeeId HR201_getEmpData(String employeeId) {
+		System.out.println("*** CrossReferenceMultipleEmployeeId.HR201_getEmpData() ***");
 		//Begin-Procedure HR201-Get-EMP-data
 		//Begin-Select
 		//EMP.ZHRF_GRP_NBR,
@@ -325,12 +331,13 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 
 
 	/**
-	 * Get-LegId-For-SeqNum from ZHRI102A.SQR
+	 * @see Get-LegId-For-SeqNum in ZHRI102A.SQR
 	 * This routine gets the Legacy ID from Alternate EID Table
 	 * @param employeeId
 	 * @param sequence
 	 */
 	public static String ZHRI100A_getLegIdForSeqNum(String employeeId, BigDecimal sequence) {
+		System.out.println("*** CrossReferenceMultipleEmployeeId.ZHRI100A_getLegIdForSeqNum() ***");
 //		!check if the multiple EID table has the EID!
 //		BEGIN-SELECT
 //		MULT.ZHRF_LEG_EMPL_ID
@@ -365,13 +372,14 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	/**
-	 * Update-OprId from ZHRI100A.SQR
+	 * @see Update-OprId in ZHRI100A.SQR
 	 * This routine will UPDATE table PS_ZHRR_MULTPL_EID for the Non Employees and Multiple EIDs if the employee has a record in HR036P
 	 * @param employeeId
 	 * @param legacyEmployeeId
 	 * @param sequence
 	 */
 	public static void ZHRI100A_updateOprId(String employeeId, String legacyEmployeeId, BigDecimal sequence) {
+		System.out.println("*** CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId() ***");
 		//BEGIN-PROCEDURE UPDATE-OPRID
 		//LET $Update-Error-Flag = 'N'
 		//!Update the PS_ZHRR_MULTPL_EID table for Multiple EIDs 
@@ -410,17 +418,19 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	public static Date findEffectiveDateByEmployeeIdAndSequence(String wrkEmplId, Integer wrkIndexNum, Date date) {
+		System.out.println("*** CrossReferenceMultipleEmployeeId.findEffectiveDateByEmployeeIdAndSequence() ***");
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/**
-	 * Insert-OprId from ZHRI100A.SQR
+	 * @see Insert-OprId in ZHRI100A.SQR
 	 * This routine will insert a row into the PS_ZHRT_EMPID_CREF table for the employee if the employee has a record in HR006P
 	 * @param employeeId
 	 * @param legacyEmployeeId
 	 */
 	public static void ZHRI100A_insertOprId(String employeeId, String legacyEmployeeId) {
+		System.out.println("*** CrossReferenceMultipleEmployeeId.ZHRI100A_insertOprId() ***");
 		//BEGIN-PROCEDURE INSERT-OPRID
 		//LET $Insert-Error-Flag = 'N'
 		//!Add to the PS_ZHRT_EMPID_CREF table
@@ -444,6 +454,24 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    finally {
 	    	em.close();
 	    }
+	}
+	
+	/**
+	 * saveNewLegacyEmployeeId
+	 * @see Get-Legacy-OprId in ZHRI100A.SQR
+	 * @param employeeId
+	 * @param legacyEmployeeId
+	 * @param indexNumber
+	 */
+	public static void saveNewLegacyEmployeeId(String employeeId, String legacyEmployeeId, BigDecimal indexNumber) {
+		System.out.println("*** CrossReferenceMultipleEmployeeId.saveNewLegacyEmployeeId() ***");
+    	if(new BigDecimal(0).equals(indexNumber)) {
+    		CrossReferenceMultipleEmployeeId.ZHRI100A_insertOprId(employeeId, legacyEmployeeId);
+    	}
+    	else {
+    		CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId(employeeId, legacyEmployeeId, indexNumber);
+    	}
+
 	}
 
 }

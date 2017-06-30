@@ -294,9 +294,9 @@ public class PsEmployment implements Serializable {
 	}
 
 	/**
-	 * AD-Get-Employment-Data from ZHRI100A.SQR
 	 * This routine will get the Termination Data row for Active Directory File Build
-	 * and convert it hiredt, rehiredt, terminationdt to YYYYMMDD format
+	 * and convert hiredt, rehiredt, terminationdt to YYYYMMDD format
+	 * @see AD-Get-Employment-Data in ZHRI100A.SQR
 	 * @param employeeId
 	 * @return
 	 */

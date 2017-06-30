@@ -153,6 +153,10 @@ public class PsActionReason implements Serializable {
 	 * Replaces SQC procedure HR02-Get-Reason-Description from ZHRI102A.SQC
 	 * This procedure retrieves a record from the Action Reason table 
 	 * with matching Action Code and Action Reason Code
+	 * @see HR02-Get-Reason-Description in ZHRI102A.SQC
+	 * @param actionCode
+	 * @param actionReasonCode
+	 * @return
 	 */
 	public static PsActionReason findByActionCodeAndActionReasonCode(String actionCode, String actionReasonCode) {
 //		!----------------------------------------------------------------------

@@ -20,7 +20,7 @@ public class ProcessParameters {
 //		private Boolean runFlag; //#run_flag
 		private Boolean criticalFlag = false; //$WrkCriticalFlag
 		
-		//from ZHRI100A.Call-Programs  //probably not used
+		//from ZHRI100A.Call-Programs  //not used
 //		private String actionCode; //$ADAction_Code
 //		private String legacyOperatorId; //$ADLegOprid
 		

@@ -260,6 +260,10 @@ public class PsEmployeeReview implements Serializable {
 	 * Select statement from HR07-Get-Employee-Review from ZHRI107A.SQC
 	 * This procedure retrieves the Next Review Date and Last Review Date from the 
 	 * PeopleSoft Employee Review Table to send back to Option 7 of AAHR01 in legacy.
+	 * @see HR07-Get-Employee-Review in ZHRI107A.SQC
+	 * @param employeeId
+	 * @param effectiveDate
+	 * @param employmentRecordNumber
 	 * @return
 	 */
 	public static PsEmployeeReview findByEmployeeIdAndEffectiveDateAndEmploymentRecordNumber(String employeeId, Date effectiveDate, BigDecimal employmentRecordNumber) {

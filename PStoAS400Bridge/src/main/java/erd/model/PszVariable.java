@@ -87,8 +87,12 @@ public class PszVariable implements Serializable {
 	}
 
 	/**
-	 * Replaces Get-Variable from ZHRI100A.SQR
 	 * Gets the variables from PS_ZPTT_VARIABLES       
+	 * @see Get-Variable procedure in ZHRI100A.SQR
+	 * @param processName
+	 * @param dbName
+	 * @param variableName
+	 * @return
 	 */
 	public static String findVariableValueByProcessNameAndDbNameAndVariableName(String processName, String dbName, String variableName) {
 //		BEGIN-SELECT
@@ -107,9 +111,9 @@ public class PszVariable implements Serializable {
 	    				+ "AND UPPER(TRIM(p.dbName)) = :dbName "
 	    				+ "AND UPPER(TRIM(p.variableName)) = :variableName ",
 	    				String.class)
-	    		    .setParameter("processName", processName.toUpperCase())
-	    		    .setParameter("dbName", dbName.toUpperCase())
-	    		    .setParameter("variableName", variableName.toUpperCase())
+	    		    .setParameter("processName", processName.toUpperCase().trim())
+	    		    .setParameter("dbName", dbName.toUpperCase().trim())
+	    		    .setParameter("variableName", variableName.toUpperCase().trim())
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0).trim();

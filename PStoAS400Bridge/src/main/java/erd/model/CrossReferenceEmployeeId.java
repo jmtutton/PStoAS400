@@ -49,7 +49,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	}
 
 	/**
-	 * HR05-Get-Next-OpId from ZHRI105A.SQC
+	 * @see HR05-Get-Next-OpId in ZHRI105A.SQC
 	 * This routine gets the operator id for the Recruiter.
 	 */
 	public CrossReferenceEmployeeId ZHRI100A_getNextOpId(String employeeId) {
@@ -76,7 +76,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	}
 
 	/**
-	 * Get-LegId-For-Seq0 - from ZHRI100A.SQR
+	 * @see Get-LegId-For-Seq0 procedure in ZHRI100A.SQR
 	 * This routine gets the Legacy ID from Employee CREF Table for Primary EIDs
 	 */
 	public static String ZHRI100A_getLegIdForSeq0(String employeeId) {
@@ -106,7 +106,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	}
 
 	/**
-	 * Insert-OprId from ZHRI100A.SQR
+	 * @see Insert-OprId procedure in ZHRI100A.SQR
 	 * This routine will insert a row into the PS_ZHRT_EMPID_CREF table for the employee if the employee has a record in HR006P
 	 */
 	public void ZHRI100A_insertOprId(String employeeId, String legacyEmployeeId) {
@@ -132,7 +132,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	}
 
 	/**
-	 * AD-Get-LegSupervisorId from ZHRI100A.SQR
+	 * @see AD-Get-LegSupervisorId procedure in ZHRI100A.SQR
 	 * Gets ZHRF_LEG_EMPL_ID from PS_ZHRT_EMPID_CREF
 	 */
 	public static String ZHRI100A_getLegSupervisorID(String employeeId) {

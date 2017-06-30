@@ -224,8 +224,15 @@ public class CrossReferenceJobCode implements Serializable {
 	 * Replaces SQC procedure HR01-Get-Position from ZHRI101A.SQC and HR04-Get-Position from ZHRI104A.SQC
 	 * This procedure finds the legacy Job Code Cross with matching setIdJobCode, jobCode, employeeClass, 
 	 * fullOrPartTime, regularOrTemporary, and department.
-	 * @see ZHRI101A.SQC
-	 * @see ZHRI104A.SQC
+	 * @see HR01-Get-Position procedure in ZHRI101A.SQC
+	 * @see HR04-Get-Position procedure in ZHRI104A.SQC
+	 * @param setIdJobCode
+	 * @param jobCode
+	 * @param employeeClass
+	 * @param fullOrPartTime
+	 * @param regularOrTemporary
+	 * @param department
+	 * @return resultList - record set result from query
 	 */
 	public static List<CrossReferenceJobCode> findPosition(String setIdJobCode, String jobCode, String employeeClass, 
 			String fullOrPartTime, String regularOrTemporary, String department) {

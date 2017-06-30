@@ -404,7 +404,7 @@ public class PsContractData implements Serializable {
 	}
 
 	/**
-	 * from HR07-Get-Contract-Data from ZHRI107A.SQC
+	 * @see HR07-Get-Contract-Data in ZHRI107A.SQC
 	 * This procedure retrieves the contract date from the PeopleSoft Contract Data Table to send back to Option 7 of AAHR01.
 	 * @param employeeId
 	 * @return PsContractData

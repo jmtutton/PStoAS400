@@ -7,7 +7,8 @@ import erd.model.PsDriversLicense;
 import erd.model.PszTriggerEmployee;
 
 /**
- * ZHRI105A - Demographic Change
+ * Employee Demographic Change Process
+ * @see ZHRI105A.SQC
  * @author John Tutton john@tutton.net
  *
  */
@@ -102,8 +103,8 @@ public class EmployeeDemographicChange {
 	}
 
 	/**
-	 * HR05-Get-Drivers-Lic from ZHRI105A.SQC
 	 * This routine gets the driver license number and state and stores them in the legacy system format.
+	 * @see HR05-Get-Drivers-Lic procedure in ZHRI105A.SQC
 	 * @param employeeId
 	 * @return PsDriversLicense record
 	 */

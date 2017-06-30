@@ -7,8 +7,10 @@ package erd;
 public class StringUtil {
 	
 	/**
-	 * Format-Employee-Name from ZHRI100A.SQR
 	 * Converts from legacy format (LAST*FIRST MI*) to PeopleSoft format (Last, First MI)
+	 * @see Format-Employee-Name procedure in ZHRI100A.SQR
+	 * @param legacyEmployeeName
+	 * @return
 	 */
     public static String formatLegacyEmployeeNameToPeopleSoftEmployeeName(String legacyEmployeeName) {
 		// ! Break apart the legacy system name field at the *

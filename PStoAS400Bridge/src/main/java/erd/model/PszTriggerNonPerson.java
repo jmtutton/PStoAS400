@@ -150,11 +150,10 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	}
 
 	/**
-	 * Check-If-POI-Termed from ZHRI100A.SQR
 	 * This routine checks if it is a POI to EMP transfer. If it is then the the flag is changed to W and wait for Hire
-	 * @param 
-	 * @param 
-	 * @return
+	 * @see Check-If-POI-Termed in ZHRI100A.SQR
+	 * @param employeeId
+	 * @return true if completionStatus equals 'C' or 'P' in trigger record 
 	 */
 	//TODO: 
 	public static Boolean ZHRI100A_checkIfPoiTermed(String employeeId) {

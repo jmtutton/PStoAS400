@@ -156,7 +156,7 @@ public class PsDriversLicense implements Serializable {
 	}
 
 	/**
-	 * HR05-Get-Drivers-Lic from ZHRI105A.SQC
+	 * @see HR05-Get-Drivers-Lic in ZHRI105A.SQC
 	 * @param employeeId
 	 * @return PsDriversLicense record
 	 */

@@ -1516,15 +1516,15 @@ public class PsJob implements Serializable {
 	}
 
 	/**
-	 * HR02-Get-Job from ZHRI102A.SQC
 	 * This routine will the Job Data row for each of the employee numbers entered in the trigger file.
 	 * finds PsJob records by employeeId, effectiveSequence, effectiveDate, and where employmentRecordNumber = 0
+	 * @see HR02-Get-Job in ZHRI102A.SQC
 	 * @param employeeId
 	 * @param effectiveDate
 	 * @param effectiveSequence
 	 * @return single PsJob record
 	 */
-	public static PsJob getJob(String employeeId, Date effectiveDate, BigDecimal effectiveSequence) {
+	public static PsJob findJobByEmployeeIdAndEffectiveDateAndEffectiveSequence(String employeeId, Date effectiveDate, BigDecimal effectiveSequence) {
 		System.out.println("********** PsJob.getJob");
 //		System.out.println("employeeId: " + employeeId);
 //		System.out.println("effectiveDate: " + effectiveDate);
@@ -1843,8 +1843,8 @@ public class PsJob implements Serializable {
 	//TODO: findJobStartDateByEmployeeIdAndJobCodeAndEffectiveDateAndEffectiveSequence(String employeeId, String jobCode, Date effectiveDate, Integer effectiveSequence)
 	   
 	/**
-	 * Replaces Check-If-Contractor from ZHRI100A.SQR
 	 * Checks to see if the employee is a contractor       
+	 * @see Check-If-Contractor in ZHRI100A.SQR
 	 * @param employeeId
 	 * @return
 	 */
@@ -1903,8 +1903,8 @@ public class PsJob implements Serializable {
 	}
 		   
 	/**
-	 * Replaces Check-If-Contractor from ZHRI100A.SQR
 	 * Checks to see if the employee is a contractor       
+	 * @see Check-If-Contractor in ZHRI100A.SQR
 	 * @param employeeId
 	 * @param effectiveDate
 	 * @param effectiveSequence
@@ -1958,8 +1958,8 @@ public class PsJob implements Serializable {
 	}
 
 	/**
-	 * Check-If-Correct102A from ZHRI100A.SQR
 	 * Checks to see if 102A process has JOB row
+	 * @see Check-If-Correct102A in ZHRI100A.SQR
 	 * @param psEmplId
 	 * @param psEffectiveDate
 	 * @param processName

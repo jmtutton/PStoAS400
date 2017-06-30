@@ -32,7 +32,7 @@ import org.apache.commons.io.IOUtils;
 public class ZHRI100A {
 
 	public static void main() {
-		System.out.println("********** ZHRI100A.main");
+		System.out.println("*** ZHRI100A.main() ***");
 		//begin-program
 		//Get-Current-DateTime  //queries the database to get the current time. It also initializes a slew of string variables ($AsOfToday, $AsOfNow, $CurrentCentury, $ReportDate
 		//Init-DateTime  //sets a collection of variables that can be used by the other procedures in datetime.sqc that format dates or do date arithmetic
@@ -40,7 +40,7 @@ public class ZHRI100A {
 		try {
 			initializeServerProperties();
 			processMain();
-		} 
+		}
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -82,12 +82,12 @@ public class ZHRI100A {
 	//end-program
 
 	/**
-	 * Process-Main from ZHRI100A,SQR
+	 * @see Process-Main in ZHRI100A.SQR
 	 * This is the process controlling procedure.
 	 * @throws InterruptedException 
 	 */
 	public static void processMain() throws InterruptedException {
-		System.out.println("********** ZHRI100A.processMain");
+		System.out.println("*** ZHRI100A.processMain() ***");
 		//LET #run_flag = 1
 		Boolean runFlag = true;
 		//WHILE #run_flag = 1
@@ -157,11 +157,11 @@ public class ZHRI100A {
 	}
 
 	/**
-	 * FTP-File from ZHRI100A.SQR
+	 * @see FTP-File in ZHRI100A.SQR
 	 * This procedure will transfer the file from UNIX to NT server
 	 */
 	public static void ZHRI100A_ftpFile() {
-		System.out.println("********** ZHRI100A_ftpFile");
+		System.out.println("*** ZHRI100A.ZHRI100A_ftpFile() ***");
 		//BEGIN-PROCEDURE FTP-FILE
 		//IF #status != 0
 		//END-IF
@@ -169,8 +169,13 @@ public class ZHRI100A {
 		//*** do nothing ***
 	}
 	
+	/**
+	 * Sets the values common to all processes class that shares the values across the application. 
+	 * @param trigger
+	 * @return
+	 */
 	public static CommonParameters initializeCommonParameters(PszTriggerSuperclass trigger) {
-		System.out.println("********** initializeCommonParameters");
+		System.out.println("*** ZHRI100A.initializeCommonParameters() ***");
 		CommonParameters commonParameters = new ProcessParameters().new CommonParameters();
 		commonParameters.setCriticalFlag(false); //from Process-Main
 		commonParameters.setProcessName(trigger.getProcessName());
@@ -184,13 +189,13 @@ public class ZHRI100A {
 	}
 
 	/**
-	 * Call-Programs from ZHRI100A.SQR
-	 * Subroutine will call appropriate programs
+	 * processTrigger
+	 * Execute appropriate process based on the process name in the trigger record.
 	 * @param trigger
-	 * @return
+	 * @return completionStatus
 	 */
 	public static String processTrigger(PszTriggerSuperclass trigger) {
-		System.out.println("********** ZHRI100A_callPrograms");
+		System.out.println("*** ZHRI100A.processTrigger() ***");
 		CommonParameters commonParameters = initializeCommonParameters(trigger);
 		String completionStatus = trigger.getCompletionStatus();
 		switch(trigger.getProcessName()) {
@@ -227,7 +232,7 @@ public class ZHRI100A {
 			commonParameters.setErrorProgramParameter("HRZ101A");
 			commonParameters.setErrorMessageParameter("A row was deleted on the hire process");
 			commonParameters.setCriticalFlag(true);
-			ZHRI100A_callErrorRoutine(commonParameters);
+			executeErrorCommand(commonParameters);
 			commonParameters.setCriticalFlag(false);
 			completionStatus = "C";
 			break;
@@ -235,7 +240,7 @@ public class ZHRI100A {
 			commonParameters.setErrorProgramParameter("HRZ102A");
 			commonParameters.setErrorMessageParameter("A row was deleted on the termination process");
 			commonParameters.setCriticalFlag(true);
-			ZHRI100A_callErrorRoutine(commonParameters);
+			executeErrorCommand(commonParameters);
 			commonParameters.setCriticalFlag(false);
 			completionStatus = "C";
 			break;
@@ -243,7 +248,7 @@ public class ZHRI100A {
 			commonParameters.setErrorProgramParameter("HRZ104A");
 			commonParameters.setErrorMessageParameter("A row was deleted on the job profile process");
 			commonParameters.setCriticalFlag(true);
-			ZHRI100A_callErrorRoutine(commonParameters);
+			executeErrorCommand(commonParameters);
 			commonParameters.setCriticalFlag(false);
 			completionStatus = "C";
 			break;
@@ -251,7 +256,7 @@ public class ZHRI100A {
 			commonParameters.setErrorProgramParameter("HRZ105A");
 			commonParameters.setErrorMessageParameter("A row was deleted on the demographics process");
 			commonParameters.setCriticalFlag(true);
-			ZHRI100A_callErrorRoutine(commonParameters);
+			executeErrorCommand(commonParameters);
 			commonParameters.setCriticalFlag(false);
 			completionStatus = "C";
 			break;
@@ -259,7 +264,7 @@ public class ZHRI100A {
 			commonParameters.setErrorProgramParameter("HRZ101A");
 			commonParameters.setErrorMessageParameter("A row was deleted on the re-hire process");
 			commonParameters.setCriticalFlag(true);
-			ZHRI100A_callErrorRoutine(commonParameters);
+			executeErrorCommand(commonParameters);
 			commonParameters.setCriticalFlag(false);
 			completionStatus = "C";
 			break;
@@ -267,7 +272,7 @@ public class ZHRI100A {
 			commonParameters.setErrorProgramParameter("HRZ107A");
 			commonParameters.setErrorMessageParameter("A row was deleted on the dates process");
 			commonParameters.setCriticalFlag(true);
-			ZHRI100A_callErrorRoutine(commonParameters);
+			executeErrorCommand(commonParameters);
 			commonParameters.setCriticalFlag(false);
 			completionStatus = "C";
 			break;
@@ -276,7 +281,7 @@ public class ZHRI100A {
 			commonParameters.setErrorMessageParameter("A row was deleted on the group transfer process");
 			commonParameters.setCriticalFlag(true);
 			commonParameters.setProcessName(trigger.getProcessName());
-			ZHRI100A_callErrorRoutine(commonParameters);
+			executeErrorCommand(commonParameters);
 			commonParameters.setCriticalFlag(false);
 			completionStatus = "C";
 			break;
@@ -311,14 +316,14 @@ public class ZHRI100A {
 	}
 
 //	/**
-//	 * Call-Programs from ZHRI100A.SQR
+//	 * @see Call-Programs in ZHRI100A.SQR
 //	 * Subroutine will call appropriate programs
 //	 * @param trigger
 //	 * @param commonParameters
 //	 * @return
 //	 */
 //	public static String ZHRI100A_callPrograms(PszTriggerSuperclass trigger) {
-//		System.out.println("********** ZHRI100A_callPrograms");
+//		System.out.println("*** ZHRI100A_callPrograms");
 //		CommonParameters commonParameters = new ProcessParameters().new CommonParameters();
 //		//LET $WrkCriticalFlag = 'N'
 //		commonParameters.setCriticalFlag(false); //from Process-Main
@@ -478,7 +483,7 @@ public class ZHRI100A {
 //			commonParameters.setCriticalFlag(true);
 //			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 //			//DO Call-Error-Routine
-//			ZHRI100A_callErrorRoutine(commonParameters);
+//			executeErrorCommand(commonParameters);
 //			//LET $WrkCriticalFlag = 'N'
 //			commonParameters.setCriticalFlag(false);
 //			//LET $CompletionStatus = 'C'
@@ -496,7 +501,7 @@ public class ZHRI100A {
 //			commonParameters.setCriticalFlag(true);
 //			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 //			//DO Call-Error-Routine
-//			ZHRI100A_callErrorRoutine(commonParameters);
+//			executeErrorCommand(commonParameters);
 //			//LET $WrkCriticalFlag = 'N'
 //			commonParameters.setCriticalFlag(false);
 //			//LET $CompletionStatus = 'C'
@@ -514,7 +519,7 @@ public class ZHRI100A {
 //			commonParameters.setCriticalFlag(true);
 //			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 //			//DO Call-Error-Routine
-//			ZHRI100A_callErrorRoutine(commonParameters);
+//			executeErrorCommand(commonParameters);
 //			//LET $WrkCriticalFlag = 'N'
 //			commonParameters.setCriticalFlag(false);
 //			//LET $CompletionStatus = 'C'
@@ -532,7 +537,7 @@ public class ZHRI100A {
 //			commonParameters.setCriticalFlag(true);
 //			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 //			//DO Call-Error-Routine
-//			ZHRI100A_callErrorRoutine(commonParameters);
+//			executeErrorCommand(commonParameters);
 //			//LET $WrkCriticalFlag = 'N'
 //			commonParameters.setCriticalFlag(false);
 //			//LET $CompletionStatus = 'C'
@@ -550,7 +555,7 @@ public class ZHRI100A {
 //			commonParameters.setCriticalFlag(true);
 //			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 //			//DO Call-Error-Routine
-//			ZHRI100A_callErrorRoutine(commonParameters);
+//			executeErrorCommand(commonParameters);
 //			//LET $WrkCriticalFlag = 'N'
 //			commonParameters.setCriticalFlag(false);
 //			//LET $CompletionStatus = 'C'
@@ -568,7 +573,7 @@ public class ZHRI100A {
 //			commonParameters.setCriticalFlag(true);
 //			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 //			//DO Call-Error-Routine
-//			ZHRI100A_callErrorRoutine(commonParameters);
+//			executeErrorCommand(commonParameters);
 //			//LET $WrkCriticalFlag = 'N'
 //			commonParameters.setCriticalFlag(false);
 //			//LET $CompletionStatus = 'C'
@@ -587,7 +592,7 @@ public class ZHRI100A {
 //			//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 //			//DO Call-Error-Routine
 //			commonParameters.setProcessName(trigger.getProcessName());
-//			ZHRI100A_callErrorRoutine(commonParameters);
+//			executeErrorCommand(commonParameters);
 //			//LET $WrkCriticalFlag = 'N'
 //			commonParameters.setCriticalFlag(false);
 //			//LET $CompletionStatus = 'C'
@@ -695,63 +700,51 @@ public class ZHRI100A {
 //	}
 
 	/**
-	 * Get-Trigger-Data-NonEmp from ZHRI100A.SQR
 	 * This procedure will get the trigger data for non employees and multiple EIDs that needs to be interfaced
-	 * @param 
-	 * @param 
-	 * @return
+	 * @see Get-Trigger-Data-NonEmp in ZHRI100A.SQR
 	 */
 	//TODO: 
 	public static void ZHRI100A_getTriggerDataNonEmp() {
-		System.out.println("********** ZHRI100A_getTriggerDataNonEmp");
+		System.out.println("*** ZHRI100A.ZHRI100A_getTriggerDataNonEmp() ***");
 		
 	}
 
 	/**
-	 * Call-Programs-NonEmp from ZHRI100A.SQR
 	 * Subroutine will call appropriate programs for Non Emp
-	 * @param 
-	 * @param 
-	 * @return
+	 * @see Call-Programs-NonEmp in ZHRI100A.SQR
 	 */
 	//TODO: 
 	public static void ZHRI100A_callProgramsNonEmp() {
-		System.out.println("********** ZHRI100A_callProgramsNonEmp");
+		System.out.println("*** ZHRI100A.ZHRI100A_callProgramsNonEmp() ***");
 		
 	}
 
 	/**
-	 * Get-Trigger-Data-POI-Emp-Convert from ZHRI100A.SQR
 	 * This procedure will get the trigger data that needs to be interfaced
-	 * @param 
-	 * @param 
-	 * @return
+	 * @see Get-Trigger-Data-POI-Emp-Convert in ZHRI100A.SQR
 	 */
 	//TODO: 
 	public static void ZHRI100A_getTriggerDataPoiEmpConvert() {
-		System.out.println("********** ZHRI100A_getTriggerDataPoiEmpConvert");
+		System.out.println("*** ZHRI100A.ZHRI100A_getTriggerDataPoiEmpConvert()");
 		
 	}
 
 	/**
-	 * Update-Trigger-Row-NonEmp from ZHRI100A.SQR
 	 * This routine update the trigger file flag switch for Non Emp
-	 * @param 
-	 * @param 
-	 * @return
+	 * @see Update-Trigger-Row-NonEmp in ZHRI100A.SQR
 	 */
 	//TODO: 
 	public static void ZHRI100A_updateTriggerRowNonEmp() {
-		System.out.println("********** ZHRI100A_updateTriggerRowNonEmp");
+		System.out.println("*** ZHRI100A.ZHRI100A_updateTriggerRowNonEmp()");
 		
 	}
 
 	/**
-	 * ZHRI100ABuiltWhereClauseDelay from ZHRI100A.SQR
 	 * Get the WHERE Clause for the delay hours in POI to EMP Transfer
+	 * @see ZHRI100ABuiltWhereClauseDelay in ZHRI100A.SQR
 	 */
 	public static String ZHRI100A_buildWhereClauseDelay() {
-		System.out.println("********** ZHRI100A_buildWhereClauseDelay");
+		System.out.println("*** ZHRI100A.ZHRI100A_buildWhereClauseDelay() ***");
 		String xWhere = PszXlat.findOutput01ByInput01AndInput02("TEMPMAST", "LEGACY-DELAY-HRS");
 		String where1 = "AND SYSTIMESTAMP  >= TR.UPDATED_DATETIME + INTERVAL " + "'" + xWhere + "'" + " HOUR";
 		//XWER.ZPTF_OUTPUT_01
@@ -765,14 +758,14 @@ public class ZHRI100A {
 	}
 
 	/**
-	 * Call-System from ZHRI100A.SQR
-	 * Executes a command line statement stored in the $Command Variable
-	 * @param command
+	 * Remotely executes a command on the AS400.
+	 * @see Call-System in ZHRI100A.SQR
+	 * @param commandString
 	 * @param commonParameters
 	 * @return 0 if success, non-zero if error
 	 */
-	public static Integer executeCommand(String commandString, CommonParameters commonParameters) {
-		System.out.println("********** ZHRI100A_callSystem");
+	public static Integer executeRemoteCommand(String commandString, CommonParameters commonParameters) {
+		System.out.println("*** ZHRI100A.ZHRI100A_callSystem() ***");
 		Integer status = executeCommandRexec(commandString);
 		if(status != 0) { //!error
 			commonParameters.setErrorProgramParameter("ZHRI100A");
@@ -785,14 +778,14 @@ public class ZHRI100A {
 	}
 
 //	/**
-//	 * Call-System from ZHRI100A.SQR
+//	 * @see Call-System in ZHRI100A.SQR
 //	 * Executes a command line statement stored in the $Command Variable
 //	 * @param command
 //	 * @param commonParameters
 //	 * @return 0 if success, non-zero if error
 //	 */
 //	public static Integer ZHRI100A_callSystem(String commandString, CommonParameters commonParameters) {
-//		System.out.println("********** ZHRI100A_callSystem");
+//		System.out.println("*** ZHRI100A_callSystem");
 //		Integer status; //#Status
 ////		String showCommand;
 ////		Integer commandLength = command.length();
@@ -849,12 +842,12 @@ public class ZHRI100A {
 //	}
 
 //	/**
-//	 * Prepare-Error-Parms from ZHRI100A.SQR
+//	 * @see Prepare-Error-Parms in ZHRI100A.SQR
 //	 * Makes sure that the parms are the correct length for the error routine RPG program to receive them
 //	 * @param commonParameters
 //	 */
 //	private static void ZHRI100A_prepareErrorParms(CommonParameters commonParameters) {
-//		System.out.println("********** ZHRI100A_prepareErrorParms");
+//		System.out.println("*** ZHRI100A_prepareErrorParms");
 //		//BEGIN-PROCEDURE PREPARE-ERROR-PARMS
 //		//!Prepare the date and time parms
 //		//DO Get-Current-DateTime                                 !Get the current date and time
@@ -881,41 +874,42 @@ public class ZHRI100A {
 //	}
 
 //	/**
-//	 * Call-Error-Routine-NonEmp from ZHRI100A.SQR
+//	 * @see Call-Error-Routine-NonEmp in ZHRI100A.SQR
 //	 * Builds the command and calls the error routine
 //	 * @param processName
 //	 * @param commonParameters
 //	 * @return command text
 //	 */
-//	private static String ZHRI100A_callErrorRoutineNonEmp(CommonParameters commonParameters) {
-//		System.out.println("********** ZHRI100A_callErrorRoutineNonEmp()");
+//	private static String executeErrorCommandNonEmp(CommonParameters commonParameters) {
+//		System.out.println("*** executeErrorCommandNonEmp()");
 //		String commandString = composeAs400RexecCommandString("HRZ110A", composeErrorParameterString(commonParameters));
 ////		System.out.println(commandString);
 //		return commandString;
 //	}
 
 	/**
-	 * Call-Error-Routine from ZHRI100A.SQR
+	 * executeErrorCommand
+	 * Composes the error command and executes it on the AS400.
+	 * @see Call-Error-Routine in ZHRI100A.SQR
 	 * @param processName
 	 * @param commonParameters
-	 * @return command text
 	 */
-	public static void ZHRI100A_callErrorRoutine(CommonParameters commonParameters) {
-		System.out.println("********** ZHRI100A_callErrorRoutine()");
+	public static void executeErrorCommand(CommonParameters commonParameters) {
+		System.out.println("*** executeErrorCommand() ***");
 		String processName = "HRZ110A";
 		String commandString = composeAs400RexecCommandString(processName, composeErrorParameterString(commonParameters));
-		executeCommand(commandString, commonParameters);
+		executeRemoteCommand(commandString, commonParameters);
 	}
 
 
 	/**
-	 * Build-Group-Where-Clause from ZHRI100A.SQR
 	 * This routine will build the where clause that will select the correct Run-ID to use.
+	 * @see Build-Group-Where-Clause in ZHRI100A.SQR
 	 * @param whereClause
 	 * @return SQL where clause
 	 */
 	public static String ZHRI100A_buildGroupWhereClause(String whereClause) {
-		System.out.println("********** ZHRI100A_buildGroupWhereClause()");
+		System.out.println("*** ZHRI100A_buildGroupWhereClause() ***");
 		String alias = ""; //TODO: I can't find where this value is set
 		String selectGroup = ""; //TODO: I can't find where this value is set
 		//BEGIN-PROCEDURE BUILD-GROUP-WHERE-CLAUSE
@@ -939,12 +933,12 @@ public class ZHRI100A {
 	}
 
 	/**
-	 * Build-EmplId-Where-Clause from ZHRI100A.SQR
 	 * Builds a where clause based on an employee id entered by the user.
+	 * @see Build-EmplId-Where-Clause in ZHRI100A.SQR
 	 * @return SQL where clause
 	 */
 	public static String ZHRI100A_buildEmplIdWhereClause() {
-		System.out.println("********** ZHRI100A_buildEmplIdWhereClause");
+		System.out.println("*** ZHRI100A_buildEmplIdWhereClause() ***");
 		String alias = ""; //TODO: I can't find where this value is set
 		String runId = ""; //TODO: I can't find where this value is set
 		//BEGIN-PROCEDURE BUILD-EMPLID-WHERE-CLAUSE
@@ -955,14 +949,14 @@ public class ZHRI100A {
 	}
 
 	/**
-	 * Replaces Get-OprId from ZHRI100A.SQR
 	 * This routine gets the legacy employee ID from the cross reference table
+	 * @see Get-OprId in ZHRI100A.SQR
 	 * @param commonParameters
 	 * @param eidIndexNumber
 	 * @return legacyEmployeeId
 	 */
 	public static String findLegacyEmployeeId(CommonParameters commonParameters) {
-		System.out.println("********** findLegacyEmployeeId()");
+		System.out.println("*** findLegacyEmployeeId() ***");
 		String employeeId;
 		if(commonParameters.getPoiFlag()) {
 			employeeId = CrossReferenceMultipleEmployeeId.ZHRI100A_getLegIdForSeqNum(commonParameters.getEmployeeId(), commonParameters.getEidIndexNumber());
@@ -978,8 +972,8 @@ public class ZHRI100A {
 	}
 
 //	/**
-//	 * Get-OprId from ZHRI100A.SQR
 //	 * This routine gets the operator id from the operator definition table
+//	 * @see Get-OprId in ZHRI100A.SQR
 //	 * @param employeeId
 //	 * @param indexNumber
 //	 * @param commonParameters
@@ -989,7 +983,7 @@ public class ZHRI100A {
 //		return ZHRI100A_getOprId(commonParameters,  null); 
 //	}
 //	public static String ZHRI100A_getOprId(CommonParameters commonParameters, BigDecimal eidIndexNumber) {
-//		System.out.println("********** ZHRI100A_getOprId()");
+//		System.out.println("*** ZHRI100A_getOprId()");
 //		BigDecimal indexNumber = commonParameters.getEffectiveSequence();
 //		//BEGIN-PROCEDURE GET-OPRID
 //		//LET $Found = 'N'
@@ -1126,17 +1120,17 @@ public class ZHRI100A {
 //	 * @return
 //	 */
 //	public static CommonParameters initializeCommonParameters() {
-//		System.out.println("********** initializeCommonParameters()");
+//		System.out.println("*** initializeCommonParameters()");
 //		CommonParameters commonParameters = new ProcessParameters().new CommonParameters();
 //		return commonParameters;
 //	}
 
 	/**
-	 * 
-	 * @return
+	 * initializeServerProperties
+	 * Sets the values for the remote AS400 server in a static class that shares the values across the application. 
 	 */
 	public static void initializeServerProperties() {
-		System.out.println("********** initializeServerProperties()");
+		System.out.println("*** initializeServerProperties() ***");
 		String processName = "ZHRI100A";
 		ServerProperties.setDbName(PsDbOwner.findDbName());
 //		commonParameters.setPeopleSoftHomePath(System.getenv("PS_HOME")); //TODO: ********
@@ -1146,6 +1140,9 @@ public class ZHRI100A {
 		if(ServerProperties.getOracleSystemId() != null) {
 			ServerProperties.setOracleSystemId(ServerProperties.getOracleSystemId().toUpperCase());
 		}
+		ServerProperties.setRemoteServerUsername("PSHRINT");
+		ServerProperties.setRemoteServerPassword("SMRHET01");
+		//get server property values from the variables table
 		ServerProperties.setRemoteServerHostName(PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(processName, ServerProperties.getDbName(), "RMTSVR"));
 		ServerProperties.setAs400Library(PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(processName, ServerProperties.getDbName(), "AS400library"));
 	}
@@ -1155,7 +1152,7 @@ public class ZHRI100A {
 //	 * @return
 //	 */
 //	public static void initializeServerProperties() {
-//		System.out.println("********** initializeServerProperties()");
+//		System.out.println("*** initializeServerProperties()");
 //		String processName = "ZHRI100A";
 //		ServerProperties.setDbName(PsDbOwner.findDbName());
 //		//LET $PS_HOME = getenv('PS_HOME')  !This gets the oracle_sid
@@ -1197,13 +1194,13 @@ public class ZHRI100A {
 //	}
 
 	/**
-	 * ZHRI100A.Check-Interface-Runfile
 	 * This procedure will check the existence run file
+	 * @see Check-Interface-Runfile in ZHRI100A.SQR
 	 * @param oracleSystemId
 	 * @return true if run file does not exist
 	 */
 	public static Boolean ZHRI100A_checkInterfaceRunFile(String oracleSystemId) {
-		System.out.println("********** ZHRI100A_checkInterfaceRunFile()");
+		System.out.println("*** ZHRI100A_checkInterfaceRunFile() ***");
 		Boolean runFlag = false;
 //		String runFilePath;
 		//LET $RUN_FILEPATH = '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'  //concatenate
@@ -1229,12 +1226,12 @@ public class ZHRI100A {
 	}
 	
 //	/**
-//	 * Get-Trigger-Data from ZHRI100A.SQR
+//	 * @see Get-Trigger-Data in ZHRI100A.SQR
 //	 * This procedure will get the trigger data that needs to be interfaced
 //	 * @param commonParameters
 //	 */
 //	public static void ZHRI100A_getTriggerData_OLD() {
-//		System.out.println("********** ZHRI100A_getTriggerData()");
+//		System.out.println("*** ZHRI100A_getTriggerData()");
 //		//asOfToday
 //		//sysDate
 //		//fileOpen
@@ -1243,7 +1240,7 @@ public class ZHRI100A {
 ////		System.out.println("triggerList == null: " + (triggerList == null));
 ////		System.out.println("triggerList.isEmpty(): " + triggerList.isEmpty());
 //		PszTriggerEmployee trigger = triggerList != null && !triggerList.isEmpty() ? triggerList.get(0) : PszTriggerEmployee.createMockTriggerForEmployeeTermination();
-//		System.out.println("************************************************** trigger: \n" + trigger.toString());
+//		System.out.println("******** trigger: \n" + trigger.toString());
 ////		Boolean adFound = false; //$AdFound  //TODO: where should this be set???
 //		//BEGIN-PROCEDURE GET-TRIGGER-DATA
 //		//LET $CompletionStatus = 'P'   !Initialize the CompletionStatus field
@@ -1296,7 +1293,7 @@ public class ZHRI100A {
 //			if("ZHRI102A".equalsIgnoreCase(trigger.getProcessName())) {
 //				//DO Check-If-Correct102A
 //				Boolean isOkToProcess = PsJob.ZHRI100A_checkIfCorrect102A(trigger.getEmployeeId(), trigger.getEffectiveDate(), trigger.getProcessName());
-////				System.out.println("************** isOkToProcess: " + isOkToProcess);
+////				System.out.println("******* isOkToProcess: " + isOkToProcess);
 //				//IF $OK-to-process = 'Y'
 //				if(isOkToProcess) {
 //					//DO Call-Programs
@@ -1393,11 +1390,13 @@ public class ZHRI100A {
 //	}
 	
 	/**
-	 * Get-Trigger-Data from ZHRI100A.SQR
 	 * This procedure will get the trigger data that needs to be interfaced
+	 * @see Get-Trigger-Data in ZHRI100A.SQR
+	 * @param trigger
+	 * @return completionStatus - "P" if trigger record is good to process
 	 */
 	public static String checkTriggerRecord(PszTriggerSuperclass trigger) {
-		System.out.println("********** ZHRI100A_getTriggerData()");
+		System.out.println("*** checkTriggerRecord() ***");
 		String completionStatus = trigger.getCompletionStatus();
 		//****************************************************************************************************
 		//TODO
@@ -1411,21 +1410,25 @@ public class ZHRI100A {
 		}
 		//TODO
 		//****************************************************************************************************
+		//set status to error
 		if(trigger.getEmployeeId() == null || trigger.getEmployeeId().isEmpty()) {
 			completionStatus = "E";
 		}
 		else if(PsJob.ZHRI100A_checkIfContractor(trigger.getEmployeeId())) {
+			//set status to complete, so this event doesn't come up again
 			completionStatus = "C";
 		}
 		else { //not a contractor and not a blank EmplId
 			//Added a check for 'ZHRI102A' - to see if corresponding row on JOB 
 			if("ZHRI102A".equalsIgnoreCase(trigger.getProcessName())) {
 				if(!PsJob.ZHRI100A_checkIfCorrect102A(trigger.getEmployeeId(), trigger.getEffectiveDate(), trigger.getProcessName())) {
+					//set status to complete, so this event doesn't come up again
 					completionStatus = "C";
 				}
 			}
 			else if("ZHRI101A".equalsIgnoreCase(trigger.getProcessName())) {
 				if(!PszTriggerNonPerson.ZHRI100A_checkIfPoiTermed(trigger.getEmployeeId())) {
+					//set status to wait
 					completionStatus = "W";
 				}
 			}
@@ -1434,14 +1437,14 @@ public class ZHRI100A {
 	}
 	
 	/**
-	 * Replaces Get-Legacy-OprId from ZHRI100A.SQR
 	 * Formulates legacy OprId from HR036P where HR036P.H36EM# = #wrk_emplid and HR036P.H36INX = #indexNum UNION
+	 * @see Get-Legacy-OprId in ZHRI100A.SQR
 	 * @param employeeId
 	 * @param indexNumber - value is 0 if employee is false
 	 * @return legacyEmployeeId
 	 */
 	public static String findNewLegacyEmployeeId(String employeeId, BigDecimal indexNumber) {
-		System.out.println("********** findLegacyEmployeeId()");
+		System.out.println("*** findNewLegacyEmployeeId() ***");
 		String legacyEmployeeId = null;
 		String legacyEmployeeName;
 		Integer employeeNumber = -1;
@@ -1462,12 +1465,7 @@ public class ZHRI100A {
 		    	if(legacyEmployeeId != null && legacyEmployeeId.length() > 5) {
 		    		legacyEmployeeId = legacyEmployeeId.substring(0, 5);
 		    	}
-		    	if(new BigDecimal(0).equals(indexNumber)) {
-		    		CrossReferenceMultipleEmployeeId.ZHRI100A_insertOprId(employeeId, legacyEmployeeId);
-		    	}
-		    	else {
-		    		CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId(employeeId, legacyEmployeeId, indexNumber);
-		    	}
+		    	CrossReferenceMultipleEmployeeId.saveNewLegacyEmployeeId(employeeId, legacyEmployeeId, indexNumber);
 			}
 			return legacyEmployeeId;
     	}
@@ -1475,7 +1473,7 @@ public class ZHRI100A {
 	}
 	
 //	/**
-//	 * Get-Legacy-OprId from ZHRI100A.SQR
+//	 * @see Get-Legacy-OprId in ZHRI100A.SQR
 //	 * Gets the new OprId from the legacy system
 //	 * Formulates legacy OprId from HR036P where HR036P.H36EM# = #wrk_emplid and HR036P.H36INX = #indexNum UNION
 //	 * @param employeeId
@@ -1484,7 +1482,7 @@ public class ZHRI100A {
 //	 * @return legacyEmployeeId
 //	 */
 //	public static String ZHRI100A_getLegacyOprId(String employeeId, BigDecimal indexNumber, Boolean poiFlag) {
-//		System.out.println("********** ZHRI100A_getLegacyOprId()");
+//		System.out.println("*** ZHRI100A_getLegacyOprId()");
 //		//Begin-Procedure Get-Legacy-Oprid                !sree**10/04/01
 //		//LET $LegEmplid = ''
 //		String legacyEmployeeId;
@@ -1555,21 +1553,23 @@ public class ZHRI100A {
 //	}
 
 	/**
-	 * composeAs400RexecCommandString
+	 * Composes a command string to remotely execute on the AS400 server
 	 * @param processName
 	 * @param parameterString
 	 * @return commandString to be used in regex call to AS400
 	 */
 	public static String composeAs400RexecCommandString(String processName, String parameterString) {
-		System.out.println("********** composeAs400RexecCommandString()");
+		System.out.println("*** composeAs400RexecCommandString() ***");
 		String commandString = 
-						"CALL " + ServerProperties.getAs400Library() + "/" + processName + " " 
+//						"CALL " + ServerProperties.getAs400Library() + "/" + processName + " " 
+//						"CALL " + "EHRHRMS05#" + "/" + processName + " " 
+						"CALL " + "" + "" + processName + " " 
 						+ "PARM(" + parameterString + ")";
 		return commandString;
 	}
 
 //	public static String composeAs400RexecCommandString(String processName, String parameterString) {
-//		System.out.println("********** composeAs400RexecCommandString()");
+//		System.out.println("*** composeAs400RexecCommandString()");
 //		//LET $Part1 = '"CALL ' || $Library ||'/HRZ202A '
 //		//LET $Part2 = 'PARM(''' || $PSauditEmpl || ''' ''' || $PSOprid || ''' ''' || $PSTermDate || ''')" '
 //		//LET $Command = $Part1||$Part2
@@ -1588,14 +1588,14 @@ public class ZHRI100A {
 //	}
 
 	/**
-	 * composeErrorParameterString
-	 * from Prepare-Error-Parms from ZHRI100A.SQR
+	 * Composes a parameter string for the AS400 error program.
 	 * Makes sure that the parameters are the correct format for the error routine RPG program to receive them
+	 * @see Prepare-Error-Parms in ZHRI100A.SQR
 	 * @param commonParameters
 	 * @return errorParameterString
 	 */
 	public static String composeErrorParameterString(CommonParameters commonParameters) {
-		System.out.println("********** composeErrorParameterString()");
+		System.out.println("*** composeErrorParameterString() ***");
 		String blankSpaceParameter = " ";
 		String criticalFlagYN = commonParameters.getCriticalFlag() != null && commonParameters.getCriticalFlag() ? "Y" : "N";
 		Calendar now = Calendar.getInstance();
@@ -1634,13 +1634,13 @@ public class ZHRI100A {
 //	 */
 //	//TODO: build it
 //	public static Integer callSystemUsingCommand(String commandString, CommonParameters commonParameters) {
-//		System.out.println("********** callSystemUsingCommand");
+//		System.out.println("*** callSystemUsingCommand");
 //		//SHOW '$Command=> ' $Command
-////		System.out.println("************************************************************");
+////		System.out.println("****");
 //		System.out.println("$Command=> " + commandString);
 ////		System.out.println(ServerProperties.print());
 ////		System.out.println(commonParameters.toString());
-////		System.out.println("************************************************************");
+////		System.out.println("****");
 //		//DO Get-Current-Datetime  !Gets the current date and time using curdttim.sqc
 //		//SHOW 'Calling Command at: ' $SysDateTime  !Surya Added - TEMPMAST
 //		//"20-JUN-2017_12:01:06.000000_AM"
@@ -1712,27 +1712,32 @@ public class ZHRI100A {
 //	}
 
 	/**
+	 * Executes a rexec command on the AS400.
 	 * Call System Using $Command #Status Wait
-	 * Execute the command that was built on the command waiting until completion
+	 * Execute the command that was built on the command waiting until completion //TODO
 	 * @param commandString
 	 * @return 0 if success, non-zero if error
 	 */
 	//TODO: build it
 	public static Integer executeCommandRexec(String commandString) {
-		System.out.println("********** executeRexec");
+		System.out.println("*** executeRexec ***");
 		//DO Get-Current-Datetime  !Gets the current date and time using curdttim.sqc
 		//"20-JUN-2017_12:01:06.000000_AM"
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy_hh:mm:ss.SSSSSS_a");
 		String currentDate = sdf.format(new Date()).toUpperCase();
 		System.out.println("$Command=> " + commandString);
 		System.out.println("Calling Command at: " + currentDate);
-		String response = as400Rexec(commandString);
-		System.out.println(response);
+		as400Rexec(commandString);
 	    return 0;
 	}
 
-	public static String as400Rexec(String commandString) {
-		System.out.println("********** callSystemUsingCommand");
+	/**
+	 * Opens a rexec connection to the AS400 server and execute a command.
+	 * @param commandString
+	 * @return
+	 */
+	public static void as400Rexec(String commandString) {
+		System.out.println("*** callSystemUsingCommand ***");
 	    RExecClient client = new RExecClient();
 //		String remoteServerHostName = ServerProperties.getRemoteServerHostName(); // remote host name
 //		String remoteServerUsername = ServerProperties.getRemoteServerUsername(); // username for remote host
@@ -1740,6 +1745,7 @@ public class ZHRI100A {
 		String remoteServerHostName = "dev.corp.erac.com";
 		String remoteServerUsername = "PSHRINT";
 		String remoteServerPassword = "SMRHET01";
+		///QSYS.LIB/EHRHRMS06#.LIB/HRZ*.PGM
 
 //	    commandString = "CALL EHRHRMS06#/HRZ102A PARM('840S4' '06' '20' '2017' '' '' '' 'V' 'O' '349NV' 'VOLUN  DISSATISFIED WHOURS         ')";
 //	    commandString = "CALL EHRHRMS06#/HRZ100A PARM('HRZ102A' '859V1' '0' ' ' 'Error Message                                                              ' 'N' '20170529' '112649' '859V1' 'Y')";
@@ -1761,7 +1767,7 @@ public class ZHRI100A {
             catch (Exception e) {
     			e.printStackTrace();
     		}
-//            readWrite(client.getInputStream(), client.getOutputStream(), System.in, System.out);
+            readWrite(client.getInputStream(), client.getOutputStream(), System.in, System.out);
         } 
         catch (SocketException e1) {
 			e1.printStackTrace();
@@ -1784,17 +1790,23 @@ public class ZHRI100A {
     			e.printStackTrace();
     		}
         }
-		return client.getOutputStream().toString(); 
 	}
 	
-	public static final  void readWrite(InputStream remoteInput, OutputStream remoteOutput, InputStream localInput, OutputStream localOutput) {
-			Thread reader, writer;
-	        reader = new Thread() {
+	/**
+	 * Copies from a remote input stream and output stream to a local input stream and output stream.
+	 * @param remoteInput
+	 * @param remoteOutput
+	 * @param localInput
+	 * @param localOutput
+	 */
+	public static final void readWrite(InputStream remoteInput, OutputStream remoteOutput, InputStream localInput, OutputStream localOutput) {
+			Thread readerThread, writerThread;
+	        readerThread = new Thread() {
 	        	public void run() {
-	        		int ch;
+	        		int byteCharacter;
 	        		try {
-	        			while (!interrupted() && (ch = localInput.read()) != -1) {
-	        				remoteOutput.write(ch);
+	        			while (!interrupted() && (byteCharacter = localInput.read()) != -1) {
+	        				remoteOutput.write(byteCharacter);
 	        				remoteOutput.flush();
 	        			}
 	        		}
@@ -1806,7 +1818,7 @@ public class ZHRI100A {
 	        		}
 	        	}
 	        };
-	        writer = new Thread() {
+	        writerThread = new Thread() {
 	        	public void run() {
 	        		try {
 	        			org.apache.commons.net.io.Util.copyStream(remoteInput, localOutput);
@@ -1820,13 +1832,13 @@ public class ZHRI100A {
 	        		}
 	        	}
 	        };
-	        writer.setPriority(Thread.currentThread().getPriority() + 1);
-	        writer.start();
-	        reader.setDaemon(true);
-	        reader.start();
+	        writerThread.setPriority(Thread.currentThread().getPriority() + 1);
+	        writerThread.start();
+	        readerThread.setDaemon(true);
+	        readerThread.start();
 	        try {
-	        	writer.join();
-	            reader.interrupt();
+	        	writerThread.join();
+	        	readerThread.interrupt();
 	        }
 	        catch (InterruptedException e) {
 				e.printStackTrace();

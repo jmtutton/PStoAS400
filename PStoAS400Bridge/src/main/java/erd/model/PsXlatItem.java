@@ -109,11 +109,15 @@ public class PsXlatItem implements Serializable {
 		this.syncId = syncId;
 	}
 	   
-		/**
-		 * Replaces AD-Get-EmplStatus-Description from ZHRI100A.SQR
-		 * Gets the Employee Status description for Active Directory File Build       
-		 */
-		public static String findFieldDescriptionByFieldNameAndFieldValueAndEffectiveDate(String fieldName, String fieldValue, Date effectiveDate) {
+	/**
+	 * Gets the Employee Status description for Active Directory File Build       
+	 * @see AD-Get-EmplStatus-Description in ZHRI100A.SQR
+	 * @param fieldName
+	 * @param fieldValue
+	 * @param effectiveDate
+	 * @return
+	 */
+	public static String findFieldDescriptionByFieldNameAndFieldValueAndEffectiveDate(String fieldName, String fieldValue, Date effectiveDate) {
 //			Begin-Select
 //			AD10.XLATLONGNAME
 //			let $ADEmplStatusDescr = ltrim(rtrim(&AD10.XLATLONGNAME,' '),' ')
@@ -126,63 +130,66 @@ public class PsXlatItem implements Serializable {
 //			                  and AD11.EFFDT <= SYSDATE
 //			                  )
 //			End-Select
-			EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-			EntityManager em = emfactory.createEntityManager();
-			
-		    try {
-		    	List<String> resultList = em.createQuery("SELECT p.xlatLongName FROM PsXlatItem p "
-		    				+ "WHERE UPPER(TRIM(p.fieldName)) = :fieldName "
-		    				+ "AND UPPER(TRIM(p.fieldValue)) = :fieldValue "
-		    				+ "AND p.effectiveDate = :effectiveDate ",
-		    				String.class)
-		    		    .setParameter("processName", fieldName.toUpperCase())
-		    		    .setParameter("fieldName", fieldValue.toUpperCase())
-		    		    .setParameter("effectiveDate", effectiveDate)
-		    		    .getResultList();
-		    	if(resultList != null && resultList.size() > 0) {
-		    		return resultList.get(0).trim();
-		    	}
-		    }
-		    catch (Exception e) {
-		    	e.printStackTrace();
-		    } 
-		    finally {
-		    	em.close();
-		    }
-		    return null;	
-		}
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		
+		try {
+			List<String> resultList = em.createQuery("SELECT p.xlatLongName FROM PsXlatItem p "
+					+ "WHERE UPPER(TRIM(p.fieldName)) = :fieldName "
+					+ "AND UPPER(TRIM(p.fieldValue)) = :fieldValue "
+					+ "AND p.effectiveDate = :effectiveDate ",
+					String.class)
+			    .setParameter("processName", fieldName.toUpperCase())
+			    .setParameter("fieldName", fieldValue.toUpperCase())
+			    .setParameter("effectiveDate", effectiveDate)
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0).trim();
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
 		   
-		/**
-		 * Replaces AD-Get-EmplStatus-Description from ZHRI100A.SQR
-		 * Gets the Employee Status description for Active Directory File Build       
-		 */
-		public static Date findMaxEffectiveDateByFieldNameAndFieldValue(String fieldName, String fieldValue) {
+	/**
+	 * Gets the Employee Status description for Active Directory File Build       
+	 * @see AD-Get-EmplStatus-Description in ZHRI100A.SQR
+	 * @param fieldName
+	 * @param fieldValue
+	 * @return
+	 */
+	public static Date findMaxEffectiveDateByFieldNameAndFieldValue(String fieldName, String fieldValue) {
 //			and AD10.EFFDT = (Select max(AD11.EFFDT) from PSXLATITEM AD11
 //			                  where AD10.FIELDNAME = AD11.FIELDNAME
 //			                  and AD10.FIELDVALUE = AD11.FIELDVALUE
 //			                  and AD11.EFFDT <= SYSDATE)
-			EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-			EntityManager em = emfactory.createEntityManager();
-			
-		    try {
-		    	List<Date> resultList = em.createQuery("SELECT MAX(p.effectiveDate) FROM PsXlatItem p "
-		    				+ "WHERE UPPER(TRIM(p.fieldName)) = :fieldName "
-		    				+ "AND UPPER(TRIM(p.fieldValue)) = :fieldValue "
-		    				+ "AND p.effectiveDate <= CURRENT_DATE ",
-		    				Date.class)
-		    		    .setParameter("fieldName", fieldName.toUpperCase())
-		    		    .setParameter("fieldValue", fieldValue.toUpperCase())
-		    		    .getResultList();
-		    	if(resultList != null && resultList.size() > 0) {
-		    		return resultList.get(0);
-		    	}
-		    }
-		    catch (Exception e) {
-		    	e.printStackTrace();
-		    } 
-		    finally {
-		    	em.close();
-		    }
-		    return null;	
-		}
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		
+	    try {
+	    	List<Date> resultList = em.createQuery("SELECT MAX(p.effectiveDate) FROM PsXlatItem p "
+	    				+ "WHERE UPPER(TRIM(p.fieldName)) = :fieldName "
+	    				+ "AND UPPER(TRIM(p.fieldValue)) = :fieldValue "
+	    				+ "AND p.effectiveDate <= CURRENT_DATE ",
+	    				Date.class)
+	    		    .setParameter("fieldName", fieldName.toUpperCase())
+	    		    .setParameter("fieldValue", fieldValue.toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
 }

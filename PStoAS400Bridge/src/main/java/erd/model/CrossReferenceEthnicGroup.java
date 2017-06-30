@@ -81,8 +81,8 @@ public class CrossReferenceEthnicGroup implements Serializable {
 	 * Replaces SQC procedure HR01-Get-Legacy-Ethnic-Code from ZHRI101A.SQC and HR05-Get-Ethnic-Group from ZHRI105A.SQC
 	 * This procedure finds the legacy ethnic code that corresponds to the PeopleSoft
 	 * ethnic group.
-	 * @see ZHRI101A.SQC
-	 * @see ZHRI105A.SQC
+	 * @see HR01-Get-Legacy-Ethnic-Code in ZHRI101A.SQC
+	 * @see HR05-Get-Ethnic-Group in ZHRI105A.SQC
 	 */
 	public static List<CrossReferenceEthnicGroup> findGetLegacyEthnicCode(String ethnicGroup) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");

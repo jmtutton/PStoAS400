@@ -256,8 +256,8 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	}
 
 	/**
-	 * Update-Trigger-Row from ZHRI100A.SQR
 	 * This routine update the trigger file flag switch
+	 * @see Update-Trigger-Row in ZHRI100A.SQR
 	 * @param seqNum
 	 * @param status
 	 * @return
@@ -304,8 +304,8 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 
 	/**
 	 * setCompletionStatusBySequenceNumber
-	 * Replaces Update-Trigger-Row from ZHRI100A.SQR
 	 * Updates TASK_FLAG in PS_ZHRT_INTTRIGGER 
+	 * @see Update-Trigger-Row in ZHRI100A.SQR
 	 * @param completionStatus
 	 * @param sequenceNumber
 	 * @return numberOfRecordsUpdated

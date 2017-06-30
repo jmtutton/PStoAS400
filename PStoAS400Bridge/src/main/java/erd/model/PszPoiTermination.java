@@ -42,8 +42,9 @@ public class PszPoiTermination implements Serializable {
 	}
 
 	/**
-	 * HR202-Insert-Timestamp from ZHRI202A.SQC
 	 * Inserts the EMP and Timestamp for the POI Term
+	 * @see HR202-Insert-Timestamp in ZHRI202A.SQC
+	 * @param employeeId
 	 */
 	public static void HR202_insertTimestamp(String employeeId) {
 		//BEGIN-PROCEDURE HR202-INSERT-TIMESTAMP

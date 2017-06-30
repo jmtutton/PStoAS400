@@ -110,9 +110,11 @@ public class PsDiversityEthnicity implements Serializable {
 	}
 	
 	/**
-	 * Replaces SQC procedure HR01-Get-Ethnic-Group from ZHRI101A.SQC
 	 * This procedure retrieves a record from the PsDiversityEthnicity table 
 	 * with matching Employee ID.
+	 * @see HR01-Get-Ethnic-Group in ZHRI101A.SQC
+	 * @param employeeId
+	 * @return
 	 */
 	public static PsDiversityEthnicity findByEmployeeId(String employeeId) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
