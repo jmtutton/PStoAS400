@@ -1,8 +1,7 @@
 package erd.controller;
 
 import erd.model.ProcessParameters.CommonParameters;
-import erd.model.ProcessParameters.NewHireParameters;
-import erd.model.PszTriggerEmployee;
+import erd.model.ProcessParameters.NewHireProcessParameters;
 
 /**
  * ZHRI101A - Employee New Hire Process
@@ -12,17 +11,24 @@ import erd.model.PszTriggerEmployee;
 
 public class EmployeeNewHire {
 
-	public String HR01_processMain(PszTriggerEmployee trigger, CommonParameters commonParameters) {
-		// TODO Auto-generated method stub
+	public String processEmployeeNewHire(CommonParameters commonParameters) {
+		System.out.println("********** processEmployeeNewHire()");
+		NewHireProcessParameters processParameters = fetchProcessParameters(commonParameters);
+		composeParameterString(processParameters);
 		return null;
+	}
+	
+	private NewHireProcessParameters fetchProcessParameters(CommonParameters commonParameters) {
+		return null;
+		
 	}
 	
 	/**
 	 * 
 	 * @param newHireParameters
 	 */
-	private String composeParameterStringForHrz109AProcess(NewHireParameters newHireParameters) {
-		System.out.println("********** composeParameterStringForHrz109AProcess");
+	private String composeParameterString(NewHireProcessParameters newHireProcessParameters) {
+		System.out.println("********** composeParameterString()");
 		//'PARM('''                              ||
 		//$LegAuditEmplid                        ||     !Legacy Emplid for audit field
 		//''' '''                                ||

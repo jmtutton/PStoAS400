@@ -108,7 +108,7 @@ public class ZHRI100ATest {
 		commonParameters.setEffectiveSequence(new BigDecimal(0));
 		commonParameters.setOperatorId("999X9");
 		String parameterString = ZHRI100A.composeErrorParameterString(commonParameters);
-		return ZHRI100A.composeAs400RexecCommandString("HRZ110A", parameterString);
+		return ZHRI100A.composeRexecCommandString("HRZ110A", parameterString);
 	}
 	
 	public static String composeMockEmployeeTerminationCommandString() {
@@ -124,8 +124,8 @@ public class ZHRI100ATest {
 		terminationProcessParameters.setTerminationCode("O");
 		terminationProcessParameters.setOperatorId("352FS");
 		terminationProcessParameters.setTerminationReason("VOLUN  DISSATISFIED WHOURS");
-		String parameterString = EmployeeTermination.composeParameterStringForTerminationProcess(terminationProcessParameters);
-		return ZHRI100A.composeAs400RexecCommandString("HRZ102A", parameterString);
+		String parameterString = EmployeeTermination.composeParameterString(terminationProcessParameters);
+		return ZHRI100A.composeRexecCommandString("HRZ102A", parameterString);
 	}
 
 //	@Test

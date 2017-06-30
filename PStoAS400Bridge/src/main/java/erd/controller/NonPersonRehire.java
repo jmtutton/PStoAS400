@@ -1,7 +1,7 @@
 package erd.controller;
 
-import erd.model.PszTriggerNonPerson;
 import erd.model.ProcessParameters.CommonParameters;
+import erd.model.ProcessParameters.NewHireProcessParameters;
 
 /**
  * ZHRI206A - Contingent Employee and Multiple EID Rehire
@@ -10,22 +10,20 @@ import erd.model.ProcessParameters.CommonParameters;
  */
 public class NonPersonRehire {
 	
-	public String HR206_processMain(PszTriggerNonPerson trigger, CommonParameters commonParameters) {
+	public String processNonPersonRehire(CommonParameters commonParameters) {
 		System.out.println("********** HR206_processMain()");
 		commonParameters.setPoiFlag(true);
-		commonParameters = HR206_initializeFields(commonParameters);
-		HR206_callSystem(commonParameters);
+		NewHireProcessParameters processParameters = fetchProcessParameters(commonParameters);
+		composeParameterString(processParameters);
 		return null;
 	}
 	
-	private CommonParameters HR206_initializeFields(CommonParameters commonParameters) {
-		System.out.println("********** HR206_initializeFields");
-		return commonParameters;
-		
+	private NewHireProcessParameters fetchProcessParameters(CommonParameters commonParameters) {
+		return null;
 	}
-
-	private String HR206_callSystem(CommonParameters commonParameters) {
-		System.out.println("********** HR206_callSystem()");
+		
+	private String composeParameterString(NewHireProcessParameters commonParameters) {
+		System.out.println("********** composeParameterString()");
 		return null;
 		
 	}

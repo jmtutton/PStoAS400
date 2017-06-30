@@ -1,10 +1,9 @@
 package erd.controller;
 
 import erd.model.ProcessParameters.CommonParameters;
-import erd.model.ProcessParameters.DemographicChangeParameters;
+import erd.model.ProcessParameters.DemographicChangeProcessParameters;
 
 import erd.model.PsDriversLicense;
-import erd.model.PszTriggerEmployee;
 
 /**
  * Employee Demographic Change Process
@@ -15,16 +14,21 @@ import erd.model.PszTriggerEmployee;
 
 public class EmployeeDemographicChange {
 
-	public String HR05_processMain(PszTriggerEmployee trigger, CommonParameters commonParameters) {
-		// TODO Auto-generated method stub
+	public String processEmployeeDemographicChange(CommonParameters commonParameters) {
+		DemographicChangeProcessParameters demographicChangeProcessParameters = fetchProcessParameters(commonParameters);
+		composeParameterString(demographicChangeProcessParameters);
+		return null;
+	}
+	
+	private DemographicChangeProcessParameters fetchProcessParameters(CommonParameters commonParameters) {
 		return null;
 	}
 	
 	/**
 	 * 
-	 * @param demographicChangeParameters
+	 * @param processParameters
 	 */
-	private String composeParameterStringForHrz105AProcess(DemographicChangeParameters demographicChangeParameters) {
+	private String composeParameterString(DemographicChangeProcessParameters demographicChangeProcessParameters) {
 		System.out.println("********** composeParameterStringForHrz102AProcess");
 		//Let $Part2 = 'Parm(''' || $PSEmpl || ''' ''' || $PSGroup|| ''' ''' || $PSreg || ''' ''' ||
 		// $PSbranch || ''' ''' || $PSEMP || ''' ''' || $PSNational_Id || ''' ''' ||
@@ -87,17 +91,17 @@ public class EmployeeDemographicChange {
 		// ''' ''' || !dshen 01/12/2012
 		// $PS_NID_COUNTRY5 || !dshen 01/12/2012
 		// ''')" '
-//		String paramaterString = "'" + demographicChangeParameters.getEmployeeId() + "' "
-//				+ "'" + demographicChangeParameters.getTerminationMonth() + "' "
-//				+ "'" + demographicChangeParameters.getTerminationDay() + "' "
-//				+ "'" + demographicChangeParameters.getTerminationYear() + "' "
-//				+ "'" + demographicChangeParameters.getRehireMonth() + "' "
-//				+ "'" + demographicChangeParameters.getRehireDay() + "' "
-//				+ "'" + demographicChangeParameters.getRehireYear() + "' "
-//				+ "'" + demographicChangeParameters.getVoluntaryOrInvoluntary() + "' "
-//				+ "'" + demographicChangeParameters.getTerminationCode() + "' "
-//				+ "'" + demographicChangeParameters.getAuditOperatorId() + "' "
-//				+ "'" + demographicChangeParameters.getTerminationReason() + "'";
+//		String paramaterString = "'" + processParameters.getEmployeeId() + "' "
+//				+ "'" + processParameters.getTerminationMonth() + "' "
+//				+ "'" + processParameters.getTerminationDay() + "' "
+//				+ "'" + processParameters.getTerminationYear() + "' "
+//				+ "'" + processParameters.getRehireMonth() + "' "
+//				+ "'" + processParameters.getRehireDay() + "' "
+//				+ "'" + processParameters.getRehireYear() + "' "
+//				+ "'" + processParameters.getVoluntaryOrInvoluntary() + "' "
+//				+ "'" + processParameters.getTerminationCode() + "' "
+//				+ "'" + processParameters.getAuditOperatorId() + "' "
+//				+ "'" + processParameters.getTerminationReason() + "'";
 //		return paramaterString;
 		return null;
 	}
@@ -108,7 +112,7 @@ public class EmployeeDemographicChange {
 	 * @param employeeId
 	 * @return PsDriversLicense record
 	 */
-	public PsDriversLicense HR05_getDriversLic(String employeeId) {
+	public PsDriversLicense fetchDriversLicense(String employeeId) {
 		//BEGIN-PROCEDURE HR05-GET-DRIVERS-LIC
 		//BEGIN-SELECT
 		PsDriversLicense psDriversLicense = PsDriversLicense.findByEmployeeId(employeeId);

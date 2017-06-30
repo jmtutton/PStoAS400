@@ -1,8 +1,7 @@
 package erd.controller;
 
 import erd.model.ProcessParameters.CommonParameters;
-import erd.model.ProcessParameters.GroupTransferParameters;
-import erd.model.PszTriggerNonPerson;
+import erd.model.ProcessParameters.NewHireProcessParameters;
 
 /**
  * ZHRI201A - Contingent Employee and Multiple EID New Hire
@@ -11,36 +10,25 @@ import erd.model.PszTriggerNonPerson;
  */
 public class NonPersonNewHire {
 	
-	public String HR201_processMain(PszTriggerNonPerson trigger, CommonParameters commonParameters) {
+	public String processNonPersonNewHire(CommonParameters commonParameters) {
 		System.out.println("********** HR201_processMain()");
 		commonParameters.setPoiFlag(true);
-		commonParameters = HR201_initializeFields(commonParameters);
-		HR201_callSystem(commonParameters);
+		NewHireProcessParameters processParameters = fetchProcessParameters(commonParameters);
+		composeParameterString(processParameters);
 		return null;
 	}
 	
-	private CommonParameters HR201_initializeFields(CommonParameters commonParameters) {
+	private NewHireProcessParameters fetchProcessParameters(CommonParameters commonParameters) {
 		System.out.println("********** HR201_initializeFields");
-		return commonParameters;
-		
-	}
-
-	private String HR201_callSystem(CommonParameters commonParameters) {
-		System.out.println("********** HR201_callSystem()");
-		return null;
-		
-	}
-
-	public String HR205_processMain(PszTriggerNonPerson trigger, CommonParameters commonParameters) {
-		// TODO Auto-generated method stub
 		return null;
 	}
+
 	/**
 	 * 
-	 * @param groupTransferParameters
+	 * @param processParameters
 	 */
-	private String composeParameterStringForHrz201AProcess(GroupTransferParameters groupTransferParameters) {
-		System.out.println("********** composeParameterStringForHrz109AProcess");
+	private String composeParameterString(NewHireProcessParameters processParameters) {
+		System.out.println("********** composeParameterString");
 		//'PARM('''                              ||
 		//$LegAuditEmplid                        ||     !Legacy Emplid for audit field
 		//''' '''                                ||
@@ -76,13 +64,15 @@ public class NonPersonNewHire {
 		//''' '''                                ||
 		//$HireRehireFlag                        ||     !Flag that indicates if this is a hire or a rehire
 		// ''')"'
-		String paramaterString = "'" + groupTransferParameters.getEmployeeId() + "' "
-				+ "'" + groupTransferParameters.getOperatorId() + "' "
-				+ "'" + groupTransferParameters.getEmployeeGroup() + "' "
-				+ "'" + groupTransferParameters.getEmployeeBranch() + "' "
-				+ "'" + groupTransferParameters.getNationalIdCountry() + "' "
-				+ "'" + groupTransferParameters.getNationalId() + "' "
-				+ "'" + groupTransferParameters.getEffectiveDate() + "'";
+		String paramaterString = ""
+//				+ "'" + processParameters.getEmployeeId() + "' "
+//				+ "'" + processParameters.getOperatorId() + "' "
+//				+ "'" + processParameters.getEmployeeGroup() + "' "
+//				+ "'" + processParameters.getEmployeeBranch() + "' "
+//				+ "'" + processParameters.getNationalIdCountry() + "' "
+//				+ "'" + processParameters.getNationalId() + "' "
+//				+ "'" + processParameters.getEffectiveDate() + "'"
+		;
 		return paramaterString;
 	}
 

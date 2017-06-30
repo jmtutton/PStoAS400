@@ -447,50 +447,50 @@ public class ProcessParameters {
 		}
 	}
 	
-	public class DemographicChangeParameters {
-		private String employeeId = ""; //$PSEmpl
-		private String employeeGroup = ""; //$PSGroup
-		private String employeeRegion = ""; //$PSReg
-		private String employeeBranch = ""; //$PSbranch
-		private String emp = ""; //$PSEMP
-		private String nationalId = ""; //$PSNational_Id
-		private String nationalIdCountry = ""; //$PS_NID_COUNTRY5
-		private String healthStat = ""; //$PSHealth_Stat
-		private String healthStatDescription = ""; //$PSHealth_Stat_Desc
-		private String vehicleReport = ""; //$PSVehRpt
-		private String name = ""; //$PSName
-		private String namePrefix = ""; //$PSName_Prefix
-		private String nickname = ""; //$PSNickname
-		private String homeAddress = ""; //$PSAddress
-		private String homeCity = ""; //$PSCity
-		private String homeState = ""; //$PSState
-		private String homePostalCode = ""; //$PSZip
-		private String homeCountry = ""; //$PSCountry
-		private String homePhone = ""; //$PSPhone
-		private String businessPhone = ""; //$PSBusiness_Phone
-		private String gender = ""; //$PSGender
-		private String maritalStatus = ""; //$PSMarITAL_StatUS
-		private String ethnicGroup = ""; //$PSEthnic_Group
-		private String changeDate = ""; //$PSChg_Dt
-		private String birthDate = ""; //$PSBirthDate
-		private String partTimeEffectiveDate = ""; //$PSStat_date
-		private String startDate = ""; //$PSStart_date  //unused??
-		private String driversLicenseNumber = ""; //$PSDriver_Lic
-		private String driversLicenseState = ""; //$PSDlstate
-		private String emergencyContactName = ""; //$PSContact_Name
-		private String emergencyContactPhone = ""; //$PSEmer_Phn
-		private String emergencyContactRelation = ""; //$PSRelation
-		private String employeeSpouse = ""; //$PSEmpl_Spouse
-		private String referralSource = ""; //$PSReferral_Source
-		private String referralSourceId = ""; //$PSSpecific_Refer_Src
-		private String recruiterGroup = ""; //$PSRecruit_Gp
-		private String recruiterId = ""; //$PSRecruiter_Id
-		private String collegeName = ""; //$PSCollege
-		private String collegeGradYear = ""; //$PSGradYr
-		private String collegeMajor = ""; //$PSMajor
+	public class DemographicChangeProcessParameters {
+//		private String employeeId = ""; //$PSEmpl
+//		private String employeeGroup = ""; //$PSGroup
+//		private String employeeRegion = ""; //$PSReg
+//		private String employeeBranch = ""; //$PSbranch
+//		private String emp = ""; //$PSEMP
+//		private String nationalId = ""; //$PSNational_Id
+//		private String nationalIdCountry = ""; //$PS_NID_COUNTRY5
+//		private String healthStat = ""; //$PSHealth_Stat
+//		private String healthStatDescription = ""; //$PSHealth_Stat_Desc
+//		private String vehicleReport = ""; //$PSVehRpt
+//		private String name = ""; //$PSName
+//		private String namePrefix = ""; //$PSName_Prefix
+//		private String nickname = ""; //$PSNickname
+//		private String homeAddress = ""; //$PSAddress
+//		private String homeCity = ""; //$PSCity
+//		private String homeState = ""; //$PSState
+//		private String homePostalCode = ""; //$PSZip
+//		private String homeCountry = ""; //$PSCountry
+//		private String homePhone = ""; //$PSPhone
+//		private String businessPhone = ""; //$PSBusiness_Phone
+//		private String gender = ""; //$PSGender
+//		private String maritalStatus = ""; //$PSMarITAL_StatUS
+//		private String ethnicGroup = ""; //$PSEthnic_Group
+//		private String changeDate = ""; //$PSChg_Dt
+//		private String birthDate = ""; //$PSBirthDate
+//		private String partTimeEffectiveDate = ""; //$PSStat_date
+//		private String startDate = ""; //$PSStart_date  //unused??
+//		private String driversLicenseNumber = ""; //$PSDriver_Lic
+//		private String driversLicenseState = ""; //$PSDlstate
+//		private String emergencyContactName = ""; //$PSContact_Name
+//		private String emergencyContactPhone = ""; //$PSEmer_Phn
+//		private String emergencyContactRelation = ""; //$PSRelation
+//		private String employeeSpouse = ""; //$PSEmpl_Spouse
+//		private String referralSource = ""; //$PSReferral_Source
+//		private String referralSourceId = ""; //$PSSpecific_Refer_Src
+//		private String recruiterGroup = ""; //$PSRecruit_Gp
+//		private String recruiterId = ""; //$PSRecruiter_Id
+//		private String collegeName = ""; //$PSCollege
+//		private String collegeGradYear = ""; //$PSGradYr
+//		private String collegeMajor = ""; //$PSMajor
 	}
 
-	public class GroupTransferParameters {
+	public class GroupTransferProcessParameters {
 		private String operatorId = ""; //$LegUserEmplid
 		private String employeeId = ""; //$LegEmplid
 		private String employeeGroup = ""; //$LegGroup
@@ -542,10 +542,10 @@ public class ProcessParameters {
 		}
 	}
 	
-	public class NewHireParameters {
+	public class NewHireProcessParameters {
 	}
 	
-	public class JobProfileParameters {
+	public class JobProfileProcessParameters {
 	}
 
 }

@@ -1,8 +1,7 @@
 package erd.controller;
 
 import erd.model.ProcessParameters.CommonParameters;
-import erd.model.ProcessParameters.JobProfileParameters;
-import erd.model.PszTriggerEmployee;
+import erd.model.ProcessParameters.JobProfileProcessParameters;
 
 /**
  * ZHRI104A - Job Profile Change
@@ -12,16 +11,22 @@ import erd.model.PszTriggerEmployee;
 
 public class EmployeeJobProfileChange {
 
-	public String HR04_processMain(PszTriggerEmployee trigger, CommonParameters commonParameters) {
-		// TODO Auto-generated method stub
+	public String processEmployeeJobProfileChange(CommonParameters commonParameters) {
+		JobProfileProcessParameters processParameters = fetchProcessParameters(commonParameters);
+		composeParameterString(processParameters);
 		return null;
+	}
+	
+	private JobProfileProcessParameters fetchProcessParameters(CommonParameters commonParameters) {
+		return null;
+		
 	}
 	
 	/**
 	 * 
-	 * @param jobProfileParameters
+	 * @param processParameters
 	 */
-	private String composeParameterStringForHrz109AProcess(JobProfileParameters jobProfileParameters) {
+	private String composeParameterString(JobProfileProcessParameters processParameters) {
 		System.out.println("********** composeParameterStringForHrz109AProcess");
 		//'PARM('''                   ||
 		//$LegEmplid                    ||
@@ -46,13 +51,13 @@ public class EmployeeJobProfileChange {
 		//''' '''                   ||
 		//$LegEffdt                     ||
 		//''')"'
-//		String paramaterString = "'" + jobProfileParameters.getEmployeeId() + "' "
-//				+ "'" + jobProfileParameters.getOperatorId() + "' "
-//				+ "'" + jobProfileParameters.getEmployeeGroup() + "' "
-//				+ "'" + jobProfileParameters.getEmployeeBranch() + "' "
-//				+ "'" + jobProfileParameters.getNationalIdCountry() + "' "
-//				+ "'" + jobProfileParameters.getNationalId() + "' "
-//				+ "'" + jobProfileParameters.getEffectiveDate() + "'";
+//		String paramaterString = "'" + processParameters.getEmployeeId() + "' "
+//				+ "'" + processParameters.getOperatorId() + "' "
+//				+ "'" + processParameters.getEmployeeGroup() + "' "
+//				+ "'" + processParameters.getEmployeeBranch() + "' "
+//				+ "'" + processParameters.getNationalIdCountry() + "' "
+//				+ "'" + processParameters.getNationalId() + "' "
+//				+ "'" + processParameters.getEffectiveDate() + "'";
 //		return paramaterString;
 		return null;
 	}

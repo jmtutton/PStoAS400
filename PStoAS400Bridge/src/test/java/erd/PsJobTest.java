@@ -68,8 +68,8 @@ public class PsJobTest {
 		Date effectiveDate = new Date();
 		try {
 			effectiveDate = (new SimpleDateFormat("dd-MMM-yyyy")).parse("14-JUN-2017");
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
+		} 
+		catch (ParseException e) {
 			e.printStackTrace();
 		}
 		Date effectiveDatePlusOne = erd.DateUtil.addDays(effectiveDate, 1);

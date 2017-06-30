@@ -1,8 +1,7 @@
 package erd.controller;
 
-import erd.model.PszTriggerEmployee;
 import erd.model.ProcessParameters.CommonParameters;
-import erd.model.ProcessParameters.NewHireParameters;
+import erd.model.ProcessParameters.NewHireProcessParameters;
 
 /**
  * ZHRI106A - Rehire 
@@ -12,24 +11,30 @@ import erd.model.ProcessParameters.NewHireParameters;
 
 public class EmployeeRehire {
 
-	public String HR06_processMain(PszTriggerEmployee trigger, CommonParameters commonParameters) {
-		// TODO Auto-generated method stub
+	public String processEmployeeRehire(CommonParameters commonParameters) {
+		NewHireProcessParameters processParameters = fetchProcessParameters(commonParameters);
+		composeParameterString(processParameters);
 		return null;
+	}
+	
+	private NewHireProcessParameters fetchProcessParameters(CommonParameters commonParameters) {
+		return null;
+		
 	}
 	
 	/**
 	 * 
-	 * @param groupTransferParameters
+	 * @param processParameters
 	 */
-	private String composeParameterStringForHrz109AProcess(NewHireParameters newHireParameters) {
-		System.out.println("********** composeParameterStringForHrz109AProcess");
-//		String paramaterString = "'" + groupTransferParameters.getEmployeeId() + "' "
-//				+ "'" + groupTransferParameters.getOperatorId() + "' "
-//				+ "'" + groupTransferParameters.getEmployeeGroup() + "' "
-//				+ "'" + groupTransferParameters.getEmployeeBranch() + "' "
-//				+ "'" + groupTransferParameters.getNationalIdCountry() + "' "
-//				+ "'" + groupTransferParameters.getNationalId() + "' "
-//				+ "'" + groupTransferParameters.getEffectiveDate() + "'";
+	private String composeParameterString(NewHireProcessParameters newHireProcessParameters) {
+		System.out.println("********** composeParameterString");
+//		String paramaterString = "'" + processParameters.getEmployeeId() + "' "
+//				+ "'" + processParameters.getOperatorId() + "' "
+//				+ "'" + processParameters.getEmployeeGroup() + "' "
+//				+ "'" + processParameters.getEmployeeBranch() + "' "
+//				+ "'" + processParameters.getNationalIdCountry() + "' "
+//				+ "'" + processParameters.getNationalId() + "' "
+//				+ "'" + processParameters.getEffectiveDate() + "'";
 //		return paramaterString;
 		return null;
 	}
