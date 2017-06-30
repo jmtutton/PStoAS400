@@ -1,0 +1,140 @@
+Display Program Information                                                 Page     1
+5770SS1 V7R1M0  100423                                                                            
+DEV       06/29/17  15:56:33 CDT
+ Program  . . . . . . . :   HRZ105A                                 
+ Library  . . . . . . . :   EHRHRMS06#
+ Owner  . . . . . . . . :   QPGMR
+ Program attribute  . . :   RPGLE
+ Detail . . . . . . . . :   *BASIC
+ Program creation information:
+   Program creation date/time . . . . . . . . . . :   05/09/17  12:02:46
+   Type of program  . . . . . . . . . . . . . . . :   ILE
+   Program entry procedure module . . . . . . . . :   HRZ105A
+     Library  . . . . . . . . . . . . . . . . . . :     ELNWM
+   Activation group attribute . . . . . . . . . . :   QILE
+   Shared activation group  . . . . . . . . . . . :   *NO
+   User profile . . . . . . . . . . . . . . . . . :   *USER
+   Use adopted authority  . . . . . . . . . . . . :   *YES
+   Coded character set identifier . . . . . . . . :   65535
+   Number of modules  . . . . . . . . . . . . . . :   1
+   Number of service programs . . . . . . . . . . :   6
+   Number of unresolved references  . . . . . . . :   0
+   Number of copyrights . . . . . . . . . . . . . :   0
+   All creation data  . . . . . . . . . . . . . . :   *YES
+   Observable information compressed  . . . . . . :   *NO
+   Run time information compressed  . . . . . . . :   *NO
+   Allow update . . . . . . . . . . . . . . . . . :   *YES
+   Allow bound *SRVPGM library name update  . . . :   *NO
+   Profiling data . . . . . . . . . . . . . . . . :   *NOCOL
+   Teraspace storage enabled PEP  . . . . . . . . :   *YES
+   Teraspace storage enabled modules  . . . . . . :   *ALL
+   Storage model  . . . . . . . . . . . . . . . . :   *SNGLVL
+   Argument optimization  . . . . . . . . . . . . :   *NO
+   Text description . . . . . . . . . . . . . . . :   PT  Batch Pgm - Demographic Changes
+ Program statistics:
+   Number of parameters . . . . . . . . . . . . . :   0            255
+   Associated space size (decompressed) . . . . . :   4096
+   Static storage size  . . . . . . . . . . . . . :   39744
+   Allow static storage reinitialization  . . . . :   *NO
+   Program size . . . . . . . . . . . . . . . . . :   1548288
+   Program state  . . . . . . . . . . . . . . . . :   *USER
+   Program domain . . . . . . . . . . . . . . . . :   *USER
+   Release program created on . . . . . . . . . . :   V6R1M0
+   Release program created for  . . . . . . . . . :   V5R3M0
+   Earliest release program can run . . . . . . . :   V5R3M0
+   Conversion required  . . . . . . . . . . . . . :   *NO
+   Conversion detail  . . . . . . . . . . . . . . :   *COMMON
+ Program performance information:
+   Paging pool  . . . . . . . . . . . . . . . . . :   *USER
+   Paging amount  . . . . . . . . . . . . . . . . :   *BLOCK
+Display Program Information                                                 Page     2
+5770SS1 V7R1M0  100423                                                                            
+DEV       06/29/17  15:56:33 CDT
+ Program  . . . . . . . :   HRZ105A                                 
+ Library  . . . . . . . :   EHRHRMS06#
+ Owner  . . . . . . . . :   QPGMR
+ Program attribute  . . :   RPGLE
+ Detail . . . . . . . . :   *SIZE
+ Program size (decompressed) and limit information:
+   Total program size (KB):
+     Current  . . . . . . . . . . . . . . . . . . :   1512
+     Maximum  . . . . . . . . . . . . . . . . . . :   268435456
+   Number of modules:
+     Current  . . . . . . . . . . . . . . . . . . :   1
+     Maximum  . . . . . . . . . . . . . . . . . . :   32767
+   Number of service programs:
+     Current  . . . . . . . . . . . . . . . . . . :   6
+     Maximum  . . . . . . . . . . . . . . . . . . :   32766
+   String directory (bytes):
+     Current  . . . . . . . . . . . . . . . . . . :   39
+     Maximum  . . . . . . . . . . . . . . . . . . :   16777184
+   Copyright strings (bytes):
+     Current  . . . . . . . . . . . . . . . . . . :   0
+     Maximum  . . . . . . . . . . . . . . . . . . :   16777184
+   Number of auxiliary storage segments:
+     Current  . . . . . . . . . . . . . . . . . . :   6
+     Maximum  . . . . . . . . . . . . . . . . . . :   16384
+   Static storage size (bytes):
+     Minimum  . . . . . . . . . . . . . . . . . . :   39744
+     Maximum  . . . . . . . . . . . . . . . . . . :   39744
+Display Program Information                                                 Page     3
+5770SS1 V7R1M0  100423                                                                            
+DEV       06/29/17  15:56:33 CDT
+ Program  . . . . . . . :   HRZ105A                                 
+ Library  . . . . . . . :   EHRHRMS06#
+ Owner  . . . . . . . . :   QPGMR
+ Program attribute  . . :   RPGLE
+ Detail . . . . . . . . :   *MODULE
+                                              Creation     Optimization     Debug
+ Module         Library        Attribute      Date            Level         Data
+ HRZ105A        ELNWM          RPGLE          01/30/12     *NONE            *YES
+Display Program Information                                                 Page     4
+5770SS1 V7R1M0  100423                                                                            
+DEV       06/29/17  15:56:33 CDT
+ Program  . . . . . . . :   HRZ105A                                 
+ Library  . . . . . . . :   EHRHRMS06#
+ Owner  . . . . . . . . :   QPGMR
+ Program attribute  . . :   RPGLE
+ Detail . . . . . . . . :   *SRVPGM
+ Service
+ Program        Library        Activation     Signature
+ HC_000S        *LIBL          *IMMED         D22AB536FFF3141A69AFE0022AA6C1F4
+ QRNXIE         QSYS           *IMMED         D8D9D5E7C9C540404040404040404040
+ QRNXIO         QSYS           *IMMED         D8D9D5E7C9D640404040404040404040
+ QRNXUTIL       QSYS           *IMMED         D8D9D5E7E4E3C9D34040404040404040
+ QRNXDUMP       QSYS           *IMMED         D8D9D5E7C4E4D4D74040404040404040
+ QLEAWI         QSYS           *IMMED         44F70FABA08585397BDF0CF195F82EC1
+Display Program Information                                                 Page     5
+5770SS1 V7R1M0  100423                                                                            
+DEV       06/29/17  15:56:33 CDT
+ Program  . . . . . . . :   HRZ105A                                 
+ Library  . . . . . . . :   EHRHRMS06#
+ Owner  . . . . . . . . :   QPGMR
+ Program attribute  . . :   RPGLE
+ Detail . . . . . . . . :   *ACTGRPEXP
+Activation group exports:
+ Data Item                                                               Size
+   (No activation group exports)
+Display Program Information                                                 Page     6
+5770SS1 V7R1M0  100423                                                                            
+DEV       06/29/17  15:56:33 CDT
+ Program  . . . . . . . :   HRZ105A                                 
+ Library  . . . . . . . :   EHRHRMS06#
+ Owner  . . . . . . . . :   QPGMR
+ Program attribute  . . :   RPGLE
+ Detail . . . . . . . . :   *ACTGRPIMP
+Activation group imports:
+ Data Item
+   (No activation group imports)
+Display Program Information                                                 Page     7
+5770SS1 V7R1M0  100423                                                                            
+DEV       06/29/17  15:56:33 CDT
+ Program  . . . . . . . :   HRZ105A                                 
+ Library  . . . . . . . :   EHRHRMS06#
+ Owner  . . . . . . . . :   QPGMR
+ Program attribute  . . :   RPGLE
+ Detail . . . . . . . . :   *COPYRIGHT
+                                                       
+Copyright information:
+   (No copyright information)
+                                        * * * * *   E N D   O F   L I S T I N G   * * * * *

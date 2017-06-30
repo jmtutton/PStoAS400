@@ -8,8 +8,7 @@ public class ServerProperties {
 	private static String peopleSoftHomePath; //$PS_HOME
 	private static String remoteAdServerName; //$RMTNTADSVR
 	private static String remoteExecScript; //$RexecScript
-	private static String remoteServerName; //$RMTSVR
-	private static Integer remoteServerPort = 22;
+	private static String remoteServerHostName; //$RMTSVR
 	private static String remoteServerUsername = "PSHRINT";
 	private static String remoteServerPassword = "SMRHET01";
 	
@@ -55,11 +54,11 @@ public class ServerProperties {
 	public static void setRemoteExecScript(String remoteExecScript) {
 		ServerProperties.remoteExecScript = remoteExecScript;
 	}
-	public static String getRemoteServerName() {
-		return remoteServerName != null ? remoteServerName.trim() : remoteServerName;
+	public static String getRemoteServerHostName() {
+		return remoteServerHostName != null ? remoteServerHostName.trim() : remoteServerHostName;
 	}
-	public static void setRemoteServerName(String remoteServerName) {
-		ServerProperties.remoteServerName = remoteServerName != null ? remoteServerName.trim() : remoteServerName;
+	public static void setRemoteServerHostName(String remoteServerHostName) {
+		ServerProperties.remoteServerHostName = remoteServerHostName != null ? remoteServerHostName.trim() : remoteServerHostName;
 	}
 	
 	public static String getRemoteServerUsername() {
@@ -82,15 +81,8 @@ public class ServerProperties {
 				+ "oracleSystemId: " + ServerProperties.oracleSystemId + "\n" //$ORACLE_SID
 				+ "peopleSoftHomePath: " + ServerProperties.peopleSoftHomePath + "\n" //$PS_HOME
 				+ "remoteAdServerName: " + ServerProperties.remoteAdServerName + "\n" //$RMTNTADSVR
-				+ "remoteServerName: " + ServerProperties.remoteServerName + "\n" //$RexecScript
+				+ "remoteServerHostName: " + ServerProperties.remoteServerHostName + "\n" //$RexecScript
 				+ "remoteServerUserName: " + ServerProperties.remoteServerUsername + "\n" //$RexecScript
 				+ "remoteServerPassword: " + ServerProperties.remoteServerPassword + "\n"; //$RMTSVR
 	}
-	public static Integer getRemoteServerPort() {
-		return remoteServerPort;
-	}
-	public static void setRemoteServerPort(Integer remoteServerPort) {
-		ServerProperties.remoteServerPort = remoteServerPort;
-	}
-
 }

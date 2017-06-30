@@ -149,4 +149,61 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	    return numberOfRecordsUpdated;
 	}
 
+	/**
+	 * Check-If-POI-Termed from ZHRI100A.SQR
+	 * This routine checks if it is a POI to EMP transfer. If it is then the the flag is changed to W and wait for Hire
+	 * @param 
+	 * @param 
+	 * @return
+	 */
+	//TODO: 
+	public static Boolean ZHRI100A_checkIfPoiTermed(String employeeId) {
+		System.out.println("********** PszTriggerNonPerson.ZHRI100A_checkIfPoiTermed()");
+		//BEGIN-PROCEDURE Check-if-POI-Termed
+		//LET $taskflag = ' '
+		//BEGIN-SELECT
+		//SEC.TASK_FLAG
+		//LET $taskflag = LTRIM(RTRIM(&SEC.TASK_FLAG, ' '), ' ')
+		//FROM PS_ZHRT_ALTTRIGGER SEC
+		//WHERE SEC.PROC_NAME = 'ZHRI202A'
+		//		AND SEC.EMPLID = $PSEmplid
+		//		AND SEC.SEQUENCE = 0
+		//		AND SEC.SEQ_NBR = 
+		//			(SELECT MAX(SEC1.SEQ_NBR) FROM PS_ZHRT_ALTTRIGGER SEC1
+		//				WHERE SEC1.PROC_NAME = 'ZHRI202A'
+		//					AND SEC1.EMPLID = $PSEmplid
+		//					AND SEC1.SEQUENCE = 0)     
+		//END-SELECT
+		//END-PROCEDURE Check-if-POI-Termed  
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = em.createQuery(
+	    		    "SELECT p.completionStatus FROM PszTriggerNonPerson p "
+	    		    		+ "WHERE TRIM(UPPER(p.processName)) = :processName "
+	    		    		+ "		AND TRIM(UPPER(p.employeeId)) = :employeeId "
+	    		    		+ "		AND p.eidIndexNumber = :eidIndexNumber "
+	    		    		+ "		AND p.sequenceNumber = "
+	    		    		+ "			(SELECT MAX(p2.sequenceNumber) FROM PszTriggerNonPerson p2 "
+	    		    		+ "				WHERE TRIM(UPPER(p2.processName)) = :processName "
+	    		    		+ "					AND TRIM(UPPER(p2.employeeId)) = :employeeId "
+	    		    		+ "					AND TRIM(UPPER(p2.eidIndexNumber)) = :eidIndexNumber) ", String.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("eidIndexNumber", 0)
+	    		    .setParameter("processName", "ZHRI202A")
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		String completionStatus = resultList.get(0);
+	    		return ("C".equalsIgnoreCase(completionStatus) || "P".equalsIgnoreCase(completionStatus));
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return false;	
+	}
+
 }

@@ -12,6 +12,8 @@ public class ProcessParameters {
 		private String operatorId; //$PSOperId
 		private String employeeId; //PSEmpl
 //		private BigDecimal indexNumber;
+		private BigDecimal effectiveSequence;
+		private BigDecimal eidIndexNumber;
 		private Date effectiveDate;
 		
 		private Boolean poiFlag; //$PoiFlag
@@ -26,7 +28,6 @@ public class ProcessParameters {
 		private String errorMessageParameter;
 		private String errorDateParameter;
 		private String errorTimeParameter;
-		private BigDecimal effectiveSequence;
 		
 //		public String getAuditOperatorId() {
 //			return auditOperatorId != null ? auditOperatorId.trim() : auditOperatorId;
@@ -123,6 +124,12 @@ public class ProcessParameters {
 		}
 		public BigDecimal getEffectiveSequence() {
 			return this.effectiveSequence;
+		}
+		public BigDecimal getEidIndexNumber() {
+			return eidIndexNumber;
+		}
+		public void setEidIndexNumber(BigDecimal eidIndexNumber) {
+			this.eidIndexNumber = eidIndexNumber;
 		}
 		@Override
 		public String toString() {

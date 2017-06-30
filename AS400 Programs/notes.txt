@@ -1,0 +1,4 @@
+ls /qsys.lib/EHRHRMS06#.LIB/HRZ*.PGM
+
+
+ pr /qsys.lib/EHRHRMS06#.LIB/HRZ102A.PGM

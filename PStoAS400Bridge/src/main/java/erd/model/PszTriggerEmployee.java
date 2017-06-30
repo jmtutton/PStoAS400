@@ -82,9 +82,31 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    		    "SELECT p FROM PszTriggerEmployee p "
 	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
 	    		    		+ "AND TRIM(UPPER(p.processName)) = :processName "
-	    		    		+ "ORDER BY p.sequenceNumber", PszTriggerEmployee.class)
+	    		    		+ "ORDER BY p.sequenceNumber "
+	    		    		+ "LIMIT 150 ", PszTriggerEmployee.class)
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .setParameter("processName", processName.toUpperCase().trim())
+	    		    .getResultList();
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+    }
+	
+	public static List<PszTriggerEmployee> findPending() {
+		System.out.println("PszTriggerEmployee.findByCompletionStatusAndProcessName()");
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	return em.createQuery(
+	    		    "SELECT p FROM PszTriggerEmployee p "
+	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = 'P' "
+	    		    		+ "ORDER BY p.sequenceNumber "
+	    		    		+ "LIMIT 150 ", PszTriggerEmployee.class)
 	    		    .getResultList();
 	    }
 	    catch (Exception e) {
@@ -176,6 +198,7 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	    		    		+ "				WHERE pj3.employeeId = pj.employeeId "
 	    		    		+ "					AND pj3.employmentRecordNumber = pj.employmentRecordNumber "
 	    		    		+ "					AND pj3.effectiveDate = pj.effectiveDate) "
+	    		    		+ "LIMIT 150 "
 	    			, PszTriggerEmployee.class)
 	    		    .setParameter("asOfToday", DateUtil.asOfToday(), TemporalType.DATE)
 //	    		    .setParameter("completionStatus", "P")
@@ -282,37 +305,37 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	/**
 	 * setCompletionStatusBySequenceNumber
 	 * Replaces Update-Trigger-Row from ZHRI100A.SQR
-	 * Updates the trigger file flag switch
+	 * Updates TASK_FLAG in PS_ZHRT_INTTRIGGER 
 	 * @param completionStatus
 	 * @param sequenceNumber
-	 * @return
+	 * @return numberOfRecordsUpdated
 	 */
 	public static int setCompletionStatusBySequenceNumber(String completionStatus, BigDecimal sequenceNumber) {
 		System.out.println("PszTriggerEmployee.setCompletionStatusBySequenceNumber()");
 		int numberOfRecordsUpdated = 0;
-//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//		EntityManager em = emfactory.createEntityManager();
-//    	EntityTransaction transaction = em.getTransaction();
-//	    try {
-//	    	transaction.begin();
-//	    	numberOfRecordsUpdated = em.createQuery(
-//	    			"UPDATE PszTriggerEmployee p "
-//	    		    		+ "SET p.completionStatus = :completionStatus "
-//	    		    		+ "WHERE p.sequenceNumber = :sequenceNumber")
-//	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
-//	    		    .setParameter("sequenceNumber", sequenceNumber)
-//	    		    .executeUpdate();
-//	    	transaction.commit();
-//	    }
-//	    catch (Exception e) {
-//	    	if(transaction.isActive()) {
-//	    		transaction.rollback();
-//	    	}
-//	    	e.printStackTrace();
-//	    }
-//	    finally {
-//	    	em.close();
-//	    }
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+    	EntityTransaction transaction = em.getTransaction();
+	    try {
+	    	transaction.begin();
+	    	numberOfRecordsUpdated = em.createQuery(
+	    			"UPDATE PszTriggerEmployee p "
+	    		    		+ "SET p.completionStatus = :completionStatus "
+	    		    		+ "WHERE p.sequenceNumber = :sequenceNumber")
+	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
+	    		    .setParameter("sequenceNumber", sequenceNumber)
+	    		    .executeUpdate();
+	    	transaction.commit();
+	    }
+	    catch (Exception e) {
+	    	if(transaction.isActive()) {
+	    		transaction.rollback();
+	    	}
+	    	e.printStackTrace();
+	    }
+	    finally {
+	    	em.close();
+	    }
 	    return numberOfRecordsUpdated;
 	}
 }

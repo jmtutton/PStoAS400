@@ -40,9 +40,9 @@ public class NonPersonTermination {
 		System.out.println("********** HR202_callSystem()");
 		String completionStatus = "E";
 		//BEGIN-PROCEDURE HR202-CALL-SYSTEM
-		String commandString = ZHRI100A.composeCommandString(commonParameters, composeParameterStringForHrz202AProcess(terminationProcessParameters));
+		String commandString = ZHRI100A.composeAs400RexecCommandString(commonParameters.getProcessName(), composeParameterStringForHrz202AProcess(terminationProcessParameters));
 		//DO Call-System   !From ZHRI100A.SQR
-		Integer status = ZHRI100A.ZHRI100A_callSystem(commandString, commonParameters);
+		Integer status = ZHRI100A.executeCommand(commandString, commonParameters);
 		//!SHOW 'Command : ' $Command
 		System.out.println("$Command=> " + commandString);
 		//IF (#Status = 0)
@@ -95,7 +95,7 @@ public class NonPersonTermination {
 		terminationProcessParameters.setTerminationDate(trigger.getEffectiveDate());
 		//!SHOW '$PSTermDate: ' $PSTermDate
 		//DO Get-OprId
-		String psOprId = ZHRI100A.ZHRI100A_getOprId(commonParameters);
+		String psOprId = ZHRI100A.findLegacyEmployeeId(commonParameters);
 		//LET $PSEmpl = $PSOprid
 		commonParameters.setEmployeeId(psOprId);
 		terminationProcessParameters.setEmployeeId(psOprId);

@@ -65,7 +65,7 @@ public class EmployeeDateChange {
 		HR07_initializeFields(commonParameters, trigger, dateChangeProcessParameters);
 		//!call procedures to get necessary PeopleSoft changed values for legacy
 		//DO Get-OprId   !gets valid operator ID using code from ZHRI100A.sqr
-		String oprId = ZHRI100A.ZHRI100A_getOprId(commonParameters);
+		String oprId = ZHRI100A.findLegacyEmployeeId(commonParameters);
 		//LET $LegacyEmplid = $PSOprid
 		dateChangeProcessParameters.setEmployeeId(oprId);
 		//IF $LegacyEmplid <> '' AND $LegacyEmplid <> ' '  !New OprId not null or blank on return
@@ -211,10 +211,9 @@ public class EmployeeDateChange {
 		//BEGIN-PROCEDURE HR07-CALL-RPG
 		//!Setup the parameter list with what needs to be passed to the RPG program to update the legacy system
 		String parameterString = composeParameterStringForHrz107AProcess(dateChangeProcessParameters);
-		commonParameters.setProcessName("HRZ107A");
-		String commandString = ZHRI100A.composeCommandString(commonParameters, parameterString);
+		String commandString = ZHRI100A.composeAs400RexecCommandString(commonParameters.getProcessName(), parameterString);
 		//DO Call-System    !Do a remote call to the RPG program, HRZ107A, in order to pass the parms from code in ZHRI100A.sqr
-		Integer status = ZHRI100A.ZHRI100A_callSystem(commandString, commonParameters);
+		Integer status = ZHRI100A.executeCommand(commandString, commonParameters);
 		//IF (#STATUS = 0)
 		if(status == 0) {
 			//LET $CompletionStatus = 'C'

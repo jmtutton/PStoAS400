@@ -1,8 +1,6 @@
 package erd.controller;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import erd.model.ProcessParameters;
 import erd.model.ProcessParameters.TerminationProcessParameters;
@@ -134,7 +132,7 @@ public class EmployeeTermination {
 //		System.out.println("************************************************** trigger: \n" + trigger.toString());
 		PsJob psJob = HR02_getJob(terminationProcessParameters, commonParameters);
 		//DO ZHRI100A.Get-OprId
-		String employeeId = ZHRI100A.ZHRI100A_getOprId(commonParameters);
+		String employeeId = ZHRI100A.findLegacyEmployeeId(commonParameters);
 		//ZHRI100A.psOprId = psOprId;
 //		commonParameters.setOperatorId(psOprId);
 //		//LET $ADLegOprid = $psOprId
@@ -208,11 +206,10 @@ public class EmployeeTermination {
 		//DO HR02-Trim-Parameters     !Routine to trim the parameters to insure that there are not a larger number of blanks being passed
 		HR02_trimParameters(terminationProcessParameters);
 //		String commandString = makeAS400PackageForHRZ102AProcess(commonParameters, terminationProcessParameters);
-		commonParameters.setProcessName("HRZ102A");
-		String commandString = ZHRI100A.composeCommandString(commonParameters, composeParameterStringForHrz102AProcess(terminationProcessParameters));
+		String commandString = ZHRI100A.composeAs400RexecCommandString(commonParameters.getProcessName(), composeParameterStringForHrz102AProcess(terminationProcessParameters));
 //		System.out.println(terminationProcessParameters.toString());
 		//DO Call-System   !From ZHRI100A.SQR
-		Integer status = ZHRI100A.ZHRI100A_callSystem(commandString, commonParameters);
+		Integer status = ZHRI100A.executeCommand(commandString, commonParameters);
 		//IF (#Status = 0)
 		if(status == 0) { //no error returned from process
 			//LET $CompletionStatus = 'C'   !Completed Normally
@@ -345,7 +342,6 @@ public class EmployeeTermination {
 			//LET $ErrorMessageParm = 'Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF'
 			commonParameters.setErrorMessageParameter("Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF");
 			//DO Call-Error-Routine       !From ZHRI100A.SQR
-			commonParameters.setProcessName("HRZ102A");
 //			String commandString = ZHRI100A.ZHRI100A_callErrorRoutine(commonParameters);
 			ZHRI100A.ZHRI100A_callErrorRoutine(commonParameters);
 			//!Default the Action and reason in the legacy system
@@ -429,7 +425,7 @@ public class EmployeeTermination {
 //		String errorMessageParameter = commonParameters.getErrorMessageParameter();
 //		String criticalFlag = commonParameters.getCriticalFlag() ? "Y" : "N";
 //		Calendar now = Calendar.getInstance();
-//		String errorDateParameter =  now.get(Calendar.MONTH) + "/" + now.get(Calendar.DATE) + "/" + now.get(Calendar.YEAR);
+//		String errorDateParameter =  now.get(Calendar.MONTH) + "" + now.get(Calendar.DATE) + "" + now.get(Calendar.YEAR);
 //		String errorTimeParameter = now.get(Calendar.HOUR_OF_DAY) + ":" + now.get(Calendar.MINUTE) + ":" + now.get(Calendar.SECOND);
 //		String opridErrorParameter = commonParameters.getOperatorId();
 //		String yesOrNoParameter = "Y"; //TODO: What should this value really be called
@@ -476,8 +472,11 @@ public class EmployeeTermination {
 	 * 
 	 * @param terminationProcessParameters
 	 */
-	private String composeParameterStringForHrz102AProcess(TerminationProcessParameters terminationProcessParameters) {
+	public static String composeParameterStringForHrz102AProcess(TerminationProcessParameters terminationProcessParameters) {
 		System.out.println("********** composeParameterStringForHrz102AProcess");
+		//!$PSTermReason is at most 30 positions long, but HRZ102A receives it with a length of 35 positions.
+		//LET $PSTermReason = RPAD($PSTermReason, 35, ' ')  !Make sure not less than 35 long
+		String terminationReason = String.format("%1$-35s", terminationProcessParameters.getTerminationReason());
 		String command = "'" + terminationProcessParameters.getEmployeeId() + "' "
 				+ "'" + terminationProcessParameters.getTerminationMonth() + "' "
 				+ "'" + terminationProcessParameters.getTerminationDay() + "' "
@@ -488,7 +487,7 @@ public class EmployeeTermination {
 				+ "'" + terminationProcessParameters.getVoluntaryOrInvoluntary() + "' "
 				+ "'" + terminationProcessParameters.getTerminationCode() + "' "
 				+ "'" + terminationProcessParameters.getOperatorId() + "' "
-				+ "'" + terminationProcessParameters.getTerminationReason() + "'";
+				+ "'" + terminationReason + "'";
 		return command;
 	}
 
