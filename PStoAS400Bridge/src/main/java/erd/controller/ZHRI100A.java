@@ -8,13 +8,12 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import erd.model.CrossReferenceEmployeeId;
 import erd.model.CrossReferenceMultipleEmployeeId;
 import erd.model.HR036P;
-import erd.model.ProcessParameters;
-import erd.model.ProcessParameters.CommonParameters;
 import erd.model.PsDbOwner;
 import erd.model.PsJob;
 import erd.model.PszTriggerEmployee;
@@ -136,137 +135,146 @@ public class ZHRI100A {
 	 * @param trigger
 	 * @return
 	 */
-	public static CommonParameters initializeCommonParameters(PszTriggerSuperclass trigger) {
-		System.out.println("*** ZHRI100A.initializeCommonParameters() ***");
-		CommonParameters commonParameters = new ProcessParameters().new CommonParameters();
-		commonParameters.setCriticalFlag(false); //from Process-Main
-		commonParameters.setProcessName(trigger.getProcessName());
-		commonParameters.setEmployeeId(trigger.getEmployeeId());
-		commonParameters.setOperatorId(trigger.getOperatorId());
-		commonParameters.setEffectiveDate(trigger.getEffectiveDate());
-		commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
-		commonParameters.setCompletionStatus(trigger.getCompletionStatus());
-		commonParameters.setPoiFlag(false);
-		return commonParameters;
+	public static HashMap<String, Object> initializeParameterMap(PszTriggerSuperclass trigger) {
+		System.out.println("********** initializeCommonParameters");
+		HashMap<String, Object> parameterMap = new HashMap<String, Object>();
+		parameterMap.put("criticalFlag", false);
+		parameterMap.put("processName", trigger.getProcessName());
+		parameterMap.put("employeeId", trigger.getEmployeeId());
+		parameterMap.put("operatorId", trigger.getOperatorId());
+		parameterMap.put("effectiveDate", trigger.getEffectiveDate());
+		parameterMap.put("effectiveSequence", trigger.getEffectiveSequence());
+		parameterMap.put("completionStatus", trigger.getCompletionStatus());
+		parameterMap.put("poiFlag", false);
+//		CommonParameters commonParameters = 
+//		CommonParameters commonParameters = new ProcessParameters().new CommonParameters();
+//		commonParameters.setCriticalFlag(false); //from Process-Main
+//		commonParameters.setProcessName(trigger.getProcessName());
+//		commonParameters.setEmployeeId(trigger.getEmployeeId());
+//		commonParameters.setOperatorId(trigger.getOperatorId());
+//		commonParameters.setEffectiveDate(trigger.getEffectiveDate());
+//		commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
+//		commonParameters.setCompletionStatus(trigger.getCompletionStatus());
+//		commonParameters.setPoiFlag(false);
+		return parameterMap;
 	}
 
 	/**
-	 * processTrigger
-	 * Execute appropriate process based on the process name in the trigger record.
+	 * Call-Programs from ZHRI100A.SQR
+	 * Subroutine will call appropriate programs
 	 * @param trigger
-	 * @return completionStatus
+	 * @return
 	 */
 	public static String processTrigger(PszTriggerSuperclass trigger) {
-		System.out.println("*** ZHRI100A.processTrigger() ***");
-		CommonParameters commonParameters = initializeCommonParameters(trigger);
-		String completionStatus = commonParameters.getCompletionStatus();
-		switch(commonParameters.getProcessName()) {
+		System.out.println("********** ZHRI100A_callPrograms");
+		HashMap<String, Object> parameterMap = initializeParameterMap(trigger);
+		String completionStatus = (String)parameterMap.get("completionStatus");
+		switch((String)parameterMap.get("processName")) {
 		case "ZHRI101A": //Process to hire employee
 			EmployeeNewHire employeeNewHire = new EmployeeNewHire();
-			completionStatus = employeeNewHire.processEmployeeNewHire(commonParameters);
+			completionStatus = employeeNewHire.processEmployeeNewHire(parameterMap);
 			break;
 		case "ZHRI102A": //Process to terminate an employee
 			EmployeeTermination employeeTermination = new EmployeeTermination();
-			completionStatus = employeeTermination.processEmployeeTermination(commonParameters);
+			completionStatus = employeeTermination.processEmployeeTermination(parameterMap);
 			break;
 		case "ZHRI104A": //Process for job profile change
 			EmployeeJobProfileChange employeeJobProfileChange = new EmployeeJobProfileChange();
-			completionStatus = employeeJobProfileChange.processEmployeeJobProfileChange(commonParameters);
+			completionStatus = employeeJobProfileChange.processEmployeeJobProfileChange(parameterMap);
 			break;
 		case "ZHRI105A": //Process for demographics change
 			EmployeeDemographicChange employeeDemographicChange = new EmployeeDemographicChange();
-			completionStatus = employeeDemographicChange.processEmployeeDemographicChange(commonParameters);
+			completionStatus = employeeDemographicChange.processEmployeeDemographicChange(parameterMap);
 			break;
 		case "ZHRI106A": 
 			//DO HR01-Process-Main       !ZHRI101A.SQC
 			EmployeeNewHire employeeNewHire2 = new EmployeeNewHire();
-			completionStatus = employeeNewHire2.processEmployeeNewHire(commonParameters);
+			completionStatus = employeeNewHire2.processEmployeeNewHire(parameterMap);
 			break;
 		case "ZHRI107A": //Process for converting dates
 			EmployeeDateChange employeeDateChange = new EmployeeDateChange();
-			completionStatus = employeeDateChange.processEmployeeDateChange(commonParameters);
+			completionStatus = employeeDateChange.processEmployeeDateChange(parameterMap);
 			break;
 		case "ZHRI109A": //Process for group transfer
 			EmployeeGroupTransfer employeeGroupTransfer = new EmployeeGroupTransfer();
-			completionStatus = employeeGroupTransfer.processEmployeeGroupTransfer(commonParameters);
+			completionStatus = employeeGroupTransfer.processEmployeeGroupTransfer(parameterMap);
 			break;
 		case "ZHRI101D": //Row deleted on hire
-			commonParameters.setErrorProgramParameter("HRZ101A");
-			commonParameters.setErrorMessageParameter("A row was deleted on the hire process");
-			commonParameters.setCriticalFlag(true);
-			executeErrorCommand(commonParameters);
-			commonParameters.setCriticalFlag(false);
+			parameterMap.put("errorProgramParameter", "HRZ101A");
+			parameterMap.put("errorMessageParameter", "A row was deleted on the hire process");
+			parameterMap.put("criticalFlag", true);
+			executeErrorCommand(parameterMap);
+			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
 		case "ZHRI102D": //Row deleted on term
-			commonParameters.setErrorProgramParameter("HRZ102A");
-			commonParameters.setErrorMessageParameter("A row was deleted on the termination process");
-			commonParameters.setCriticalFlag(true);
-			executeErrorCommand(commonParameters);
-			commonParameters.setCriticalFlag(false);
+			parameterMap.put("errorProgramParameter", "HRZ102A");
+			parameterMap.put("errorMessageParameter", "A row was deleted on the termination process");
+			parameterMap.put("criticalFlag", true);
+			executeErrorCommand(parameterMap);
+			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
 		case "ZHRI104D": //Row deleted on job status change
-			commonParameters.setErrorProgramParameter("HRZ104A");
-			commonParameters.setErrorMessageParameter("A row was deleted on the job profile process");
-			commonParameters.setCriticalFlag(true);
-			executeErrorCommand(commonParameters);
-			commonParameters.setCriticalFlag(false);
+			parameterMap.put("errorProgramParameter", "HRZ104A");
+			parameterMap.put("errorMessageParameter", "A row was deleted on the job profile process");
+			parameterMap.put("criticalFlag", true);
+			executeErrorCommand(parameterMap);
+			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
 		case "ZHRI105D": //Row deleted on demographics change
-			commonParameters.setErrorProgramParameter("HRZ105A");
-			commonParameters.setErrorMessageParameter("A row was deleted on the demographics process");
-			commonParameters.setCriticalFlag(true);
-			executeErrorCommand(commonParameters);
-			commonParameters.setCriticalFlag(false);
+			parameterMap.put("errorProgramParameter", "HRZ105A");
+			parameterMap.put("errorMessageParameter", "A row was deleted on the demographics process");
+			parameterMap.put("criticalFlag", true);
+			executeErrorCommand(parameterMap);
+			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
 		case "ZHRI106D": //Row deleted on rehire
-			commonParameters.setErrorProgramParameter("HRZ101A");
-			commonParameters.setErrorMessageParameter("A row was deleted on the re-hire process");
-			commonParameters.setCriticalFlag(true);
-			executeErrorCommand(commonParameters);
-			commonParameters.setCriticalFlag(false);
+			parameterMap.put("errorProgramParameter", "HRZ101A");
+			parameterMap.put("errorMessageParameter", "A row was deleted on the re-hire process");
+			parameterMap.put("criticalFlag", true);
+			executeErrorCommand(parameterMap);
+			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
 		case "ZHRI107D": //Row deleted on the dates process
-			commonParameters.setErrorProgramParameter("HRZ107A");
-			commonParameters.setErrorMessageParameter("A row was deleted on the dates process");
-			commonParameters.setCriticalFlag(true);
-			executeErrorCommand(commonParameters);
-			commonParameters.setCriticalFlag(false);
+			parameterMap.put("errorProgramParameter", "HRZ107A");
+			parameterMap.put("errorMessageParameter", "A row was deleted on the dates process");
+			parameterMap.put("criticalFlag", true);
+			executeErrorCommand(parameterMap);
+			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
 		case "ZHRI109D": //Row deleted on the group transfer process
-			commonParameters.setErrorProgramParameter("HRZ109A");
-			commonParameters.setErrorMessageParameter("A row was deleted on the group transfer process");
-			commonParameters.setCriticalFlag(true);
-			commonParameters.setProcessName(commonParameters.getProcessName());
-			executeErrorCommand(commonParameters);
-			commonParameters.setCriticalFlag(false);
+			parameterMap.put("errorProgramParameter", "HRZ109A");
+			parameterMap.put("errorMessageParameter", "A row was deleted on the group transfer process");
+			parameterMap.put("criticalFlag", true);
+			executeErrorCommand(parameterMap);
+			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
 		case "ZHRI201A": //Non-person new hire
-			commonParameters.setPoiFlag(true);
+			parameterMap.put("poiFlag", true);
 			NonPersonNewHire nonPersonNewHire = new NonPersonNewHire();
-			completionStatus = nonPersonNewHire.processNonPersonNewHire(commonParameters);
+			completionStatus = nonPersonNewHire.processNonPersonNewHire(parameterMap);
 			break;
 		case "ZHRI202A": //Non-person termination
-			commonParameters.setPoiFlag(true);
+			parameterMap.put("poiFlag", true);
 			NonPersonTermination nonPersonTermination = new NonPersonTermination();
-			completionStatus = nonPersonTermination.processNonPersonTermination(commonParameters);
+			completionStatus = nonPersonTermination.processNonPersonTermination(parameterMap);
 			break;
 		case "ZHRI205A":
-			commonParameters.setPoiFlag(true);
+			parameterMap.put("poiFlag", true);
 			NonPersonDemographicChange nonPersonDemographicChange = new NonPersonDemographicChange();
-			completionStatus = nonPersonDemographicChange.processNonPersonDemographicChange(commonParameters);
+			completionStatus = nonPersonDemographicChange.processNonPersonDemographicChange(parameterMap);
 			break;
 		case "ZHRI206A": //Non-person 
-			commonParameters.setPoiFlag(true);
+			parameterMap.put("poiFlag", true);
 			//DO HR201-Process-Main       !ZHRI201A.SQC
 			NonPersonNewHire nonPersonNewHire2 = new NonPersonNewHire();
-			completionStatus = nonPersonNewHire2.processNonPersonNewHire(commonParameters);
+			completionStatus = nonPersonNewHire2.processNonPersonNewHire(parameterMap);
 			break;
 		default: //ERROR
 			//set to E to prevent looping and to mark the record as error
@@ -341,15 +349,15 @@ public class ZHRI100A {
 	 * @param commonParameters
 	 * @return 0 if success, non-zero if error
 	 */
-	public static Integer executeRemoteCommand(String commandString, CommonParameters commonParameters) {
+	public static Integer executeRemoteCommand(String commandString, HashMap<String, Object> parameterMap) {
 		System.out.println("*** ZHRI100A.ZHRI100A_callSystem() ***");
 		Integer status = executeCommandRexec(commandString);
 		if(status != 0) { //!error
-			commonParameters.setErrorProgramParameter("ZHRI100A");
-			commonParameters.setErrorMessageParameter("Error executing Call System command, contact HR-PeopleSoft On-Call");
-			commonParameters.setCriticalFlag(true);
-			commandString = composeRexecCommandString("HRZ110A", composeErrorParameterString(commonParameters));
-			commonParameters.setCriticalFlag(false);
+			parameterMap.put("errorProgramParameter", "ZHRI100A");
+			parameterMap.put("errorMessageParameter", "Error executing Call System command, contact HR-PeopleSoft On-Call");
+					parameterMap.put("criticalFlag", true);
+			commandString = composeRexecCommandString("HRZ110A", composeErrorParameterString(parameterMap));
+			parameterMap.put("criticalFlag", false);
 		}
 		return status;
 	}
@@ -361,11 +369,11 @@ public class ZHRI100A {
 	 * @param processName
 	 * @param commonParameters
 	 */
-	public static void executeErrorCommand(CommonParameters commonParameters) {
+	public static void executeErrorCommand(HashMap<String, Object> parameterMap) {
 		System.out.println("*** executeErrorCommand() ***");
 		String processName = "HRZ110A";
-		String commandString = composeRexecCommandString(processName, composeErrorParameterString(commonParameters));
-		executeRemoteCommand(commandString, commonParameters);
+		String commandString = composeRexecCommandString(processName, composeErrorParameterString(parameterMap));
+		executeRemoteCommand(commandString, parameterMap);
 	}
 
 	/**
@@ -421,18 +429,18 @@ public class ZHRI100A {
 	 * @param eidIndexNumber
 	 * @return legacyEmployeeId
 	 */
-	public static String fetchLegacyEmployeeId(CommonParameters commonParameters) {
+	public static String fetchLegacyEmployeeId(HashMap<String, Object> parameterMap) {
 		System.out.println("*** fetchLegacyEmployeeId() ***");
 		String employeeId;
-		if(commonParameters.getPoiFlag()) {
-			employeeId = CrossReferenceMultipleEmployeeId.ZHRI100A_getLegIdForSeqNum(commonParameters.getEmployeeId(), commonParameters.getEidIndexNumber());
+		if((Boolean)parameterMap.get("poiFlag")) {
+			employeeId = CrossReferenceMultipleEmployeeId.ZHRI100A_getLegIdForSeqNum((String)parameterMap.get("employeeId"), (BigDecimal)parameterMap.get("eidIndexNumber"));
 		}
 		else {
-			employeeId = CrossReferenceEmployeeId.ZHRI100A_getLegIdForSeq0(commonParameters.getEmployeeId());
+			employeeId = CrossReferenceEmployeeId.ZHRI100A_getLegIdForSeq0((String)parameterMap.get("employeeId"));
 		}
 		if(employeeId == null || employeeId.isEmpty()) {
-			BigDecimal indexNumber = commonParameters.getPoiFlag() ? commonParameters.getEffectiveSequence() : new BigDecimal(0);
-			employeeId = fetchNewLegacyEmployeeId(commonParameters.getEmployeeId(), indexNumber);
+			BigDecimal indexNumber = (Boolean)parameterMap.get("poiFlag") ? (BigDecimal)parameterMap.get("effectiveSequence") : new BigDecimal(0);
+			employeeId = fetchNewLegacyEmployeeId((String)parameterMap.get("employeeId"), indexNumber);
 		}
 		return employeeId;
 	}
@@ -688,10 +696,10 @@ public class ZHRI100A {
 	 * @param commonParameters
 	 * @return errorParameterString
 	 */
-	public static String composeErrorParameterString(CommonParameters commonParameters) {
+	public static String composeErrorParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("*** composeErrorParameterString() ***");
 		String blankSpaceParameter = " ";
-		String criticalFlagYN = commonParameters.getCriticalFlag() != null && commonParameters.getCriticalFlag() ? "Y" : "N";
+		String criticalFlagYN = parameterMap.get("criticalFlag") != null && (Boolean)parameterMap.get("criticalFlag") ? "Y" : "N";
 		Calendar now = Calendar.getInstance();
 		//format date to YYYYMMDD
 		String errorDateParameter =
@@ -702,16 +710,16 @@ public class ZHRI100A {
 		//TODO: What should this value really be called, and when is it not 'Y'??
 		String yesOrNoParameter = "Y";
 		//error message parameter must be 75 characters long
-		String errorMessageParameter = String.format("%1$-75s", commonParameters.getErrorMessageParameter());
-		String operatorIdParameter = commonParameters.getOperatorId();
+		String errorMessageParameter = String.format("%1$-75s", parameterMap.get("errorMessageParameter"));
+		String operatorIdParameter = (String)parameterMap.get("operatorId");
 		if(operatorIdParameter != null) {
 			operatorIdParameter = operatorIdParameter.toUpperCase();
 			if(operatorIdParameter.startsWith("E")) {
 				operatorIdParameter = operatorIdParameter.substring(1); //strip the E off of the front of the employee ID
 			}
 		}
-		String errorParameterString = "'" + commonParameters.getErrorProgramParameter() + "' "
-					+ "'" + commonParameters.getEmployeeId() + "' '" + commonParameters.getEffectiveSequence() + "' "
+		String errorParameterString = "'" + parameterMap.get("errorProgramParameter") + "' "
+					+ "'" + parameterMap.get("employeeId") + "' '" + parameterMap.get("effectiveSequence") + "' "
 					+ "'" + blankSpaceParameter + "' '" + errorMessageParameter + "' "
 					+ "'" + criticalFlagYN + "' '" + errorDateParameter + "' "
 					+ "'" + errorTimeParameter + "' '" + operatorIdParameter + "' "

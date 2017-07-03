@@ -1,7 +1,6 @@
 package erd.controller;
 
-import erd.model.ProcessParameters.CommonParameters;
-import erd.model.ProcessParameters.GroupTransferProcessParameters;
+import java.util.HashMap;
 
 /**
  * ZHRI109A - Group Transfer
@@ -10,13 +9,13 @@ import erd.model.ProcessParameters.GroupTransferProcessParameters;
  */
 public class EmployeeGroupTransfer {
 
-	public String processEmployeeGroupTransfer(CommonParameters commonParameters) {
-		GroupTransferProcessParameters processParameters = fetchProcessParameters(commonParameters);
-		composeParameterString(processParameters);
+	public String processEmployeeGroupTransfer(HashMap<String, Object> parameterMap) {
+		parameterMap = fetchProcessParameters(parameterMap);
+		composeParameterString(parameterMap);
 		return null;
 	}
 	
-	private GroupTransferProcessParameters fetchProcessParameters(CommonParameters commonParameters) {
+	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		return null;
 	}
 	
@@ -24,7 +23,7 @@ public class EmployeeGroupTransfer {
 	 * 
 	 * @param processParameters
 	 */
-	private String composeParameterString(GroupTransferProcessParameters processParameters) {
+	private String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("********** composeParameterStringForHrz109AProcess");
 		//'PARM('''                     ||
 		//$LegEmplid                    ||
@@ -41,13 +40,13 @@ public class EmployeeGroupTransfer {
 		//''' '''                       ||
 		//$LegEffdt                     ||
 		//''')"' 
-		String paramaterString = "'" + processParameters.getEmployeeId() + "' "
-				+ "'" + processParameters.getOperatorId() + "' "
-				+ "'" + processParameters.getEmployeeGroup() + "' "
-				+ "'" + processParameters.getEmployeeBranch() + "' "
-				+ "'" + processParameters.getNationalIdCountry() + "' "
-				+ "'" + processParameters.getNationalId() + "' "
-				+ "'" + processParameters.getEffectiveDate() + "'";
+		String paramaterString = "'" + parameterMap.get("employeeId") + "' "
+				+ "'" + parameterMap.get("operatorId") + "' "
+				+ "'" + parameterMap.get("employeeGroup") + "' "
+				+ "'" + parameterMap.get("employeeBranch") + "' "
+				+ "'" + parameterMap.get("nationalIdCountry") + "' "
+				+ "'" + parameterMap.get("nationalId") + "' "
+				+ "'" + parameterMap.get("effectiveDate") + "'";
 		return paramaterString;
 	}
 

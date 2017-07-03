@@ -1,7 +1,6 @@
 package erd.controller;
 
-import erd.model.ProcessParameters.CommonParameters;
-import erd.model.ProcessParameters.JobProfileProcessParameters;
+import java.util.HashMap;
 
 /**
  * ZHRI104A - Job Profile Change
@@ -11,13 +10,13 @@ import erd.model.ProcessParameters.JobProfileProcessParameters;
 
 public class EmployeeJobProfileChange {
 
-	public String processEmployeeJobProfileChange(CommonParameters commonParameters) {
-		JobProfileProcessParameters processParameters = fetchProcessParameters(commonParameters);
-		composeParameterString(processParameters);
+	public String processEmployeeJobProfileChange(HashMap<String, Object> parameterMap) {
+		parameterMap = fetchProcessParameters(parameterMap);
+		composeParameterString(parameterMap);
 		return null;
 	}
 	
-	private JobProfileProcessParameters fetchProcessParameters(CommonParameters commonParameters) {
+	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		return null;
 		
 	}
@@ -26,7 +25,7 @@ public class EmployeeJobProfileChange {
 	 * 
 	 * @param processParameters
 	 */
-	private String composeParameterString(JobProfileProcessParameters processParameters) {
+	private String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("********** composeParameterStringForHrz109AProcess");
 		//'PARM('''                   ||
 		//$LegEmplid                    ||

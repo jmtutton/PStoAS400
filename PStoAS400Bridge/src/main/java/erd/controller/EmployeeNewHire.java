@@ -1,7 +1,6 @@
 package erd.controller;
 
-import erd.model.ProcessParameters.CommonParameters;
-import erd.model.ProcessParameters.NewHireProcessParameters;
+import java.util.HashMap;
 
 /**
  * ZHRI101A - Employee New Hire Process
@@ -11,14 +10,14 @@ import erd.model.ProcessParameters.NewHireProcessParameters;
 
 public class EmployeeNewHire {
 
-	public String processEmployeeNewHire(CommonParameters commonParameters) {
+	public String processEmployeeNewHire(HashMap<String, Object> parameterMap) {
 		System.out.println("********** processEmployeeNewHire()");
-		NewHireProcessParameters processParameters = fetchProcessParameters(commonParameters);
-		composeParameterString(processParameters);
+		parameterMap = fetchProcessParameters(parameterMap);
+		composeParameterString(parameterMap);
 		return null;
 	}
 	
-	private NewHireProcessParameters fetchProcessParameters(CommonParameters commonParameters) {
+	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		return null;
 		
 	}
@@ -27,7 +26,7 @@ public class EmployeeNewHire {
 	 * 
 	 * @param newHireParameters
 	 */
-	private String composeParameterString(NewHireProcessParameters newHireProcessParameters) {
+	private String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("********** composeParameterString()");
 		//'PARM('''                              ||
 		//$LegAuditEmplid                        ||     !Legacy Emplid for audit field

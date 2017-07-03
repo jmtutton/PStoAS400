@@ -25,7 +25,6 @@ public class NonPersonTerminate {
 	 * This is the main processing procedure.
 	 */
 	public static void HR202_processMain(String psAuditOperId, Integer indexNum, Date psDateIn) {
-		Boolean poiFlag = true;
 //		String errorProgramParm = "HRZ202A";
 //		!show '$PSAuditOperId: ' $PSAuditOperId
 //		!show '$PSDateIn: '  $PSDateIn
@@ -51,7 +50,7 @@ public class NonPersonTerminate {
 		System.out.println("psTermDate: " + psTermDate);
 //		do Get-Oprid
 		String psEmpl = "?";
-		Integer eidIndexNumber = 0;
+//		Integer eidIndexNumber = 0;
 //		String psOprId = ZHRI100A.getOprId(psEmpl, indexNum, poiFlag, eidIndexNumber);
 //		Let $PSEmpl = $PSOprid
 //		psEmpl = psOprId;
@@ -63,31 +62,31 @@ public class NonPersonTerminate {
 		}
 	}
 
-	/**
-	 * HR202-Call-System from ZHRI202A.SQC
-	 * This routine calls the Legacy system.
-	 */
-	private static Integer HR202_callSystem(String psAuditEmpl, String psOprId, Date psTermDate) {
-		Integer status = 0;
-		String library = "library";
-		String command = "CALL " + library + "/HRZ202A Parm('" + psAuditEmpl + "' '" + psOprId + "' '" + psTermDate + "')";
-//		Let $Part2 = 'Parm('''       ||
-//		             $PSauditEmpl    ||
-//		             ''' '''         ||
-//		             $PSOprid        ||
-//		             ''' '''         ||
-//		             $PSTermDate     ||
-//		             ''')" '
-//		Let $Part1 = '"CALL ' || $Library ||'/HRZ202A '
-//		Let $Command = $Part1||$Part2
-//		Do Call-System             !From ZHRI100A.SQR
-//		!show 'Command : ' $Command
-//		if (#Status = 0)
-//		    let $NCompletionStatus = 'C'   !Completed Normally
-//		end-if    !#Status = 0
-		System.out.println("command: " + command);
-		return status;
-	}
+//	/**
+//	 * HR202-Call-System from ZHRI202A.SQC
+//	 * This routine calls the Legacy system.
+//	 */
+//	private static Integer HR202_callSystem(String psAuditEmpl, String psOprId, Date psTermDate) {
+//		Integer status = 0;
+//		String library = "library";
+//		String command = "CALL " + library + "/HRZ202A Parm('" + psAuditEmpl + "' '" + psOprId + "' '" + psTermDate + "')";
+////		Let $Part2 = 'Parm('''       ||
+////		             $PSauditEmpl    ||
+////		             ''' '''         ||
+////		             $PSOprid        ||
+////		             ''' '''         ||
+////		             $PSTermDate     ||
+////		             ''')" '
+////		Let $Part1 = '"CALL ' || $Library ||'/HRZ202A '
+////		Let $Command = $Part1||$Part2
+////		Do Call-System             !From ZHRI100A.SQR
+////		!show 'Command : ' $Command
+////		if (#Status = 0)
+////		    let $NCompletionStatus = 'C'   !Completed Normally
+////		end-if    !#Status = 0
+//		System.out.println("command: " + command);
+//		return status;
+//	}
 
 	/**
 	 * HR202-Get-Term-Date from ZHRI202A.SQC

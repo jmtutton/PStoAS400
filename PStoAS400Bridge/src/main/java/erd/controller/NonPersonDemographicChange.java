@@ -1,7 +1,6 @@
 package erd.controller;
 
-import erd.model.ProcessParameters.CommonParameters;
-import erd.model.ProcessParameters.DemographicChangeProcessParameters;
+import java.util.HashMap;
 
 /**
  * ZHRI205A - Contingent Employee and Multiple EID Demographic Change Process
@@ -11,14 +10,14 @@ import erd.model.ProcessParameters.DemographicChangeProcessParameters;
 
 public class NonPersonDemographicChange {
 	
-	public String processNonPersonDemographicChange(CommonParameters commonParameters) {
+	public String processNonPersonDemographicChange(HashMap<String, Object> parameterMap) {
 		System.out.println("********** HR205_processMain()");
-		DemographicChangeProcessParameters processParameters = fetchProcessParameters(commonParameters);
-		composeParameterString(processParameters);
+		parameterMap = fetchProcessParameters(parameterMap);
+		composeParameterString(parameterMap);
 		return null;
 	}
 	
-	private DemographicChangeProcessParameters fetchProcessParameters(CommonParameters commonParameters) {
+	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		System.out.println("********** fetchProcessParameters");
 		return null;
 		
@@ -26,9 +25,9 @@ public class NonPersonDemographicChange {
 
 	/**
 	 * 
-	 * @param processParameters
+	 * @param parameterMap
 	 */
-	private String composeParameterString(DemographicChangeProcessParameters processParameters) {
+	private String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("********** composeParameterString");
 		//Let $Part2 = 'Parm('''                 ||
 		// $PSAuditemp               ||
@@ -61,13 +60,13 @@ public class NonPersonDemographicChange {
 		// ''' '''                   ||
 		// $PSCity                   ||
 		// ''')" '
-//		String paramaterString = "'" + processParameters.getEmployeeId() + "' "
-//				+ "'" + processParameters.getOperatorId() + "' "
-//				+ "'" + processParameters.getEmployeeGroup() + "' "
-//				+ "'" + processParameters.getEmployeeBranch() + "' "
-//				+ "'" + processParameters.getNationalIdCountry() + "' "
-//				+ "'" + processParameters.getNationalId() + "' "
-//				+ "'" + processParameters.getEffectiveDate() + "'";
+//		String paramaterString = "'" + parameterMap.getEmployeeId() + "' "
+//				+ "'" + parameterMap.getOperatorId() + "' "
+//				+ "'" + parameterMap.getEmployeeGroup() + "' "
+//				+ "'" + parameterMap.getEmployeeBranch() + "' "
+//				+ "'" + parameterMap.getNationalIdCountry() + "' "
+//				+ "'" + parameterMap.getNationalId() + "' "
+//				+ "'" + parameterMap.getEffectiveDate() + "'";
 //		return paramaterString;
 		return null;
 	}

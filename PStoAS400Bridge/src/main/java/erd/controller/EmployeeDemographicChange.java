@@ -1,7 +1,6 @@
 package erd.controller;
 
-import erd.model.ProcessParameters.CommonParameters;
-import erd.model.ProcessParameters.DemographicChangeProcessParameters;
+import java.util.HashMap;
 
 import erd.model.PsDriversLicense;
 
@@ -14,13 +13,13 @@ import erd.model.PsDriversLicense;
 
 public class EmployeeDemographicChange {
 
-	public String processEmployeeDemographicChange(CommonParameters commonParameters) {
-		DemographicChangeProcessParameters demographicChangeProcessParameters = fetchProcessParameters(commonParameters);
-		composeParameterString(demographicChangeProcessParameters);
+	public String processEmployeeDemographicChange(HashMap<String, Object> parameterMap) {
+		parameterMap = fetchProcessParameters(parameterMap);
+		composeParameterString(parameterMap);
 		return null;
 	}
 	
-	private DemographicChangeProcessParameters fetchProcessParameters(CommonParameters commonParameters) {
+	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		return null;
 	}
 	
@@ -28,7 +27,7 @@ public class EmployeeDemographicChange {
 	 * 
 	 * @param processParameters
 	 */
-	private String composeParameterString(DemographicChangeProcessParameters demographicChangeProcessParameters) {
+	private String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("********** composeParameterStringForHrz102AProcess");
 		//Let $Part2 = 'Parm(''' || $PSEmpl || ''' ''' || $PSGroup|| ''' ''' || $PSreg || ''' ''' ||
 		// $PSbranch || ''' ''' || $PSEMP || ''' ''' || $PSNational_Id || ''' ''' ||

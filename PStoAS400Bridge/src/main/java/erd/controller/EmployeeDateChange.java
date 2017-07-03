@@ -3,11 +3,10 @@ package erd.controller;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
-import erd.model.ProcessParameters.CommonParameters;
-import erd.model.ProcessParameters.DateChangeProcessParameters;
-import erd.model.ProcessParameters;
 import erd.model.PsAccomplishment;
 import erd.model.PsContractData;
 import erd.model.PsEmployeeReview;
@@ -24,55 +23,53 @@ public class EmployeeDateChange {
 	/**
 	 * @see HR07-Initialize-Fields in ZHRI107A.SQC
 	 * This will initialize the fields at each call.
-	 * @param commonParameters
+	 * @param parameterMap
 	 * @param trigger
-	 * @param processParameters
+	 * @param parameterMap
 	 */
-	public DateChangeProcessParameters fetchProcessParameters(CommonParameters commonParameters) {
-		DateChangeProcessParameters processParameters = new ProcessParameters().new DateChangeProcessParameters();
+	public HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		//BEGIN-PROCEDURE HR07-INITIALIZE-FIELDS
 		//LET $LegEffdt = $PSEffdt
 		//!Remove leading 'E' from the PS employee operator ID to comply with the 5 long legacy format
 		//LET $LegacyUserEmplId = SUBSTR($AuditOprId,2,5)
 		//UPPERCASE $LegacyUserEmplId !Make sure it is in all caps in case ID has a letter in it
 		//END-PROCEDURE HR07-INITIALIZE-FIELDS
-		commonParameters.setOperatorId(commonParameters.getOperatorId());
-		if(commonParameters.getOperatorId() != null && commonParameters.getOperatorId().length() > 1) {
-			processParameters.setUserEmployeeId(commonParameters.getOperatorId().substring(1).toUpperCase()); //strips the 'E' off of the employee id
+		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
+			parameterMap.put("userEmployeeId", ((String)parameterMap.get("operatorId")).substring(1).toUpperCase()); //strips the 'E' off of the employee id
 		}
-		return processParameters;
+		return parameterMap;
 	}
 
 	/**
 	 * @see HR07-Process-Main in ZHRI107A.SQC
 	 * @param trigger
-	 * @param commonParameters
+	 * @param parameterMap
 	 * @return
 	 */
-	public String processEmployeeDateChange(CommonParameters commonParameters) {
+	public String processEmployeeDateChange(HashMap<String, Object> parameterMap) {
 		//BEGIN-PROCEDURE HR07-PROCESS-MAIN
 		//DO HR07-Initialize-Fields
-		commonParameters.setErrorProgramParameter("HRZ107A");
-		DateChangeProcessParameters processParameters = fetchProcessParameters(commonParameters);
-		if(commonParameters.getOperatorId() != null && commonParameters.getOperatorId().length() > 1) {
+		parameterMap.put("errorProgramParameter", "HRZ107A");
+		parameterMap = fetchProcessParameters(parameterMap);
+		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
 			//!Remove leading 'E' from the PS employee operator ID to comply with the 5 long legacy format
-			processParameters.setUserEmployeeId(commonParameters.getOperatorId().substring(1).toUpperCase()); //strips the 'E' off of the employee id
+			parameterMap.put("userEmployeeId", ((String)parameterMap.get("operatorId")).substring(1).toUpperCase()); //strips the 'E' off of the employee id
 		}
 		//!call procedures to get necessary PeopleSoft changed values for legacy
 		//DO Get-OprId   !gets valid operator ID using code from ZHRI100A.sqr
-		String oprId = ZHRI100A.fetchLegacyEmployeeId(commonParameters);
+		String oprId = ZHRI100A.fetchLegacyEmployeeId(parameterMap);
 		//LET $LegacyEmplid = $PSOprid
-		processParameters.setEmployeeId(oprId);
+		parameterMap.put("employeeId", oprId);
 		//IF $LegacyEmplid <> '' AND $LegacyEmplid <> ' '  !New OprId not null or blank on return
-		if(processParameters.getEmployeeId() != null && !processParameters.getEmployeeId().isEmpty()) {
+		if(parameterMap.get("employeeId") != null && !((String)parameterMap.get("employeeId")).isEmpty()) {
 			//DO HR07-Get-Employee-Review
-			processParameters = HR07_getEmployeeReview(processParameters, commonParameters);
+			parameterMap = HR07_getEmployeeReview(parameterMap);
 			//DO HR07-Get-Accomplishments
-			processParameters = HR07_getAccomplishments(processParameters, commonParameters);
+			parameterMap = HR07_getAccomplishments(parameterMap);
 			//DO HR07-Get-Contract-Data
-			processParameters = HR07_getContractData(processParameters, commonParameters);
+			parameterMap = HR07_getContractData(parameterMap);
 			//DO HR07-Call-RPG
-			HR07_callRpg(commonParameters, processParameters);
+			HR07_callRpg(parameterMap);
 		//END-IF    !$LegacyEmplid <> '' and $LegacyEmplid <> ' '
 		}
 		//END-PROCEDURE HR07-PROCESS-MAIN
@@ -83,16 +80,17 @@ public class EmployeeDateChange {
 	 * @see HR07-Get-Employee-Review in ZHRI107A.SQC
 	 * This procedure retrieves the Next Review Date and Last Review Date from the 
 	 * PeopleSoft Employee Review Table to send back to Option 7 of AAHR01 in legacy.
-	 * @param processParameters
-	 * @param commonParameters
+	 * @param parameterMap
+	 * @param parameterMap
 	 * @return
 	 */
-	public DateChangeProcessParameters HR07_getEmployeeReview(DateChangeProcessParameters processParameters, CommonParameters commonParameters) {
+	public HashMap<String, Object> HR07_getEmployeeReview(HashMap<String, Object> parameterMap) {
 		//BEGIN-PROCEDURE HR07-GET-EMPLOYEE-REVIEW
 		//BEGIN-SELECT
 		PsEmployeeReview psEmployeeReview = 
 				PsEmployeeReview.findByEmployeeIdAndEffectiveDateAndEmploymentRecordNumber(
-						commonParameters.getEmployeeId(), commonParameters.getEffectiveDate(), new BigDecimal(0));
+						(String)parameterMap.get("employeeId"), 
+						(Date)parameterMap.get("effectiveDate"), new BigDecimal(0));
 		//TO_CHAR(CER7.NEXT_REVIEW_DT, 'YYYY-MM-DD')  &CER7NEXT_REVIEW_DT
 		//LET $PSNextReviewDate = &CER7NEXT_REVIEW_DT
 		//LET $LegNextReviewDate = $PSNextReviewDate
@@ -100,33 +98,33 @@ public class EmployeeDateChange {
 		//LET $LegLastReviewDate = $LegEffdt
 		//!Format next review date and last review date so legacy will accept it (MM field, DD field and CCYY field)
 		//UNSTRING $PSNextReviewDate BY '-' INTO $LegNxtRevDtYear $LegNxtRevDtMonth $LegNxtRevDtDay
-		processParameters.setNextReviewYear(new SimpleDateFormat("yyyy").format(psEmployeeReview.getNextReviewDt()));
-		processParameters.setNextReviewMonth(new SimpleDateFormat("mm").format(psEmployeeReview.getNextReviewDt()));
-		processParameters.setNextReviewDay(new SimpleDateFormat("dd").format(psEmployeeReview.getNextReviewDt()));
+		parameterMap.put("nextReviewYear", new SimpleDateFormat("yyyy").format(psEmployeeReview.getNextReviewDt()));
+		parameterMap.put("nextReviewMonth", new SimpleDateFormat("mm").format(psEmployeeReview.getNextReviewDt()));
+		parameterMap.put("nextReviewDay", new SimpleDateFormat("dd").format(psEmployeeReview.getNextReviewDt()));
 		//UNSTRING $LegLastReviewDate BY '-' INTO $LegLstRevDtYear $LegLstRevDtMonth $LegLstRevDtDay
-		processParameters.setLastReviewYear(new SimpleDateFormat("yyyy").format(psEmployeeReview.getEffectiveDate()));
-		processParameters.setLastReviewMonth(new SimpleDateFormat("mm").format(psEmployeeReview.getEffectiveDate()));
-		processParameters.setLastReviewDay(new SimpleDateFormat("dd").format(psEmployeeReview.getEffectiveDate()));
+		parameterMap.put("lastReviewYear", new SimpleDateFormat("yyyy").format(psEmployeeReview.getEffectiveDate()));
+		parameterMap.put("lastReviewMonth", new SimpleDateFormat("mm").format(psEmployeeReview.getEffectiveDate()));
+		parameterMap.put("lastReviewDay", new SimpleDateFormat("dd").format(psEmployeeReview.getEffectiveDate()));
 		//FROM PS_Employee_Review CER7
 		//WHERE CER7.EmplId = $PSEMPLID
 			//AND CER7.EMPL_RCD = 0
 			//AND TO_CHAR(CER7.EFFDT, 'YYYY-MM-DD') = $PSEFFDT
 		//END-SELECT
 		//END-PROCEDURE HR07-GET-EMPLOYEE-REVIEW
-		return processParameters;
+		return parameterMap;
 	}
 
 	/**
 	 * @see HR07-Get-Accomplishments in ZHRI107A.SQC
 	 * This procedure retrieves the Negative Drug Test Date and Physical Test Date from the 
 	 * PeopleSoft Accomplishments Table to send back to Option 7 of AAHR01.
-	 * @param processParameters
-	 * @param commonParameters
+	 * @param parameterMap
+	 * @param parameterMap
 	 * @return
 	 */
-	public DateChangeProcessParameters HR07_getAccomplishments(DateChangeProcessParameters processParameters, CommonParameters commonParameters) {
+	public HashMap<String, Object> HR07_getAccomplishments(HashMap<String, Object> parameterMap) {
 		List<String> accomplishmentCodeList = Arrays.asList("DRUGTST", "PHYS L3", "PHYS L4");
-		PsAccomplishment psAccomplishment = PsAccomplishment.findByEmployeeIdAndAccomplishmentCodes(commonParameters.getEmployeeId(), accomplishmentCodeList);
+		PsAccomplishment psAccomplishment = PsAccomplishment.findByEmployeeIdAndAccomplishmentCodes((String)parameterMap.get("employeeId"), accomplishmentCodeList);
 		//BEGIN-PROCEDURE HR07-GET-ACCOMPLISHMENTS
 		//LET $SelectAccomplishment = LTRIM(RTRIM(&CA7.ACCOMPLISHMENT,' '),' ')
 		//!select the correct accomplishment to pull in the correct date
@@ -136,9 +134,9 @@ public class EmployeeDateChange {
 			//WHEN = 'DRUGTST'
 			case "DRUGTST":
 				//LET $LegNegDrugTestDate = $PSIssueDate
-				processParameters.setNegDrugTestYear(new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
-				processParameters.setNegDrugTestMonth(new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
-				processParameters.setNegDrugTestDay(new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
+				parameterMap.put("negDrugTestYear", new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
+				parameterMap.put("negDrugTestMonth", new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
+				parameterMap.put("negDrugTestDay", new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
 				//!Format negative drug test date so legacy will accept it (MM field, DD field and CCYY field)
 				//UNSTRING $PSIssueDate BY '-' INTO $LegNegDrugTstYear $LegNegDrugTstMonth $LegNegDrugTstDay
 				//BREAK                 !Exit the evaluate statement
@@ -149,9 +147,9 @@ public class EmployeeDateChange {
 			case "PHYS L4":
 				//LET $LegPhysical3TestDate = $PSIssueDate
 				//LET $LegPhysical4TestDate = $PSIssueDate
-				processParameters.setPhysTestYear(new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
-				processParameters.setPhysTestMonth(new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
-				processParameters.setPhysTestDay(new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
+				parameterMap.put("physTestYear", new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
+				parameterMap.put("physTestMonth", new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
+				parameterMap.put("physTestDay", new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
 				//!Format physical test date so legacy will accept it (MM field, DD field and CCYY field)
 				//UNSTRING $PSIssueDate BY '-' INTO $LegPhysTstYear $LegPhysTstMonth $LegPhysTstDay
 				//BREAK    !Exit the evaluate statement
@@ -169,21 +167,21 @@ public class EmployeeDateChange {
 	/**
 	 * @see HR07-Get-Contract-Data in ZHRI107A.SQC
 	 * This procedure retrieves the contract date from the PeopleSoft Contract Data Table to send back to Option 7 of AAHR01.
-	 * @param processParameters
-	 * @param commonParameters
+	 * @param parameterMap
+	 * @param parameterMap
 	 * @return
 	 */
-	public DateChangeProcessParameters HR07_getContractData(DateChangeProcessParameters processParameters, CommonParameters commonParameters) {
+	public HashMap<String, Object> HR07_getContractData(HashMap<String, Object> parameterMap) {
 		//BEGIN-PROCEDURE HR07-GET-CONTRACT-DATA
 		//BEGIN-SELECT
-		PsContractData psContractData = PsContractData.findByEmployeeId(commonParameters.getEmployeeId());
+		PsContractData psContractData = PsContractData.findByEmployeeId((String)parameterMap.get("employeeId"));
 		//TO_CHAR(CCD7.CONTRACT_BEGIN_DT, 'YYYY-MM-DD')  &CCD7EFFDT
 		//LET $LegContractDate = &CCD7EFFDT
 		//!Format contract date so legacy will accept it (MM field, DD field and CCYY field)
 		//UNSTRING $LegContractDate BY '-' INTO $LegContractDtYear $LegContractDtMonth $LegContractDtDay
-		processParameters.setContractYear(new SimpleDateFormat("yyyy").format(psContractData.getContractBeginDt()));
-		processParameters.setContractMonth(new SimpleDateFormat("mm").format(psContractData.getContractBeginDt()));
-		processParameters.setContractDay(new SimpleDateFormat("dd").format(psContractData.getContractBeginDt()));
+		parameterMap.put("contractYear", new SimpleDateFormat("yyyy").format(psContractData.getContractBeginDt()));
+		parameterMap.put("contractMonth", new SimpleDateFormat("mm").format(psContractData.getContractBeginDt()));
+		parameterMap.put("contractDay", new SimpleDateFormat("dd").format(psContractData.getContractBeginDt()));
 		//!select the maximum contract date to get the most current one because an employee can have more than 1 active contract
 		//FROM PS_CONTRACT_DATA CCD7
 		//WHERE CCD7.Emplid = $PSEmplid
@@ -199,16 +197,16 @@ public class EmployeeDateChange {
 	/**
 	 * @see HR07-Call-RPG in ZHRI107A.SQC
 	 * This procedure calls the RPG program to update the legacy files/fields needed by Option 7 of AAHR01.
-	 * @param processParameters
+	 * @param parameterMap
 	 * @return
 	 */
-	public String HR07_callRpg(CommonParameters commonParameters, DateChangeProcessParameters processParameters) {
+	public String HR07_callRpg(HashMap<String, Object> parameterMap) {
 		//BEGIN-PROCEDURE HR07-CALL-RPG
 		//!Setup the parameter list with what needs to be passed to the RPG program to update the legacy system
-		String parameterString = composeParameterString(processParameters);
-		String commandString = ZHRI100A.composeRexecCommandString(commonParameters.getProcessName(), parameterString);
+		String parameterString = composeParameterString(parameterMap);
+		String commandString = ZHRI100A.composeRexecCommandString((String)parameterMap.get("processName"), parameterString);
 		//DO Call-System    !Do a remote call to the RPG program, HRZ107A, in order to pass the parms from code in ZHRI100A.sqr
-		Integer status = ZHRI100A.executeRemoteCommand(commandString, commonParameters);
+		Integer status = ZHRI100A.executeRemoteCommand(commandString, parameterMap);
 		//IF (#STATUS = 0)
 		if(status == 0) {
 			//LET $CompletionStatus = 'C'
@@ -220,10 +218,10 @@ public class EmployeeDateChange {
 	
 	/**
 	 * Setup the parameter list with what needs to be passed to the RPG program to update the legacy system
-	 * @param processParameters
+	 * @param parameterMap
 	 * @return
 	 */
-	public String composeParameterString(DateChangeProcessParameters processParameters) {
+	public String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("********** composeParameterString");
 		//'PARM('''                           ||
 		//$LegacyEmplid                       ||
@@ -278,32 +276,30 @@ public class EmployeeDateChange {
 		//''' '''                             ||
 		//$LegCompanySeniorityYear            ||
 		//''')" '
-		String parameterString = "'" + processParameters.getEmployeeId() + "' "
-				+ "'" + processParameters.getEmployeeId() + "' "
-				+ "'" + processParameters.getUserEmployeeId() + "' "
-				+ "'" + processParameters.getHireMonth() + "' "
-				+ "'" + processParameters.getHireYear() + "' "
-				+ "'" + processParameters.getTerminationMonth() + "' "
-				+ "'" + processParameters.getTerminationDay() + "' "
-				+ "'" + processParameters.getTerminationYear() + "' "
-				+ "'" + processParameters.getLastReviewMonth() + "' "
-				+ "'" + processParameters.getLastReviewDay() + "' "
-				+ "'" + processParameters.getLastReviewYear() + "' "
-				+ "'" + processParameters.getNextReviewMonth() + "' "
-				+ "'" + processParameters.getNextReviewDay() + "' "
-				+ "'" + processParameters.getNextReviewYear() + "' "
-				+ "'" + processParameters.getNegDrugTestMonth() + "' "
-				+ "'" + processParameters.getNegDrugTestDay() + "' "
-				+ "'" + processParameters.getNegDrugTestYear()+ "' "
-				+ "'" + processParameters.getPhysTestMonth() + "' "
-				+ "'" + processParameters.getPhysTestDay() + "' "
-				+ "'" + processParameters.getContractMonth() + "' "
-				+ "'" + processParameters.getContractDay() + "' "
-				+ "'" + processParameters.getContractYear() + "' "
-				+ "'" + processParameters.getCompanySeniorityMonth() + "' "
-				+ "'" + processParameters.getCompanySeniorityDay() + "' "
-				+ "'" + processParameters.getCompanySeniorityYear() + "' "
-				+ "'" + processParameters.getEmployeeId() + "'";
+		String parameterString = "'" + parameterMap.get("employeeId") + "' "
+				+ "'" + parameterMap.get("userEmployeeId") + "' "
+				+ "'" + parameterMap.get("hireMonth") + "' "
+				+ "'" + parameterMap.get("hireYear") + "' "
+				+ "'" + parameterMap.get("terminationMonth") + "' "
+				+ "'" + parameterMap.get("terminationDay") + "' "
+				+ "'" + parameterMap.get("terminationYear") + "' "
+				+ "'" + parameterMap.get("lastReviewMonth") + "' "
+				+ "'" + parameterMap.get("lastReviewDay") + "' "
+				+ "'" + parameterMap.get("lastReviewYear") + "' "
+				+ "'" + parameterMap.get("nextReviewMonth") + "' "
+				+ "'" + parameterMap.get("nextReviewDay") + "' "
+				+ "'" + parameterMap.get("nextReviewYear") + "' "
+				+ "'" + parameterMap.get("negDrugTestMonth") + "' "
+				+ "'" + parameterMap.get("negDrugTestDay") + "' "
+				+ "'" + parameterMap.get("negDrugTestYear") + "' "
+				+ "'" + parameterMap.get("physTestMonth") + "' "
+				+ "'" + parameterMap.get("physTestDay") + "' "
+				+ "'" + parameterMap.get("contractMonth") + "' "
+				+ "'" + parameterMap.get("contractDay") + "' "
+				+ "'" + parameterMap.get("contractYear") + "' "
+				+ "'" + parameterMap.get("companySeniorityMonth") + "' "
+				+ "'" + parameterMap.get("companySeniorityDay") + "' "
+				+ "'" + parameterMap.get("companySeniorityYear") + "' ";
 		return parameterString;
 	}
 

@@ -1,14 +1,13 @@
 package erd.controller;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
-import erd.model.ProcessParameters;
-import erd.model.ProcessParameters.TerminationProcessParameters;
 import erd.model.CrossReferenceTerminationReason;
 import erd.model.PsActionReason;
 import erd.model.PsJob;
-import erd.model.ProcessParameters.CommonParameters;
 
 /**
  * Employee Termination Process
@@ -26,24 +25,24 @@ public class EmployeeTermination {
 	 * @param commonParameters
 	 * @return completionStatus
 	 */
-	public String processEmployeeTermination(CommonParameters commonParameters) {
+	public String processEmployeeTermination(HashMap<String, Object> parameterMap) {
 		System.out.println("********** processEmployeeTermination() ***");
-		commonParameters.setErrorProgramParameter("HRZ102A");
+		parameterMap.put("errorProgramParameter", "HRZ102A");
 		String completionStatus = "E";
-		Date effectiveTerminationDate = erd.DateUtil.addDays(commonParameters.getEffectiveDate(), 1);
+		Date effectiveTerminationDate = erd.DateUtil.addDays((Date)parameterMap.get("effectiveDate"), 1);
 		PsJob psJob = PsJob.findJobByEmployeeIdAndEffectiveDateAndEffectiveSequence(
-				commonParameters.getEmployeeId(), effectiveTerminationDate, 
-				commonParameters.getEffectiveSequence());
+				(String)parameterMap.get("employeeId"), effectiveTerminationDate, 
+				(BigDecimal)parameterMap.get("effectiveSequence"));
 		if(psJob != null) {
-			String employeeId = ZHRI100A.fetchLegacyEmployeeId(commonParameters);
+			String employeeId = ZHRI100A.fetchLegacyEmployeeId(parameterMap);
 			if(employeeId != null  && !employeeId.isEmpty()) {
-				TerminationProcessParameters processParameters = fetchProcessParameters(psJob, commonParameters);
-				processParameters.setEmployeeId(employeeId);
-				processParameters.setOperatorId(commonParameters.getOperatorId());
-				processParameters = formatDates(psJob, processParameters);
-				String commandString = ZHRI100A.composeRexecCommandString(commonParameters.getProcessName(), 
-						composeParameterString(processParameters));
-				Integer status = ZHRI100A.executeRemoteCommand(commandString, commonParameters);
+				parameterMap = fetchProcessParameters(psJob, parameterMap);
+				parameterMap.put("employeeId", employeeId);
+				parameterMap.put("operatorId", (String)parameterMap.get("operatorId"));
+				parameterMap = formatDates(psJob, parameterMap);
+				String commandString = ZHRI100A.composeRexecCommandString((String)parameterMap.get("processName"), 
+						composeParameterString(parameterMap));
+				Integer status = ZHRI100A.executeRemoteCommand(commandString, parameterMap);
 				//IF (#Status = 0)  //TODO
 				if(status == 0) { //no error returned from process
 					//completed normally
@@ -60,20 +59,19 @@ public class EmployeeTermination {
 	 * @param psJob
 	 * @return processParameters
 	 */
-	private TerminationProcessParameters fetchProcessParameters(PsJob psJob, CommonParameters commonParameters) {
+	private HashMap<String, Object> fetchProcessParameters(PsJob psJob, HashMap<String, Object> parameterMap) {
 		System.out.println("*** findTerminationProcessParameters() ***");
-		TerminationProcessParameters processParameters = new ProcessParameters().new TerminationProcessParameters();
-		String terminationReason = fetchTerminationReason(psJob, processParameters);
-		processParameters.setTerminationReason(terminationReason);
+		String terminationReason = fetchTerminationReason(psJob, parameterMap);
+		parameterMap.put("terminationReason", terminationReason);
 		if(terminationReason == null) {
-			commonParameters.setErrorMessageParameter("Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF");
-			ZHRI100A.executeErrorCommand(commonParameters);
-			processParameters.setVoluntaryOrInvoluntary("V");
-			processParameters.setTerminationCode("O");
-			processParameters.setTerminationReason("ACTION REASON NOT SELECTED IN PS");
+			parameterMap.put("errorMessageParameter", "Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF");
+			ZHRI100A.executeErrorCommand(parameterMap);
+			parameterMap.put("voluntaryOrInvoluntary", "V");
+			parameterMap.put("terminationCode", "O");
+			parameterMap.put("terminationReason", "ACTION REASON NOT SELECTED IN PS");
 		}
-		processParameters = fetchTerminationCodes(psJob, processParameters);
-		return processParameters;
+		parameterMap = fetchTerminationCodes(psJob, parameterMap);
+		return parameterMap;
 	}
 
 	/**
@@ -83,10 +81,10 @@ public class EmployeeTermination {
 	 * @param processParameters
 	 * @return terminationReason
 	 */
-	private String fetchTerminationReason(PsJob psJob, TerminationProcessParameters processParameters) {
+	private String fetchTerminationReason(PsJob psJob, HashMap<String, Object> parameterMap) {
 		System.out.println("*** findTerminationReason() ***");
 		String terminationReason = null;
-		if("O".equalsIgnoreCase(processParameters.getTerminationCode()) && "TER".equalsIgnoreCase(psJob.getAction())) {
+		if("O".equalsIgnoreCase((String)parameterMap.get("terminationCode")) && "TER".equalsIgnoreCase(psJob.getAction())) {
 			terminationReason = PsActionReason.findReasonDescriptionByActionAndActionReason(psJob.getAction(), psJob.getActionReason());
 		}
 		if(terminationReason != null) {
@@ -103,14 +101,14 @@ public class EmployeeTermination {
 	 * @param processParameters
 	 * @return processParameters
 	 */
-	private TerminationProcessParameters fetchTerminationCodes(PsJob psJob, TerminationProcessParameters processParameters) {
+	private HashMap<String, Object> fetchTerminationCodes(PsJob psJob, HashMap<String, Object> parameterMap) {
 		System.out.println("*** fetchTerminationCodes() ***");
 		CrossReferenceTerminationReason crossReferenceTerminationReason = CrossReferenceTerminationReason.findByActionAndActionReasonAndStatus(psJob.getAction(), psJob.getActionReason(), "A");
 		if(crossReferenceTerminationReason != null) {
-			processParameters.setVoluntaryOrInvoluntary(crossReferenceTerminationReason.getLegacyTerminationCode());
-			processParameters.setTerminationCode(crossReferenceTerminationReason.getLegacyTerminationReason());
+			parameterMap.put("voluntaryOrInvoluntary", crossReferenceTerminationReason.getLegacyTerminationCode());
+			parameterMap.put("terminationCode", crossReferenceTerminationReason.getLegacyTerminationReason());
 		}
-		return processParameters;
+		return parameterMap;
 	}
 
 	/**
@@ -118,20 +116,20 @@ public class EmployeeTermination {
 	 * @param processParameters
 	 * @return string of single-quoted parameter
 	 */
-	public static String composeParameterString(TerminationProcessParameters processParameters) {
+	public static String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("*** composeParameterString() ***");
 		//the HRZ102A program requires termination reason parameter to be character long
-		String terminationReason = String.format("%1$-35s", processParameters.getTerminationReason());
-		String parameterString = "'" + processParameters.getEmployeeId() + "' "
-				+ "'" + processParameters.getTerminationMonth() + "' "
-				+ "'" + processParameters.getTerminationDay() + "' "
-				+ "'" + processParameters.getTerminationYear() + "' "
-				+ "'" + processParameters.getRehireMonth() + "' "
-				+ "'" + processParameters.getRehireDay() + "' "
-				+ "'" + processParameters.getRehireYear() + "' "
-				+ "'" + processParameters.getVoluntaryOrInvoluntary() + "' "
-				+ "'" + processParameters.getTerminationCode() + "' "
-				+ "'" + processParameters.getOperatorId() + "' "
+		String terminationReason = String.format("%1$-35s", parameterMap.get("terminationReason"));
+		String parameterString = "'" + parameterMap.get("employeeId") + "' "
+				+ "'" + parameterMap.get("terminationMonth") + "' "
+				+ "'" + parameterMap.get("terminationDay") + "' "
+				+ "'" + parameterMap.get("terminationYear") + "' "
+				+ "'" + parameterMap.get("rehireMonth") + "' "
+				+ "'" + parameterMap.get("rehireDay") + "' "
+				+ "'" + parameterMap.get("rehireYear") + "' "
+				+ "'" + parameterMap.get("voluntaryOrInvoluntary") + "' "
+				+ "'" + parameterMap.get("terminationCode") + "' "
+				+ "'" + parameterMap.get("operatorId") + "' "
 				+ "'" + terminationReason + "'";
 		return parameterString;
 	}
@@ -142,19 +140,19 @@ public class EmployeeTermination {
 	 * @param processParameters
 	 * @return processParameters
 	 */
-	public static TerminationProcessParameters formatDates(PsJob psJob, TerminationProcessParameters processParameters) {
+	public static HashMap<String, Object> formatDates(PsJob psJob, HashMap<String, Object> parameterMap) {
 		System.out.println("*** formatDates() ***");
 		if("REH".equals(psJob.getAction()) && "REH".equals(psJob.getActionReason())) {
-			processParameters.setRehireYear(new SimpleDateFormat("yyyy").format(psJob.getEffectiveDate()));
-			processParameters.setRehireMonth(new SimpleDateFormat("mm").format(psJob.getEffectiveDate()));
-			processParameters.setRehireDay(new SimpleDateFormat("dd").format(psJob.getEffectiveDate()));
+			parameterMap.put("rehireYear", new SimpleDateFormat("yyyy").format(psJob.getEffectiveDate()));
+			parameterMap.put("rehireMonth", new SimpleDateFormat("mm").format(psJob.getEffectiveDate()));
+			parameterMap.put("rehireDay", new SimpleDateFormat("dd").format(psJob.getEffectiveDate()));
 		}
 		if("TER".equals(psJob.getAction()) || "RET".equals(psJob.getAction()) || "TWP".equals(psJob.getAction()) || "TWB".equals(psJob.getAction())) {
-			processParameters.setTerminationYear(new SimpleDateFormat("yyyy").format(psJob.getEffectiveDate()));
-			processParameters.setTerminationMonth(new SimpleDateFormat("MM").format(psJob.getEffectiveDate()));
-			processParameters.setTerminationDay(new SimpleDateFormat("dd").format(psJob.getEffectiveDate()));
+			parameterMap.put("terminationYear", new SimpleDateFormat("yyyy").format(psJob.getEffectiveDate()));
+			parameterMap.put("terminationMonth", new SimpleDateFormat("MM").format(psJob.getEffectiveDate()));
+			parameterMap.put("terminationDay", new SimpleDateFormat("dd").format(psJob.getEffectiveDate()));
 		}
-		return processParameters;
+		return parameterMap;
 
 	}
 
