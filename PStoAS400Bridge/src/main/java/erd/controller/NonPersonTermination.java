@@ -24,7 +24,7 @@ public class NonPersonTermination {
 		//LET $PSEmpl = ' '
 		//LET $PSTermDate = ' '
 		//Let $ErrorProgramParm = 'HRZ202A'
-		parameterMap.put("ErrorProgramParameter", "HRZ202A");
+		parameterMap.put("errorProgramParameter", "HRZ202A");
 		//End-Procedure HR202-Initialize-Fields
 		return parameterMap;
 	}
@@ -38,7 +38,7 @@ public class NonPersonTermination {
 		System.out.println("********** HR202_callSystem()");
 		String completionStatus = "E";
 		//BEGIN-PROCEDURE HR202-CALL-SYSTEM
-		String commandString = ZHRI100A.composeRexecCommandString((String)parameterMap.get("ProcessName"), composeParameterString(parameterMap));
+		String commandString = ZHRI100A.composeRexecCommandString((String)parameterMap.get("processName"), composeParameterString(parameterMap));
 		//DO Call-System   !From ZHRI100A.SQR
 		Integer status = ZHRI100A.executeRemoteCommand(commandString, parameterMap);
 		//!SHOW 'Command : ' $Command
@@ -48,9 +48,9 @@ public class NonPersonTermination {
 			//LET $NCompletionStatus = 'C'   !Completed Normally
 			completionStatus = "C";
 			//IF $Wrk_indexNum = '0'   !Insert only if it is a POI Term
-			if(new BigDecimal(0).equals(parameterMap.get("EffectiveSequence"))) {
+			if(new BigDecimal(0).equals(parameterMap.get("effectiveSequence"))) {
 				//DO HR202-Insert-Timestamp
-				PszPoiTermination.HR202_insertTimestamp((String)parameterMap.get("EmployeeId"));
+				PszPoiTermination.HR202_insertTimestamp((String)parameterMap.get("employeeId"));
 			//END-IF
 			}
 		//END-IF    !#Status = 0
@@ -79,22 +79,22 @@ public class NonPersonTermination {
 		//LET $PSauditEmpl = LTRIM(RTRIM($PSAuditOperId,' '),' ')  !Remove leading and trailing Blanks
 		//LET $PSauditEmpl = LTRIM($PSauditEmpl,'E')  !Remove the leading 'E' from the employee ID
 		//UPPERCASE $PSauditEmpl  !Be sure in all CAPS
-		if(parameterMap.get("OperatorId") != null && ((String)parameterMap.get("OperatorId")).length() > 1) {
-			parameterMap.put("OperatorId", ((String)parameterMap.get("OperatorId")).substring(1).toUpperCase()); //strips the 'E' off of the employee id
+		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
+			parameterMap.put("operatorId", ((String)parameterMap.get("operatorId")).substring(1).toUpperCase()); //strips the 'E' off of the employee id
 		}
 		parameterMap.put("peratorId", parameterMap.get("OperatorId"));
 		//!SHOW '$PSauditEmpl: ' $PSauditEmpl
 		//!DO HR202-Get-Term-Date
 		//LET $PSTermDate = DATETOSTR(STRTODATE($PSDateIn,'YYYY-MM-DD'),'YYYYMMDD')
-		parameterMap.put("erminationDate", parameterMap.get("EffectiveDate"));
+		parameterMap.put("terminationDate", parameterMap.get("EffectiveDate"));
 		//!SHOW '$PSTermDate: ' $PSTermDate
 		//DO Get-OprId
 		String psOprId = ZHRI100A.fetchLegacyEmployeeId(parameterMap);
 		//LET $PSEmpl = $PSOprid
-		parameterMap.put("EmployeeId", psOprId);
-		parameterMap.put("mployeeId", psOprId);
+		parameterMap.put("employeeId", psOprId);
+		parameterMap.put("employeeId", psOprId);
 		//IF $PSEmpl <> '' AND $PSEmpl <> ' '  !If the new oprid is not blank and it is not null on return
-		if(parameterMap.get("EmployeeId") != null && !((String)parameterMap.get("mployeeId")).isEmpty()) {
+		if(parameterMap.get("employeeId") != null && !((String)parameterMap.get("employeeId")).isEmpty()) {
 			//DO HR202-Call-System
 			HR202_callSystem(parameterMap);
 		//END-IF   !$PSEmpl <> '' and $PSEmpl <> ' '
@@ -111,17 +111,10 @@ public class NonPersonTermination {
 	private String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("********** composeParameterStringForHrz202AProcess");
 		//LET $PSTermDate = DATETOSTR(STRTODATE($PSDateIn,'YYYY-MM-DD'),'YYYYMMDD')
-		//LET $Part2 = 'Parm('''       ||
-		//				$PSauditEmpl    ||
-		//				''' '''         ||
-		//				$PSOprid        ||
-		//				''' '''         ||
-		//				$PSTermDate     ||
-		//				''')" '
-		String terminationDate = new SimpleDateFormat("yyyyMMdd").format(parameterMap.get("TerminationDate"));
-		String parameterString = "'" + parameterMap.get("OperatorId") + "' "
-				+ "'" + parameterMap.get("EmployeeId") + "' "
-				+ "'" + terminationDate + "'";
+		String terminationDate = new SimpleDateFormat("yyyyMMdd").format(parameterMap.get("terminationDate"));
+		String parameterString = "'" + parameterMap.get("operatorId") + "' " //$PSauditEmpl
+				+ "'" + parameterMap.get("employeeId") + "' " //$PSOprid
+				+ "'" + terminationDate + "'"; //$PSTermDate
 		return parameterString;
 	}
 	

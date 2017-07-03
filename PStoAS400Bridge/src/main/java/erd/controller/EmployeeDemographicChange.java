@@ -29,80 +29,79 @@ public class EmployeeDemographicChange {
 	 */
 	private String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("********** composeParameterStringForHrz102AProcess");
-		//Let $Part2 = 'Parm(''' || $PSEmpl || ''' ''' || $PSGroup|| ''' ''' || $PSreg || ''' ''' ||
 		// $PSbranch || ''' ''' || $PSEMP || ''' ''' || $PSNational_Id || ''' ''' ||
 		// $PSHealth_Stat || ''' ''' || $PSHealth_Stat_Desc || ''' ''' || $PSVehRpt || ''' ''' ||
 		// $PSName || ''' ''' || $PSName_Prefix || ''' ''' || $PSNickname ||
-		// ''' ''' ||
 		// $PSAddress ||
-		// ''' ''' ||
 		// $PSCity ||
-		// ''' ''' ||
 		// $PSState||
-		// ''' ''' ||
 		// $PSZip ||
-		// ''' ''' ||
 		// $PSPhone||
-		// ''' ''' ||
 		// $PSBusiness_Phone ||
-		// ''' ''' ||
 		// $PSCountry ||
-		// ''' ''' ||
 		// $PSGender ||
-		// ''' ''' ||
 		// $PSMarITAL_StatUS ||
-		// ''' ''' ||
 		// $PSEthnic_Group ||
-		// ''' ''' ||
 		// $PSChg_Dt ||
-		// ''' ''' ||
 		// $PSBirthDate ||
-		// ''' ''' ||
 		// $PSStat_date ||
-		// ''' ''' ||
 		// $PSStart_date ||
-		// ''' ''' ||
 		// $PSDriver_Lic ||
-		// ''' ''' ||
 		// $PSDlstate ||
-		// ''' ''' ||
 		// $PSContact_Name ||
-		// ''' ''' ||
 		// $PSEmer_Phn ||
-		// ''' ''' ||
 		// $PSRelation ||
-		// ''' ''' ||
 		// $PSEmpl_Spouse ||
-		// ''' ''' ||
 		// $PSReferral_Source ||
-		// ''' ''' ||
 		// $PSRecruit_Gp ||
-		// ''' ''' ||
 		// $PSRecruiter_Id ||
-		// ''' ''' ||
 		// $PSSpecific_Refer_Src ||
-		// ''' ''' ||
 		// $PSCollege ||
-		// ''' ''' ||
 		// $PSGradYr ||
-		// ''' ''' ||
 		// $PSMajor||
-		// ''' ''' || !dshen 01/12/2012
 		// $PS_NID_COUNTRY5 || !dshen 01/12/2012
-		// ''')" '
-//		String paramaterString = "'" + processParameters.getEmployeeId() + "' "
-//				+ "'" + processParameters.getTerminationMonth() + "' "
-//				+ "'" + processParameters.getTerminationDay() + "' "
-//				+ "'" + processParameters.getTerminationYear() + "' "
-//				+ "'" + processParameters.getRehireMonth() + "' "
-//				+ "'" + processParameters.getRehireDay() + "' "
-//				+ "'" + processParameters.getRehireYear() + "' "
-//				+ "'" + processParameters.getVoluntaryOrInvoluntary() + "' "
-//				+ "'" + processParameters.getTerminationCode() + "' "
-//				+ "'" + processParameters.getAuditOperatorId() + "' "
-//				+ "'" + processParameters.getTerminationReason() + "'";
-//		return paramaterString;
-		return null;
+		String paramaterString = ""
+        + "'" + parameterMap.get("PSEmpl") + "' "
+        + "'" + parameterMap.get("PSGroup") + "' "
+        + "'" + parameterMap.get("PSreg") + "' "
+        + "'" + parameterMap.get("PSbranch") + "' "
+        + "'" + parameterMap.get("PSEMP") + "' "
+        + "'" + parameterMap.get("PSNational_Id") + "' "
+        + "'" + parameterMap.get("PSHealth_Stat") + "' "
+        + "'" + parameterMap.get("PSHealth_Stat_Desc") + "' "
+        + "'" + parameterMap.get("PSVehRpt") + "' "
+        + "'" + parameterMap.get("PSName") + "' "
+        + "'" + parameterMap.get("PSName_Prefix") + "' "
+        + "'" + parameterMap.get("PSNickname") + "' "
+        + "'" + parameterMap.get("PSAddress") + "' "
+        + "'" + parameterMap.get("PSCity") + "' "
+        + "'" + parameterMap.get("PSState") + "' "
+        + "'" + parameterMap.get("PSZip") + "' "
+        + "'" + parameterMap.get("PSPhone") + "' "
+        + "'" + parameterMap.get("PSBusiness_Phone") + "' "
+        + "'" + parameterMap.get("PSCountry") + "' "
+        + "'" + parameterMap.get("PSGender") + "' "
+        + "'" + parameterMap.get("PSMarITAL_StatUS") + "' "
+        + "'" + parameterMap.get("PSEthnic_Group") + "' "
+        + "'" + parameterMap.get("PSChg_Dt") + "' "
+        + "'" + parameterMap.get("PSBirthDate") + "' "
+        + "'" + parameterMap.get("PSStat_date") + "' "
+        + "'" + parameterMap.get("PSStart_date") + "' "
+        + "'" + parameterMap.get("PSDriver_Lic") + "' "
+        + "'" + parameterMap.get("PSDlstate") + "' "
+        + "'" + parameterMap.get("PSContact_Name") + "' "
+        + "'" + parameterMap.get("PSEmer_Phn") + "' "
+        + "'" + parameterMap.get("PSRelation") + "' "
+        + "'" + parameterMap.get("PSEmpl_Spouse") + "' "
+        + "'" + parameterMap.get("PSReferral_Source") + "' "
+        + "'" + parameterMap.get("PSRecruit_Gp") + "' "
+        + "'" + parameterMap.get("PSRecruiter_Id") + "' "
+        + "'" + parameterMap.get("PSSpecific_Refer_Src") + "' "
+        + "'" + parameterMap.get("PSCollege") + "' "
+        + "'" + parameterMap.get("PSGradYr") + "' "
+        + "'" + parameterMap.get("PSMajor") + "' "
+        + "'" + parameterMap.get("PS_NID_COUNTRY5") + "' ";
+		return paramaterString;
 	}
 
 	/**

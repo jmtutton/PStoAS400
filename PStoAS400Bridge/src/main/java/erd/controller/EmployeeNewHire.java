@@ -24,7 +24,7 @@ public class EmployeeNewHire {
 	
 	/**
 	 * 
-	 * @param newHireParameters
+	 * @param parameterMap
 	 */
 	private String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("********** composeParameterString()");
@@ -107,15 +107,46 @@ public class EmployeeNewHire {
 		//''' '''                                ||      !dshen 01/11/2012
 		//$PS_NID_COUNTRY                        ||         !dshen 01/11/2012
 		// ''')"'
-//		String paramaterString = "'" + newHireParameters.getEmployeeId() + "' "
-//				+ "'" + newHireParameters.getOperatorId() + "' "
-//				+ "'" + newHireParameters.getEmployeeGroup() + "' "
-//				+ "'" + newHireParameters.getEmployeeBranch() + "' "
-//				+ "'" + newHireParameters.getNationalIdCountry() + "' "
-//				+ "'" + newHireParameters.getNationalId() + "' "
-//				+ "'" + newHireParameters.getEffectiveDate() + "'";
-//		return paramaterString;
-		return null;
+		String paramaterString = "'" + parameterMap.get("legacyAuditEmplid") + "' "     //Legacy Emplid for audit field
+		+ "'" + parameterMap.get("legacyAddEmplid") + "' "      //Legacy Alternate Employee Id for the employee being hired
+		+ "'" + parameterMap.get("legacyGroup") + "' "          //Legacy Group
+		+ "'" + parameterMap.get("legacyBranch") + "' "         //Legacy Branch
+		+ "'" + parameterMap.get("legacyLastName") + "' "       //Legacy Last Name
+		+ "'" + parameterMap.get("legacyFirstName") + "' "      //Legacy First Name
+		+ "'" + parameterMap.get("legacyMiddleInit") + "' "     //Legacy Middle Initial
+		+ "'" + parameterMap.get("legacyMaritalStatus") + "' "  //Legacy Marital Status
+		+ "'" + parameterMap.get("legacyNickName") + "' "       //Legacy Nickname
+		+ "'" + parameterMap.get("legacyJobStatus") + "' "      //Legacy Job Status
+		+ "'" + parameterMap.get("legacyGender") + "' "         //Legacy Gender
+		+ "'" + parameterMap.get("legacyBirthYear") + "' "      //Legacy Birth Date
+		+ "'" + parameterMap.get("legacyBirthMonth") + "' "     //Legacy Birth Month
+		+ "'" + parameterMap.get("legacyBirthDay") + "' "       //Legacy Birth Day
+		+ "'" + parameterMap.get("legacyServiceYear") + "' "    //Legacy Service Year
+		+ "'" + parameterMap.get("legacyServiceMonth") + "' "   //Legacy Service Month
+		+ "'" + parameterMap.get("legacyServiceDay") + "' "     //Legacy Service Day
+		+ "'" + parameterMap.get("legacyUnionFlag") + "' "      //Legacy Union Flag
+		+ "'" + parameterMap.get("legacyRace") + "' "           //Legacy Race
+		+ "'" + parameterMap.get("legacyTimeCardFlag") + "' "   //Legacy Time Card Flag
+		+ "'" + parameterMap.get("legacyNid") + "' "            //Legacy National Id (Social Security Number)
+		+ "'" + parameterMap.get("legacyDepartment") + "' "     //Legacy Department
+		+ "'" + parameterMap.get("legacySubDept") + "' "        //Legacy Sub Dept
+		+ "'" + parameterMap.get("legacyPosition") + "' "       //Legacy Position
+		+ "'" + parameterMap.get("legacyReferralSource") + "' " //Legacy Referral Source Code
+		+ "'" + parameterMap.get("psSpecificReferSrc") + "' "	//Legacy Referral Source Code
+		+ "'" + parameterMap.get("legacyAddress1") + "' "       //Legacy Address1
+		+ "'" + parameterMap.get("legacyCity") + "' "           //Legacy City
+		+ "'" + parameterMap.get("legacyState") + "' "          //Legacy State
+		+ "'" + parameterMap.get("legacyZip") + "' "            //Legacy Zip
+		+ "'" + parameterMap.get("legacyHomeAreaCode") + "' "   //Legacy Home Area code
+		+ "'" + parameterMap.get("legacyHomePhone") + "' "      //Legacy Employee Home phone number
+		+ "'" + parameterMap.get("legacyHomePhoneError") + "' " //Flag to mark that the home phone number was too long
+		+ "'" + parameterMap.get("legacyWrkAreaCode") + "' "    //Legacy Work Area code
+		+ "'" + parameterMap.get("legacyWorkPhone") + "' "      //Legacy Employee Work phone number
+		+ "'" + parameterMap.get("legacyWrkPhoneError") + "' "  //Flag to mark that the Work phone number was too long
+		+ "'" + parameterMap.get("psNamePrefix") + "' "  	  	//Flag to mark that the Work phone number was too long
+		+ "'" + parameterMap.get("hireRehireFlag") + "' "     	//Flag that indicates if this is a hire or a rehire
+		+ "'" + parameterMap.get("psNidCountry") + "' ";     	//dshen 01/11/2012
+		return paramaterString;
 	}
 
 }

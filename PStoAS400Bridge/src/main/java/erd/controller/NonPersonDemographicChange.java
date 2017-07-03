@@ -29,46 +29,23 @@ public class NonPersonDemographicChange {
 	 */
 	private String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("********** composeParameterString");
-		//Let $Part2 = 'Parm('''                 ||
-		// $PSAuditemp               ||
-		// ''' '''                   ||       
-		// $PSEmpl                   ||
-		// ''' '''                   ||
-		// $PSGroup                  ||
-		// ''' '''                   ||
-		// $PSbranch                 ||
-		// ''' '''                   ||
-		// $PSLName                  ||
-		// ''' '''                   ||
-		// $PSFName                  ||
-		// ''' '''                   ||
-		// $PSMName                  ||
-		// ''' '''                   ||
-		// $PSNickname               ||
-		// ''' '''                   ||
-		// $PSGender                 ||
-		// ''' '''                   ||
-		// $LegServiceDate           ||
-		// ''' '''                   ||
-		// $PSDeptid                 ||
-		// ''' '''                   ||
-		// $PSPosition               ||
-		// ''' '''                   ||
-		// $PSReferral_Source        ||
-		// ''' '''                   ||
-		// $PSAddress                ||
-		// ''' '''                   ||
-		// $PSCity                   ||
-		// ''')" '
-//		String paramaterString = "'" + parameterMap.getEmployeeId() + "' "
-//				+ "'" + parameterMap.getOperatorId() + "' "
-//				+ "'" + parameterMap.getEmployeeGroup() + "' "
-//				+ "'" + parameterMap.getEmployeeBranch() + "' "
-//				+ "'" + parameterMap.getNationalIdCountry() + "' "
-//				+ "'" + parameterMap.getNationalId() + "' "
-//				+ "'" + parameterMap.getEffectiveDate() + "'";
-//		return paramaterString;
-		return null;
+		String paramaterString = ""
+		+ "'" + parameterMap.get("PSAuditemp") + "' " //$PSAuditEmp
+		+ "'" + parameterMap.get("PSEmpl") + "' " //$PSEmpl
+		+ "'" + parameterMap.get("PSGroup") + "' " //$PSGroup
+		+ "'" + parameterMap.get("PSBranch") + "' " //$PSBranch
+		+ "'" + parameterMap.get("PSLName") + "' " //$PSLName
+		+ "'" + parameterMap.get("PSFName") + "' " //$PSFName
+		+ "'" + parameterMap.get("PSMName") + "' " //$PSMName
+		+ "'" + parameterMap.get("PSNickname") + "' " //$PSNickname
+		+ "'" + parameterMap.get("PSGender") + "' " //$PSGender
+		+ "'" + parameterMap.get("LegServiceDate") + "' " //$LegServiceDate
+		+ "'" + parameterMap.get("PSDeptId") + "' " //$PSDeptId
+		+ "'" + parameterMap.get("PSPosition") + "' " //$PSPosition
+		+ "'" + parameterMap.get("PSReferralSource") + "' " //$PSReferral_Source
+		+ "'" + parameterMap.get("PSAddress") + "' " //$PSAddress
+		+ "'" + parameterMap.get("PSCity") + "' "; //$PSCity
+		return paramaterString;
 	}
 	
 }

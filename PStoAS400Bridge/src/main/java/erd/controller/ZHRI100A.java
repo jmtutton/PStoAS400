@@ -70,9 +70,10 @@ public class ZHRI100A {
 			for(PszTriggerSuperclass trigger : triggerList) {
 				String completionStatus = checkTriggerRecord(trigger);
 				if("P".equalsIgnoreCase(completionStatus)) {
-					completionStatus = processTrigger(trigger);
+					HashMap<String, Object> parameterMap = initializeParameterMap(trigger);
+					completionStatus = callPrograms(parameterMap);
 				}
-				if(!"P".equalsIgnoreCase(completionStatus)) {
+				else {
 					if(trigger instanceof PszTriggerEmployee) {
 						PszTriggerEmployee.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
 					}
@@ -145,17 +146,12 @@ public class ZHRI100A {
 		parameterMap.put("effectiveDate", trigger.getEffectiveDate());
 		parameterMap.put("effectiveSequence", trigger.getEffectiveSequence());
 		parameterMap.put("completionStatus", trigger.getCompletionStatus());
-		parameterMap.put("poiFlag", false);
-//		CommonParameters commonParameters = 
-//		CommonParameters commonParameters = new ProcessParameters().new CommonParameters();
-//		commonParameters.setCriticalFlag(false); //from Process-Main
-//		commonParameters.setProcessName(trigger.getProcessName());
-//		commonParameters.setEmployeeId(trigger.getEmployeeId());
-//		commonParameters.setOperatorId(trigger.getOperatorId());
-//		commonParameters.setEffectiveDate(trigger.getEffectiveDate());
-//		commonParameters.setEffectiveSequence(trigger.getEffectiveSequence());
-//		commonParameters.setCompletionStatus(trigger.getCompletionStatus());
-//		commonParameters.setPoiFlag(false);
+		if(trigger instanceof PszTriggerEmployee) {
+			parameterMap.put("poiFlag", false);
+		}
+		else {
+			parameterMap.put("poiFlag", true);
+		}
 		return parameterMap;
 	}
 
@@ -165,39 +161,48 @@ public class ZHRI100A {
 	 * @param trigger
 	 * @return
 	 */
-	public static String processTrigger(PszTriggerSuperclass trigger) {
+	public static String callPrograms(HashMap<String, Object> parameterMap) {
 		System.out.println("********** ZHRI100A_callPrograms");
-		HashMap<String, Object> parameterMap = initializeParameterMap(trigger);
 		String completionStatus = (String)parameterMap.get("completionStatus");
 		switch((String)parameterMap.get("processName")) {
 		case "ZHRI101A": //Process to hire employee
-			EmployeeNewHire employeeNewHire = new EmployeeNewHire();
-			completionStatus = employeeNewHire.processEmployeeNewHire(parameterMap);
+			parameterMap.put("hireRehireFlag",  "H");
+			completionStatus = new EmployeeNewHire().processEmployeeNewHire(parameterMap);
 			break;
 		case "ZHRI102A": //Process to terminate an employee
-			EmployeeTermination employeeTermination = new EmployeeTermination();
-			completionStatus = employeeTermination.processEmployeeTermination(parameterMap);
+			completionStatus = new EmployeeTermination().processEmployeeTermination(parameterMap);
 			break;
-		case "ZHRI104A": //Process for job profile change
-			EmployeeJobProfileChange employeeJobProfileChange = new EmployeeJobProfileChange();
-			completionStatus = employeeJobProfileChange.processEmployeeJobProfileChange(parameterMap);
+		case "ZHRI104A": //Process for employee job profile change
+			completionStatus = new EmployeeJobProfileChange().processEmployeeJobProfileChange(parameterMap);
 			break;
-		case "ZHRI105A": //Process for demographics change
-			EmployeeDemographicChange employeeDemographicChange = new EmployeeDemographicChange();
-			completionStatus = employeeDemographicChange.processEmployeeDemographicChange(parameterMap);
+		case "ZHRI105A": //Process for employee demographics change
+			completionStatus = new EmployeeDemographicChange().processEmployeeDemographicChange(parameterMap);
 			break;
-		case "ZHRI106A": 
+		case "ZHRI106A": //Process for employee rehire
 			//DO HR01-Process-Main       !ZHRI101A.SQC
-			EmployeeNewHire employeeNewHire2 = new EmployeeNewHire();
-			completionStatus = employeeNewHire2.processEmployeeNewHire(parameterMap);
+			parameterMap.put("hireRehireFlag",  "R");
+			completionStatus =  new EmployeeNewHire().processEmployeeNewHire(parameterMap);
 			break;
-		case "ZHRI107A": //Process for converting dates
-			EmployeeDateChange employeeDateChange = new EmployeeDateChange();
-			completionStatus = employeeDateChange.processEmployeeDateChange(parameterMap);
+		case "ZHRI107A": //Process for converting employee dates
+			completionStatus = new EmployeeDateChange().processEmployeeDateChange(parameterMap);
 			break;
-		case "ZHRI109A": //Process for group transfer
-			EmployeeGroupTransfer employeeGroupTransfer = new EmployeeGroupTransfer();
-			completionStatus = employeeGroupTransfer.processEmployeeGroupTransfer(parameterMap);
+		case "ZHRI109A": //Process for employee group transfer
+			completionStatus = new EmployeeGroupTransfer().processEmployeeGroupTransfer(parameterMap);
+			break;
+		case "ZHRI201A": //Process for non-person new hire
+			parameterMap.put("hireRehireFlag",  "H");
+			completionStatus = new NonPersonNewHire().processNonPersonNewHire(parameterMap);
+			break;
+		case "ZHRI202A": //Process for non-person termination
+			completionStatus = new NonPersonTermination().processNonPersonTermination(parameterMap);
+			break;
+		case "ZHRI205A": //Process for non-person demographics change
+			completionStatus = new NonPersonDemographicChange().processNonPersonDemographicChange(parameterMap);
+			break;
+		case "ZHRI206A": //Process for non-person rehire
+			//DO HR201-Process-Main       !ZHRI201A.SQC
+			parameterMap.put("hireRehireFlag",  "R");
+			completionStatus = new NonPersonNewHire().processNonPersonNewHire(parameterMap);
 			break;
 		case "ZHRI101D": //Row deleted on hire
 			parameterMap.put("errorProgramParameter", "HRZ101A");
@@ -255,29 +260,8 @@ public class ZHRI100A {
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
-		case "ZHRI201A": //Non-person new hire
-			parameterMap.put("poiFlag", true);
-			NonPersonNewHire nonPersonNewHire = new NonPersonNewHire();
-			completionStatus = nonPersonNewHire.processNonPersonNewHire(parameterMap);
-			break;
-		case "ZHRI202A": //Non-person termination
-			parameterMap.put("poiFlag", true);
-			NonPersonTermination nonPersonTermination = new NonPersonTermination();
-			completionStatus = nonPersonTermination.processNonPersonTermination(parameterMap);
-			break;
-		case "ZHRI205A":
-			parameterMap.put("poiFlag", true);
-			NonPersonDemographicChange nonPersonDemographicChange = new NonPersonDemographicChange();
-			completionStatus = nonPersonDemographicChange.processNonPersonDemographicChange(parameterMap);
-			break;
-		case "ZHRI206A": //Non-person 
-			parameterMap.put("poiFlag", true);
-			//DO HR201-Process-Main       !ZHRI201A.SQC
-			NonPersonNewHire nonPersonNewHire2 = new NonPersonNewHire();
-			completionStatus = nonPersonNewHire2.processNonPersonNewHire(parameterMap);
-			break;
 		default: //ERROR
-			//set to E to prevent looping and to mark the record as error
+			//set to E to prevent re-processing and to mark the record as error
 			completionStatus = "E";
 			break;
 		}

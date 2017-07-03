@@ -25,28 +25,13 @@ public class EmployeeGroupTransfer {
 	 */
 	private String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("********** composeParameterStringForHrz109AProcess");
-		//'PARM('''                     ||
-		//$LegEmplid                    ||
-		//''' '''                       ||
-		//$LegUserEmplid                ||
-		//''' '''                       ||
-		//$LegGroup                     ||
-		//''' '''                       ||
-		//$LegBranch                    ||
-		//''' '''                       ||
-		//$LegCountryCode               ||
-		//''' '''                       ||
-		//$LegNid                       ||
-		//''' '''                       ||
-		//$LegEffdt                     ||
-		//''')"' 
-		String paramaterString = "'" + parameterMap.get("employeeId") + "' "
-				+ "'" + parameterMap.get("operatorId") + "' "
-				+ "'" + parameterMap.get("employeeGroup") + "' "
-				+ "'" + parameterMap.get("employeeBranch") + "' "
-				+ "'" + parameterMap.get("nationalIdCountry") + "' "
-				+ "'" + parameterMap.get("nationalId") + "' "
-				+ "'" + parameterMap.get("effectiveDate") + "'";
+		String paramaterString = "'" + parameterMap.get("employeeId") + "' " //$LegEmplid 
+				+ "'" + parameterMap.get("operatorId") + "' " //$LegUserEmplid
+				+ "'" + parameterMap.get("employeeGroup") + "' " //$LegGroup
+				+ "'" + parameterMap.get("employeeBranch") + "' " //$LegBranch
+				+ "'" + parameterMap.get("nationalIdCountry") + "' " //$LegCountryCode
+				+ "'" + parameterMap.get("nationalId") + "' " //$LegNid
+				+ "'" + parameterMap.get("effectiveDate") + "'"; //$LegEffdt
 		return paramaterString;
 	}
 

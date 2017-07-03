@@ -27,50 +27,24 @@ public class NonPersonNewHire {
 	 */
 	private String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("********** composeParameterString");
-		//'PARM('''                              ||
-		//$LegAuditEmplid                        ||     !Legacy Emplid for audit field
-		//''' '''                                ||
-		//$LegAddEmplid                          ||       !Legacy Alternate Employee Id for the employee being hired
-		//''' '''                                ||
-		//$Legindex                              ||           !Legacy Index Number
-		//''' '''                                ||
-		//$LegGroup                              ||           !Legacy Group
-		//''' '''                                ||
-		//$LegBranch                             ||          !Legacy Branch
-		//''' '''                                ||
-		//$LegLastName                           ||        !Legacy Last Name
-		//''' '''                                ||
-		//$LegFirstName                          ||       !Legacy First Name
-		//''' '''                                ||
-		//$LegMiddleInit                         ||      !Legacy Middle Initial
-		//''' '''                                ||
-		//$LegNickName                           ||        !Legacy Nickname
-		//''' '''                                ||
-		//$LegGender                             ||          !Legacy Gender
-		//''' '''                                ||
-		//$LegServiceDate                        ||     !Legacy Start Date
-		//''' '''                                ||
-		//$LegDepartment                         ||      !Legacy Department
-		//''' '''                                ||
-		//$LegPosition                           ||       !Legacy Position
-		//''' '''                                ||
-		//$LegReferralSource                     || !Legacy Referral Source Code
-		//''' '''                                ||
-		//$LegAddress1                           ||        !Legacy Address1
-		//''' '''                                ||
-		//$LegCity                               ||            !Legacy City
-		//''' '''                                ||
-		//$HireRehireFlag                        ||     !Flag that indicates if this is a hire or a rehire
-		// ''')"'
 		String paramaterString = ""
-//				+ "'" + processParameters.getEmployeeId() + "' "
-//				+ "'" + processParameters.getOperatorId() + "' "
-//				+ "'" + processParameters.getEmployeeGroup() + "' "
-//				+ "'" + processParameters.getEmployeeBranch() + "' "
-//				+ "'" + processParameters.getNationalIdCountry() + "' "
-//				+ "'" + processParameters.getNationalId() + "' "
-//				+ "'" + processParameters.getEffectiveDate() + "'"
-		;
+		+ "'" + parameterMap.get("LegAuditEmplid") + "' "     //Legacy Emplid for audit field
+		+ "'" + parameterMap.get("LegAddEmplid") + "' "       //Legacy Alternate Employee Id for the employee being hired
+		+ "'" + parameterMap.get("Legindex") + "' "           //Legacy Index Number
+		+ "'" + parameterMap.get("LegGroup") + "' "           //Legacy Group
+		+ "'" + parameterMap.get("LegBranch") + "' "          //Legacy Branch
+		+ "'" + parameterMap.get("LegLastName") + "' "        //Legacy Last Name
+		+ "'" + parameterMap.get("LegFirstName") + "' "       //Legacy First Name
+		+ "'" + parameterMap.get("LegMiddleInit") + "' "      //Legacy Middle Initial
+		+ "'" + parameterMap.get("LegNickName") + "' "        //Legacy Nickname
+		+ "'" + parameterMap.get("LegGender") + "' "          //Legacy Gender
+		+ "'" + parameterMap.get("LegServiceDate") + "' "     //Legacy Start Date
+		+ "'" + parameterMap.get("LegDepartment") + "' "      //Legacy Department
+		+ "'" + parameterMap.get("LegPosition") + "' "        //Legacy Position
+		+ "'" + parameterMap.get("LegReferralSource") + "' "  //Legacy Referral Source Code
+		+ "'" + parameterMap.get("LegAddress1") + "' "        //Legacy Address1
+		+ "'" + parameterMap.get("LegCity") + "' "            //Legacy City
+		+ "'" + parameterMap.get("HireRehireFlag") + "' ";    //Flag that indicates if this is a hire or a rehire
 		return paramaterString;
 	}
 
