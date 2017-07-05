@@ -13,22 +13,35 @@ import erd.model.PsDriversLicense;
 
 public class EmployeeDemographicChange {
 
-	public String processEmployeeDemographicChange(HashMap<String, Object> parameterMap) {
+	/**
+	 * 
+	 * @param parameterMap
+	 * @return
+	 */
+	public String doProcess(HashMap<String, Object> parameterMap) {
+		System.out.println("*** EmployeeDemographicChange.doProcess() ***");
 		parameterMap = fetchProcessParameters(parameterMap);
-		composeParameterString(parameterMap);
-		return null;
-	}
-	
-	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		return null;
+		parameterMap.put("parameterString", composeParameterString(parameterMap));
+		return ZHRI100A.doCommand(parameterMap);
 	}
 	
 	/**
 	 * 
-	 * @param processParameters
+	 * @param parameterMap
+	 * @return
+	 */
+	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
+		System.out.println("*** EmployeeDemographicChange.fetchProcessParameters() ***");
+		parameterMap.put("errorProgramParameter", "HRZ105A");
+		return parameterMap;
+	}
+	
+	/**
+	 * 
+	 * @param parameterMap
 	 */
 	private String composeParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("********** composeParameterStringForHrz102AProcess");
+		System.out.println("*** EmployeeDemographicChange.composeParameterString() ***");
 		// $PSbranch || ''' ''' || $PSEMP || ''' ''' || $PSNational_Id || ''' ''' ||
 		// $PSHealth_Stat || ''' ''' || $PSHealth_Stat_Desc || ''' ''' || $PSVehRpt || ''' ''' ||
 		// $PSName || ''' ''' || $PSName_Prefix || ''' ''' || $PSNickname ||

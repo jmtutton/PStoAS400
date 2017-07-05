@@ -9,22 +9,35 @@ import java.util.HashMap;
  */
 public class EmployeeGroupTransfer {
 
-	public String processEmployeeGroupTransfer(HashMap<String, Object> parameterMap) {
+	/**
+	 * 
+	 * @param parameterMap
+	 * @return
+	 */
+	public String doProcess(HashMap<String, Object> parameterMap) {
+		System.out.println("*** EmployeeGroupTransfer.doProcess() ***");
 		parameterMap = fetchProcessParameters(parameterMap);
-		composeParameterString(parameterMap);
-		return null;
-	}
-	
-	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		return null;
+		parameterMap.put("parameterString", composeParameterString(parameterMap));
+		return ZHRI100A.doCommand(parameterMap);
 	}
 	
 	/**
 	 * 
-	 * @param processParameters
+	 * @param parameterMap
+	 * @return
+	 */
+	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
+		System.out.println("*** EmployeeGroupTransfer.fetchProcessParameters() ***");
+		parameterMap.put("errorProgramParameter", "HRZ109A");
+		return parameterMap;
+	}
+	
+	/**
+	 * 
+	 * @param parameterMap
 	 */
 	private String composeParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("********** composeParameterStringForHrz109AProcess");
+		System.out.println("*** EmployeeGroupTransfer.composeParameterString() ***");
 		String paramaterString = "'" + parameterMap.get("employeeId") + "' " //$LegEmplid 
 				+ "'" + parameterMap.get("operatorId") + "' " //$LegUserEmplid
 				+ "'" + parameterMap.get("employeeGroup") + "' " //$LegGroup

@@ -10,16 +10,27 @@ import java.util.HashMap;
 
 public class NonPersonDemographicChange {
 	
-	public String processNonPersonDemographicChange(HashMap<String, Object> parameterMap) {
-		System.out.println("********** HR205_processMain()");
+	/**
+	 * 
+	 * @param parameterMap
+	 * @return
+	 */
+	public String doProcess(HashMap<String, Object> parameterMap) {
+		System.out.println("*** NonPersonDemographicChange.doProcess() ***");
 		parameterMap = fetchProcessParameters(parameterMap);
-		composeParameterString(parameterMap);
-		return null;
+		parameterMap.put("parameterString", composeParameterString(parameterMap));
+		return ZHRI100A.doCommand(parameterMap);
 	}
 	
+	/**
+	 * 
+	 * @param parameterMap
+	 * @return
+	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("********** fetchProcessParameters");
-		return null;
+		System.out.println("*** NonPersonDemographicChange.fetchProcessParameters() ***");
+		parameterMap.put("errorProgramParameter", "HRZ205A");
+		return parameterMap;
 		
 	}
 
@@ -28,7 +39,7 @@ public class NonPersonDemographicChange {
 	 * @param parameterMap
 	 */
 	private String composeParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("********** composeParameterString");
+		System.out.println("*** NonPersonDemographicChange.composeParameterString() ***");
 		String paramaterString = ""
 		+ "'" + parameterMap.get("PSAuditemp") + "' " //$PSAuditEmp
 		+ "'" + parameterMap.get("PSEmpl") + "' " //$PSEmpl

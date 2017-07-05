@@ -10,23 +10,36 @@ import java.util.HashMap;
 
 public class EmployeeJobProfileChange {
 
-	public String processEmployeeJobProfileChange(HashMap<String, Object> parameterMap) {
+	/**
+	 * 
+	 * @param parameterMap
+	 * @return
+	 */
+	public String doProcess(HashMap<String, Object> parameterMap) {
+		System.out.println("*** EmployeeJobProfileChange.doProcess() ***");
 		parameterMap = fetchProcessParameters(parameterMap);
-		composeParameterString(parameterMap);
-		return null;
+		parameterMap.put("parameterString", composeParameterString(parameterMap));
+		return ZHRI100A.doCommand(parameterMap);
 	}
 	
+	/**
+	 * 
+	 * @param parameterMap
+	 * @return
+	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		return null;
+		System.out.println("*** EmployeeJobProfileChange.fetchProcessParameters() ***");
+		parameterMap.put("errorProgramParameter", "HRZ109A");
+		return parameterMap;
 		
 	}
 	
 	/**
 	 * 
-	 * @param processParameters
+	 * @param parameterMap
 	 */
 	private String composeParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("********** composeParameterStringForHrz109AProcess");
+		System.out.println("*** EmployeeJobProfileChange.composeParameterString() ***");
 		//'PARM('''                   ||
 		//$LegEmplid                    ||
 		//''' '''                   ||

@@ -21,70 +21,70 @@ import erd.model.PsEmployeeReview;
 public class EmployeeDateChange {
 
 	/**
-	 * @see HR07-Initialize-Fields in ZHRI107A.SQC
-	 * This will initialize the fields at each call.
+	 * @see HR07-Process-Main in ZHRI107A.SQC
 	 * @param parameterMap
-	 * @param trigger
+	 * @return
+	 */
+	public String doProcess(HashMap<String, Object> parameterMap) {
+		System.out.println("*** EmployeeDateChange.doProcess() ***");
+		//BEGIN-PROCEDURE HR07-PROCESS-MAIN
+		//DO HR07-Initialize-Fields
+		parameterMap = fetchProcessParameters(parameterMap);
+		//IF $LegacyEmplid <> '' AND $LegacyEmplid <> ' '  !New OprId not null or blank on return
+		if(parameterMap.get("employeeId") != null && !((String)parameterMap.get("employeeId")).isEmpty()) {
+			//DO HR07-Call-RPG
+			parameterMap.put("parameterString", composeParameterString(parameterMap));
+			return ZHRI100A.doCommand(parameterMap);
+			//LET $CompletionStatus = 'C'
+			//END-IF    !#STATUS = 0
+		//END-IF    !$LegacyEmplid <> '' and $LegacyEmplid <> ' '
+		}
+		//END-PROCEDURE HR07-PROCESS-MAIN
+		return "E";
+	}
+
+	/**
+	 * This will initialize the fields at each call.
+	 * @see HR07-Initialize-Fields in ZHRI107A.SQC
 	 * @param parameterMap
 	 */
 	public HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
+		System.out.println("*** EmployeeDateChange.fetchProcessParameters() ***");
+		parameterMap.put("errorProgramParameter", "HRZ107A");
 		//BEGIN-PROCEDURE HR07-INITIALIZE-FIELDS
 		//LET $LegEffdt = $PSEffdt
 		//!Remove leading 'E' from the PS employee operator ID to comply with the 5 long legacy format
 		//LET $LegacyUserEmplId = SUBSTR($AuditOprId,2,5)
-		//UPPERCASE $LegacyUserEmplId !Make sure it is in all caps in case ID has a letter in it
-		//END-PROCEDURE HR07-INITIALIZE-FIELDS
-		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
-			parameterMap.put("userEmployeeId", ((String)parameterMap.get("operatorId")).substring(1).toUpperCase()); //strips the 'E' off of the employee id
-		}
-		return parameterMap;
-	}
-
-	/**
-	 * @see HR07-Process-Main in ZHRI107A.SQC
-	 * @param trigger
-	 * @param parameterMap
-	 * @return
-	 */
-	public String processEmployeeDateChange(HashMap<String, Object> parameterMap) {
-		//BEGIN-PROCEDURE HR07-PROCESS-MAIN
-		//DO HR07-Initialize-Fields
-		parameterMap.put("errorProgramParameter", "HRZ107A");
-		parameterMap = fetchProcessParameters(parameterMap);
-		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
-			//!Remove leading 'E' from the PS employee operator ID to comply with the 5 long legacy format
-			parameterMap.put("userEmployeeId", ((String)parameterMap.get("operatorId")).substring(1).toUpperCase()); //strips the 'E' off of the employee id
-		}
-		//!call procedures to get necessary PeopleSoft changed values for legacy
 		//DO Get-OprId   !gets valid operator ID using code from ZHRI100A.sqr
-		String oprId = ZHRI100A.fetchLegacyEmployeeId(parameterMap);
+		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
+			parameterMap.put("operatorId", ((String)parameterMap.get("operatorId")).substring(1).toUpperCase()); //strips the 'E' off of the id
+		}
 		//LET $LegacyEmplid = $PSOprid
-		parameterMap.put("employeeId", oprId);
+		parameterMap.put("employeeId", ZHRI100A.fetchLegacyEmployeeId(parameterMap));
 		//IF $LegacyEmplid <> '' AND $LegacyEmplid <> ' '  !New OprId not null or blank on return
 		if(parameterMap.get("employeeId") != null && !((String)parameterMap.get("employeeId")).isEmpty()) {
+			//UPPERCASE $LegacyUserEmplId !Make sure it is in all caps in case ID has a letter in it
+			parameterMap.put("employeeId", ((String)parameterMap.get("operatorId")).toUpperCase());
 			//DO HR07-Get-Employee-Review
-			parameterMap = HR07_getEmployeeReview(parameterMap);
+			parameterMap = fetchEmployeeReviewDates(parameterMap);
 			//DO HR07-Get-Accomplishments
-			parameterMap = HR07_getAccomplishments(parameterMap);
+			parameterMap = fetchAccomplishmentDates(parameterMap);
 			//DO HR07-Get-Contract-Data
-			parameterMap = HR07_getContractData(parameterMap);
-			//DO HR07-Call-RPG
-			HR07_callRpg(parameterMap);
-		//END-IF    !$LegacyEmplid <> '' and $LegacyEmplid <> ' '
+			parameterMap = fetchContractDate(parameterMap);
 		}
-		//END-PROCEDURE HR07-PROCESS-MAIN
-		return null;
+		return parameterMap;
+		//END-PROCEDURE HR07-INITIALIZE-FIELDS
 	}
 
 	/**
-	 * @see HR07-Get-Employee-Review in ZHRI107A.SQC
 	 * This procedure retrieves the Next Review Date and Last Review Date from the 
 	 * PeopleSoft Employee Review Table to send back to Option 7 of AAHR01 in legacy.
-	 * @param parameterMap
+	 * @see HR07-Get-Employee-Review in ZHRI107A.SQC
 	 * @param parameterMap
 	 * @return
 	 */
-	public HashMap<String, Object> HR07_getEmployeeReview(HashMap<String, Object> parameterMap) {
+	public HashMap<String, Object> fetchEmployeeReviewDates(HashMap<String, Object> parameterMap) {
+		System.out.println("*** EmployeeDateChange.fetchEmployeeReviewDates() ***");
 		//BEGIN-PROCEDURE HR07-GET-EMPLOYEE-REVIEW
 		//BEGIN-SELECT
 		PsEmployeeReview psEmployeeReview = 
@@ -98,31 +98,30 @@ public class EmployeeDateChange {
 		//LET $LegLastReviewDate = $LegEffdt
 		//!Format next review date and last review date so legacy will accept it (MM field, DD field and CCYY field)
 		//UNSTRING $PSNextReviewDate BY '-' INTO $LegNxtRevDtYear $LegNxtRevDtMonth $LegNxtRevDtDay
-		parameterMap.put("nextReviewYear", new SimpleDateFormat("yyyy").format(psEmployeeReview.getNextReviewDt()));
-		parameterMap.put("nextReviewMonth", new SimpleDateFormat("mm").format(psEmployeeReview.getNextReviewDt()));
-		parameterMap.put("nextReviewDay", new SimpleDateFormat("dd").format(psEmployeeReview.getNextReviewDt()));
+		if(psEmployeeReview.getNextReviewDt() != null) {
+			parameterMap.put("nextReviewYear", new SimpleDateFormat("yyyy").format(psEmployeeReview.getNextReviewDt()));
+			parameterMap.put("nextReviewMonth", new SimpleDateFormat("mm").format(psEmployeeReview.getNextReviewDt()));
+			parameterMap.put("nextReviewDay", new SimpleDateFormat("dd").format(psEmployeeReview.getNextReviewDt()));
+		}
 		//UNSTRING $LegLastReviewDate BY '-' INTO $LegLstRevDtYear $LegLstRevDtMonth $LegLstRevDtDay
-		parameterMap.put("lastReviewYear", new SimpleDateFormat("yyyy").format(psEmployeeReview.getEffectiveDate()));
-		parameterMap.put("lastReviewMonth", new SimpleDateFormat("mm").format(psEmployeeReview.getEffectiveDate()));
-		parameterMap.put("lastReviewDay", new SimpleDateFormat("dd").format(psEmployeeReview.getEffectiveDate()));
-		//FROM PS_Employee_Review CER7
-		//WHERE CER7.EmplId = $PSEMPLID
-			//AND CER7.EMPL_RCD = 0
-			//AND TO_CHAR(CER7.EFFDT, 'YYYY-MM-DD') = $PSEFFDT
-		//END-SELECT
+		if(psEmployeeReview.getNextReviewDt() != null) {
+			parameterMap.put("lastReviewYear", new SimpleDateFormat("yyyy").format(psEmployeeReview.getEffectiveDate()));
+			parameterMap.put("lastReviewMonth", new SimpleDateFormat("mm").format(psEmployeeReview.getEffectiveDate()));
+			parameterMap.put("lastReviewDay", new SimpleDateFormat("dd").format(psEmployeeReview.getEffectiveDate()));
+		}
 		//END-PROCEDURE HR07-GET-EMPLOYEE-REVIEW
 		return parameterMap;
 	}
-
+	
 	/**
-	 * @see HR07-Get-Accomplishments in ZHRI107A.SQC
 	 * This procedure retrieves the Negative Drug Test Date and Physical Test Date from the 
 	 * PeopleSoft Accomplishments Table to send back to Option 7 of AAHR01.
-	 * @param parameterMap
+	 * @see HR07-Get-Accomplishments in ZHRI107A.SQC
 	 * @param parameterMap
 	 * @return
 	 */
-	public HashMap<String, Object> HR07_getAccomplishments(HashMap<String, Object> parameterMap) {
+	public HashMap<String, Object> fetchAccomplishmentDates(HashMap<String, Object> parameterMap) {
+		System.out.println("*** EmployeeDateChange.fetchAccomplishmentDates() ***");
 		List<String> accomplishmentCodeList = Arrays.asList("DRUGTST", "PHYS L3", "PHYS L4");
 		PsAccomplishment psAccomplishment = PsAccomplishment.findByEmployeeIdAndAccomplishmentCodes((String)parameterMap.get("employeeId"), accomplishmentCodeList);
 		//BEGIN-PROCEDURE HR07-GET-ACCOMPLISHMENTS
@@ -134,12 +133,14 @@ public class EmployeeDateChange {
 			//WHEN = 'DRUGTST'
 			case "DRUGTST":
 				//LET $LegNegDrugTestDate = $PSIssueDate
-				parameterMap.put("negDrugTestYear", new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
-				parameterMap.put("negDrugTestMonth", new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
-				parameterMap.put("negDrugTestDay", new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
-				//!Format negative drug test date so legacy will accept it (MM field, DD field and CCYY field)
-				//UNSTRING $PSIssueDate BY '-' INTO $LegNegDrugTstYear $LegNegDrugTstMonth $LegNegDrugTstDay
-				//BREAK                 !Exit the evaluate statement
+				if(psAccomplishment.getDateIssued() != null) {
+					parameterMap.put("negDrugTestYear", new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
+					parameterMap.put("negDrugTestMonth", new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
+					parameterMap.put("negDrugTestDay", new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
+					//!Format negative drug test date so legacy will accept it (MM field, DD field and CCYY field)
+					//UNSTRING $PSIssueDate BY '-' INTO $LegNegDrugTstYear $LegNegDrugTstMonth $LegNegDrugTstDay
+					//BREAK                 !Exit the evaluate statement
+				}
 			break;
 			//!when accomplishment is equal to physical test date for level 3 or level 4
 			//WHEN = 'PHYS L3' OR WHEN = 'PHYS L4'
@@ -147,11 +148,13 @@ public class EmployeeDateChange {
 			case "PHYS L4":
 				//LET $LegPhysical3TestDate = $PSIssueDate
 				//LET $LegPhysical4TestDate = $PSIssueDate
-				parameterMap.put("physTestYear", new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
-				parameterMap.put("physTestMonth", new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
-				parameterMap.put("physTestDay", new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
-				//!Format physical test date so legacy will accept it (MM field, DD field and CCYY field)
-				//UNSTRING $PSIssueDate BY '-' INTO $LegPhysTstYear $LegPhysTstMonth $LegPhysTstDay
+				if(psAccomplishment.getDateIssued() != null) {
+					parameterMap.put("physTestYear", new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
+					parameterMap.put("physTestMonth", new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
+					parameterMap.put("physTestDay", new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
+					//!Format physical test date so legacy will accept it (MM field, DD field and CCYY field)
+					//UNSTRING $PSIssueDate BY '-' INTO $LegPhysTstYear $LegPhysTstMonth $LegPhysTstDay
+				}
 				//BREAK    !Exit the evaluate statement
 			break;
 			//!when equal to anything else, do not get issue date
@@ -165,13 +168,13 @@ public class EmployeeDateChange {
 	}
 
 	/**
-	 * @see HR07-Get-Contract-Data in ZHRI107A.SQC
 	 * This procedure retrieves the contract date from the PeopleSoft Contract Data Table to send back to Option 7 of AAHR01.
-	 * @param parameterMap
+	 * @see HR07-Get-Contract-Data in ZHRI107A.SQC
 	 * @param parameterMap
 	 * @return
 	 */
-	public HashMap<String, Object> HR07_getContractData(HashMap<String, Object> parameterMap) {
+	public HashMap<String, Object> fetchContractDate(HashMap<String, Object> parameterMap) {
+		System.out.println("*** EmployeeDateChange.fetchContractDate() ***");
 		//BEGIN-PROCEDURE HR07-GET-CONTRACT-DATA
 		//BEGIN-SELECT
 		PsContractData psContractData = PsContractData.findByEmployeeId((String)parameterMap.get("employeeId"));
@@ -194,27 +197,28 @@ public class EmployeeDateChange {
 		return null;
 	}
 
-	/**
-	 * @see HR07-Call-RPG in ZHRI107A.SQC
-	 * This procedure calls the RPG program to update the legacy files/fields needed by Option 7 of AAHR01.
-	 * @param parameterMap
-	 * @return
-	 */
-	public String HR07_callRpg(HashMap<String, Object> parameterMap) {
-		//BEGIN-PROCEDURE HR07-CALL-RPG
-		//!Setup the parameter list with what needs to be passed to the RPG program to update the legacy system
-		String parameterString = composeParameterString(parameterMap);
-		String commandString = ZHRI100A.composeRexecCommandString((String)parameterMap.get("processName"), parameterString);
-		//DO Call-System    !Do a remote call to the RPG program, HRZ107A, in order to pass the parms from code in ZHRI100A.sqr
-		Integer status = ZHRI100A.executeRemoteCommand(commandString, parameterMap);
-		//IF (#STATUS = 0)
-		if(status == 0) {
-			//LET $CompletionStatus = 'C'
-		//END-IF    !#STATUS = 0
-		}
-		//END-PROCEDURE HR07-CALL-RPG
-		return null;
-	}
+//	/**
+//	 * @see HR07-Call-RPG in ZHRI107A.SQC
+//	 * This procedure calls the RPG program to update the legacy files/fields needed by Option 7 of AAHR01.
+//	 * @param parameterMap
+//	 * @return
+//	 */
+//	public String HR07_callRpg(HashMap<String, Object> parameterMap) {
+//		System.out.println("*** EmployeeDateChange.HR07_callRpg() ***");
+//		//BEGIN-PROCEDURE HR07-CALL-RPG
+//		//!Setup the parameter list with what needs to be passed to the RPG program to update the legacy system
+//		String parameterString = composeParameterString(parameterMap);
+//		String commandString = ZHRI100A.composeRexecCommandString((String)parameterMap.get("processName"), parameterString);
+//		//DO Call-System    !Do a remote call to the RPG program, HRZ107A, in order to pass the parms from code in ZHRI100A.sqr
+//		Integer status = ZHRI100A.executeRemoteCommand(commandString, parameterMap);
+//		//IF (#STATUS = 0)
+//		if(status == 0) {
+//			//LET $CompletionStatus = 'C'
+//		//END-IF    !#STATUS = 0
+//		}
+//		//END-PROCEDURE HR07-CALL-RPG
+//		return null;
+//	}
 	
 	/**
 	 * Setup the parameter list with what needs to be passed to the RPG program to update the legacy system
@@ -222,7 +226,7 @@ public class EmployeeDateChange {
 	 * @return
 	 */
 	public String composeParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("********** composeParameterString");
+		System.out.println("*** EmployeeDateChange.composeParameterString() ***");
 		//'PARM('''                           ||
 		//$LegacyEmplid                       ||
 		//''' '''                             ||
@@ -277,7 +281,7 @@ public class EmployeeDateChange {
 		//$LegCompanySeniorityYear            ||
 		//''')" '
 		String parameterString = "'" + parameterMap.get("employeeId") + "' "
-				+ "'" + parameterMap.get("userEmployeeId") + "' "
+				+ "'" + parameterMap.get("operatorId") + "' "
 				+ "'" + parameterMap.get("hireMonth") + "' "
 				+ "'" + parameterMap.get("hireYear") + "' "
 				+ "'" + parameterMap.get("terminationMonth") + "' "

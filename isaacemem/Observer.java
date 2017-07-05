@@ -33,7 +33,7 @@ public class Observer {
 	
 	private List<String> getEmployeeProcessNames(){
 		List<String> array = new ArrayList<String>();
-		array.add("ZHRI101A");  //Process to hire employee
+		array.add("ZHRI101A"); //Process to hire employee
 		array.add("ZHRI102A"); //Process to terminate an employee
 		array.add("ZHRI104A"); //Process for job status change
 		array.add("ZHRI105A"); //Process for demographics change
@@ -61,7 +61,7 @@ public class Observer {
         System.out.println("Observer started");
         
         //initialize key fields
-        this.dataExporter = dataExporter;
+        this.dataImporter = dataImporter;
         this.dataExporter = dataExporter;
         
         //Start trigger check        

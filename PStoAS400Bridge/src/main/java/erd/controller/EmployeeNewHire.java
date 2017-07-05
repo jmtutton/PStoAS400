@@ -10,16 +10,27 @@ import java.util.HashMap;
 
 public class EmployeeNewHire {
 
-	public String processEmployeeNewHire(HashMap<String, Object> parameterMap) {
-		System.out.println("********** processEmployeeNewHire()");
+	/**
+	 * 
+	 * @param parameterMap
+	 * @return
+	 */
+	public String doProcess(HashMap<String, Object> parameterMap) {
+		System.out.println("*** EmployeeNewHire.doProcess() ***");
 		parameterMap = fetchProcessParameters(parameterMap);
-		composeParameterString(parameterMap);
-		return null;
+		parameterMap.put("parameterString", composeParameterString(parameterMap));
+		return ZHRI100A.doCommand(parameterMap);
 	}
 	
+	/**
+	 * 
+	 * @param parameterMap
+	 * @return
+	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		return null;
-		
+		System.out.println("*** EmployeeNewHire.fetchProcessParameters() ***");
+		parameterMap.put("errorProgramParameter", "HRZ101A");
+		return parameterMap;
 	}
 	
 	/**
@@ -27,7 +38,7 @@ public class EmployeeNewHire {
 	 * @param parameterMap
 	 */
 	private String composeParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("********** composeParameterString()");
+		System.out.println("*** EmployeeNewHire.composeParameterString() ***");
 		//'PARM('''                              ||
 		//$LegAuditEmplid                        ||     !Legacy Emplid for audit field
 		//''' '''                                ||

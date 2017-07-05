@@ -9,16 +9,27 @@ import java.util.HashMap;
  */
 public class NonPersonNewHire {
 	
-	public String processNonPersonNewHire(HashMap<String, Object> parameterMap) {
-		System.out.println("********** HR201_processMain()");
+	/**
+	 * 
+	 * @param parameterMap
+	 * @return
+	 */
+	public String doProcess(HashMap<String, Object> parameterMap) {
+		System.out.println("*** NonPersonNewHire.doProcess() ***");
 		parameterMap = fetchProcessParameters(parameterMap);
-		composeParameterString(parameterMap);
-		return null;
+		parameterMap.put("parameterString", composeParameterString(parameterMap));
+		return ZHRI100A.doCommand(parameterMap);
 	}
 	
+	/**
+	 * 
+	 * @param parameterMap
+	 * @return
+	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("********** HR201_initializeFields");
-		return null;
+		System.out.println("*** NonPersonNewHire.fetchProcessParameters() ***");
+		parameterMap.put("errorProgramParameter", "HRZ201A");
+		return parameterMap;
 	}
 
 	/**
@@ -26,7 +37,7 @@ public class NonPersonNewHire {
 	 * @param processParameters
 	 */
 	private String composeParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("********** composeParameterString");
+		System.out.println("*** NonPersonNewHire.composeParameterString() ***");
 		String paramaterString = ""
 		+ "'" + parameterMap.get("LegAuditEmplid") + "' "     //Legacy Emplid for audit field
 		+ "'" + parameterMap.get("LegAddEmplid") + "' "       //Legacy Alternate Employee Id for the employee being hired

@@ -137,7 +137,7 @@ public class ZHRI100A {
 	 * @return
 	 */
 	public static HashMap<String, Object> initializeParameterMap(PszTriggerSuperclass trigger) {
-		System.out.println("********** initializeCommonParameters");
+		System.out.println("********** ZHRI100A.initializeParameterMap");
 		HashMap<String, Object> parameterMap = new HashMap<String, Object>();
 		parameterMap.put("criticalFlag", false);
 		parameterMap.put("processName", trigger.getProcessName());
@@ -162,53 +162,53 @@ public class ZHRI100A {
 	 * @return
 	 */
 	public static String callPrograms(HashMap<String, Object> parameterMap) {
-		System.out.println("********** ZHRI100A_callPrograms");
+		System.out.println("********** ZHRI100A.callPrograms");
 		String completionStatus = (String)parameterMap.get("completionStatus");
 		switch((String)parameterMap.get("processName")) {
 		case "ZHRI101A": //Process to hire employee
 			parameterMap.put("hireRehireFlag",  "H");
-			completionStatus = new EmployeeNewHire().processEmployeeNewHire(parameterMap);
+			completionStatus = new EmployeeNewHire().doProcess(parameterMap);
 			break;
 		case "ZHRI102A": //Process to terminate an employee
-			completionStatus = new EmployeeTermination().processEmployeeTermination(parameterMap);
+			completionStatus = new EmployeeTermination().doProcess(parameterMap);
 			break;
 		case "ZHRI104A": //Process for employee job profile change
-			completionStatus = new EmployeeJobProfileChange().processEmployeeJobProfileChange(parameterMap);
+			completionStatus = new EmployeeJobProfileChange().doProcess(parameterMap);
 			break;
 		case "ZHRI105A": //Process for employee demographics change
-			completionStatus = new EmployeeDemographicChange().processEmployeeDemographicChange(parameterMap);
+			completionStatus = new EmployeeDemographicChange().doProcess(parameterMap);
 			break;
 		case "ZHRI106A": //Process for employee rehire
 			//DO HR01-Process-Main       !ZHRI101A.SQC
 			parameterMap.put("hireRehireFlag",  "R");
-			completionStatus =  new EmployeeNewHire().processEmployeeNewHire(parameterMap);
+			completionStatus =  new EmployeeNewHire().doProcess(parameterMap);
 			break;
 		case "ZHRI107A": //Process for converting employee dates
-			completionStatus = new EmployeeDateChange().processEmployeeDateChange(parameterMap);
+			completionStatus = new EmployeeDateChange().doProcess(parameterMap);
 			break;
 		case "ZHRI109A": //Process for employee group transfer
-			completionStatus = new EmployeeGroupTransfer().processEmployeeGroupTransfer(parameterMap);
+			completionStatus = new EmployeeGroupTransfer().doProcess(parameterMap);
 			break;
 		case "ZHRI201A": //Process for non-person new hire
 			parameterMap.put("hireRehireFlag",  "H");
-			completionStatus = new NonPersonNewHire().processNonPersonNewHire(parameterMap);
+			completionStatus = new NonPersonNewHire().doProcess(parameterMap);
 			break;
 		case "ZHRI202A": //Process for non-person termination
-			completionStatus = new NonPersonTermination().processNonPersonTermination(parameterMap);
+			completionStatus = new NonPersonTermination().doProcess(parameterMap);
 			break;
 		case "ZHRI205A": //Process for non-person demographics change
-			completionStatus = new NonPersonDemographicChange().processNonPersonDemographicChange(parameterMap);
+			completionStatus = new NonPersonDemographicChange().doProcess(parameterMap);
 			break;
 		case "ZHRI206A": //Process for non-person rehire
 			//DO HR201-Process-Main       !ZHRI201A.SQC
 			parameterMap.put("hireRehireFlag",  "R");
-			completionStatus = new NonPersonNewHire().processNonPersonNewHire(parameterMap);
+			completionStatus = new NonPersonNewHire().doProcess(parameterMap);
 			break;
 		case "ZHRI101D": //Row deleted on hire
 			parameterMap.put("errorProgramParameter", "HRZ101A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the hire process");
 			parameterMap.put("criticalFlag", true);
-			executeErrorCommand(parameterMap);
+			doErrorCommand(parameterMap);
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
@@ -216,7 +216,7 @@ public class ZHRI100A {
 			parameterMap.put("errorProgramParameter", "HRZ102A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the termination process");
 			parameterMap.put("criticalFlag", true);
-			executeErrorCommand(parameterMap);
+			doErrorCommand(parameterMap);
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
@@ -224,7 +224,7 @@ public class ZHRI100A {
 			parameterMap.put("errorProgramParameter", "HRZ104A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the job profile process");
 			parameterMap.put("criticalFlag", true);
-			executeErrorCommand(parameterMap);
+			doErrorCommand(parameterMap);
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
@@ -232,7 +232,7 @@ public class ZHRI100A {
 			parameterMap.put("errorProgramParameter", "HRZ105A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the demographics process");
 			parameterMap.put("criticalFlag", true);
-			executeErrorCommand(parameterMap);
+			doErrorCommand(parameterMap);
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
@@ -240,7 +240,7 @@ public class ZHRI100A {
 			parameterMap.put("errorProgramParameter", "HRZ101A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the re-hire process");
 			parameterMap.put("criticalFlag", true);
-			executeErrorCommand(parameterMap);
+			doErrorCommand(parameterMap);
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
@@ -248,7 +248,7 @@ public class ZHRI100A {
 			parameterMap.put("errorProgramParameter", "HRZ107A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the dates process");
 			parameterMap.put("criticalFlag", true);
-			executeErrorCommand(parameterMap);
+			doErrorCommand(parameterMap);
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
@@ -256,7 +256,7 @@ public class ZHRI100A {
 			parameterMap.put("errorProgramParameter", "HRZ109A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the group transfer process");
 			parameterMap.put("criticalFlag", true);
-			executeErrorCommand(parameterMap);
+			doErrorCommand(parameterMap);
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
@@ -327,37 +327,37 @@ public class ZHRI100A {
 	}
 
 	/**
-	 * Remotely executes a command on the AS400.
-	 * @see Call-System in ZHRI100A.SQR
-	 * @param commandString
-	 * @param commonParameters
-	 * @return 0 if success, non-zero if error
-	 */
-	public static Integer executeRemoteCommand(String commandString, HashMap<String, Object> parameterMap) {
-		System.out.println("*** ZHRI100A.ZHRI100A_callSystem() ***");
-		Integer status = executeCommandRexec(commandString);
-		if(status != 0) { //!error
-			parameterMap.put("errorProgramParameter", "ZHRI100A");
-			parameterMap.put("errorMessageParameter", "Error executing Call System command, contact HR-PeopleSoft On-Call");
-					parameterMap.put("criticalFlag", true);
-			commandString = composeRexecCommandString("HRZ110A", composeErrorParameterString(parameterMap));
-			parameterMap.put("criticalFlag", false);
-		}
-		return status;
-	}
+//	 * Remotely executes a command on the AS400.
+//	 * @see Call-System in ZHRI100A.SQR
+//	 * @param commandString
+//	 * @param commonParameters
+//	 * @return 0 if success, non-zero if error
+//	 */
+//	public static Integer executeRemoteCommand(String commandString, HashMap<String, Object> parameterMap) {
+//		System.out.println("*** ZHRI100A.executeRemoteCommand() ***");
+//		Integer status = executeCommandRexec(commandString);
+//		if(status != 0) { //!error
+//			parameterMap.put("errorProgramParameter", "ZHRI100A");
+//			parameterMap.put("errorMessageParameter", "Error executing Call System command, contact HR-PeopleSoft On-Call");
+//			parameterMap.put("criticalFlag", true);
+//			commandString = composeRexecCommandString("HRZ110A", composeErrorParameterString(parameterMap));
+//			ZHRI100A.executeRemoteCommand(commandString, parameterMap);
+//			parameterMap.put("criticalFlag", false);
+//		}
+//		return status;
+//	}
 
 	/**
-	 * executeErrorCommand
 	 * Composes the error command and executes it on the AS400.
 	 * @see Call-Error-Routine in ZHRI100A.SQR
 	 * @param processName
 	 * @param commonParameters
 	 */
-	public static void executeErrorCommand(HashMap<String, Object> parameterMap) {
-		System.out.println("*** executeErrorCommand() ***");
-		String processName = "HRZ110A";
-		String commandString = composeRexecCommandString(processName, composeErrorParameterString(parameterMap));
-		executeRemoteCommand(commandString, parameterMap);
+	public static void doErrorCommand(HashMap<String, Object> parameterMap) {
+		System.out.println("*** ZHRI100A.doErrorCommand() ***");
+		parameterMap.put("parameterString", composeErrorParameterString(parameterMap));
+		parameterMap.put("processName", "HRZ110A");
+		ZHRI100A.doCommand(parameterMap);
 	}
 
 	/**
@@ -367,7 +367,7 @@ public class ZHRI100A {
 	 * @return SQL where clause
 	 */
 	public static String ZHRI100A_buildGroupWhereClause(String whereClause) {
-		System.out.println("*** ZHRI100A_buildGroupWhereClause() ***");
+		System.out.println("*** ZHRI100A.ZHRI100A_buildGroupWhereClause() ***");
 		String alias = ""; //TODO: I can't find where this value is set
 		String selectGroup = ""; //TODO: I can't find where this value is set
 		//BEGIN-PROCEDURE BUILD-GROUP-WHERE-CLAUSE
@@ -396,7 +396,7 @@ public class ZHRI100A {
 	 * @return SQL where clause
 	 */
 	public static String ZHRI100A_buildEmplIdWhereClause() {
-		System.out.println("*** ZHRI100A_buildEmplIdWhereClause() ***");
+		System.out.println("*** ZHRI100A.ZHRI100A_buildEmplIdWhereClause() ***");
 		String alias = ""; //TODO: I can't find where this value is set
 		String runId = ""; //TODO: I can't find where this value is set
 		//BEGIN-PROCEDURE BUILD-EMPLID-WHERE-CLAUSE
@@ -414,7 +414,7 @@ public class ZHRI100A {
 	 * @return legacyEmployeeId
 	 */
 	public static String fetchLegacyEmployeeId(HashMap<String, Object> parameterMap) {
-		System.out.println("*** fetchLegacyEmployeeId() ***");
+		System.out.println("*** ZHRI100A.fetchLegacyEmployeeId() ***");
 		String employeeId;
 		if((Boolean)parameterMap.get("poiFlag")) {
 			employeeId = CrossReferenceMultipleEmployeeId.ZHRI100A_getLegIdForSeqNum((String)parameterMap.get("employeeId"), (BigDecimal)parameterMap.get("eidIndexNumber"));
@@ -528,7 +528,7 @@ public class ZHRI100A {
 	 * Sets the values for the remote AS400 server in a static class that shares the values across the application. 
 	 */
 	public static void initializeServerProperties() {
-		System.out.println("*** initializeServerProperties() ***");
+		System.out.println("*** ZHRI100A.initializeServerProperties() ***");
 		String processName = "ZHRI100A";
 		ServerProperties.setDbName(PsDbOwner.findDbName());
 //		commonParameters.setPeopleSoftHomePath(System.getenv("PS_HOME")); //TODO: ********
@@ -552,7 +552,7 @@ public class ZHRI100A {
 	 * @return true if run file does not exist
 	 */
 	public static Boolean ZHRI100A_checkInterfaceRunFile(String oracleSystemId) {
-		System.out.println("*** ZHRI100A_checkInterfaceRunFile() ***");
+		System.out.println("*** ZHRI100A.ZHRI100A_checkInterfaceRunFile() ***");
 		Boolean runFlag = false;
 //		String runFilePath;
 		//LET $RUN_FILEPATH = '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'  //concatenate
@@ -584,7 +584,7 @@ public class ZHRI100A {
 	 * @return completionStatus - "P" if trigger record is good to process
 	 */
 	public static String checkTriggerRecord(PszTriggerSuperclass trigger) {
-		System.out.println("*** checkTriggerRecord() ***");
+		System.out.println("*** ZHRI100A.checkTriggerRecord() ***");
 		String completionStatus = trigger.getCompletionStatus();
 		//****************************************************************************************************
 		//TODO
@@ -632,7 +632,7 @@ public class ZHRI100A {
 	 * @return legacyEmployeeId
 	 */
 	public static String fetchNewLegacyEmployeeId(String employeeId, BigDecimal indexNumber) {
-		System.out.println("*** fetchNewLegacyEmployeeId() ***");
+		System.out.println("*** ZHRI100A.fetchNewLegacyEmployeeId() ***");
 		String legacyEmployeeId = null;
 		String legacyEmployeeName;
 		Integer employeeNumber = -1;
@@ -666,10 +666,12 @@ public class ZHRI100A {
 	 * @param parameterString
 	 * @return commandString to be used in regex call to AS400
 	 */
-	public static String composeRexecCommandString(String processName, String parameterString) {
-		System.out.println("*** composeAs400RexecCommandString() ***");
+	public static String composeCommandString(HashMap<String, Object> parameterMap) {
+		System.out.println("*** ZHRI100A.composeRexecCommandString() ***");
 		String commandString = 
-						"CALL " + ServerProperties.getAs400Library() + "/" + processName + " " + "PARM(" + parameterString + ")";
+						"CALL " + ServerProperties.getAs400Library() + "/" 
+								+ (String)parameterMap.get("processName") + " " 
+								+ "PARM(" + (String)parameterMap.get("paramterString") + ")";
 		return commandString;
 	}
 
@@ -681,9 +683,9 @@ public class ZHRI100A {
 	 * @return errorParameterString
 	 */
 	public static String composeErrorParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("*** composeErrorParameterString() ***");
+		System.out.println("*** ZHRI100A.composeErrorParameterString() ***");
 		String blankSpaceParameter = " ";
-		String criticalFlagYN = parameterMap.get("criticalFlag") != null && (Boolean)parameterMap.get("criticalFlag") ? "Y" : "N";
+		String criticalFlagYN = (Boolean)parameterMap.get("criticalFlag") != null && (Boolean)parameterMap.get("criticalFlag") ? "Y" : "N";
 		Calendar now = Calendar.getInstance();
 		//format date to YYYYMMDD
 		String errorDateParameter =
@@ -694,7 +696,7 @@ public class ZHRI100A {
 		//TODO: What should this value really be called, and when is it not 'Y'??
 		String yesOrNoParameter = "Y";
 		//error message parameter must be 75 characters long
-		String errorMessageParameter = String.format("%1$-75s", parameterMap.get("errorMessageParameter"));
+		String errorMessageParameter = String.format("%1$-75s", (String)parameterMap.get("errorMessageParameter"));
 		String operatorIdParameter = (String)parameterMap.get("operatorId");
 		if(operatorIdParameter != null) {
 			operatorIdParameter = operatorIdParameter.toUpperCase();
@@ -702,39 +704,43 @@ public class ZHRI100A {
 				operatorIdParameter = operatorIdParameter.substring(1); //strip the E off of the front of the employee ID
 			}
 		}
-		String errorParameterString = "'" + parameterMap.get("errorProgramParameter") + "' "
-					+ "'" + parameterMap.get("employeeId") + "' '" + parameterMap.get("effectiveSequence") + "' "
-					+ "'" + blankSpaceParameter + "' '" + errorMessageParameter + "' "
-					+ "'" + criticalFlagYN + "' '" + errorDateParameter + "' "
-					+ "'" + errorTimeParameter + "' '" + operatorIdParameter + "' "
+		String errorParameterString = "'" + (String)parameterMap.get("errorProgramParameter") + "' "
+					+ "'" + (String)parameterMap.get("employeeId") + "' " 
+					+ "'" + (BigDecimal)parameterMap.get("effectiveSequence") + "' "
+					+ "'" + blankSpaceParameter + "' " 
+					+ "'" + errorMessageParameter + "' "
+					+ "'" + criticalFlagYN + "' " 
+					+ "'" + errorDateParameter + "' "
+					+ "'" + errorTimeParameter + "' " 
+					+ "'" + operatorIdParameter + "' "
 					+ "'" + yesOrNoParameter + "'";
 		return errorParameterString;
 	}
 
-	/**
-	 * Executes a rexec command on the AS400.
-	 * Call System Using $Command #Status Wait
-	 * Execute the command that was built on the command waiting until completion //TODO
-	 * @param commandString
-	 * @return 0 if success, non-zero if error
-	 */
-	public static Integer executeCommandRexec(String commandString) {
-		System.out.println("*** executeRexec ***");
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy_hh:mm:ss.SSSSSS_a");
-		String currentDate = sdf.format(new Date()).toUpperCase();
-		System.out.println("$Command=> " + commandString);
-		System.out.println("Calling Command at: " + currentDate);
-		as400Rexec(commandString);
-	    return 0;
-	}
+//	/**
+//	 * Executes a rexec command on the AS400.
+//	 * Call System Using $Command #Status Wait
+//	 * Execute the command that was built on the command waiting until completion //TODO
+//	 * @param commandString
+//	 * @return 0 if success, non-zero if error
+//	 */
+//	public static Integer doRexec(String commandString) {
+//		System.out.println("*** ZHRI100A.executeCommandRexec ***");
+//		System.out.println("$Command=> " + commandString);
+//		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy_hh:mm:ss.SSSSSS_a");
+//		String currentDate = sdf.format(new Date()).toUpperCase();
+//		System.out.println("Calling Command at: " + currentDate);
+//		as400Rexec(commandString);
+//	    return 0;
+//	}
 
 	/**
-	 * Opens a rexec connection to the AS400 server and execute a command.
+	 * Opens a rexec connection to the AS400 server and executes a command.
 	 * @param commandString
 	 * @return
 	 */
-	public static void as400Rexec(String commandString) {
-		System.out.println("*** callSystemUsingCommand ***");
+	public static Integer doRexec(String commandString) {
+		System.out.println("*** ZHRI100A.doRexec ***");		
 	    RExecClient client = new RExecClient();
 //		String remoteServerHostName = ServerProperties.getRemoteServerHostName();
 //		String remoteServerUsername = ServerProperties.getRemoteServerUsername();
@@ -786,6 +792,7 @@ public class ZHRI100A {
     			e.printStackTrace();
     		}
         }
+	    return 0;
 	}
 	
 	/**
@@ -796,6 +803,7 @@ public class ZHRI100A {
 	 * @param localOutput
 	 */
 	public static final void readWrite(InputStream remoteInput, OutputStream remoteOutput, InputStream localInput, OutputStream localOutput) {
+		System.out.println("********** ZHRI100A.readWrite");
 		Thread readerThread, writerThread;
         readerThread = new Thread() {
         	public void run() {
@@ -843,4 +851,30 @@ public class ZHRI100A {
 			e.printStackTrace();
 		}
 	}
+        
+	/**
+	 * 
+	 * @param parameterMap
+	 * @return completionStatus
+	 */
+    public static String doCommand(HashMap<String, Object> parameterMap) {
+		System.out.println("********** ZHRI100A.doCommand");
+		String commandString = ZHRI100A.composeCommandString(parameterMap);
+		System.out.println("$Command=> " + commandString);
+		System.out.println("Calling Command at: " + (new SimpleDateFormat("dd-MMM-yyyy_hh:mm:ss.SSSSSS_a")).format(new Date()).toUpperCase());
+		Integer status = doRexec(commandString);
+		//IF (#Status = 0)  //TODO
+		if(status == 0) { //no error returned from process
+			//completed normally
+			return "C";
+		}
+		else { //!error
+			parameterMap.put("errorProgramParameter", "ZHRI100A");
+			parameterMap.put("errorMessageParameter", "Error executing Call System command, contact HR-PeopleSoft On-Call");
+			parameterMap.put("criticalFlag", true);
+			doErrorCommand(parameterMap);
+		}
+		return "E";
+    }
+	
 }

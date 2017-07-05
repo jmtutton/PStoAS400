@@ -2,15 +2,14 @@ package erd;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Test;
 
-import erd.controller.EmployeeTermination;
 import erd.controller.ZHRI100A;
 import erd.model.ProcessParameters;
 import erd.model.ProcessParameters.CommonParameters;
-import erd.model.ProcessParameters.TerminationProcessParameters;
 
 public class ZHRI100ATest {
 
@@ -49,7 +48,7 @@ public class ZHRI100ATest {
 		///QSYS.LIB/EHRHRMS06#.LIB/HRZ*.PGM
 		String commandString = null;
 //		commandString = composeMockErrorCommandString();
-		commandString = composeMockEmployeeTerminationCommandString();
+//		commandString = composeMockEmployeeTerminationCommandString();
 //		commandString = "DSPPGM PGM(EHRHRMS06#/HR100P00)";
 //		commandString = "DSPPGM PGM(EHRHRMS06#/HRZ102A)";
 //		commandString = "RTVCLSRC PGM(EHRHRMS06#/HRZ102A)";
@@ -62,7 +61,7 @@ public class ZHRI100ATest {
 //		commandString = "CALL EHRHRMS06/HRZ101A PARM('999X9' '999999'    'U6' '20' 'JOHN' 'JOHNSSON' '' 'S' ' ' 'F' 'M' '1993' '10' '01' '2017' '06' '30' 'N' ' ' 'Y' ' ' 'D' '03' 'MGTRN' ' ' '                                   ' '99 ANGLEIA WAY' 'FAREHAM' 'HANTS' 'PO15 7HZ' '44 ' '7823557' 'Y' '' '' 'N' 'MR' 'H' 'GB')";
 //		commandString = "CALL EHRHRMS06#/HRZ110A PARM('HRZ123A' '12345' '0' ' ' 'This is a test.                                                            ' 'N' '20170530' '132027' '999X9' 'Y')";
 		System.out.println(commandString);
-		ZHRI100A.as400Rexec(commandString);
+		ZHRI100A.doRexec(commandString);
 	}
 	
 	@Test
@@ -95,11 +94,12 @@ public class ZHRI100ATest {
 		ZHRI100A.initializeServerProperties();
 		for(String commandString : commandStringList) {
 			System.out.println(commandString);
-			ZHRI100A.as400Rexec(commandString);
+			ZHRI100A.doRexec(commandString);
 		}
 	}
 	
 	public static String composeMockErrorCommandString() {
+		HashMap<String, Object> parameterMap = new HashMap<String, Object>();
 		CommonParameters commonParameters = new ProcessParameters().new CommonParameters();
 		commonParameters.setErrorProgramParameter("HRZ999A");
 		commonParameters.setEmployeeId("12345");
@@ -107,26 +107,29 @@ public class ZHRI100ATest {
 		commonParameters.setCriticalFlag(false);
 		commonParameters.setEffectiveSequence(new BigDecimal(0));
 		commonParameters.setOperatorId("999X9");
-		String parameterString = ZHRI100A.composeErrorParameterString(commonParameters);
-		return ZHRI100A.composeRexecCommandString("HRZ110A", parameterString);
+		String parameterString = ZHRI100A.composeErrorParameterString(parameterMap);
+		parameterMap.put("processName", "HRZ110A");
+		parameterMap.put("parameterString", parameterString);
+		return ZHRI100A.composeCommandString(parameterMap);
 	}
 	
-	public static String composeMockEmployeeTerminationCommandString() {
-		TerminationProcessParameters terminationProcessParameters = new ProcessParameters().new TerminationProcessParameters();
-		terminationProcessParameters.setEmployeeId("352FS");
-		terminationProcessParameters.setTerminationMonth("06");
-		terminationProcessParameters.setTerminationDay("30");
-		terminationProcessParameters.setTerminationYear("2017");
-		terminationProcessParameters.setRehireMonth("");
-		terminationProcessParameters.setRehireDay("");
-		terminationProcessParameters.setRehireYear("");
-		terminationProcessParameters.setVoluntaryOrInvoluntary("V");
-		terminationProcessParameters.setTerminationCode("O");
-		terminationProcessParameters.setOperatorId("352FS");
-		terminationProcessParameters.setTerminationReason("VOLUN  DISSATISFIED WHOURS");
-		String parameterString = EmployeeTermination.composeParameterString(terminationProcessParameters);
-		return ZHRI100A.composeRexecCommandString("HRZ102A", parameterString);
-	}
+//	public static String composeMockEmployeeTerminationCommandString() {
+//		HashMap<String, Object> parameterMap = new HashMap<String, Object>();
+//		TerminationProcessParameters terminationProcessParameters = new ProcessParameters().new TerminationProcessParameters();
+//		terminationProcessParameters.setEmployeeId("352FS");
+//		terminationProcessParameters.setTerminationMonth("06");
+//		terminationProcessParameters.setTerminationDay("30");
+//		terminationProcessParameters.setTerminationYear("2017");
+//		terminationProcessParameters.setRehireMonth("");
+//		terminationProcessParameters.setRehireDay("");
+//		terminationProcessParameters.setRehireYear("");
+//		terminationProcessParameters.setVoluntaryOrInvoluntary("V");
+//		terminationProcessParameters.setTerminationCode("O");
+//		terminationProcessParameters.setOperatorId("352FS");
+//		terminationProcessParameters.setTerminationReason("VOLUN  DISSATISFIED WHOURS");
+//		String parameterString = EmployeeTermination.composeParameterString(parameterMap);
+//		return ZHRI100A.composeRexecCommandString("HRZ102A", parameterString);
+//	}
 
 //	@Test
 //	public void test() {
