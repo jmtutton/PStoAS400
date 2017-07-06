@@ -70,17 +70,18 @@ public class ZHRI100A {
 			for(PszTriggerSuperclass trigger : triggerList) {
 				String completionStatus = checkTriggerRecord(trigger);
 				if("P".equalsIgnoreCase(completionStatus)) {
-					HashMap<String, Object> parameterMap = initializeParameterMap(trigger);
+					HashMap<String, Object> parameterMap = parameterizeTriggerFields(trigger);
 					completionStatus = callPrograms(parameterMap);
 				}
-				else {
-					if(trigger instanceof PszTriggerEmployee) {
-						PszTriggerEmployee.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
-					}
-					else {
-						PszTriggerNonPerson.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
-					}
+//				else {
+				//update trigger record
+				if(trigger instanceof PszTriggerEmployee) {
+					PszTriggerEmployee.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
 				}
+				else {
+					PszTriggerNonPerson.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
+				}
+//				}
 			}
 			//TRANCTRL.Commit-Transaction
 			//LET $Command = 'sleep 15'  !After interface run wait 15 seconds and do it again  !sree**rehost  !ZHR_MOD_ZHRI100A_sleep
@@ -136,7 +137,7 @@ public class ZHRI100A {
 	 * @param trigger
 	 * @return
 	 */
-	public static HashMap<String, Object> initializeParameterMap(PszTriggerSuperclass trigger) {
+	public static HashMap<String, Object> parameterizeTriggerFields(PszTriggerSuperclass trigger) {
 		System.out.println("********** ZHRI100A.initializeParameterMap");
 		HashMap<String, Object> parameterMap = new HashMap<String, Object>();
 		parameterMap.put("criticalFlag", false);
@@ -327,27 +328,6 @@ public class ZHRI100A {
 	}
 
 	/**
-//	 * Remotely executes a command on the AS400.
-//	 * @see Call-System in ZHRI100A.SQR
-//	 * @param commandString
-//	 * @param commonParameters
-//	 * @return 0 if success, non-zero if error
-//	 */
-//	public static Integer executeRemoteCommand(String commandString, HashMap<String, Object> parameterMap) {
-//		System.out.println("*** ZHRI100A.executeRemoteCommand() ***");
-//		Integer status = executeCommandRexec(commandString);
-//		if(status != 0) { //!error
-//			parameterMap.put("errorProgramParameter", "ZHRI100A");
-//			parameterMap.put("errorMessageParameter", "Error executing Call System command, contact HR-PeopleSoft On-Call");
-//			parameterMap.put("criticalFlag", true);
-//			commandString = composeRexecCommandString("HRZ110A", composeErrorParameterString(parameterMap));
-//			ZHRI100A.executeRemoteCommand(commandString, parameterMap);
-//			parameterMap.put("criticalFlag", false);
-//		}
-//		return status;
-//	}
-
-	/**
 	 * Composes the error command and executes it on the AS400.
 	 * @see Call-Error-Routine in ZHRI100A.SQR
 	 * @param processName
@@ -441,88 +421,6 @@ public class ZHRI100A {
 	//!        an insert fails
 	//!----------------------------------------------------------------------
 	
-	//!----------------------------------------------------------------------
-	//! Procedure:  Build-Active-Dir-Output-File
-	//!----------------------------------------------------------------------
-	
-	//!----------------------------------------------------------------------
-	//! Procedure:  AD-Get-Job-Data
-	//! Desc:  Gets the Job data from the job table.
-	//!----------------------------------------------------------------------
-	
-	//!----------------------------------------------------------------------
-	//! Procedure: AD-Get-Job-Description
-	//! Desc:  This routine will get the Job description for Active Directory File Build
-	//!----------------------------------------------------------------------
-
-	//	!----------------------------------------------------------------------
-	//! Procedure: AD-Get-EmplStatus-Description
-	//! Desc:  This routine will get the Employee Status description for Active Directory File Build
-	//!----------------------------------------------------------------------
-
-	//!----------------------------------------------------------------------
-	//! Procedure:  AD-Get-JobStart-Date
-	//! Desc:  Gets the Job Start date from the job table.
-	//!----------------------------------------------------------------------
-
-	//!----------------------------------------------------------------------
-	//! Procedure:  AD-Get-Pers-Data-Effdt
-	//! Desc:  This routine will get the Personal Data row for each of the
-	//!        employee numbers entered in the trigger file.  Pers_Data_Effdt table
-	//!        no longer has name info, so are using Names table.
-	//!----------------------------------------------------------------------
-
-	//!----------------------------------------------------------------------
-	//! Procedure:  AD-Get-NameSuffix
-	//! Desc:  This routine will get the Name Suffix row for each of the
-	//!        employee numbers entered in the trigger file.
-	//!----------------------------------------------------------------------
-
-	//!----------------------------------------------------------------------
-	//! Procedure:  AD-Get-Personal-Data
-	//! Desc:  This routine will get the Personal Data row for each of the
-	//!        employee numbers entered in the trigger file.
-	//!----------------------------------------------------------------------
-
-	//!----------------------------------------------------------------------
-	//! Procedure: AD-Get-Country-Code
-	//! Desc:  This routine will get the Country Code for Active Directory File Build
-	//!----------------------------------------------------------------------
-
-	//!----------------------------------------------------------------------
-	//! Procedure:  AD-Get-Business-Phone
-	//! Desc:  This routine gets the business phone number from the Peoplesoft
-	//!        tables.
-	//!----------------------------------------------------------------------
-
-	//!----------------------------------------------------------------------
-	//! Procedure:  AD-Get-Employee-Fax
-	//! Desc:  This routine gets the business phone number from the Peoplesoft
-	//!        tables.
-	//!----------------------------------------------------------------------
-
-	//!----------------------------------------------------------------------
-	//! Procedure:  AD-Get-LegSuperviorID
-	//!----------------------------------------------------------------------
-
-	//!---------------------------------------------------------------------------------------
-	//! Procedure:  AD-Get-Employment-Data
-	//! Desc:  This routine will get the Termination Data row for Active Directory File Build
-	//!---------------------------------------------------------------------------------------
-
-	//!----------------------------------------------------------------------
-	//! Procedure:  AD-Get-Names
-	//! Desc:  This routine gets the Preferred Name from PS_Names for Active Directory File Build
-	//!----------------------------------------------------------------------
-
-	//!----------------------------------------------------------------------
-	//! Procedure:  Write-Active-Dir-Output-File
-	//!----------------------------------------------------------------------
-
-	//!----------------------------------------------------------------------
-	//! Procedure:  Initialize-AD-WrkFields
-	//!----------------------------------------------------------------------
-
 	/**
 	 * initializeServerProperties
 	 * Sets the values for the remote AS400 server in a static class that shares the values across the application. 
@@ -717,30 +615,14 @@ public class ZHRI100A {
 		return errorParameterString;
 	}
 
-//	/**
-//	 * Executes a rexec command on the AS400.
-//	 * Call System Using $Command #Status Wait
-//	 * Execute the command that was built on the command waiting until completion //TODO
-//	 * @param commandString
-//	 * @return 0 if success, non-zero if error
-//	 */
-//	public static Integer doRexec(String commandString) {
-//		System.out.println("*** ZHRI100A.executeCommandRexec ***");
-//		System.out.println("$Command=> " + commandString);
-//		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy_hh:mm:ss.SSSSSS_a");
-//		String currentDate = sdf.format(new Date()).toUpperCase();
-//		System.out.println("Calling Command at: " + currentDate);
-//		as400Rexec(commandString);
-//	    return 0;
-//	}
-
 	/**
 	 * Opens a rexec connection to the AS400 server and executes a command.
 	 * @param commandString
-	 * @return
+	 * @return status
 	 */
 	public static Integer doRexec(String commandString) {
-		System.out.println("*** ZHRI100A.doRexec ***");		
+		System.out.println("*** ZHRI100A.doRexec ***");
+		Integer status = 0;
 	    RExecClient client = new RExecClient();
 //		String remoteServerHostName = ServerProperties.getRemoteServerHostName();
 //		String remoteServerUsername = ServerProperties.getRemoteServerUsername();
@@ -757,6 +639,7 @@ public class ZHRI100A {
 			client.connect(remoteServerHostName);
             if (!client.isConnected()) {
                 System.err.println("The RLogin client is not connected to " + remoteServerHostName);
+                status = -1;
             }
             System.out.println("client.isConnected() = " + client.isConnected());
             try {
@@ -765,20 +648,25 @@ public class ZHRI100A {
             catch(IOException e) {
                 e.printStackTrace();
                 System.err.println("Could not execute command.");
+                status = -2;
             }
             catch (Exception e) {
     			e.printStackTrace();
-    		}
+                status = -3;
+            }
             readWrite(client.getInputStream(), client.getOutputStream(), System.in, System.out);
         } 
         catch (SocketException e1) {
 			e1.printStackTrace();
+            status = -4;
 		} 
         catch (IOException e1) {
 			e1.printStackTrace();
+            status = -5;
 		}
         catch (Exception e1) {
 			e1.printStackTrace();
+            status = -6;
 		}
         finally {
             IOUtils.closeQuietly(inputStream);
@@ -787,12 +675,14 @@ public class ZHRI100A {
 			} 
             catch (IOException e) {
 				e.printStackTrace();
+	            status = -7;
 			}
             catch (Exception e) {
     			e.printStackTrace();
+                status = -8;
     		}
         }
-	    return 0;
+	    return status;
 	}
 	
 	/**
@@ -802,8 +692,9 @@ public class ZHRI100A {
 	 * @param localInput
 	 * @param localOutput
 	 */
-	public static final void readWrite(InputStream remoteInput, OutputStream remoteOutput, InputStream localInput, OutputStream localOutput) {
+	public static final Integer readWrite(InputStream remoteInput, OutputStream remoteOutput, InputStream localInput, OutputStream localOutput) {
 		System.out.println("********** ZHRI100A.readWrite");
+		Integer status = 0;
 		Thread readerThread, writerThread;
         readerThread = new Thread() {
         	public void run() {
@@ -846,10 +737,13 @@ public class ZHRI100A {
         }
         catch (InterruptedException e) {
 			e.printStackTrace();
-        }
+			status = -10;
+		}
         catch (Exception e) {
 			e.printStackTrace();
+			status = -11;
 		}
+		return status;
 	}
         
 	/**
@@ -888,7 +782,7 @@ public class ZHRI100A {
 		for(String parameterName : (List<String>)parameterMap.get("parameterNameList")) {
 			parameterString += "'" + (String)parameterMap.get(parameterName) + "' ";
 		}
-		return parameterString;
+		return parameterString.trim();
 	}
 	
 }
