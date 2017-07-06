@@ -163,7 +163,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param employeeId
 	 */
 	public CrossReferenceMultipleEmployeeId HR205_getEmpData(String employeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.HR205_getEmpData() ***");
+		System.out.println("*** CrossReferenceMultipleEmployeeId.HR205_getEmpData()");
 //		BEGIN-PROCEDURE HR205-GET-EMP-DATA
 //		BEGIN-SELECT
 //		EMP5.ZHRF_GRP_NBR,
@@ -196,7 +196,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	public CrossReferenceMultipleEmployeeId MainSqlEmp(String employeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.MainSqlEmp() ***");
+		System.out.println("*** CrossReferenceMultipleEmployeeId.MainSqlEmp()");
 //		!******************************
 //		!get the max effdt for every employee
 //		!  -store the last inactive row before the max effdt into s_dt. If null, use dummy date.
@@ -226,7 +226,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	public CrossReferenceMultipleEmployeeId getMinEffdtEmp(String employeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.getMinEffdtEmp() ***");
+		System.out.println("*** CrossReferenceMultipleEmployeeId.getMinEffdtEmp()");
 		//!****************************
 		//begin-procedure get-min-effdt-emp
 		//LET $LegServiceDate =''
@@ -244,7 +244,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	public CrossReferenceMultipleEmployeeId getLastInactiveDtEmp(String employeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.getLastInactiveDtEmp() ***");
+		System.out.println("*** CrossReferenceMultipleEmployeeId.getLastInactiveDtEmp()");
 		//!*************************************
 		//begin-procedure get-last-inactive-dt-emp
 		//begin-select
@@ -265,7 +265,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param employeeId
 	 */
 	public CrossReferenceMultipleEmployeeId HR202_getTermDate(String employeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.HR202_getTermDate() ***");
+		System.out.println("*** CrossReferenceMultipleEmployeeId.HR202_getTermDate()");
 		//Begin-Procedure HR202-get-term-date
 		//Begin-Select
 		//POI2.EFFDT
@@ -297,7 +297,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param employeeId
 	 */
 	public CrossReferenceMultipleEmployeeId HR201_getEmpData(String employeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.HR201_getEmpData() ***");
+		System.out.println("*** CrossReferenceMultipleEmployeeId.HR201_getEmpData()");
 		//Begin-Procedure HR201-Get-EMP-data
 		//Begin-Select
 		//EMP.ZHRF_GRP_NBR,
@@ -336,25 +336,24 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param employeeId
 	 * @param sequence
 	 */
-	public static String ZHRI100A_getLegIdForSeqNum(String employeeId, BigDecimal sequence) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.ZHRI100A_getLegIdForSeqNum() ***");
-//		!check if the multiple EID table has the EID!
-//		BEGIN-SELECT
-//		MULT.ZHRF_LEG_EMPL_ID
-//			LET $PSOprid = LTRIM(RTRIM(&MULT.ZHRF_LEG_EMPL_ID,' '),' ')
-//		    IF $PSOprid <> ''
-//		    	LET $Found = 'Y'
-//		    END-IF
-//		FROM PS_ZHRR_MULTPL_EID MULT
-//		WHERE MULT.Emplid = $Wrk_Emplid  
-//		AND MULT.Sequence = #indexNum      
-//		END-SELECT
+	public static String findLegacyEmployeeIdByEmployeeIdAndSequence(String employeeId, BigDecimal sequence) {
+		System.out.println("*** CrossReferenceMultipleEmployeeId.findLegacyEmployeeIdByEmployeeIdAndSequence()");
+		System.out.println("String employeeId:" + employeeId);
+		System.out.println("BigDecimal sequence:" + sequence);
+		//BEGIN-SELECT
+		//MULT.ZHRF_LEG_EMPL_ID
+		//FROM PS_ZHRR_MULTPL_EID MULT
+		//WHERE MULT.Emplid = $Wrk_Emplid  
+		//AND MULT.Sequence = #indexNum      
+		//END-SELECT
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<String> resultList = em.createQuery("SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceMultipleEmployeeId c "
-	    			+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
-	    			+ "AND c.sequence = :sequence", String.class)
+	    	List<String> resultList = em.createQuery(
+	    			"SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceMultipleEmployeeId c "
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+	    					+ "AND c.sequence = :sequence"
+	    			, String.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .setParameter("sequence", sequence)
 	    		    .getResultList();
@@ -379,7 +378,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param sequence
 	 */
 	public static void ZHRI100A_updateOprId(String employeeId, String legacyEmployeeId, BigDecimal sequence) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId() ***");
+		System.out.println("*** CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId()");
 		//BEGIN-PROCEDURE UPDATE-OPRID
 		//LET $Update-Error-Flag = 'N'
 		//!Update the PS_ZHRR_MULTPL_EID table for Multiple EIDs 
@@ -418,7 +417,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	public static Date findEffectiveDateByEmployeeIdAndSequence(String wrkEmplId, Integer wrkIndexNum, Date date) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.findEffectiveDateByEmployeeIdAndSequence() ***");
+		System.out.println("*** CrossReferenceMultipleEmployeeId.findEffectiveDateByEmployeeIdAndSequence()");
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -430,7 +429,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param legacyEmployeeId
 	 */
 	public static void ZHRI100A_insertOprId(String employeeId, String legacyEmployeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.ZHRI100A_insertOprId() ***");
+		System.out.println("*** CrossReferenceMultipleEmployeeId.ZHRI100A_insertOprId()");
 		//BEGIN-PROCEDURE INSERT-OPRID
 		//LET $Insert-Error-Flag = 'N'
 		//!Add to the PS_ZHRT_EMPID_CREF table
@@ -464,7 +463,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param indexNumber
 	 */
 	public static void saveNewLegacyEmployeeId(String employeeId, String legacyEmployeeId, BigDecimal indexNumber) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.saveNewLegacyEmployeeId() ***");
+		System.out.println("*** CrossReferenceMultipleEmployeeId.saveNewLegacyEmployeeId()");
     	if(new BigDecimal(0).equals(indexNumber)) {
     		CrossReferenceMultipleEmployeeId.ZHRI100A_insertOprId(employeeId, legacyEmployeeId);
     	}

@@ -5,7 +5,6 @@ import java.util.Date;
 
 import javax.persistence.*;
 
-
 /**
  * The persistent class for the PS_ZHRT_POI_TERM database table.
  * @author John Tutton john@tutton.net
@@ -15,7 +14,6 @@ import javax.persistence.*;
 @NamedQuery(name="PszPoiTermination.findAll", query="SELECT p FROM PszPoiTermination p")
 public class PszPoiTermination implements Serializable {
 	private static final long serialVersionUID = 1L;
-
 
 	@Id
 	@Column(name="EMPLID", nullable=false, length=11)
@@ -46,14 +44,12 @@ public class PszPoiTermination implements Serializable {
 	 * @see HR202-Insert-Timestamp in ZHRI202A.SQC
 	 * @param employeeId
 	 */
-	public static void HR202_insertTimestamp(String employeeId) {
-		//BEGIN-PROCEDURE HR202-INSERT-TIMESTAMP
-		//DO GET-CURRENT-DATETIME  !Gets the current date and time using curdttim.sqc
+	public static void insertTimestamp(String employeeId) {
+		System.out.println("*** PszPoiTermination.insertTimestamp()");
 		//BEGIN-SQL  
 		//INSERT INTO PS_ZHRT_POI_TERM (EMPLID, PROC_NAME, UPDATED_DATETIME)
 		//VALUES ( $Wrk_Emplid, 'TERM', $SysDateTime)
 		//END-SQL
-		//END-PROCEDURE HR202-INSERT-TIMESTAMP		
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {

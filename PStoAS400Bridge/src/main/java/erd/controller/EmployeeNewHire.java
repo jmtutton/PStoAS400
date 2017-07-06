@@ -18,7 +18,7 @@ public class EmployeeNewHire {
 	 * @return
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeNewHire.doProcess() ***");
+		System.out.println("*** EmployeeNewHire.doProcess()");
 		parameterMap = fetchProcessParameters(parameterMap);
 		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
 		return ZHRI100A.doCommand(parameterMap);
@@ -30,7 +30,7 @@ public class EmployeeNewHire {
 	 * @return
 	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeNewHire.fetchProcessParameters() ***");
+		System.out.println("*** EmployeeNewHire.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ101A");
 		parameterMap.put("parameterNameList", getParameterNameList());
 		return parameterMap;

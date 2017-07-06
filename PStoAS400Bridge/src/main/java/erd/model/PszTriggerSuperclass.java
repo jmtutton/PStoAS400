@@ -27,27 +27,27 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	protected static String ENTITY_NAME = "";
 
 	@Id
-	@Column(name = "SEQ_NBR", nullable = false, insertable = false, precision = 38)
+	@Column(name="SEQ_NBR", nullable=false, precision=15)
 	protected BigDecimal sequenceNumber;
 	   
-	@Column(name="OPRID")
+	@Column(name="OPRID", nullable=false, length=30)
 	protected String operatorId;
 
-	@Column(name = "EMPLID")
+	@Column(name="EMPLID", nullable=false, length=11)
 	protected String employeeId;
 
-	@Column(name = "EFFDT")
+	@Column(name="EFFDT")
 	@Temporal(TemporalType.DATE)
 	protected Date effectiveDate;
 	   
-	@Column(name = "EFFSEQ", precision = 38)
+	@Column(name="EFFSEQ", nullable=false, precision=38)
 	protected BigDecimal effectiveSequence;
 	   
-	@Column(name = "PROC_NAME")
+	@Column(name="PROC_NAME", nullable=false, length=10)
 	protected String processName;  //TODO: make enum
 	   
-	@Column(name = "TASK_FLAG")
-	protected String completionStatus;  //TODO: make enum with values 'P', 'C', 'E'
+	@Column(name="TASK_FLAG", nullable=false, length=1)
+	protected String completionStatus;  //TODO: make enum with values 'P', 'C', 'E', 'W'
 
 	public BigDecimal getSequenceNumber() {
 		return sequenceNumber;

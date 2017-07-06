@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * The persistent class for the PS_LOCATION_TBL database table.
@@ -805,26 +806,42 @@ public class PsLocation implements Serializable {
 ////		End-Procedure HR01-Get-Location-Country
 //		return null;
 //	}
-//
-//	public PsLocation findByLocation05(String location) {
-////		!----------------------------------------------------------------------
-////		! Procedure:  HR05-Get-Location-Country
-////		! Desc:       This routine gets the country in which an employee is
-////		!             currently working.
-////		!----------------------------------------------------------------------
-////		Begin-Procedure HR05-Get-Location-Country
-////		begin-select
-////		CLT2.Country
-////		  Let $PSLoc_Country = &CLT2.Country
-////		  Let $Wrk_AD_CountryCdBuild = 'Y'
-////		from PS_Location_Tbl CLT2
-////		where CLT2.Location = $PSLocation
-////		end-select
-////		End-Procedure HR05-Get-Location
-//		return null;
-//	}
 
-	public PsLocation HR09Getjobdata(String location) {
+	/**
+	 * This routine gets the country in which an employee is currently working.
+	 * @see HR05-Get-Location-Country
+	 * @param location
+	 * @return countryIsoAlpha3Code
+	 */
+	public static String findCountryByLocation(String location) {
+		//BEGIN-SELECT
+		//CLT2.Country
+		//FROM PS_Location_Tbl CLT2
+		//WHERE CLT2.Location = $PSLocation
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = em.createQuery(
+	    			"SELECT p.countryIsoAlpha3Code FROM PsLocation p "
+	    				+ "WHERE TRIM(UPPER(p.location)) = :location "
+	    			, String.class)
+	    		    .setParameter("location", location.toUpperCase().trim())
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
+
+	public static PsLocation HR09Getjobdata(String location) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR09-Get-job-data
 //		! Desc:  Gets the employees data from the job table that needs to be
@@ -871,7 +888,7 @@ public class PsLocation implements Serializable {
 		return null;
 	}
 
-	public PsLocation findByLocation(String location) {
+	public static PsLocation findByLocation(String location) {
 //		!----------------------------------------------------------------------
 //		! Procedure: AD-Get-Country-Code
 //		! Desc:  This routine will get the Country Code for Active Directory File Build
@@ -888,7 +905,7 @@ public class PsLocation implements Serializable {
 		return null;
 	}
 	
-	public String findCountryIsoAlpha3CodeByLocation(String location) {
+	public static String findCountryIsoAlpha3CodeByLocation(String location) {
 		return null;
 	}
 

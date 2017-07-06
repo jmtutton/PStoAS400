@@ -31,7 +31,7 @@ import org.apache.commons.io.IOUtils;
 public class ZHRI100A {
 
 	public static void main() {
-		System.out.println("*** ZHRI100A.main() ***");
+		System.out.println("*** ZHRI100A.main()");
 		try {
 			initializeServerProperties();
 			processMain();
@@ -43,12 +43,12 @@ public class ZHRI100A {
 	}
 
 	/**
+	 * This is the main process controlling method.
 	 * @see Process-Main in ZHRI100A.SQR
-	 * This is the process controlling procedure.
 	 * @throws InterruptedException 
 	 */
 	public static void processMain() throws InterruptedException {
-		System.out.println("*** ZHRI100A.processMain() ***");
+		System.out.println("*** ZHRI100A.processMain()");
 		//LET #run_flag = 1
 		Boolean runFlag = true;
 		//WHILE #run_flag = 1
@@ -56,30 +56,32 @@ public class ZHRI100A {
 			//****************************************************************************************************
 			//TODO
 			//ZHRI100A.Check-Interface-RunFile
-			runFlag = ZHRI100A_checkInterfaceRunFile(ServerProperties.getOracleSystemId());
+			runFlag = interfaceRunFileExists(ServerProperties.getOracleSystemId());
 			//TODO
 			//****************************************************************************************************
 			//ZHRI100A.Get-Trigger-Data       !Process the interface requests
 			//****************************************************************************************************
 			//TODO
 //			List<PszTriggerEmployee> triggerList = PszTriggerEmployee.findPending();
-			List<PszTriggerEmployee> triggerList = PszTriggerEmployee.findByCompletionStatusAndProcessName("P", "ZHRI102A");
-			triggerList = (triggerList != null && !triggerList.isEmpty()) ? Arrays.asList(triggerList.get(0)) : Arrays.asList(PszTriggerEmployee.createMockTriggerForEmployeeTermination());
+//			List<PszTriggerEmployee> triggerList = PszTriggerEmployee.findByCompletionStatusAndProcessName("P", "ZHRI102A");
+//			List<PszTriggerNonPerson> triggerList = PszTriggerNonPerson.findByCompletionStatusAndProcessName("P", "ZHRI102A");
+//			List<PszTriggerEmployee> triggerList = Arrays.asList(PszTriggerEmployee.createMockTriggerForNonPersonTermination());
+			List<PszTriggerNonPerson> triggerList = Arrays.asList(PszTriggerNonPerson.createMockTriggerForNonPersonTermination());
 			//TODO
 			//****************************************************************************************************
 			for(PszTriggerSuperclass trigger : triggerList) {
-				String completionStatus = checkTriggerRecord(trigger);
-				if("P".equalsIgnoreCase(completionStatus)) {
+				trigger = checkTriggerRecord(trigger);
+				if("P".equalsIgnoreCase(trigger.getCompletionStatus())) {
 					HashMap<String, Object> parameterMap = parameterizeTriggerFields(trigger);
-					completionStatus = callPrograms(parameterMap);
+					trigger.setCompletionStatus(callPrograms(parameterMap));
 				}
 //				else {
 				//update trigger record
 				if(trigger instanceof PszTriggerEmployee) {
-					PszTriggerEmployee.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
+					PszTriggerEmployee.setCompletionStatusBySequenceNumber(trigger.getCompletionStatus(), trigger.getSequenceNumber());
 				}
 				else {
-					PszTriggerNonPerson.setCompletionStatusBySequenceNumber(completionStatus, trigger.getSequenceNumber());
+					PszTriggerNonPerson.setCompletionStatusBySequenceNumber(trigger.getCompletionStatus(), trigger.getSequenceNumber());
 				}
 //				}
 			}
@@ -124,7 +126,7 @@ public class ZHRI100A {
 	 * This procedure will transfer the file from UNIX to NT server
 	 */
 	public static void ZHRI100A_ftpFile() {
-		System.out.println("*** ZHRI100A.ZHRI100A_ftpFile() ***");
+		System.out.println("*** ZHRI100A.ZHRI100A_ftpFile()");
 		//BEGIN-PROCEDURE FTP-FILE
 		//IF #status != 0
 		//END-IF
@@ -138,7 +140,8 @@ public class ZHRI100A {
 	 * @return
 	 */
 	public static HashMap<String, Object> parameterizeTriggerFields(PszTriggerSuperclass trigger) {
-		System.out.println("********** ZHRI100A.initializeParameterMap");
+		System.out.println("*** ZHRI100A.parameterizeTriggerFields");
+//		System.out.println(((PszTriggerNonPerson)trigger).toString());
 		HashMap<String, Object> parameterMap = new HashMap<String, Object>();
 		parameterMap.put("criticalFlag", false);
 		parameterMap.put("processName", trigger.getProcessName());
@@ -152,7 +155,10 @@ public class ZHRI100A {
 		}
 		else {
 			parameterMap.put("poiFlag", true);
+			parameterMap.put("eidIndexNumber", ((PszTriggerNonPerson)trigger).getEidIndexNumber());
+			System.out.println("eidIndexNumber: " + parameterMap.get("eidIndexNumber"));
 		}
+//		System.out.println(parameterMap.get("employeeId"));
 		return parameterMap;
 	}
 
@@ -163,7 +169,7 @@ public class ZHRI100A {
 	 * @return
 	 */
 	public static String callPrograms(HashMap<String, Object> parameterMap) {
-		System.out.println("********** ZHRI100A.callPrograms");
+		System.out.println("*** ZHRI100A.callPrograms");
 		String completionStatus = (String)parameterMap.get("completionStatus");
 		switch((String)parameterMap.get("processName")) {
 		case "ZHRI101A": //Process to hire employee
@@ -275,7 +281,7 @@ public class ZHRI100A {
 	 */
 	//TODO: 
 	public static void ZHRI100A_getTriggerDataNonEmp() {
-		System.out.println("*** ZHRI100A.ZHRI100A_getTriggerDataNonEmp() ***");
+		System.out.println("*** ZHRI100A.ZHRI100A_getTriggerDataNonEmp()");
 		
 	}
 
@@ -285,7 +291,7 @@ public class ZHRI100A {
 	 */
 	//TODO: 
 	public static void ZHRI100A_callProgramsNonEmp() {
-		System.out.println("*** ZHRI100A.ZHRI100A_callProgramsNonEmp() ***");
+		System.out.println("*** ZHRI100A.ZHRI100A_callProgramsNonEmp()");
 		
 	}
 
@@ -314,7 +320,7 @@ public class ZHRI100A {
 	 * @see ZHRI100ABuiltWhereClauseDelay in ZHRI100A.SQR
 	 */
 	public static String ZHRI100A_buildWhereClauseDelay() {
-		System.out.println("*** ZHRI100A.ZHRI100A_buildWhereClauseDelay() ***");
+		System.out.println("*** ZHRI100A.ZHRI100A_buildWhereClauseDelay()");
 		String xWhere = PszXlat.findOutput01ByInput01AndInput02("TEMPMAST", "LEGACY-DELAY-HRS");
 		String where1 = "AND SYSTIMESTAMP  >= TR.UPDATED_DATETIME + INTERVAL " + "'" + xWhere + "'" + " HOUR";
 		//XWER.ZPTF_OUTPUT_01
@@ -334,7 +340,7 @@ public class ZHRI100A {
 	 * @param commonParameters
 	 */
 	public static void doErrorCommand(HashMap<String, Object> parameterMap) {
-		System.out.println("*** ZHRI100A.doErrorCommand() ***");
+		System.out.println("*** ZHRI100A.doErrorCommand()");
 		parameterMap.put("parameterString", composeErrorParameterString(parameterMap));
 		parameterMap.put("processName", "HRZ110A");
 		ZHRI100A.doCommand(parameterMap);
@@ -347,7 +353,7 @@ public class ZHRI100A {
 	 * @return SQL where clause
 	 */
 	public static String ZHRI100A_buildGroupWhereClause(String whereClause) {
-		System.out.println("*** ZHRI100A.ZHRI100A_buildGroupWhereClause() ***");
+		System.out.println("*** ZHRI100A.ZHRI100A_buildGroupWhereClause()");
 		String alias = ""; //TODO: I can't find where this value is set
 		String selectGroup = ""; //TODO: I can't find where this value is set
 		//BEGIN-PROCEDURE BUILD-GROUP-WHERE-CLAUSE
@@ -376,7 +382,7 @@ public class ZHRI100A {
 	 * @return SQL where clause
 	 */
 	public static String ZHRI100A_buildEmplIdWhereClause() {
-		System.out.println("*** ZHRI100A.ZHRI100A_buildEmplIdWhereClause() ***");
+		System.out.println("*** ZHRI100A.ZHRI100A_buildEmplIdWhereClause()");
 		String alias = ""; //TODO: I can't find where this value is set
 		String runId = ""; //TODO: I can't find where this value is set
 		//BEGIN-PROCEDURE BUILD-EMPLID-WHERE-CLAUSE
@@ -394,10 +400,12 @@ public class ZHRI100A {
 	 * @return legacyEmployeeId
 	 */
 	public static String fetchLegacyEmployeeId(HashMap<String, Object> parameterMap) {
-		System.out.println("*** ZHRI100A.fetchLegacyEmployeeId() ***");
+		System.out.println("*** ZHRI100A.fetchLegacyEmployeeId()");
+		System.out.println(parameterMap.get("employeeId"));
+		System.out.println(parameterMap.get("eidIndexNumber"));
 		String employeeId;
 		if((Boolean)parameterMap.get("poiFlag")) {
-			employeeId = CrossReferenceMultipleEmployeeId.ZHRI100A_getLegIdForSeqNum((String)parameterMap.get("employeeId"), (BigDecimal)parameterMap.get("eidIndexNumber"));
+			employeeId = CrossReferenceMultipleEmployeeId.findLegacyEmployeeIdByEmployeeIdAndSequence((String)parameterMap.get("employeeId"), (BigDecimal)parameterMap.get("eidIndexNumber"));
 		}
 		else {
 			employeeId = CrossReferenceEmployeeId.ZHRI100A_getLegIdForSeq0((String)parameterMap.get("employeeId"));
@@ -426,7 +434,7 @@ public class ZHRI100A {
 	 * Sets the values for the remote AS400 server in a static class that shares the values across the application. 
 	 */
 	public static void initializeServerProperties() {
-		System.out.println("*** ZHRI100A.initializeServerProperties() ***");
+		System.out.println("*** ZHRI100A.initializeServerProperties()");
 		String processName = "ZHRI100A";
 		ServerProperties.setDbName(PsDbOwner.findDbName());
 //		commonParameters.setPeopleSoftHomePath(System.getenv("PS_HOME")); //TODO: ********
@@ -449,9 +457,8 @@ public class ZHRI100A {
 	 * @param oracleSystemId
 	 * @return true if run file does not exist
 	 */
-	public static Boolean ZHRI100A_checkInterfaceRunFile(String oracleSystemId) {
-		System.out.println("*** ZHRI100A.ZHRI100A_checkInterfaceRunFile() ***");
-		Boolean runFlag = false;
+	public static Boolean interfaceRunFileExists(String oracleSystemId) {
+		System.out.println("*** ZHRI100A.interfaceRunFileExists()");
 //		String runFilePath;
 		//LET $RUN_FILEPATH = '/usr/local/barch/' || $ORACLE_SID || '/work/hrinterface.run'  //concatenate
 //		runFilePath = "/usr/local/barch/" + oracleSystemId + "/work/hrinterface.run";
@@ -465,14 +472,15 @@ public class ZHRI100A {
 		//IF #file_exists = 0
 		if(fileExists == false) {
 			//LET #run_flag = 1
-			runFlag = true;		}
+//			runFlag = true;		
+		}
 		//ELSE
 		else {
 			//LET #run_flag = 0
-			runFlag = false;
+//			runFlag = false;
 		//END-IF
 		}
-		return runFlag;
+		return fileExists;
 	}
 	
 	/**
@@ -481,9 +489,8 @@ public class ZHRI100A {
 	 * @param trigger
 	 * @return completionStatus - "P" if trigger record is good to process
 	 */
-	public static String checkTriggerRecord(PszTriggerSuperclass trigger) {
-		System.out.println("*** ZHRI100A.checkTriggerRecord() ***");
-		String completionStatus = trigger.getCompletionStatus();
+	public static PszTriggerSuperclass checkTriggerRecord(PszTriggerSuperclass trigger) {
+		System.out.println("*** ZHRI100A.checkTriggerRecord()");
 		//****************************************************************************************************
 		//TODO
 		Boolean fileIsOpen = false;
@@ -498,28 +505,28 @@ public class ZHRI100A {
 		//****************************************************************************************************
 		//set status to error
 		if(trigger.getEmployeeId() == null || trigger.getEmployeeId().isEmpty()) {
-			completionStatus = "E";
+			trigger.setCompletionStatus("E");
 		}
-		else if(PsJob.ZHRI100A_checkIfContractor(trigger.getEmployeeId())) {
+		else if(PsJob.employeeIsContractor(trigger.getEmployeeId())) {
 			//set status to complete, so this event doesn't come up again
-			completionStatus = "C";
+			trigger.setCompletionStatus("C");
 		}
 		else { //not a contractor and not a blank EmplId
 			//Added a check for 'ZHRI102A' - to see if corresponding row on JOB 
 			if("ZHRI102A".equalsIgnoreCase(trigger.getProcessName())) {
-				if(!PsJob.ZHRI100A_checkIfCorrect102A(trigger.getEmployeeId(), trigger.getEffectiveDate(), trigger.getProcessName())) {
+				if(!PsJob.correspondingJobRecordExists(trigger.getEmployeeId(), trigger.getEffectiveDate(), trigger.getProcessName())) {
 					//set status to complete, so this event doesn't come up again
-					completionStatus = "C";
+					trigger.setCompletionStatus("C");
 				}
 			}
 			else if("ZHRI101A".equalsIgnoreCase(trigger.getProcessName())) {
-				if(!PszTriggerNonPerson.ZHRI100A_checkIfPoiTermed(trigger.getEmployeeId())) {
+				if(!PszTriggerNonPerson.isPoiToEmpTransfer(trigger.getEmployeeId())) {
 					//set status to wait
-					completionStatus = "W";
+					trigger.setCompletionStatus("W");
 				}
 			}
 		}
-		return completionStatus;
+		return trigger;
 	}
 	
 	/**
@@ -530,7 +537,7 @@ public class ZHRI100A {
 	 * @return legacyEmployeeId
 	 */
 	public static String fetchNewLegacyEmployeeId(String employeeId, BigDecimal indexNumber) {
-		System.out.println("*** ZHRI100A.fetchNewLegacyEmployeeId() ***");
+		System.out.println("*** ZHRI100A.fetchNewLegacyEmployeeId()");
 		String legacyEmployeeId = null;
 		String legacyEmployeeName;
 		Integer employeeNumber = -1;
@@ -565,7 +572,7 @@ public class ZHRI100A {
 	 * @return commandString to be used in regex call to AS400
 	 */
 	public static String composeCommandString(HashMap<String, Object> parameterMap) {
-		System.out.println("*** ZHRI100A.composeRexecCommandString() ***");
+		System.out.println("*** ZHRI100A.composeCommandString()");
 		String commandString = 
 						"CALL " + ServerProperties.getAs400Library() + "/" 
 								+ (String)parameterMap.get("processName") + " " 
@@ -581,7 +588,7 @@ public class ZHRI100A {
 	 * @return errorParameterString
 	 */
 	public static String composeErrorParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("*** ZHRI100A.composeErrorParameterString() ***");
+		System.out.println("*** ZHRI100A.composeErrorParameterString()");
 		String blankSpaceParameter = " ";
 		String criticalFlagYN = (Boolean)parameterMap.get("criticalFlag") != null && (Boolean)parameterMap.get("criticalFlag") ? "Y" : "N";
 		Calendar now = Calendar.getInstance();
@@ -693,7 +700,7 @@ public class ZHRI100A {
 	 * @param localOutput
 	 */
 	public static final Integer readWrite(InputStream remoteInput, OutputStream remoteOutput, InputStream localInput, OutputStream localOutput) {
-		System.out.println("********** ZHRI100A.readWrite");
+		System.out.println("*** ZHRI100A.readWrite");
 		Integer status = 0;
 		Thread readerThread, writerThread;
         readerThread = new Thread() {
@@ -752,7 +759,7 @@ public class ZHRI100A {
 	 * @return completionStatus
 	 */
     public static String doCommand(HashMap<String, Object> parameterMap) {
-		System.out.println("********** ZHRI100A.doCommand");
+		System.out.println("*** ZHRI100A.doCommand");
 		String commandString = ZHRI100A.composeCommandString(parameterMap);
 		System.out.println("$Command=> " + commandString);
 		System.out.println("Calling Command at: " + (new SimpleDateFormat("dd-MMM-yyyy_hh:mm:ss.SSSSSS_a")).format(new Date()).toUpperCase());
@@ -777,7 +784,7 @@ public class ZHRI100A {
 	 */
 	@SuppressWarnings("unchecked")
 	public static String composeParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("*** ZHRI100A.composeParameterString() ***");
+		System.out.println("*** ZHRI100A.composeParameterString()");
 		String parameterString = "";
 		for(String parameterName : (List<String>)parameterMap.get("parameterNameList")) {
 			parameterString += "'" + (String)parameterMap.get(parameterName) + "' ";

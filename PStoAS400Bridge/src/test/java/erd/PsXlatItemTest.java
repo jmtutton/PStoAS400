@@ -17,7 +17,7 @@ public class PsXlatItemTest {
 //		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
 //		Date effectiveDate;
 //		try {
-//			effectiveDate = (Date) simpleDateFormat.parse("01/01/2000");
+//			effectiveDate = (Date)");
 //		}
 //		catch(Exception name) {
 //		}

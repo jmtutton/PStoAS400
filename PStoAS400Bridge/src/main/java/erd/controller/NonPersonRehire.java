@@ -18,7 +18,7 @@ public class NonPersonRehire {
 	 * @return completionStatus
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** NonPersonRehire.doProcess() ***");
+		System.out.println("*** NonPersonRehire.doProcess()");
 		parameterMap = fetchProcessParameters(parameterMap);
 		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
 		return null;
@@ -30,7 +30,7 @@ public class NonPersonRehire {
 	 * @return
 	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** NonPersonRehire.fetchProcessParameters() ***");
+		System.out.println("*** NonPersonRehire.fetchProcessParameters()");
 		parameterMap.put("parameterNameList", getParameterNameList());
 		return null;
 	}
@@ -41,7 +41,7 @@ public class NonPersonRehire {
 	 */
 	//TODO
 	private static List<String> getParameterNameList() {
-		System.out.println("*** NonPersonRehire.getParameterNameList() ***");
+		System.out.println("*** NonPersonRehire.getParameterNameList()");
 		return Arrays.asList("operatorId", "employeeId", "indexNumber", 
 				"group", "branch",
 				"lastName", "firstName", "middleInitial", "nickname",

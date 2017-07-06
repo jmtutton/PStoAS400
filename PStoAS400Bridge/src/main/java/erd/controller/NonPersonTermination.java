@@ -24,16 +24,17 @@ public class NonPersonTermination {
 	 * @return completionStatus
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** NonPersonTermination.doProcess() ***");
+		System.out.println("*** NonPersonTermination.doProcess()");
 		String completionStatus = "E";
 		parameterMap = fetchProcessParameters(parameterMap);
-		parameterMap.put("employeeId", ZHRI100A.fetchLegacyEmployeeId(parameterMap));
+		System.out.println("********************* parameterMap.get(\"employeeId\") = " + parameterMap.get("employeeId"));
 		if(parameterMap.get("employeeId") != null && !((String)parameterMap.get("employeeId")).isEmpty()) {
 			parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
 			completionStatus = ZHRI100A.doCommand(parameterMap);
 			if("C".equalsIgnoreCase(completionStatus)) {
+				//insert POI termination record
 				if(new BigDecimal(0).equals((BigDecimal)parameterMap.get("effectiveSequence"))) {
-					PszPoiTermination.HR202_insertTimestamp((String)parameterMap.get("employeeId"));
+					PszPoiTermination.insertTimestamp((String)parameterMap.get("employeeId"));
 				}
 			}
 		}
@@ -41,28 +42,32 @@ public class NonPersonTermination {
 	}
 	
 	/**
-	 * Initialize the fields to ensure that that they all start out blank.
-	 * @see HR02-Initialize-Fields in ZHRI202A.SQC
+	 * Collects the values for the parameters needed for this process.
+	 * @see HR202-Initialize-Fields in ZHRI202A.SQC
 	 * @param parameterMap
 	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** NonPersonTermination.fetchProcessParameters() ***");
+		System.out.println("*** NonPersonTermination.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ202A");
 		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
-			parameterMap.put("operatorId", ((String)parameterMap.get("operatorId")).substring(1).toUpperCase()); //strips the 'E' off of the employee id
+			////strip the 'E' off of the operator id to format the legacy employee ID from the PeopleSoft OprId for audit field
+			parameterMap.put("operatorId", ((String)parameterMap.get("operatorId")).substring(1).toUpperCase()); 
 		}
+		//datetostr($PSDateIn,'YYYYMMDD')
 		String terminationDate = new SimpleDateFormat("yyyyMMdd").format((Date)parameterMap.get("effectiveDate"));
 		parameterMap.put("terminationDate", terminationDate);
+		parameterMap.put("employeeId", ZHRI100A.fetchLegacyEmployeeId(parameterMap));
 		parameterMap.put("parameterNameList", getParameterNameList());
 		return parameterMap;
 	}
 	
 	/**
+	 * Returns a list of parameter names specific to this process.
 	 * @see HR202-Call-System in ZHRI202A.SQC
-	 * @return list of parameter names for this process
+	 * @return parameterNameList
 	 */
 	private static List<String> getParameterNameList() {
-		System.out.println("*** NonPersonTermination.getParameterNameList() ***");
+		System.out.println("*** NonPersonTermination.getParameterNameList()");
 		return Arrays.asList("operatorId", "employeeId", "terminationDate");
 	}
 	

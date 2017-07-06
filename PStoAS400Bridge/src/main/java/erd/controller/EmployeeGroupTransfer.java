@@ -17,7 +17,7 @@ public class EmployeeGroupTransfer {
 	 * @return completionStatus
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeGroupTransfer.doProcess() ***");
+		System.out.println("*** EmployeeGroupTransfer.doProcess()");
 		parameterMap = fetchProcessParameters(parameterMap);
 		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
 		return ZHRI100A.doCommand(parameterMap);
@@ -29,7 +29,7 @@ public class EmployeeGroupTransfer {
 	 * @return parameterMap
 	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeGroupTransfer.fetchProcessParameters() ***");
+		System.out.println("*** EmployeeGroupTransfer.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ109A");
 		parameterMap.put("parameterNameList", getParameterNameList());
 		return parameterMap;

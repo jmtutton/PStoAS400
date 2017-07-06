@@ -14,14 +14,14 @@ import java.util.List;
 public class EmployeeRehire {
 
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeRehire.doProcess() ***");
+		System.out.println("*** EmployeeRehire.doProcess()");
 		parameterMap = fetchProcessParameters(parameterMap);
 		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
 		return null;
 	}
 	
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeRehire.fetchProcessParameters() ***");
+		System.out.println("*** EmployeeRehire.fetchProcessParameters()");
 		parameterMap.put("parameterNameList", getParameterNameList());
 		return null;
 		
@@ -33,7 +33,7 @@ public class EmployeeRehire {
 	 */
 	//TODO
 	private static List<String> getParameterNameList() {
-		System.out.println("*** EmployeeRehire.getParameterNameList() ***");
+		System.out.println("*** EmployeeRehire.getParameterNameList()");
 		return Arrays.asList("operatorId", "employeeId",
 				"group", "branch",
 				"lastName", "firstName", "middleInitial", "maritalStatus", "nickname",

@@ -29,10 +29,10 @@ public class ZHRI100ATest {
 //		ZHRI100A.ZHRI100A_callErrorRoutine(commonParameters);
 //	}
 
-//	@Test
-//	public void testZHRI100A_for_termination() {
-//		ZHRI100A.main();
-//	}
+	@Test
+	public void testZHRI100A_for_termination() {
+		ZHRI100A.main();
+	}
 //	
 //	@Test
 //	public void testCallSystemUsingCommand() {

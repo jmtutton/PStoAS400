@@ -18,7 +18,7 @@ public class NonPersonDemographicChange {
 	 * @return completionStatus
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** NonPersonDemographicChange.doProcess() ***");
+		System.out.println("*** NonPersonDemographicChange.doProcess()");
 		parameterMap = fetchProcessParameters(parameterMap);
 		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
 		return ZHRI100A.doCommand(parameterMap);
@@ -30,7 +30,7 @@ public class NonPersonDemographicChange {
 	 * @return
 	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** NonPersonDemographicChange.fetchProcessParameters() ***");
+		System.out.println("*** NonPersonDemographicChange.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ205A");
 		parameterMap.put("parameterNameList", getParameterNameList());
 		return parameterMap;

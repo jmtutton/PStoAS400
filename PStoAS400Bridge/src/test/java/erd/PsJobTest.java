@@ -36,7 +36,7 @@ public class PsJobTest {
 	public void testCheckIfContractor() {
 		//TODO: need a test case where EMPL_CLASS = 'R'
 		String employeeId = "524338";
-		boolean result = PsJob.ZHRI100A_checkIfContractor(employeeId);
+		boolean result = PsJob.employeeIsContractor(employeeId);
 		assertNotNull(result);
 		assertFalse(result);
 		System.out.println("\nresult: " + result);
@@ -47,7 +47,7 @@ public class PsJobTest {
 		String employeeId = "349NV";
 		Date effectiveDate = new Date();
 		String processName = "ZHRI102A";
-		boolean result = PsJob.ZHRI100A_checkIfCorrect102A(employeeId, effectiveDate, processName);
+		boolean result = PsJob.correspondingJobRecordExists(employeeId, effectiveDate, processName);
 		assertNotNull(result);
 		assertTrue(result);
 		System.out.println("\nresult: " + result);
@@ -74,8 +74,17 @@ public class PsJobTest {
 		}
 		Date effectiveDatePlusOne = erd.DateUtil.addDays(effectiveDate, 1);
 		BigDecimal effectiveSequence = new BigDecimal(0);
-		PsJob result = PsJob.findJobByEmployeeIdAndEffectiveDateAndEffectiveSequence(employeeId, effectiveDatePlusOne, effectiveSequence);
+		PsJob result = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence(employeeId, effectiveDatePlusOne, effectiveSequence);
 		assertNotNull(result);
 	}
+	
+	@Test
+	public void testFindRegulatoryRegionByEmployeeId() {
+		String employeeId = "323506";
+		String result = PsJob.findRegulatoryRegionByEmployeeId(employeeId);
+		assertNotNull(result);
+		System.out.println("\nresult = " + result);
+	}
+
 
 }

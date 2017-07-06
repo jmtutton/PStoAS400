@@ -45,7 +45,41 @@ public class EmployeeDemographicChange {
 	 * @return completionStatus
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDemographicChange.doProcess() ***");
+		//DO HR05-Initialize-Fields
+		parameterMap = setUnusedParameters(parameterMap);
+		//DO HR05-Get-Info
+		parameterMap.put("maritalStatus", PsEffectiveDatedPersonalData.findMaritalStatusByEmployeeIdAndEffectiveDate((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate")));
+		parameterMap = fetchAddress(parameterMap);
+		//DO HR05-Get-Personal-Data
+		parameterMap = fetchPersonalData(parameterMap);
+		//DO HR05-Get-Referral-Source
+		parameterMap = fetchReferralSource(parameterMap);
+		//DO HR05-Get-Job
+		parameterMap = fetchJob(parameterMap);
+		//DO HR05-Get-Region
+		parameterMap.put("regulatoryRegion", PsJob.findRegulatoryRegionByEmployeeId((String)parameterMap.get("employeeId")));
+		//DO HR05-Get-Location-Country
+//		parameterMap.put("regulatoryRegion", PsLocation.findCountryByLocation(location));
+		//DO HR05-GET-2CHAR-COUNTRY
+		//DO Get-OprId
+		String operatorId = (String)parameterMap.get("operatorId");
+		if(operatorId != null && operatorId.length() > 5) {
+			parameterMap.put("operatorId", operatorId.substring(1, 5).trim());
+		}
+		//LET $PSEmpl = $PSOprid
+		//IF $PSEmpl <> '' and $PSEmpl <> ' '
+		//LET $PSNational_Id = ' '
+		//DO HR05-Get-Business-Phone
+		//DO HR05-Get-Main-Phone
+		//DO HR05-Get-Names-Table
+		//DO HR05-Get-Citizenship
+		//DO HR05-Get-Diversity
+		//DO HR05-Get-Drivers-Lic
+		//DO HR05-Get-Emergency-Cntct
+		//DO HR05-Get-Employee-Checklist
+		//DO HR05-Process-Data
+		
+		System.out.println("*** EmployeeDemographicChange.doProcess()");
 		parameterMap = fetchProcessParameters(parameterMap);
 		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
 		return ZHRI100A.doCommand(parameterMap);
@@ -56,41 +90,15 @@ public class EmployeeDemographicChange {
 	 * @return parameterMap
 	 */
 	private static HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDemographicChange.fetchProcessParameters() ***");
+		System.out.println("*** EmployeeDemographicChange.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ105A");
-		parameterMap = setUnusedParameters(parameterMap);
-		PsJob psJob = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"), (BigDecimal)parameterMap.get("effectiveSequence"));
-		if(psJob != null) {
-			CrossReferencePt12p crossReferencePt12p = CrossReferencePt12p.findByDepartment(psJob.getLocation()); //location == department
-			if(crossReferencePt12p != null) {
-				parameterMap.put("group", crossReferencePt12p.getGroup());
-				parameterMap.put("branch", crossReferencePt12p.getBranch());
-			}
-			else {
-				parameterMap.put("errorProgramParameter", "ZHRI105A");
-				parameterMap.put("errorMessageParameter", "Location not in XRef table");
-				ZHRI100A.doErrorCommand(parameterMap);
-			}
-			parameterMap.put("region", CrossReferenceCompany.findLegacyRegionByBusinessUnit(psJob.getBusinessUnit()));
-			if("P".equalsIgnoreCase(psJob.getFullPartTime())) {
-				parameterMap.put("partTimeEffectiveDate", new SimpleDateFormat("yyyyMMdd").format((Date)parameterMap.get("effectiveDate")).toUpperCase());
-			}
-		}
-		String operatorId = (String)parameterMap.get("operatorId");
-		if(operatorId != null && operatorId.length() > 5) {
-			parameterMap.put("operatorId", operatorId.substring(1, 5).trim());
-		}
 		parameterMap = fetchDriversLicense(parameterMap);
 		parameterMap = fetchEmergencyContact(parameterMap);
-		parameterMap = fetchAddress(parameterMap);
 		parameterMap = fetchName(parameterMap);
-		parameterMap = fetchReferralSource(parameterMap);
-		parameterMap = fetchPersonalData(parameterMap);
 		parameterMap.put("changeDate", new SimpleDateFormat("yyyyMMdd").format(DateUtil.asOfToday()).toUpperCase());
 		parameterMap.put("nationalId", PsPersonalNationalId.findNationalIdByEmployeeIdAndCountry((String)parameterMap.get("employeeId"), (String)parameterMap.get("region")));
 		parameterMap.put("homePhone", PsPersonalPhone.findPhoneByEmployeeIdAndPhoneType((String)parameterMap.get("employeeId"), "MAIN"));
 		parameterMap.put("businessPhone", PsPersonalPhone.findPhoneByEmployeeIdAndPhoneType((String)parameterMap.get("employeeId"), "BUSN"));
-		parameterMap.put("maritalStatus", PsEffectiveDatedPersonalData.findMaritalStatusByEmployeeIdAndEffectiveDate((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate")));
 		parameterMap.put("citizenshipCountry", PsCountry.findCountryIsoAlpha2CodeByEmployeeId((String)parameterMap.get("employeeId")));
 		parameterMap.put("nationalIdCountry", PsCountry.findCountryIsoAlpha2CodeByCountryCode((String)parameterMap.get("region")));
 		parameterMap.put("recruiterId", fetchRecruiterId(parameterMap));
@@ -392,5 +400,43 @@ public class EmployeeDemographicChange {
 		}
 		return legacyEthnicCode;
 	}
+	
+	/**
+	 * @see HR05-Get-Job
+	 * @param parameterMap
+	 * @return
+	 */
+	private static HashMap<String, Object> fetchJob(HashMap<String, Object> parameterMap) {
+		PsJob psJob = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"), (BigDecimal)parameterMap.get("effectiveSequence"));
+		if(psJob != null) {
+			parameterMap.put("PSDate", psJob.getLocation());
+			parameterMap.put("PSLocation", psJob.getLocation());
+			parameterMap.put("PSBusiness_unit", psJob.getLocation());
+			parameterMap.put("PSCompany", psJob.getLocation());
+			parameterMap.put("PSFullPartTime", psJob.getLocation());
+			parameterMap.put("PSEmplClass", psJob.getLocation());
+			parameterMap.put("PSEmplStatus", psJob.getLocation());
+			parameterMap.put("PSDeptid", psJob.getLocation());
+			parameterMap.put("PSJobcode", psJob.getLocation());
+			CrossReferencePt12p crossReferencePt12p = CrossReferencePt12p.findByDepartment(psJob.getLocation()); //location == department
+			if(crossReferencePt12p != null) {
+				parameterMap.put("group", crossReferencePt12p.getGroup());
+				parameterMap.put("branch", crossReferencePt12p.getBranch());
+			}
+			else {
+				parameterMap.put("errorProgramParameter", "ZHRI105A");
+				parameterMap.put("errorMessageParameter", "Location not in XRef table");
+				ZHRI100A.doErrorCommand(parameterMap);
+			}
+			parameterMap.put("region", CrossReferenceCompany.findLegacyRegionByBusinessUnit(psJob.getBusinessUnit()));
+			if("P".equalsIgnoreCase(psJob.getFullPartTime())) {
+				parameterMap.put("partTimeEffectiveDate", new SimpleDateFormat("yyyyMMdd").format((Date)parameterMap.get("effectiveDate")).toUpperCase());
+			}
+		    //Do HR05-Get-Location
+		    //Do HR05-Get-Business-Unit
+		}
+		return parameterMap;
+	}
+
 	
 }

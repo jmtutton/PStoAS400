@@ -26,7 +26,7 @@ public class EmployeeDateChange {
 	 * @return
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDateChange.doProcess() ***");
+		System.out.println("*** EmployeeDateChange.doProcess()");
 		parameterMap = fetchProcessParameters(parameterMap);
 		if(parameterMap.get("employeeId") != null && !((String)parameterMap.get("employeeId")).isEmpty()) {
 			parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
@@ -41,7 +41,7 @@ public class EmployeeDateChange {
 	 * @param parameterMap
 	 */
 	public HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDateChange.fetchProcessParameters() ***");
+		System.out.println("*** EmployeeDateChange.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ107A");
 		parameterMap = setUnusedParameters(parameterMap);
 		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
@@ -95,7 +95,7 @@ public class EmployeeDateChange {
 	 * @return parameterMap
 	 */
 	public HashMap<String, Object> fetchEmployeeReviewDates(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDateChange.fetchEmployeeReviewDates() ***");
+		System.out.println("*** EmployeeDateChange.fetchEmployeeReviewDates()");
 		PsEmployeeReview psEmployeeReview = 
 				PsEmployeeReview.findByEmployeeIdAndEffectiveDateAndEmploymentRecordNumber(
 						(String)parameterMap.get("employeeId"), 
@@ -122,7 +122,7 @@ public class EmployeeDateChange {
 	 * @return parameterMap
 	 */
 	public HashMap<String, Object> fetchAccomplishmentDates(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDateChange.fetchAccomplishmentDates() ***");
+		System.out.println("*** EmployeeDateChange.fetchAccomplishmentDates()");
 		List<String> accomplishmentCodeList = Arrays.asList("DRUGTST", "PHYS L3", "PHYS L4");
 		PsAccomplishment psAccomplishment = PsAccomplishment.findByEmployeeIdAndAccomplishmentCodes((String)parameterMap.get("employeeId"), accomplishmentCodeList);
 		if(psAccomplishment != null) {
@@ -161,7 +161,7 @@ public class EmployeeDateChange {
 	 * @return parameterMap
 	 */
 	public HashMap<String, Object> fetchContractDate(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDateChange.fetchContractDate() ***");
+		System.out.println("*** EmployeeDateChange.fetchContractDate()");
 		PsContractData psContractData = PsContractData.findByEmployeeIdAndMaxBeginDate((String)parameterMap.get("employeeId"));
 		parameterMap.put("contractYear", new SimpleDateFormat("yyyy").format(psContractData.getContractBeginDt()));
 		parameterMap.put("contractMonth", new SimpleDateFormat("mm").format(psContractData.getContractBeginDt()));

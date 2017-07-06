@@ -97,7 +97,7 @@ public class PszTriggerTest {
 	@Test 
 	public void testZHRI100A_checkIfPoiTermed() {
 		String employeeId = "340243";
-		Boolean result = PszTriggerNonPerson.ZHRI100A_checkIfPoiTermed(employeeId);
+		Boolean result = PszTriggerNonPerson.isPoiToEmpTransfer(employeeId);
 		assertNotNull(result);
 		System.out.println("result: " + result);
 	}
