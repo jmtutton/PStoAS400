@@ -39,7 +39,7 @@ public class EmployeeTermination {
 			if(employeeId != null  && !employeeId.isEmpty()) {
 				parameterMap.put("employeeId", employeeId);
 				parameterMap = fetchProcessParameters(psJob, parameterMap);
-				parameterMap.put("parameterString", composeParameterString(parameterMap));
+				parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
 				completionStatus = ZHRI100A.doCommand(parameterMap);
 			}
 		}
@@ -54,7 +54,6 @@ public class EmployeeTermination {
 	 */
 	private static HashMap<String, Object> fetchProcessParameters(PsJob psJob, HashMap<String, Object> parameterMap) {
 		System.out.println("*** EmployeeTermination.fetchProcessParameters() ***");
-		parameterMap.put("parameterNameList", getParameterNameList());
 		parameterMap.put("errorProgramParameter", "HRZ102A");
 		parameterMap.put("terminationReason", fetchTerminationReason(psJob, parameterMap));
 		if(parameterMap.get("terminationReason") == null) {
@@ -66,6 +65,7 @@ public class EmployeeTermination {
 		}
 		parameterMap = fetchDates(psJob, parameterMap);
 		parameterMap = fetchTerminationCodes(psJob, parameterMap);
+		parameterMap.put("parameterNameList", getParameterNameList());
 		return parameterMap;
 	}
 
@@ -83,7 +83,7 @@ public class EmployeeTermination {
 			terminationReason = PsActionReason.findReasonDescriptionByActionAndActionReason(psJob.getAction(), psJob.getActionReason());
 		}
 		if(terminationReason != null) {
-			//remove non-alphanumeric characters
+			//remove non-alphanumeric characters, except for space
 			terminationReason = terminationReason.replaceAll("[^a-zA-Z0-9] ", "");
 		}
 		return terminationReason;
@@ -105,41 +105,6 @@ public class EmployeeTermination {
 		}
 		return parameterMap;
 	}
-
-	/**
-	 * Composes the string of termination process parameters
-	 * @param processParameters
-	 * @return string of single-quoted parameter
-	 */
-	private static String composeParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeTermination.composeParameterString() ***");
-		//the HRZ102A program requires termination reason parameter to be character long
-		parameterMap.put("terminationReason", String.format("%1$-35s", parameterMap.get("terminationReason")));
-		String parameterString = "'" + parameterMap.get("employeeId") + "' "
-				+ "'" + parameterMap.get("terminationMonth") + "' "
-				+ "'" + parameterMap.get("terminationDay") + "' "
-				+ "'" + parameterMap.get("terminationYear") + "' "
-				+ "'" + parameterMap.get("rehireMonth") + "' "
-				+ "'" + parameterMap.get("rehireDay") + "' "
-				+ "'" + parameterMap.get("rehireYear") + "' "
-				+ "'" + parameterMap.get("voluntaryOrInvoluntary") + "' "
-				+ "'" + parameterMap.get("terminationCode") + "' "
-				+ "'" + parameterMap.get("operatorId") + "' "
-				+ "'" + parameterMap.get("terminationReason") + "'";
-		@SuppressWarnings("unchecked")
-		List<String> parameterNameList = (List<String>)parameterMap.get("parameterNameList");
-		parameterString = "";
-		for(String parameterName : parameterNameList) {
-			parameterString += "'" + (String)parameterMap.get(parameterName) + "' ";
-		}
-		return parameterString;
-	}
-	
-	private static List<String> getParameterNameList() {
-		return Arrays.asList("employeeId","terminationMonth","terminationDay", "terminationYear",
-					"rehireMonth","rehireDay","rehireYear","voluntaryOrInvoluntary",
-					"terminationCode","operatorId","terminationReason");
-	}
 	
 	/**
 	 * Splits the termination date and rehire date into YYYY, MM, and DD format.
@@ -160,7 +125,16 @@ public class EmployeeTermination {
 			parameterMap.put("terminationDay", new SimpleDateFormat("dd").format(psJob.getEffectiveDate()));
 		}
 		return parameterMap;
-
+	}
+	
+	/**
+	 * @see HR02-Process-Data in ZHRI102A.SQC
+	 * @return list of parameter names for this process
+	 */
+	private static List<String> getParameterNameList() {
+		return Arrays.asList("employeeId","terminationMonth","terminationDay", "terminationYear",
+					"rehireMonth","rehireDay","rehireYear","voluntaryOrInvoluntary",
+					"terminationCode","operatorId","terminationReason");
 	}
 
 }

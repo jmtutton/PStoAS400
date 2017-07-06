@@ -442,7 +442,7 @@ public class CrudTest {
 	public void testPsDbOwner_FindDbName() {
 		String results = PsDbOwner.findDbName();
 		assertNotNull(results);
-		System.out.println("PsDbOwner.dbName: " + results);
+//		System.out.println("PsDbOwner.dbName: " + results);
 	}
 
 }

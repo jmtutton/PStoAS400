@@ -1,6 +1,8 @@
 package erd.controller;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * ZHRI109A - Group Transfer
@@ -12,40 +14,34 @@ public class EmployeeGroupTransfer {
 	/**
 	 * 
 	 * @param parameterMap
-	 * @return
+	 * @return completionStatus
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
 		System.out.println("*** EmployeeGroupTransfer.doProcess() ***");
 		parameterMap = fetchProcessParameters(parameterMap);
-		parameterMap.put("parameterString", composeParameterString(parameterMap));
+		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
 		return ZHRI100A.doCommand(parameterMap);
 	}
 	
 	/**
 	 * 
 	 * @param parameterMap
-	 * @return
+	 * @return parameterMap
 	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		System.out.println("*** EmployeeGroupTransfer.fetchProcessParameters() ***");
 		parameterMap.put("errorProgramParameter", "HRZ109A");
+		parameterMap.put("parameterNameList", getParameterNameList());
 		return parameterMap;
 	}
 	
 	/**
-	 * 
-	 * @param parameterMap
+	 * @see HR09-Call-RPG
+	 * @return list of parameter names for this process
 	 */
-	private String composeParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeGroupTransfer.composeParameterString() ***");
-		String paramaterString = "'" + parameterMap.get("employeeId") + "' " //$LegEmplid 
-				+ "'" + parameterMap.get("operatorId") + "' " //$LegUserEmplid
-				+ "'" + parameterMap.get("employeeGroup") + "' " //$LegGroup
-				+ "'" + parameterMap.get("employeeBranch") + "' " //$LegBranch
-				+ "'" + parameterMap.get("nationalIdCountry") + "' " //$LegCountryCode
-				+ "'" + parameterMap.get("nationalId") + "' " //$LegNid
-				+ "'" + parameterMap.get("effectiveDate") + "'"; //$LegEffdt
-		return paramaterString;
+	private static List<String> getParameterNameList() {
+		return Arrays.asList("employeeId", "operatorId", "employeeGroup", "employeeBranch", 
+				"nationalIdCountry", "nationalId", "effectiveDate");
 	}
 
 }

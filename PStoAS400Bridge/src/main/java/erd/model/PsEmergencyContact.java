@@ -1,7 +1,12 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
 import javax.persistence.*;
+
+import erd.DateUtil;
 
 /**
  * The persistent class for the PS_EMERGENCY_CNTCT database table.
@@ -174,7 +179,7 @@ public class PsEmergencyContact implements Serializable {
 	}
 
 	public String getContactName() {
-		return this.contactName;
+		return this.contactName != null ? this.contactName.trim() : this.contactName;
 	}
 
 	public void setContactName(String contactName) {
@@ -262,7 +267,7 @@ public class PsEmergencyContact implements Serializable {
 	}
 
 	public String getPhone() {
-		return this.phone;
+		return this.phone != null ? this.phone.trim() : this.phone;
 	}
 
 	public void setPhone(String phone) {
@@ -294,7 +299,7 @@ public class PsEmergencyContact implements Serializable {
 	}
 
 	public String getRelationship() {
-		return this.relationship;
+		return this.relationship != null ? this.relationship.trim() : this.relationship;
 	}
 
 	public void setRelationship(String relationship) {
@@ -325,30 +330,58 @@ public class PsEmergencyContact implements Serializable {
 		this.state = state;
 	}
 	
-	public PsEmergencyContact findByEmployeeIdAndIsPrimaryContact(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR05-Get-Emergency-Cntct
-//		! Desc:  This routine gets the emergency contact information from the
-//		!        Emergecny contact table and converts it to the legay system
-//		!        format.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR05-Get-Emergency-Cntct
-//		begin-select
-//		CEC.Contact_Name
-//		CEC.Phone
-//		CEC.Relationship
-//		  Let $PSContact_Name = RTRIM(LTRIM(&CEC.Contact_Name,' '),' ')
-//		  uppercase $PSContact_Name
-//		  Do Replace-Character($PSContact_Name,'''','''''',$PSContact_Name)  !From ZRmvSpcChr.sqc
-//		  Let $Relations = &CEC.Relationship
-//		  Do Remove-Non-Letters-Numbers (&CEC.Phone, $PSEmer_Phn)      !From ZRmvSpcChr.sqc
-//		  Do HR05-Format-Relationships
-//		from PS_Emergency_Cntct CEC
-//		where CEC.Emplid = $PSEmplid
-//		  and CEC.Primary_Contact = 'Y'
-//		end-select
-//		End-Procedure HR05-Get-Emergency-Cntct
-	return null;
+	/**
+	 * This routine gets the emergency contact information from the PS_EMERGENCY_CNTCT table and converts it to the legacy system format.
+	 * @see HR05-Get-Emergency-Cntct in ZHRI105A.SQC
+	 * @param employeeId
+	 * @return PsEmergencyContact record
+	 */
+	public static PsEmergencyContact findByEmployeeIdAndPrimaryContact(String employeeId) {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<PsEmergencyContact> resultList = em.createQuery(
+	    			"SELECT PsEmergencyContact FROM PsEmergencyContact c "
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+	    					+ "AND UPPER(TRIM(isPrimaryContact)) = 'Y' "
+	    					, PsEmergencyContact.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
+	
+	/**
+	 * This procedure converts the PeopleSoft relationship codes to legacy system relationship descriptions.
+	 * @see HR05-Format-Relationships in ZHRI105A.SQC
+	 * @param relationship
+	 * @return relationship
+	 */
+	public static String formatRelationship(String relationship) {
+		Date asofToday = DateUtil.asOfToday();
+		//BEGIN-PROCEDURE HR05-FORMAT-RELATIONSHIPS
+		//LET $FieldName = 'RELATIONSHIP'
+		//LET $FieldValue = $Relations
+		//LET $AsOfDate = $AsOfToday
+		//DO Read-Translate-Table  !From ZREADXLT.SQC
+		PsXlatItem psXlatItem = PsXlatItem.findByFieldNameAndFieldValueAndEffectiveDate("RELATIONSHIP", relationship, asofToday);
+		relationship = psXlatItem.getXlatLongName();
+		//LET $PSRelation = SUBSTR($XlatLongName, 1, 20)
+		//UPPERCASE $PSRelation
+		if(relationship != null && relationship.length() > 20) {
+			relationship = relationship.substring(0, 20).toUpperCase();
+		}
+		//END-PROCEDURE HR05-FORMAT-RELATIONSHIPS
+		return relationship;
 	}
 
 }

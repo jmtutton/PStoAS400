@@ -33,7 +33,7 @@ public class EmployeeDateChange {
 		//IF $LegacyEmplid <> '' AND $LegacyEmplid <> ' '  !New OprId not null or blank on return
 		if(parameterMap.get("employeeId") != null && !((String)parameterMap.get("employeeId")).isEmpty()) {
 			//DO HR07-Call-RPG
-			parameterMap.put("parameterString", composeParameterString(parameterMap));
+			parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
 			return ZHRI100A.doCommand(parameterMap);
 			//LET $CompletionStatus = 'C'
 			//END-IF    !#STATUS = 0
@@ -51,6 +51,16 @@ public class EmployeeDateChange {
 	public HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		System.out.println("*** EmployeeDateChange.fetchProcessParameters() ***");
 		parameterMap.put("errorProgramParameter", "HRZ107A");
+		//set unused parameters
+		parameterMap.put("hireYear", "");
+		parameterMap.put("hireMonth", "");
+		parameterMap.put("hireDay", "");
+		parameterMap.put("terminationYear", "");
+		parameterMap.put("terminationMonth", "");
+		parameterMap.put("terminationDay", "");
+		parameterMap.put("companySeniorityYear", "");
+		parameterMap.put("companySeniorityMonth", "");
+		parameterMap.put("companySeniorityDay", "");
 		//BEGIN-PROCEDURE HR07-INITIALIZE-FIELDS
 		//LET $LegEffdt = $PSEffdt
 		//!Remove leading 'E' from the PS employee operator ID to comply with the 5 long legacy format
@@ -72,6 +82,7 @@ public class EmployeeDateChange {
 			//DO HR07-Get-Contract-Data
 			parameterMap = fetchContractDate(parameterMap);
 		}
+		parameterMap.put("parameterNameList", getParameterNameList());
 		return parameterMap;
 		//END-PROCEDURE HR07-INITIALIZE-FIELDS
 	}
@@ -81,7 +92,7 @@ public class EmployeeDateChange {
 	 * PeopleSoft Employee Review Table to send back to Option 7 of AAHR01 in legacy.
 	 * @see HR07-Get-Employee-Review in ZHRI107A.SQC
 	 * @param parameterMap
-	 * @return
+	 * @return appended parameterMap
 	 */
 	public HashMap<String, Object> fetchEmployeeReviewDates(HashMap<String, Object> parameterMap) {
 		System.out.println("*** EmployeeDateChange.fetchEmployeeReviewDates() ***");
@@ -118,7 +129,7 @@ public class EmployeeDateChange {
 	 * PeopleSoft Accomplishments Table to send back to Option 7 of AAHR01.
 	 * @see HR07-Get-Accomplishments in ZHRI107A.SQC
 	 * @param parameterMap
-	 * @return
+	 * @return appended parameterMap
 	 */
 	public HashMap<String, Object> fetchAccomplishmentDates(HashMap<String, Object> parameterMap) {
 		System.out.println("*** EmployeeDateChange.fetchAccomplishmentDates() ***");
@@ -171,140 +182,31 @@ public class EmployeeDateChange {
 	 * This procedure retrieves the contract date from the PeopleSoft Contract Data Table to send back to Option 7 of AAHR01.
 	 * @see HR07-Get-Contract-Data in ZHRI107A.SQC
 	 * @param parameterMap
-	 * @return
+	 * @return appended parameterMap
 	 */
 	public HashMap<String, Object> fetchContractDate(HashMap<String, Object> parameterMap) {
 		System.out.println("*** EmployeeDateChange.fetchContractDate() ***");
-		//BEGIN-PROCEDURE HR07-GET-CONTRACT-DATA
-		//BEGIN-SELECT
-		PsContractData psContractData = PsContractData.findByEmployeeId((String)parameterMap.get("employeeId"));
-		//TO_CHAR(CCD7.CONTRACT_BEGIN_DT, 'YYYY-MM-DD')  &CCD7EFFDT
-		//LET $LegContractDate = &CCD7EFFDT
-		//!Format contract date so legacy will accept it (MM field, DD field and CCYY field)
-		//UNSTRING $LegContractDate BY '-' INTO $LegContractDtYear $LegContractDtMonth $LegContractDtDay
+		PsContractData psContractData = PsContractData.findByEmployeeIdAndMaxBeginDate((String)parameterMap.get("employeeId"));
 		parameterMap.put("contractYear", new SimpleDateFormat("yyyy").format(psContractData.getContractBeginDt()));
 		parameterMap.put("contractMonth", new SimpleDateFormat("mm").format(psContractData.getContractBeginDt()));
 		parameterMap.put("contractDay", new SimpleDateFormat("dd").format(psContractData.getContractBeginDt()));
-		//!select the maximum contract date to get the most current one because an employee can have more than 1 active contract
-		//FROM PS_CONTRACT_DATA CCD7
-		//WHERE CCD7.Emplid = $PSEmplid
-		//		AND CCD7.CONTRACT_BEGIN_DT = 
-		//			(SELECT MAX(CONTRACT_BEGIN_DT) FROM PS_CONTRACT_DATA CCD8
-		//				WHERE CCD8.EMPLID = CCD7.EMPLID
-		//					AND CCD8.CONTRACT_BEGIN_DT <= $AsofToday)
-		//END-SELECT
-		//END-PROCEDURE HR07-GET-CONTRACT-DATA
 		return null;
 	}
 
-//	/**
-//	 * @see HR07-Call-RPG in ZHRI107A.SQC
-//	 * This procedure calls the RPG program to update the legacy files/fields needed by Option 7 of AAHR01.
-//	 * @param parameterMap
-//	 * @return
-//	 */
-//	public String HR07_callRpg(HashMap<String, Object> parameterMap) {
-//		System.out.println("*** EmployeeDateChange.HR07_callRpg() ***");
-//		//BEGIN-PROCEDURE HR07-CALL-RPG
-//		//!Setup the parameter list with what needs to be passed to the RPG program to update the legacy system
-//		String parameterString = composeParameterString(parameterMap);
-//		String commandString = ZHRI100A.composeRexecCommandString((String)parameterMap.get("processName"), parameterString);
-//		//DO Call-System    !Do a remote call to the RPG program, HRZ107A, in order to pass the parms from code in ZHRI100A.sqr
-//		Integer status = ZHRI100A.executeRemoteCommand(commandString, parameterMap);
-//		//IF (#STATUS = 0)
-//		if(status == 0) {
-//			//LET $CompletionStatus = 'C'
-//		//END-IF    !#STATUS = 0
-//		}
-//		//END-PROCEDURE HR07-CALL-RPG
-//		return null;
-//	}
-	
 	/**
-	 * Setup the parameter list with what needs to be passed to the RPG program to update the legacy system
-	 * @param parameterMap
-	 * @return
+	 * @see HR07-Call-RPG in ZHRI107A.SQC
+	 * @return list of parameter names for this process
 	 */
-	public String composeParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDateChange.composeParameterString() ***");
-		//'PARM('''                           ||
-		//$LegacyEmplid                       ||
-		//''' '''                             ||
-		//$LegacyUserEmplid                   ||
-		//''' '''                             ||
-		//$LegHireDtMonth                     ||
-		//''' '''                             ||
-		//$LegHireDtDay                       ||
-		//''' '''                             ||
-		//$LegHireDtYear                      ||
-		//''' '''                             ||
-		//$LegTermDtMonth                     ||
-		//''' '''                             ||
-		//$LegTermDtDay                       ||
-		//''' '''                             ||
-		//$LegTermDtYear                      ||
-		//''' '''                             ||
-		//$LegLstRevDtMonth                   ||
-		//''' '''                             ||
-		//$LegLstRevDtDay                     ||
-		//''' '''                             ||
-		//$LegLstRevDtYear                    ||
-		//''' '''                             ||
-		//$LegNxtRevDtMonth                   ||
-		//''' '''                             ||
-		//$LegNxtRevDtDay                     ||
-		//''' '''                             ||
-		//$LegNxtRevDtYear                    ||
-		//''' '''                             ||
-		//$LegNegDrugTstMonth                 ||
-		//''' '''                             ||
-		//$LegNegDrugTstDay                   ||
-		//''' '''                             ||
-		//$LegNegDrugTstYear                  ||
-		//''' '''                             ||
-		//$LegPhysTstMonth                    ||
-		//''' '''                             ||
-		//$LegPhysTstDay                      ||
-		//''' '''                             ||
-		//$LegPhysTstYear                     ||
-		//''' '''                             ||
-		//$LegContractDtMonth                 ||
-		//''' '''                             ||
-		//$LegContractDtDay                   ||
-		//''' '''                             ||
-		//$LegContractDtYear                  ||
-		//''' '''                             ||
-		//$LegCompanySeniorityMonth           ||
-		//''' '''                             ||
-		//$LegCompanySeniorityDay             ||
-		//''' '''                             ||
-		//$LegCompanySeniorityYear            ||
-		//''')" '
-		String parameterString = "'" + parameterMap.get("employeeId") + "' "
-				+ "'" + parameterMap.get("operatorId") + "' "
-				+ "'" + parameterMap.get("hireMonth") + "' "
-				+ "'" + parameterMap.get("hireYear") + "' "
-				+ "'" + parameterMap.get("terminationMonth") + "' "
-				+ "'" + parameterMap.get("terminationDay") + "' "
-				+ "'" + parameterMap.get("terminationYear") + "' "
-				+ "'" + parameterMap.get("lastReviewMonth") + "' "
-				+ "'" + parameterMap.get("lastReviewDay") + "' "
-				+ "'" + parameterMap.get("lastReviewYear") + "' "
-				+ "'" + parameterMap.get("nextReviewMonth") + "' "
-				+ "'" + parameterMap.get("nextReviewDay") + "' "
-				+ "'" + parameterMap.get("nextReviewYear") + "' "
-				+ "'" + parameterMap.get("negDrugTestMonth") + "' "
-				+ "'" + parameterMap.get("negDrugTestDay") + "' "
-				+ "'" + parameterMap.get("negDrugTestYear") + "' "
-				+ "'" + parameterMap.get("physTestMonth") + "' "
-				+ "'" + parameterMap.get("physTestDay") + "' "
-				+ "'" + parameterMap.get("contractMonth") + "' "
-				+ "'" + parameterMap.get("contractDay") + "' "
-				+ "'" + parameterMap.get("contractYear") + "' "
-				+ "'" + parameterMap.get("companySeniorityMonth") + "' "
-				+ "'" + parameterMap.get("companySeniorityDay") + "' "
-				+ "'" + parameterMap.get("companySeniorityYear") + "' ";
-		return parameterString;
+	private static List<String> getParameterNameList() {
+		return Arrays.asList("employeeId","operatorId",
+				"hireMonth", "hireDay", "hireYear",
+				"terminationMonth", "terminationDay", "terminationYear",
+				"lastReviewMonth", "lastReviewDay", "lastReviewYear",
+				"nextReviewMonth", "nextReviewDay", "nextReviewYear",
+				"negDrugTestMonth", "negDrugTestDay", "negDrugTestYear",
+				"physTestMonth", "physTestDay","physTestYear",
+				"contractMonth","contractDay", "contractYear",
+				"companySeniorityMonth","companySeniorityDay","companySeniorityYear");
 	}
 
 }

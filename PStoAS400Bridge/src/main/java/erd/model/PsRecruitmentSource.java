@@ -18,37 +18,37 @@ public class PsRecruitmentSource implements Serializable {
 
 	@Id
 	@Column(name="HRS_SOURCE_ID", nullable=false, precision=15)
-	private BigDecimal recruitmentSourceId;
+	private BigDecimal sourceId;
 
 	@Column(name="EFF_STATUS", length=1)
-	private String statusAsOfEffectiveDate;
+	private String status;
 
 	@Column(name="EFFDT", nullable=false)
 	@Temporal(TemporalType.DATE)
 	private Date effectiveDate;
 
 	@Column(name="HRS_SOURCE_DESCR", nullable=false, length=254)
-	private String recruitmentSourceDescription;
+	private String sourceDescription;
 
 	@Column(name="HRS_SOURCE_NAME", nullable=false, length=30)
-	private String recruitmentSourceNameCode;
+	private String sourceName;
 
 	@Column(name="HRS_SOURCE_STATUS")
 	@Temporal(TemporalType.DATE)
-	private Date recruitmentSourceStatusDate;
+	private Date sourceStatusDate;
 
 	@Column(name="HRS_SOURCE_TYPE", nullable=false, length=3)
-	private String recruitmentSourceTypeCode;
+	private String sourceTypeCode;
 
 	public PsRecruitmentSource() {
 	}
 
-	public String getStatusAsOfEffectiveDate() {
-		return this.statusAsOfEffectiveDate;
+	public String getStatus() {
+		return this.status;
 	}
 
-	public void setStatusAsOfEffectiveDate(String statusAsOfEffectiveDate) {
-		this.statusAsOfEffectiveDate = statusAsOfEffectiveDate;
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public Date getEffectiveDate() {
@@ -59,47 +59,47 @@ public class PsRecruitmentSource implements Serializable {
 		this.effectiveDate = effectiveDate;
 	}
 
-	public String getHrsSourceDescription() {
-		return this.recruitmentSourceDescription;
+	public String getSourceDescription() {
+		return this.sourceDescription != null ? this.sourceDescription.trim() : this.sourceDescription;
 	}
 
-	public void setRecruitmentSourceDescription(String recruitmentSourceDescription) {
-		this.recruitmentSourceDescription = recruitmentSourceDescription;
+	public void setSourceDescription(String sourceDescription) {
+		this.sourceDescription = sourceDescription;
 	}
 
-	public BigDecimal getRecruitmentSourceId() {
-		return this.recruitmentSourceId;
+	public BigDecimal getSourceId() {
+		return this.sourceId;
 	}
 
-	public void setRecruitmentSourceId(BigDecimal recruitmentSourceId) {
-		this.recruitmentSourceId = recruitmentSourceId;
+	public void setSourceId(BigDecimal sourceId) {
+		this.sourceId = sourceId;
 	}
 
-	public String getRecruitmentSourceNameCode() {
-		return this.recruitmentSourceNameCode;
+	public String getSourceName() {
+		return this.sourceName != null ? this.sourceName.trim() : this.sourceName;
 	}
 
-	public void setRecruitmentSourceNameCode(String recruitmentSourceNameCode) {
-		this.recruitmentSourceNameCode = recruitmentSourceNameCode;
+	public void setSourceName(String sourceName) {
+		this.sourceName = sourceName;
 	}
 
-	public Date getRecruitmentSourceStatusDate() {
-		return this.recruitmentSourceStatusDate;
+	public Date getSourceStatusDate() {
+		return this.sourceStatusDate;
 	}
 
-	public void setRecruitmentSourceStatusDate(Date recruitmentSourceStatusDate) {
-		this.recruitmentSourceStatusDate = recruitmentSourceStatusDate;
+	public void setSourceStatusDate(Date sourceStatusDate) {
+		this.sourceStatusDate = sourceStatusDate;
 	}
 
-	public String getRecruitmentSourceTypeCode() {
-		return this.recruitmentSourceTypeCode;
+	public String getSourceTypeCode() {
+		return this.sourceTypeCode;
 	}
 
-	public void setRecruitmentSourceTypeCode(String recruitmentSourceTypeCode) {
-		this.recruitmentSourceTypeCode = recruitmentSourceTypeCode;
+	public void setSourceTypeCode(String sourceTypeCode) {
+		this.sourceTypeCode = sourceTypeCode;
 	}
 
-	public PsRecruitmentSource HR01GetPersonalData(String employeeId) {
+	public static PsRecruitmentSource HR01GetPersonalData(String employeeId) {
 //	!----------------------------------------------------------------------
 //	! Procedure:  HR01-Get-Personal-Data
 //	! Desc:  Gets the employees data from the personal data effdt table that
@@ -228,7 +228,7 @@ public class PsRecruitmentSource implements Serializable {
 	return null;
 }
 
-	public PsRecruitmentSource HR05GetReferralSource(String employeeId) {
+	public static PsRecruitmentSource HR05GetReferralSource(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR05-Get-Referral-Source
 //		! Desc:  This routine will get the referral source data for each of the
@@ -257,15 +257,26 @@ public class PsRecruitmentSource implements Serializable {
 		return null;
 	}
 
-	public PsRecruitmentSource findByRecruitmentSourceId(String recruitmentSourceId) {
+	/**
+	 * @see HR05-Get-Referral-Source
+	 * @param recruitmentSourceId
+	 * @return
+	 */
+	public static PsRecruitmentSource findByRecruitmentSourceId(String sourceId) {
+		//BEGIN-SELECT
+		//CHSI2.HRS_SOURCE_NAME                                                               ! ALS-10/08/2008
+		//CHSI2.HRS_SOURCE_DESCR                                                              ! ALS-10/08/2008
+		//FROM PS_HRS_SOURCE_I CHSI2                                                          ! ALS-10/08/2008
+		//WHERE CHSI2.HRS_SOURCE_ID = CPAI3.HRS_SOURCE_ID                                   ! ALS-10/08/2008
+		//END-SELECT
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
-		
 	    try {
-	    	List<PsRecruitmentSource> resultList = em.createQuery("SELECT p FROM PsRecruitmentSource p "
-	    				+ "WHERE UPPER(TRIM(p.recruitmentSourceId)) = :fieldName ",
-	    				PsRecruitmentSource.class)
-	    		    .setParameter("recruitmentSourceId", recruitmentSourceId.toUpperCase())
+	    	List<PsRecruitmentSource> resultList = em.createQuery(
+	    			"SELECT p FROM PsRecruitmentSource p "
+	    					+ "WHERE UPPER(TRIM(p.sourceId)) = :sourceId ",
+	    					PsRecruitmentSource.class)
+	    		    .setParameter("sourceId", sourceId.trim().toUpperCase())
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);

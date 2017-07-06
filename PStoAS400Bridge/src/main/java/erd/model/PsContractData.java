@@ -406,11 +406,12 @@ public class PsContractData implements Serializable {
 	/**
 	 * @see HR07-Get-Contract-Data in ZHRI107A.SQC
 	 * This procedure retrieves the contract date from the PeopleSoft Contract Data Table to send back to Option 7 of AAHR01.
+	 * It selects the maximum contract date to get the most current one because an employee can have more than 1 active contract.
 	 * @param employeeId
 	 * @return PsContractData
 	 */
-	public static PsContractData findByEmployeeId(String employeeId) {
-		System.out.println("PsContractData.findByEmployeeIdAndAccomplishmentCodes()");
+	public static PsContractData findByEmployeeIdAndMaxBeginDate(String employeeId) {
+		System.out.println("PsContractData.findByEmployeeIdAndMaxBeginDate()");
 		Date asofToday = DateUtil.asOfToday();
 		//BEGIN-PROCEDURE HR07-GET-CONTRACT-DATA
 		//BEGIN-SELECT

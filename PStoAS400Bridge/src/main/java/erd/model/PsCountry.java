@@ -1,6 +1,8 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.*;
 
 /**
@@ -105,22 +107,75 @@ public class PsCountry implements Serializable {
 		this.isPostSearchAvailable = isPostSearchAvailable;
 	}
 	
-	public PsCountry findByCountryCode(String countryIsoAlpha3Code) {
-//	!----------------------------------------------------------------------------
-//	! Procedure: GET-2CHAR-COUNTRY
-//	! DESC: This procedure will get the 2 character country code
-//	!-----------------------------------------------------------------------------
-//	BEGIN-PROCEDURE GET-2CHAR-COUNTRY
-//	BEGIN-SELECT
-//	CTRY.COUNTRY_2CHAR
-//	   let $PS_NID_COUNTRY=ltrim(rtrim(&CTRY.COUNTRY_2CHAR,' '),' ')
-//	   let $PS_NID_COUNTRY=substr($PS_NID_COUNTRY,1,2)
-//	FROM PS_COUNTRY_TBL  CTRY
-//	WHERE CTRY.country=$PS_REG_REGION
-//	END-SELECT
-//	END-PROCEDURE
-		return null;
+	public static String findCountryIsoAlpha2CodeByCountryCode(String country) {
+		//!----------------------------------------------------------------------------
+		//! Procedure: GET-2CHAR-COUNTRY
+		//! DESC: This procedure will get the 2 character country code
+		//!-----------------------------------------------------------------------------
+		//BEGIN-PROCEDURE GET-2CHAR-COUNTRY
+		//BEGIN-SELECT
+		//CTRY.COUNTRY_2CHAR
+		//let $PS_NID_COUNTRY=ltrim(rtrim(&CTRY.COUNTRY_2CHAR,' '),' ')
+		//let $PS_NID_COUNTRY=substr($PS_NID_COUNTRY,1,2)
+		//FROM PS_COUNTRY_TBL  CTRY
+		//WHERE CTRY.country=$PS_REG_REGION
+		//END-SELECT
+		//END-PROCEDURE
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = em.createQuery(
+	    			"SELECT c.countryIsoAlpha2Code FROM PsCountry c "
+	    					+ "WHERE UPPER(TRIM(c.country)) = :country ", String.class)
+	    		    .setParameter("country", country.toUpperCase().trim())
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		String result  = resultList.get(0).trim().toUpperCase();
+	    		if(result.length() > 2) {
+	    			result = result.substring(0, 2);
+	    		}
+	    		return result;
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
 
+	/**
+	 * @see HR05-Get-Citizenship in ZHRI105A.SQC
+	 * @param employeeId
+	 * @return countryIsoAlpha2Code
+	 */
+	public static String findCountryIsoAlpha2CodeByEmployeeId(String employeeId) {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = (List<String>) em.createQuery(
+	    			"SELECT p.countryIsoAlpha2Code "
+	    				+ "FROM PsCitizenship p, PsCountry p2 "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				+ "AND UPPER(TRIM(p2.countryIsoAlpha3Code)) = UPPER(TRIM(p.countryIsoAlpha3Code)) "
+	    				, String.class)
+	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    	else 
+	    		return null;
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
 
 }

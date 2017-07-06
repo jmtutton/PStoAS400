@@ -877,4 +877,18 @@ public class ZHRI100A {
 		return "E";
     }
 	
+	/**
+	 * Composes the string of termination process parameters
+	 * @param parameterMap
+	 */
+	@SuppressWarnings("unchecked")
+	public static String composeParameterString(HashMap<String, Object> parameterMap) {
+		System.out.println("*** ZHRI100A.composeParameterString() ***");
+		String parameterString = "";
+		for(String parameterName : (List<String>)parameterMap.get("parameterNameList")) {
+			parameterString += "'" + (String)parameterMap.get(parameterName) + "' ";
+		}
+		return parameterString;
+	}
+	
 }

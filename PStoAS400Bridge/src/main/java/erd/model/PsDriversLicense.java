@@ -132,7 +132,7 @@ public class PsDriversLicense implements Serializable {
 	}
 
 	public String getState() {
-		return this.state;
+		return this.state != null ? this.state.toUpperCase().trim() : this.state;
 	}
 
 	public void setState(String state) {
@@ -178,8 +178,8 @@ public class PsDriversLicense implements Serializable {
 	    try {
 	    	List<PsDriversLicense> resultList = em.createQuery(
 	    		    "SELECT p FROM PsDriversLicense p "
-	    		    		+ "WHERE p.employeeId = :employeeId ", PsDriversLicense.class)
-	    		    .setParameter("employeeId", employeeId)
+	    		    		+ "WHERE TRIM(UPPER(p.employeeId)) = :employeeId ", PsDriversLicense.class)
+	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList.get(0);

@@ -1,6 +1,8 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.*;
 
 /**
@@ -84,7 +86,7 @@ public class CrossReferenceCompany implements Serializable {
 		this.legacyRegion = legacyRegion;
 	}
 
-	public CrossReferenceCompany HR01GetGroup(String employeeId) {
+	public static CrossReferenceCompany HR01GetGroup(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR01-Get-Group
 //		! Desc:  Gets the group from the cross reference file using Company
@@ -110,7 +112,7 @@ public class CrossReferenceCompany implements Serializable {
 		return null;
 	}
 
-	public CrossReferenceCompany HR04GetGroup(String employeeId) {
+	public static CrossReferenceCompany HR04GetGroup(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR04-Get-Group
 //		! Desc:  Gets the group from the cross reference file using Company
@@ -136,7 +138,7 @@ public class CrossReferenceCompany implements Serializable {
 		return null;
 	}
 
-	public CrossReferenceCompany HR09GetGroup(String employeeId) {
+	public static CrossReferenceCompany HR09GetGroup(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR09-Get-Group
 //		! Desc:  Gets the group from the cross reference file using Company
@@ -161,4 +163,42 @@ public class CrossReferenceCompany implements Serializable {
 //		End-Procedure HR09-Get-Group
 		return null;
 	}
+	
+	/**
+	 * This routine gets the business unit and old region from the cross reference table PT005P.
+	 * @see HR05-Get-Business-Unit in ZHRI105A.SQC
+	 * @return region
+	 */
+	public static String findLegacyRegionByBusinessUnit(String businessUnit) {
+		//BEGIN-SELECT
+		//CPT51.ZHRF_LEGREGION
+		//LET $PSReg = &CPT51.ZHRF_LEGREGION
+		//FROM PS_ZHRT_CMPNY_CREF CPT51
+		//WHERE CPT51.BUSINESS_UNIT = &CJ7.Business_Unit
+		//AND CPT51.STATUS = 'A'
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		try {
+			List<CrossReferenceCompany> resultList = em.createQuery(
+					"SELECT CrossReferenceCompany FROM CrossReferenceCompany c "
+					+ "WHERE UPPER(TRIM(c.businessUnit)) = :businessUnit "
+					+ "AND UPPER(TRIM(c.status)) = 'A' "
+					, CrossReferenceCompany.class)
+					.setParameter("businessUnit", businessUnit.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0).getLegacyRegion();
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
+
+	
 }

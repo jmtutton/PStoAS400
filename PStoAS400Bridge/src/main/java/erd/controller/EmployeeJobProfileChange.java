@@ -1,6 +1,8 @@
 package erd.controller;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * ZHRI104A - Job Profile Change
@@ -13,12 +15,12 @@ public class EmployeeJobProfileChange {
 	/**
 	 * 
 	 * @param parameterMap
-	 * @return
+	 * @return completionStatus
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
 		System.out.println("*** EmployeeJobProfileChange.doProcess() ***");
 		parameterMap = fetchProcessParameters(parameterMap);
-		parameterMap.put("parameterString", composeParameterString(parameterMap));
+		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
 		return ZHRI100A.doCommand(parameterMap);
 	}
 	
@@ -30,48 +32,20 @@ public class EmployeeJobProfileChange {
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		System.out.println("*** EmployeeJobProfileChange.fetchProcessParameters() ***");
 		parameterMap.put("errorProgramParameter", "HRZ109A");
+		parameterMap.put("parameterNameList", getParameterNameList());
 		return parameterMap;
 		
 	}
 	
 	/**
-	 * 
-	 * @param parameterMap
+	 * @see HR04-Call-RPG in ZHRI104A.SQC
+	 * @return list of parameter names for this process
 	 */
-	private String composeParameterString(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeJobProfileChange.composeParameterString() ***");
-		//'PARM('''                   ||
-		//$LegEmplid                    ||
-		//''' '''                   ||
-		//$LegUserEmplid                ||
-		//''' '''                   ||
-		//$LegBranch                    ||
-		//''' '''                   ||
-		//$LegDepartment                ||
-		//''' '''                   ||
-		//$LegSubDepartment             ||
-		//''' '''                   ||
-		//$LegPosition                  ||
-		//''' '''                   ||
-		//$LegJobStatus                 ||
-		//''' '''                   ||
-		//$LegWorkStatus                ||
-		//''' '''                   ||
-		//$LegUnionFlag                 ||
-		//''' '''                   ||
-		//$LegTimeCardFlag              ||
-		//''' '''                   ||
-		//$LegEffdt                     ||
-		//''')"'
-//		String paramaterString = "'" + processParameters.getEmployeeId() + "' "
-//				+ "'" + processParameters.getOperatorId() + "' "
-//				+ "'" + processParameters.getEmployeeGroup() + "' "
-//				+ "'" + processParameters.getEmployeeBranch() + "' "
-//				+ "'" + processParameters.getNationalIdCountry() + "' "
-//				+ "'" + processParameters.getNationalId() + "' "
-//				+ "'" + processParameters.getEffectiveDate() + "'";
-//		return paramaterString;
-		return null;
+	private static List<String> getParameterNameList() {
+		return Arrays.asList("employeeId","operatorId",
+				"employeeBranch", "employeeDepartment", "employeeSubDepartment",
+				"employeePosition", "employeeJobStatus", "employeeWorkStatus",
+				"employeeUnionFlag", "employeeTimeCardFlag", "effectiveDate");
 	}
 
 }

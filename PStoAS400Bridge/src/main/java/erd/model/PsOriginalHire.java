@@ -42,7 +42,7 @@ public class PsOriginalHire implements Serializable {
 		this.originalHireDate = originalHireDate;
 	}
 
-	public PsOriginalHire findByEmployeeId(String employeeId) {
+	public static Date findOriginalHireDateByEmployeeId(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR05-Get-Personal-Data
 //		! Desc:  This routine will get the Personal Data row for each of the

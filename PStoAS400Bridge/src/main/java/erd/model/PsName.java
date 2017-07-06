@@ -2,6 +2,7 @@ package erd.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.sql.Timestamp;
 
 import javax.persistence.*;
@@ -341,12 +342,57 @@ public class PsName implements Serializable {
 	}
 
 	
-	public PsName findByEmployeeIdAndNameTypeAndEffectiveDate(String employeeId, String nameType, Date effectiveDate) {
-		return null;
+
+	/**
+	 * @see HR05-Get-Names-Table in ZHRI105A.SQC
+	 * @param employeeId
+	 * @param nameType
+	 * @param effectiveDate
+	 * @return PsName record
+	 */
+	public static PsName findByEmployeeIdAndNameTypeAndEffectiveDate(String employeeId, String nameType, Date effectiveDate) {
+		//BEGIN-SELECT
+		//FROM PS_Names CN5
+		//WHERE CN5.Emplid = $PSEmplid
+		//AND CN5.NAME_TYPE = 'PRF'
+		//AND CN5.EFFDT = 
+		//		(SELECT MAX(EFFDT) FROM PS_Names CN6
+		//			WHERE CN6.EMPLID = CN5.EMPLID
+		//       		AND CN6.NAME_TYPE = CN5.NAME_TYPE
+		//           	AND TO_CHAR(CN6.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		try {
+			List<PsName> resultList = em.createQuery(
+					"SELECT PsName FROM PsName p "
+					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+						+ "AND UPPER(TRIM(p.nameType)) = :nameType "
+						+ "AND p.effectiveDate = "
+							+ "(SELECT MAX(p2.effectiveDate) FROM PsName p2 "
+								+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
+									+ "AND UPPER(TRIM(p2.nameType)) = UPPER(TRIM(p.nameType)) "
+									+ "AND p2.effectiveDate <= :effectiveDate) "
+					, PsName.class)
+					.setParameter("employeeId", employeeId.trim().toUpperCase())
+					.setParameter("nameType", nameType.trim().toUpperCase())
+					.setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
 
 	
-	public PsName findByEmployeeId205(String employeeId) {
+	public static PsName findByEmployeeId205(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR205-Get-Personal-Data
 //		! Desc:  This routine will get the Personal Data row for each of the
@@ -385,7 +431,7 @@ public class PsName implements Serializable {
 		return null;
 	}
 
-	public PsName findByEmployeeId201(String employeeId) {
+	public static PsName findByEmployeeId201(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR201-Get-Personal-Data
 //		! Desc:  Gets the employees data from the personal data effdt table that
@@ -425,7 +471,7 @@ public class PsName implements Serializable {
 		return null;
 	}
 
-	public PsName findByEmployeeId01(String employeeId) {
+	public static PsName findByEmployeeId01(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR01-Get-Personal-Data
 //		! Desc:  Gets the employees data from the personal data effdt table that
@@ -554,111 +600,112 @@ public class PsName implements Serializable {
 		return null;
 	}
 
-	public PsName findByEmployeeId05(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR05-Get-Names-Table
-//		! Desc:  This routine Gets the nickname for employee and formats it in
-//		!        the form acceptable to the legacy system.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR05-Get-Names-Table
-//		Let $Found = 'N'
-//		Let $PSNickname = ' '  !Initialize the nickname field to blanks
-//		begin-select
-//		CN5.Name_Type
-//		CN5.FIRST_NAME
-//		   Let $PSNickname = ltrim(rtrim(&CN5.FIRST_NAME,' '),' ')
-//		   Let $PSPrfName = $PSNickname
-//		   Let $PSNickname = substr($PSNickName,1,20)
-//		   uppercase $PSNickName
-//		   Do Replace-Character($PSNickName,'''','''''',$PSNickName)   !From ZRmvSpcChr.sqc
-//		   Let $Found = 'Y'
-//		   Let $Wrk_AD_NamesBuild = 'Y'
-//		from PS_Names CN5
-//		where CN5.Emplid = $PSEmplid
-//		  and CN5.NAME_TYPE = 'PRF'
-//		  and CN5.EFFDT     = (SELECT MAX(EFFDT) FROM PS_Names CN6
-//		                      WHERE CN6.EMPLID     = CN5.EMPLID
-//		                      AND   CN6.NAME_TYPE  = CN5.NAME_TYPE
-//		                      AND   to_char(CN6.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		end-select
-//		If $Found = 'N'
-//		    Let $PSNickName = ' '
-//		End-if    !$Found = 'N'
-//		End-Procedure HR05-Get-Names-Table
-		return null;
+	/**
+	 * This routine Gets the nickname for employee and formats it in the form acceptable to the legacy system.
+	 * @see HR05-Get-Names-Table in ZHRI105A.SQC
+	 * @param employeeId
+	 * @return nickname
+	 */
+	public static String findNicknameByEmployeeIdAndEffectiveDate(String employeeId, Date effectiveDate) {
+//		//Begin-Procedure HR05-Get-Names-Table
+//		//Let $Found = 'N'
+//		//Let $PSNickname = ' '  !Initialize the nickname field to blanks
+//		//begin-select
+//		//CN5.Name_Type
+//		//CN5.FIRST_NAME            !changed for v8.3
+//		//Let $PSNickname = ltrim(rtrim(&CN5.FIRST_NAME,' '),' ') !changed for v8.3
+//		//Let $PSPrfName = $PSNickname                                 !sree-UAAMOD
+//		//Let $PSNickname = substr($PSNickName,1,20)
+//		//uppercase $PSNickName
+//		//Do Replace-Character($PSNickName,'''','''''',$PSNickName)   !From ZRmvSpcChr.sqc
+//		//Let $Found = 'Y'
+//		//Let $Wrk_AD_NamesBuild = 'Y'
+//		//from PS_Names CN5
+//		//where CN5.Emplid = $PSEmplid
+//		//and CN5.NAME_TYPE = 'PRF'    !changed for v8.3
+//		//and CN5.EFFDT = 
+//		//	(SELECT MAX(EFFDT) FROM PS_Names CN6   !added for v8.3
+//		//                      WHERE CN6.EMPLID     = CN5.EMPLID      !added for v8.3
+//		//                      AND   CN6.NAME_TYPE  = CN5.NAME_TYPE
+//		//                      AND   to_char(CN6.EFFDT,'YYYY-MM-DD') <= $PSEffdt) !added for v8.3
+//		//end-select
+//		//If $Found = 'N'
+//		//Let $PSNickName = ' '
+//		//End-if    !$Found = 'N'
+//		//End-Procedure HR05-Get-Names-Table
+//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+//		EntityManager em = emfactory.createEntityManager();
+//		try {
+//			List<PsName> resultList = em.createQuery(
+//					"SELECT p.phone FROM PsPersonalPhone p "
+//					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+//					+ "AND UPPER(TRIM(p.phoneType)) = :phoneType "
+//					, String.class)
+//					.setParameter("employeeId", employeeId.trim().toUpperCase())
+//					.setParameter("phoneType", phoneType.trim().toUpperCase())
+//	    		    .getResultList();
+//	    	if(resultList != null && resultList.size() > 0) {
+//	    		return resultList.get(0);
+//	    	}
+//	    }
+//	    catch (Exception e) {
+//	    	e.printStackTrace();
+//	    } 
+//	    finally {
+//	    	em.close();
+//	    }
+	    return null;	
 	}
 
-	public PsName GetInfo05(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR05-Get-Info
-//		! Desc:  This new routine will get the name/address/marital status info row for each of the
-//		!        employee numbers entered in the trigger file.  All this data used to come from
-//		!        pers_data_effdt.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR05-Get-Info
-//		begin-select
-//		CAD3.Address1
-//		CAD3.City
-//		CAD3.State
-//		CAD3.Postal
-//		CPDE3.Mar_Status
-//		to_char(CPDE3.Effdt, 'YYYY-MM-DD')    &CPDE3Effdt
-//		  Let $Effdt = &CPDE3Effdt
-//		  Let $PSAddress =  RTRIM(LTRIM(&CAD3.Address1,' '),' ')
-//		  uppercase $PSAddress
-//		  Do Replace-Character($PSAddress,'''','''''',$PSAddress)  !From ZRmvSpcChr.sqc
-//		  Let $PSCity = RTRIM(LTRIM(&CAD3.City,' '),' ')
-//		  uppercase $PSCity
-//		  Do Replace-Character($PSCity,'''','''''',$PSCity)       !From ZRmvSpcChr.sqc
-//		  Let $PSState = RTRIM(LTRIM(&CAD3.State,' '),' ')
-//		  uppercase $PSState
-//		  Let $PSZip = RTRIM(LTRIM(&CAD3.Postal,' '),' ')
-//		  Let $PSMarital_Status = &CPDE3.Mar_Status
-//		from  PS_PERS_DATA_EFFDT CPDE3,
-//		      PS_ADDRESSES CAD3
-//		where CPDE3.Emplid = $PSEmplid
-//		  and CPDE3.Emplid = CAD3.Emplid
-//		  and CAD3.ADDRESS_TYPE = 'HOME'
-//		  and CAD3.EFFDT    = (SELECT MAX(EFFDT) FROM PS_ADDRESSES CAD4
-//		                      WHERE CAD4.EMPLID   = CAD3.EMPLID
-//		                      AND   CAD4.ADDRESS_TYPE  = CAD3.ADDRESS_TYPE
-//		                      AND   to_char(CAD4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		  and CPDE3.EFFDT = (SELECT MAX(EFFDT)
-//		                      FROM PS_PERS_DATA_EFFDT CPDE4
-//		                     WHERE CPDE4.EMPLID = CPDE3.EMPLID
-//		                       AND  to_char(CPDE4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		end-select
-//		begin-select
-//		CN3.Name
-//		CN3.First_Name
-//		CN3.Last_Name
-//		CN3.Name_Prefix
-//		CN3.Middle_Name
-//		CN3.Name_Suffix   !ZHR_MOD_SUFFIX_LAST_NAME
-//		     !Let $PSName = RTRIM(LTRIM(&CN3.Name,' '),' ')
-//		     Do HR05-format-name
-//		     Do Replace-Character($PSName,'''','''''',$PSName)               !From ZRmvSpcChr.sqc
-//		     Let $PSName_Prefix = RTRIM(LTRIM(&CN3.Name_Prefix,' '),' ')
-//		     uppercase $PSName_Prefix
-//		     Do Replace-Character($PSName_Prefix,'''','''''',$PSName_Prefix) !From ZRmvSpcChr.sqc
-//		     Let $ADPSLastName = RTRIM(LTRIM(&CN3.Last_Name,' '),' ')
-//		     Let $ADPSFirstName = RTRIM(LTRIM(&CN3.First_Name,' '),' ')
-//		     Let $ADPSMiddleName = RTRIM(LTRIM(&CN3.Middle_Name,' '),' ')
-//		     Let $ADPSMiddleName = SUBSTR($ADPSMiddleName,1,1)
-//		     Let $Wrk_AD_PersdataEffdtBuild = 'Y'
-//		from  PS_NAMES CN3
-//		where CN3.NAME_TYPE = 'PRI'
-//		  and CN3.Emplid = $PSEmplid
-//		  and CN3.EFFDT     = (SELECT MAX(EFFDT) FROM PS_NAMES CN4
-//		                      WHERE CN4.EMPLID   = CN3.EMPLID
-//		                      AND   CN4.NAME_TYPE  = CN3.NAME_TYPE
-//		                      AND   to_char(CN4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		end-select
-//		End-Procedure HR05-Get-Info
-		return null;
+	/**
+	 * @see HR05-Get-Info in ZHRI105A.SQC
+	 * @param employeeId
+	 * @param effectiveDate
+	 * @param addressType
+	 * @return PsName record
+	 */
+	public static PsName findByEmployeeIdAndEffectiveDateAndNameType(String employeeId, Date effectiveDate, String nameType) {
+		//BEGIN-SELECT
+		//FROM PS_NAMES CN3
+		//WHERE CN3.NAME_TYPE = 'PRI'
+		//  	AND CN3.EmplId = $PSEmplId
+		//  	AND CN3.EFFDT = 
+		//			(SELECT MAX(EFFDT) FROM PS_NAMES CN4
+		//    			WHERE CN4.EMPLID   = CN3.EMPLID
+		//           		AND CN4.NAME_TYPE  = CN3.NAME_TYPE
+		//            		AND TO_CHAR(CN4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		try {
+			List<PsName> resultList = em.createQuery(
+					"SELECT PsName FROM PsName p "
+							+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+							+ "WHERE UPPER(TRIM(p.nameType)) = :nameType "
+							+ "AND p.effectiveDate = "
+							+ "(SELECT MAX(p2.effectiveDate) FROM PsName p2 "
+								+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
+									+ "AND UPPER(TRIM(p2.nameType)) = UPPER(TRIM(p.nameType)) "
+									+ "AND p2.effectiveDate <= :effectiveDate) "
+					, PsName.class)
+					.setParameter("employeeId", employeeId.trim().toUpperCase())
+					.setParameter("nameType", nameType.trim().toUpperCase())
+					.setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
 
-	public String GetPersDataEffdt(String employeeId) {
+	public static String GetPersDataEffdt(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  AD-Get-Pers-Data-Effdt
 //		! Desc:  This routine will get the Personal Data row for each of the
@@ -686,7 +733,7 @@ public class PsName implements Serializable {
 		return null;
 	}
 
-	public PsName findNameSuffix(String employeeId) {
+	public static PsName findNameSuffix(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  AD-Get-NameSuffix
 //		! Desc:  This routine will get the Name Suffix row for each of the
@@ -709,7 +756,8 @@ public class PsName implements Serializable {
 		return null;
 	}
 	
-	public String findPreferredName(String employeeId) {
+	public static String findPreferredName(String employeeId) {
+		return employeeId;
 //	!----------------------------------------------------------------------
 //	! Procedure:  AD-Get-Names
 //	! Desc:  This routine gets the Preferred Name from PS_Names for Active Directory File Build
@@ -728,7 +776,6 @@ public class PsName implements Serializable {
 //	                      AND to_char(ADN2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
 //	end-select
 //	end-procedure AD-Get-Names
-		return null;
 	}
 	
 }

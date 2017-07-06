@@ -2,6 +2,7 @@ package erd.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.sql.Timestamp;
 
 import javax.persistence.*;
@@ -120,7 +121,7 @@ public class PsEffectiveDatedPersonalData implements Serializable {
 	}
 
 	public String getMaritalStatus() {
-		return this.maritalStatus;
+		return this.maritalStatus != null ? this.maritalStatus.trim().toUpperCase() : this.maritalStatus;
 	}
 
 	public void setMaritalStatus(String maritalStatus) {
@@ -147,7 +148,7 @@ public class PsEffectiveDatedPersonalData implements Serializable {
 		return null;
 	}
 
-	public PsEffectiveDatedPersonalData GetPersonalData205(String employeeId) {
+	public static PsEffectiveDatedPersonalData GetPersonalData205(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR205-Get-Personal-Data
 //		! Desc:  This routine will get the Personal Data row for each of the
@@ -186,7 +187,7 @@ public class PsEffectiveDatedPersonalData implements Serializable {
 		return null;
 	}
 
-	public PsEffectiveDatedPersonalData GetPersonalData201(String employeeId) {
+	public static PsEffectiveDatedPersonalData GetPersonalData201(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR201-Get-Personal-Data
 //		! Desc:  Gets the employees data from the personal data effdt table that
@@ -226,7 +227,7 @@ public class PsEffectiveDatedPersonalData implements Serializable {
 		return null;
 	}
 
-	public PsEffectiveDatedPersonalData GetPersonalData01(String employeeId) {
+	public static PsEffectiveDatedPersonalData GetPersonalData01(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR01-Get-Personal-Data
 //		! Desc:  Gets the employees data from the personal data effdt table that
@@ -355,77 +356,50 @@ public class PsEffectiveDatedPersonalData implements Serializable {
 		return null;
 	}
 
-	public PsEffectiveDatedPersonalData HR05GetInfo(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR05-Get-Info
-//		! Desc:  This new routine will get the name/address/marital status info row for each of the
-//		!        employee numbers entered in the trigger file.  All this data used to come from
-//		!        pers_data_effdt.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR05-Get-Info
-//		begin-select
-//		CAD3.Address1
-//		CAD3.City
-//		CAD3.State
-//		CAD3.Postal
-//		CPDE3.Mar_Status
-//		to_char(CPDE3.Effdt, 'YYYY-MM-DD')    &CPDE3Effdt
-//		  Let $Effdt = &CPDE3Effdt
-//		  Let $PSAddress =  RTRIM(LTRIM(&CAD3.Address1,' '),' ')
-//		  uppercase $PSAddress
-//		  Do Replace-Character($PSAddress,'''','''''',$PSAddress)  !From ZRmvSpcChr.sqc
-//		  Let $PSCity = RTRIM(LTRIM(&CAD3.City,' '),' ')
-//		  uppercase $PSCity
-//		  Do Replace-Character($PSCity,'''','''''',$PSCity)       !From ZRmvSpcChr.sqc
-//		  Let $PSState = RTRIM(LTRIM(&CAD3.State,' '),' ')
-//		  uppercase $PSState
-//		  Let $PSZip = RTRIM(LTRIM(&CAD3.Postal,' '),' ')
-//		  Let $PSMarital_Status = &CPDE3.Mar_Status
-//		from  PS_PERS_DATA_EFFDT CPDE3,
-//		      PS_ADDRESSES CAD3
-//		where CPDE3.Emplid = $PSEmplid
-//		  and CPDE3.Emplid = CAD3.Emplid
-//		  and CAD3.ADDRESS_TYPE = 'HOME'
-//		  and CAD3.EFFDT    = (SELECT MAX(EFFDT) FROM PS_ADDRESSES CAD4
-//		                      WHERE CAD4.EMPLID   = CAD3.EMPLID
-//		                      AND   CAD4.ADDRESS_TYPE  = CAD3.ADDRESS_TYPE
-//		                      AND   to_char(CAD4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		  and CPDE3.EFFDT = (SELECT MAX(EFFDT)
-//		                      FROM PS_PERS_DATA_EFFDT CPDE4
-//		                     WHERE CPDE4.EMPLID = CPDE3.EMPLID
-//		                       AND  to_char(CPDE4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		end-select
-//		begin-select
-//		CN3.Name
-//		CN3.First_Name
-//		CN3.Last_Name
-//		CN3.Name_Prefix
-//		CN3.Middle_Name
-//		CN3.Name_Suffix   !ZHR_MOD_SUFFIX_LAST_NAME
-//		     !Let $PSName = RTRIM(LTRIM(&CN3.Name,' '),' ')
-//		     Do HR05-format-name
-//		     Do Replace-Character($PSName,'''','''''',$PSName)               !From ZRmvSpcChr.sqc
-//		     Let $PSName_Prefix = RTRIM(LTRIM(&CN3.Name_Prefix,' '),' ')
-//		     uppercase $PSName_Prefix
-//		     Do Replace-Character($PSName_Prefix,'''','''''',$PSName_Prefix) !From ZRmvSpcChr.sqc
-//		     Let $ADPSLastName = RTRIM(LTRIM(&CN3.Last_Name,' '),' ')
-//		     Let $ADPSFirstName = RTRIM(LTRIM(&CN3.First_Name,' '),' ')
-//		     Let $ADPSMiddleName = RTRIM(LTRIM(&CN3.Middle_Name,' '),' ')
-//		     Let $ADPSMiddleName = SUBSTR($ADPSMiddleName,1,1)
-//		     Let $Wrk_AD_PersdataEffdtBuild = 'Y'
-//		from  PS_NAMES CN3
-//		where CN3.NAME_TYPE = 'PRI'
-//		  and CN3.Emplid = $PSEmplid
-//		  and CN3.EFFDT     = (SELECT MAX(EFFDT) FROM PS_NAMES CN4
-//		                      WHERE CN4.EMPLID   = CN3.EMPLID
-//		                      AND   CN4.NAME_TYPE  = CN3.NAME_TYPE
-//		                      AND   to_char(CN4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		end-select
-//		End-Procedure HR05-Get-Info
-		return null;
+	/**
+	 * @see HR05-Get-Info
+	 * @param employeeId
+	 * @param effectiveDate
+	 * @return
+	 */
+	public static String findMaritalStatusByEmployeeIdAndEffectiveDate(String employeeId, Date effectiveDate) {
+		//BEGIN-SELECT
+		//CPDE3.Mar_Status
+		//LET $PSMarital_Status = &CPDE3.Mar_Status
+		//FROM PS_PERS_DATA_EFFDT CPDE3
+		//WHERE CPDE3.EFFDT = 
+		//		(SELECT MAX(EFFDT) FROM PS_PERS_DATA_EFFDT CPDE4
+		//			WHERE CPDE4.EMPLID = CPDE3.EMPLID
+		//			AND TO_CHAR(CPDE4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		try {
+			List<PsEffectiveDatedPersonalData> resultList = em.createQuery(
+					"SELECT p.maritalStatus FROM PsEffectiveDatedPersonalData p "
+					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+						+ "AND p.effectiveDate = "
+							+ "(SELECT MAX(p2.effectiveDate) FROM PsEffectiveDatedPersonalData p2 "
+							+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
+								+ "AND p2.effectiveDate <= :effectiveDate) "
+					, PsEffectiveDatedPersonalData.class)
+					.setParameter("employeeId", employeeId.trim().toUpperCase())
+					.setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0).getMaritalStatus();
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
 
-	public PsEffectiveDatedPersonalData CheckEffdtTransaction(String employeeId) {
+	public static PsEffectiveDatedPersonalData CheckEffdtTransaction(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  Check-Effdt-Transaction
 //		!----------------------------------------------------------------------

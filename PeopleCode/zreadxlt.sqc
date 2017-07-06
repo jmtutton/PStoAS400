@@ -1,0 +1,176 @@
+!----------------------------*ERAC*---------------------------------------|
+!  FILE:        zReadXlt:  Custom readxlat.sqc to read the Translate      |
+!                           Table using string dates.                     |
+!-------------------------------------------------------------------------|
+!  DESCRIPTION:                                                           |
+!    This SQC was necessary when using the custom $AsOfDate which is a    |
+!    text date created in zhrgtval.sqc.                                   |
+!-------------------------------------------------------------------------|
+!  INPUTS:  $FieldName  (name of field to be translated)                  |
+!           $FieldValue (value of field to be translated)                 |
+!           $AsOfDate   (As-Of-Date must be custom $AsOfDate in string    |
+!                        format of YYYY-MM-DD                             |
+!  OUTPUTS: Temporary Enterprise Employees Report                         |
+!                                                                         |
+!-------------------------------------------------------------------------------------------!
+! AUTHOR                DATE      MODIFICATION                    PROJECT ID                !
+! ------------------    --------  ------------------------------  ------------------------- !
+! Thomas Beiter         11/13/00  Initial version                    ZHR_MOD_REHOST         !
+!-------------------------------------------------------------------------------------------!
+! AUTHOR            DATE      MODIFICATION                    |             PROJECT ID      !
+! Shelly Smith   03/05/02  No changes to sqc. But have checked       Z_UPGRADE83_E96344     !
+!                          Out due to migrated to unix.       |    -------------------------!
+!                                                             |                             !
+!-------------------------------------------------------------------------------------------!
+!----------------------------------------------------------------------------------------!
+! AUTHOR              DATE      MODIFICATION                    		         !
+! Seema Kalantri    07/23/08    XLATTABLE renamed to PSXLATITEM as part of 8.49 Tools Upgrade !
+!				1. Table XLATTABLE is renamed to PSXLATITEM			!
+!				2. Field LANGUAGE_CD is removed from the table			!
+!				3. Field Eff_Status is added to the table 			!
+
+begin-procedure Read-Translate-Table
+#ifdef debugx
+  display 'Entering zREADXLAT.SQC: Read-Translate-Table'
+  display ' Input $FieldName: ' noline
+  display $FieldName
+  display ' Input $FieldValue: ' noline
+  display $FieldValue
+  display ' Input $AsOfDate: ' noline
+  display $AsOfDate
+  
+  !*****************************************************************************************************!
+  ! Following code is commented as Language_Cd field is removed from the table as part of Tools Upgrade	!
+  !   Author: Seema Kalantri										!
+  !   Date: 07/23/2008 											!
+  !													!
+  !  #ifdef debugy											!
+  !  display '   $curr_language_cd: ' noline								!
+  !  display $curr_language_cd										!
+  !  #endif 												!
+  !*****************************************************************************************************!
+#endif
+
+  move '' to $XlatShortName
+  move '' to $XlatLongName
+
+  if $FieldName <> '' and $FieldValue <> ''
+    if $AsOfDate = ''  !if no As-Of-Date is specified, default to Today
+      move $AsOfToday_String to $AsOfDate
+    end-if
+
+    
+    !****************************************************************************************************!
+    ! Following code is commented as Language_Cd field is removed from the table as part of Tools Upgrade!
+    ! Filed Language Code is replaced with ' ' in calling function Select_From_Xlat			 !
+    ! Author: Seema Kalantri										 !
+    ! Date: 07/23/2008 											 !						
+    !													 !
+    ! do Select_From_Xlat ($FieldName, $FieldValue, $curr_language_cd,					 !
+    !                         $XlatShortName, $XlatLongName)						 !
+    !													 !
+    !************************************************************************				 !
+    ! If there was no row found, try again using the default language cd    *				 !
+    !************************************************************************				 !
+    !if $XlatShortName = '' and $XlatLongName = ''							 !
+    !  if $PSOptions_language_cd = ''									 !
+    !    do Get-PSOptions-Language ($PSOptions_language_cd)						 !
+    !  end-if												 !
+    !													 !
+    !  if $PSOptions_language_cd <> $curr_language_cd							 !
+    !    do Select_From_Xlat ($FieldName, $FieldValue, $PSOptions_language_cd,				 !
+    !                         $XlatShortName, $XlatLongName)						 !
+    !  end-if												 !
+    !end-if												 !
+    !**************************************End of Code Change********************************************!
+    
+    do Select_From_Xlat ($FieldName, $FieldValue, ' ',$XlatShortName, $XlatLongName)
+    
+  end-if
+
+#ifdef debugx
+  display 'Exiting READXLAT.SQC: Read-Translate-Table'
+  display ' Output $XlatShortName: ' noline
+  display $XlatShortName
+  display ' Input $XlatLongName: ' noline
+  display $XlatLongName
+#endif
+end-procedure
+
+
+!***********************************************************************
+! Select_From_Xlat                                                     *
+!                                                                      *
+!  Retrieves the XLATSHORTNAME and XLATLONGNAME from the XLATTABLE     *
+!  for the input language code.                                        *
+!***********************************************************************
+begin-procedure Select_From_Xlat ($FldName, $FldVal, $Language_cd,
+                                  :$ShortName, :$LongName)
+#ifdef debugx
+  display 'Entering READXLAT.SQC: Select_From_Xlat'
+ 
+  display ' Input $Language_cd: ' noline
+  display $Language_cd
+  display ' Input $FldName: ' noline
+  display $FldName
+  display ' Input $FldVal: ' noline
+  display $FldVal
+#endif
+
+!****************************************************************************************************!
+! Following code is modified as part of 8.49 tools upgrade					     !
+!1. Table XLATTABLE is renamed to PSXLATITEM							     !
+!2. Field LANGUAGE_CD is removed from the table							     !
+!3. Field Eff_Status is added to the table 							     !
+!  let $Lcl_Language_Cd = rtrim($Language_cd, ' ')						     !
+!Author: Seema Kalantri										     !
+!Date: 07/23/2008 */										     !
+!/* 												     !
+!  begin-SELECT											     !
+!XLATSHORTNAME											     !
+!XLATLONGNAME											     !
+!  move &XlatShortName to $ShortName								     !
+!  move &XlatLongName  to $LongName								     !
+!    FROM  XLATTABLE										     !
+!    WHERE FIELDNAME   = $FldName								     !
+!      AND FIELDVALUE  = $FldVal								     !
+!      AND LANGUAGE_CD = $Lcl_Language_Cd							     !
+!      AND EFFDT =										     !
+!          (SELECT MAX(EFFDT)									     !
+!             FROM   XLATTABLE									     !
+!             WHERE  FIELDNAME  = $_FieldName							     !
+!               AND  FIELDVALUE = $_FieldValue							     !
+!               AND  LANGUAGE_CD = $Lcl_Language_Cd						     !
+!               AND  EFFDT     <= to_date($_AsOfDate,'YYYY-MM-DD'))				     !
+!  end-SELECT											     !
+!****************************************************************************************************!
+
+!****************************************************************************************************!
+! New SQL with modifed table and field names
+!   Author: Seema Kalantri
+!   Date: 07-23-2008 */
+!****************************************************************************************************!
+begin-SELECT
+XLATSHORTNAME
+XLATLONGNAME
+  move &XlatShortName to $ShortName
+  move &XlatLongName  to $LongName
+    FROM  PSXLATITEM
+    WHERE FIELDNAME   = $FldName
+      AND FIELDVALUE  = $FldVal
+      AND EFFDT =
+          (SELECT MAX(EFFDT)
+             FROM   PSXLATITEM
+             WHERE  FIELDNAME  = $_FieldName
+               AND  FIELDVALUE = $_FieldValue
+               AND  EFFDT     <= to_date($_AsOfDate,'YYYY-MM-DD'))
+ end-SELECT
+
+#ifdef debugx
+  display 'Exiting READXLAT.SQC: Select_From_Xlat'
+  display ' Output $ShortName: ' noline
+  display $ShortName
+  display ' Output $LongName: ' noline
+  display $LongName
+#endif
+end-procedure

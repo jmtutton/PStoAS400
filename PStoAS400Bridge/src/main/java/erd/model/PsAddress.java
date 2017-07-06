@@ -2,6 +2,7 @@ package erd.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.sql.Timestamp;
 
 import javax.persistence.*;
@@ -138,7 +139,7 @@ public class PsAddress implements Serializable {
 	}
 
 	public String getAddress1() {
-		return this.address1;
+		return this.address1 != null ? this.address1.trim() : this.address1;
 	}
 
 	public void setAddress1(String address1) {
@@ -194,7 +195,7 @@ public class PsAddress implements Serializable {
 	}
 
 	public String getCity() {
-		return this.city;
+		return this.city != null ? this.city.trim() : this.city;
 	}
 
 	public void setCity(String city) {
@@ -306,7 +307,7 @@ public class PsAddress implements Serializable {
 	}
 
 	public String getPostal() {
-		return this.postal;
+		return this.postal != null ? this.postal.trim() : this.postal;
 	}
 
 	public void setPostal(String postal) {
@@ -322,14 +323,14 @@ public class PsAddress implements Serializable {
 	}
 
 	public String getState() {
-		return this.state;
+		return this.state != null ? this.state.trim() : this.state;
 	}
 
 	public void setState(String state) {
 		this.state = state;
 	}
 
-	public PsAddress HR01GetPersonalData(String employeeId, String addressType, Date effectiveDate) {
+	public static PsAddress HR01GetPersonalData(String employeeId, String addressType, Date effectiveDate) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR01-Get-Personal-Data
 //		! Desc:  Gets the employees data from the personal data effdt table that
@@ -458,74 +459,51 @@ public class PsAddress implements Serializable {
 		return null;
 	}
 
-	public PsAddress HR05GetInfo(String employeeId, String addressType, Date effectiveDate) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR05-Get-Info
-//		! Desc:  This new routine will get the name/address/marital status info row for each of the
-//		!        employee numbers entered in the trigger file.  All this data used to come from
-//		!        pers_data_effdt.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR05-Get-Info
-//		begin-select
-//		CAD3.Address1
-//		CAD3.City
-//		CAD3.State
-//		CAD3.Postal
-//		CPDE3.Mar_Status
-//		to_char(CPDE3.Effdt, 'YYYY-MM-DD')    &CPDE3Effdt
-//		  Let $Effdt = &CPDE3Effdt
-//		  Let $PSAddress =  RTRIM(LTRIM(&CAD3.Address1,' '),' ')
-//		  uppercase $PSAddress
-//		  Do Replace-Character($PSAddress,'''','''''',$PSAddress)  !From ZRmvSpcChr.sqc
-//		  Let $PSCity = RTRIM(LTRIM(&CAD3.City,' '),' ')
-//		  uppercase $PSCity
-//		  Do Replace-Character($PSCity,'''','''''',$PSCity)       !From ZRmvSpcChr.sqc
-//		  Let $PSState = RTRIM(LTRIM(&CAD3.State,' '),' ')
-//		  uppercase $PSState
-//		  Let $PSZip = RTRIM(LTRIM(&CAD3.Postal,' '),' ')
-//		  Let $PSMarital_Status = &CPDE3.Mar_Status
-//		from  PS_PERS_DATA_EFFDT CPDE3,
-//		      PS_ADDRESSES CAD3
-//		where CPDE3.Emplid = $PSEmplid
-//		  and CPDE3.Emplid = CAD3.Emplid
-//		  and CAD3.ADDRESS_TYPE = 'HOME'
-//		  and CAD3.EFFDT    = (SELECT MAX(EFFDT) FROM PS_ADDRESSES CAD4
-//		                      WHERE CAD4.EMPLID   = CAD3.EMPLID
-//		                      AND   CAD4.ADDRESS_TYPE  = CAD3.ADDRESS_TYPE
-//		                      AND   to_char(CAD4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		  and CPDE3.EFFDT = (SELECT MAX(EFFDT)
-//		                      FROM PS_PERS_DATA_EFFDT CPDE4
-//		                     WHERE CPDE4.EMPLID = CPDE3.EMPLID
-//		                       AND  to_char(CPDE4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		end-select
-//		begin-select
-//		CN3.Name
-//		CN3.First_Name
-//		CN3.Last_Name
-//		CN3.Name_Prefix
-//		CN3.Middle_Name
-//		CN3.Name_Suffix   !ZHR_MOD_SUFFIX_LAST_NAME
-//		     !Let $PSName = RTRIM(LTRIM(&CN3.Name,' '),' ')
-//		     Do HR05-format-name
-//		     Do Replace-Character($PSName,'''','''''',$PSName)               !From ZRmvSpcChr.sqc
-//		     Let $PSName_Prefix = RTRIM(LTRIM(&CN3.Name_Prefix,' '),' ')
-//		     uppercase $PSName_Prefix
-//		     Do Replace-Character($PSName_Prefix,'''','''''',$PSName_Prefix) !From ZRmvSpcChr.sqc
-//		     Let $ADPSLastName = RTRIM(LTRIM(&CN3.Last_Name,' '),' ')
-//		     Let $ADPSFirstName = RTRIM(LTRIM(&CN3.First_Name,' '),' ')
-//		     Let $ADPSMiddleName = RTRIM(LTRIM(&CN3.Middle_Name,' '),' ')
-//		     Let $ADPSMiddleName = SUBSTR($ADPSMiddleName,1,1)
-//		     Let $Wrk_AD_PersdataEffdtBuild = 'Y'
-//		from  PS_NAMES CN3
-//		where CN3.NAME_TYPE = 'PRI'
-//		  and CN3.Emplid = $PSEmplid
-//		  and CN3.EFFDT     = (SELECT MAX(EFFDT) FROM PS_NAMES CN4
-//		                      WHERE CN4.EMPLID   = CN3.EMPLID
-//		                      AND   CN4.NAME_TYPE  = CN3.NAME_TYPE
-//		                      AND   to_char(CN4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		end-select
-//		End-Procedure HR05-Get-Info
-		return null;
+	/**
+	 * @see HR05-Get-Info in ZHRI105A.SQC
+	 * @param employeeId
+	 * @param effectiveDate
+	 * @param addressType
+	 * @return PsAddress record
+	 */
+	public static PsAddress findByEmployeeIdAndEffectiveDateAndAddressType(String employeeId, Date effectiveDate, String addressType) {
+		//BEGIN-SELECT
+		//FROM PS_ADDRESSES CAD3
+		//WHERE CAD3.EmplId = $PSEmplId
+		//AND CAD3.ADDRESS_TYPE = 'HOME'
+		//AND CAD3.EFFDT  = (SELECT MAX(EFFDT) FROM PS_ADDRESSES CAD4
+		//		WHERE CAD4.EMPLID   = CAD3.EMPLID
+		//			AND CAD4.ADDRESS_TYPE  = CAD3.ADDRESS_TYPE
+		//			AND TO_CHAR(CAD4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		try {
+			List<PsAddress> resultList = em.createQuery(
+					"SELECT PsAddress FROM PsAddress p "
+							+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+							+ "WHERE UPPER(TRIM(p.addressType)) = :addressType "
+							+ "AND p.effectiveDate = "
+							+ "(SELECT MAX(p2.effectiveDate) FROM PsAddress p2 "
+								+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
+									+ "AND UPPER(TRIM(p2.addressType)) = UPPER(TRIM(p.addressType)) "
+									+ "AND p2.effectiveDate <= :effectiveDate) "
+					, PsAddress.class)
+					.setParameter("employeeId", employeeId.trim().toUpperCase())
+					.setParameter("addressType", addressType.trim().toUpperCase())
+					.setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
 
 }

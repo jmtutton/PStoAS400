@@ -8,21 +8,14 @@ public class ProcessParameters {
 	public class CommonParameters {
 		private String processName;
 		private String completionStatus;
-//		private String auditOperatorId; //$PSAuditOperId
 		private String operatorId; //$PSOperId
-		private String employeeId; //PSEmpl
-//		private BigDecimal indexNumber;
+		private String employeeId; //$PSEmpl
 		private BigDecimal effectiveSequence;
 		private BigDecimal eidIndexNumber;
 		private Date effectiveDate;
 		
 		private Boolean poiFlag; //$PoiFlag
-//		private Boolean runFlag; //#run_flag
 		private Boolean criticalFlag = false; //$WrkCriticalFlag
-		
-		//from ZHRI100A.Call-Programs  //not used
-//		private String actionCode; //$ADAction_Code
-//		private String legacyOperatorId; //$ADLegOprid
 		
 		private String errorProgramParameter;
 		private String errorMessageParameter;

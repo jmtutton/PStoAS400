@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.sql.Timestamp;
 
 /**
@@ -1529,7 +1530,7 @@ public class PsPersonalData implements Serializable {
 		this.vaBenefit = vaBenefit;
 	}
 
-	public PsPersonalData HR01GetPersonalData(String employeeId) {
+	public static PsPersonalData HR01GetPersonalData(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR01-Get-Personal-Data
 //		! Desc:  Gets the employees data from the personal data effdt table that
@@ -1658,57 +1659,43 @@ public class PsPersonalData implements Serializable {
 		return null;
 	}
 
-	public PsPersonalData HR05GetPersonalData(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR05-Get-Personal-Data
-//		! Desc:  This routine will get the Personal Data row for each of the
-//		!        employee numbers entered in the trigger file.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR05-Get-Personal-Data
-//		begin-select
-//		to_char(COHE.ORIG_HIRE_DT, 'YYYY-MM-DD')  &CPD2Orig_Hire_Dt
-//		CPD2.Sex
-//		to_char(CPD2.Birthdate, 'YYYY-MM-DD')  &CPD2Birthdate
-//		CPD2.Lang_Cd
-//		  Let $PSGender = &CPD2.Sex
-//		  Let $PSBDate = &CPD2Birthdate
-//		  Unstring $PSBDate by '-' into $first $second $Third
-//		  Let $PSBirthdate = $Second || $Third || $first
-//		  IF &CPD2Orig_Hire_Dt = ''
-//		    Let $PSStart_Dt = '00000000'
-//		  else
-//		     Unstring &CPD2Orig_Hire_dt by '-' into $first $second $Third
-//		     Let $PSStart_dt = $First || $Second || $Third
-//		  end-if
-//		  Let $PSLangCd = RTRIM(LTRIM(&CPD2.Lang_Cd,' '),' ')
-//		  Let $Wrk_AD_PersDataBuild = 'Y'
-//		from PS_Personal_Data CPD2
-//		    ,PS_ORIG_HIR_EMP_VW COHE
-//		where CPD2.Emplid = $PSEmplid
-//		  and COHE.EMPLID = CPD2.EMPLID
-//		end-select
-//		End-Procedure HR05-Get-Personal-Data
-		return null;
+	
+	/**
+	 * This routine will get the Personal Data row for each of the employee numbers entered in the trigger file.
+	 * @see HR05-Get-Personal-Data in ZHRI105A.SQC
+	 */
+	public static PsPersonalData findByEmployeeId(String employeeId) {
+		//BEGIN-SELECT
+		//FROM PS_Personal_Data CPD2, PS_ORIG_HIR_EMP_VW COHE                                                        
+		//WHERE CPD2.Emplid = $PSEmplid
+		//AND COHE.EMPLID = CPD2.EMPLID                                                     
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<PsPersonalData> resultList = (List<PsPersonalData>) em.createQuery(
+	    			"SELECT PsPersonalData "
+	    				+ "FROM PsPersonalData p, PsEmployeeOriginalHire p2 "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				+ "AND UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
+	    				, PsPersonalData.class)
+	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    	else 
+	    		return null;
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
 
-	public PsPersonalData findByEmployeeId(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  AD-Get-Personal-Data
-//		! Desc:  This routine will get the Personal Data row for each of the
-//		!        employee numbers entered in the trigger file.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure AD-Get-Personal-Data
-//		Let $PSLangCd = ''
-//		begin-select
-//		ADPD.LANG_CD
-//		  Let $PSLangCd = RTRIM(LTRIM(&ADPD.LANG_CD,' '),' ')
-//		from PS_Personal_Data ADPD
-//		where ADPD.Emplid = $PSEmplid
-//		end-select
-//		end-procedure AD-Get-Personal-Data		
-		return null;
-	}
-	
 	public String findLanguageCodeByEmployeeId(String employeeId) {
 		return null;
 	}

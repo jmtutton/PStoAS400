@@ -1,6 +1,8 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.*;
 
 /**
@@ -87,7 +89,7 @@ public class PsPersonalPhone implements Serializable {
 		return null;
 	}
 
-	public PsPersonalPhone findMainPhone(String employeeId) {
+	public static PsPersonalPhone findMainPhone(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR01-Get-Main-Phone
 //		! Desc:  This routine gets the main phone number from the Peoplesoft
@@ -105,7 +107,7 @@ public class PsPersonalPhone implements Serializable {
 		return null;
 	}
 
-	public PsPersonalPhone HR05GetMainPhone(String employeeId) {
+	public static PsPersonalPhone HR05GetMainPhone(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR05-Get-Main-Phone
 //		! Desc:  This routine gets the main phone number from the Peoplesoft
@@ -126,7 +128,7 @@ public class PsPersonalPhone implements Serializable {
 		return null;
 	}
 
-	public PsPersonalPhone findBusinessPhone(String employeeId) {
+	public static PsPersonalPhone findBusinessPhone(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  AD-Get-Business-Phone
 //		! Desc:  This routine gets the business phone number from the Peoplesoft
@@ -145,7 +147,7 @@ public class PsPersonalPhone implements Serializable {
 		return null;
 	}
 
-	public PsPersonalPhone findEmployeeFax(String employeeId) {
+	public static PsPersonalPhone findEmployeeFax(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  AD-Get-Employee-Fax
 //		! Desc:  This routine gets the business phone number from the Peoplesoft
@@ -163,8 +165,35 @@ public class PsPersonalPhone implements Serializable {
 		return null;
 	}
 	
-	public String findPhoneByEmployeeIdAndPhoneType(String employeeId, String phoneType) {
-		return null;
+	/**
+	 * @see HR05-Get-Business-Phone in ZHRI105A.SQC
+	 * @param employeeId
+	 * @param phoneType
+	 * @return phone
+	 */
+	public static String findPhoneByEmployeeIdAndPhoneType(String employeeId, String phoneType) {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		try {
+			List<String> resultList = em.createQuery(
+					"SELECT p.phone FROM PsPersonalPhone p "
+					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+					+ "AND UPPER(TRIM(p.phoneType)) = :phoneType "
+					, String.class)
+					.setParameter("employeeId", employeeId.trim().toUpperCase())
+					.setParameter("phoneType", phoneType.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
 
 	

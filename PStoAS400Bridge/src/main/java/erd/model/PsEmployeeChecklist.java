@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * The persistent class for the PS_EMPL_CHECKLIST database table.
@@ -80,35 +81,48 @@ public class PsEmployeeChecklist implements Serializable {
 	}
 
 	public String getResponsibleId() {
-		return this.responsibleId;
+		return this.responsibleId != null ? this.responsibleId.trim().toUpperCase() : this.responsibleId;
 	}
 
 	public void setResponsibleId(String responsibleId) {
 		this.responsibleId = responsibleId;
 	}
 
-	public PsEmployeeChecklist findByEmployeeIdAndChecklistDate(String employeeId, Date checklistDate) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR05-Get-Employee-Checklist
-//		! Desc:  This routine gets the Responsible Id from the Employee checklist
-//		!        table.  This field is used to populate the Recruiter Id field
-//		!        in AAHR05.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR05-Get-Employee-Checklist
-//		begin-select
-//		CECT.Responsible_Id
-//		  If &CECT.Responsible_Id > '           '
-//		     Let $PSResponsible_Id = &CECT.Responsible_Id
-//		     Do HR05-Get-Next-Opid
-//		  End-if    !&CECT.Responsible_Id > '           '
-//		from PS_Empl_Checklist CECT
-//		where CECT.Emplid = $PSEmplid
-//		  and to_char(CECT.Checklist_Dt,'YYYY-MM-DD') = $PSEffdt
-//		end-select
-//		End-Procedure HR05-Get-Employee-Checklist
-		return null;
+	/**
+	 * This routine gets the Responsible Id from the Employee checklist table.
+	 * This field is used to populate the Recruiter Id field in AAHR05.
+	 * @see  HR05-Get-Employee-Checklist in ZHRI105A.SQC
+	 * @return responsibleId
+	 */
+	public static String findByEmployeeIdAndChecklistDate(String employeeId, Date checklistDate) {
+		//BEGIN-SELECT
+		//CECT.Responsible_Id
+		//FROM PS_Empl_Checklist CECT
+		//WHERE CECT.Emplid = $PSEmplid
+		//AND TO_CHAR(CECT.Checklist_Dt,'YYYY-MM-DD') = $PSEffdt
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = em.createQuery(
+	    			"SELECT UPPER(TRIM(c.responsibleId)) FROM PsEmployeeChecklist c "
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+	    					+ "AND checklistDate = :checklistDate "
+	    					, String.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("checklistDate", checklistDate, TemporalType.DATE)
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
-
-
 	
 }

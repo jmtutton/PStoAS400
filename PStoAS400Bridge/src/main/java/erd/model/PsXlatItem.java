@@ -141,7 +141,7 @@ public class PsXlatItem implements Serializable {
 					String.class)
 			    .setParameter("processName", fieldName.toUpperCase())
 			    .setParameter("fieldName", fieldValue.toUpperCase())
-			    .setParameter("effectiveDate", effectiveDate)
+			    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0).trim();
@@ -179,6 +179,58 @@ public class PsXlatItem implements Serializable {
 	    				Date.class)
 	    		    .setParameter("fieldName", fieldName.toUpperCase())
 	    		    .setParameter("fieldValue", fieldValue.toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
+	   
+	/**
+	 * @see Read-Translate-Table in ZREADXLT.SQC
+	 * @param fieldName
+	 * @param fieldValue
+	 * @return PsXlatItem record
+	 */
+	public static PsXlatItem findByFieldNameAndFieldValueAndEffectiveDate(String fieldName, String fieldValue, Date effectiveDate) {
+		//BEGIN-SELECT
+		//XLATSHORTNAME
+		//XLATLONGNAME
+		//  move &XlatShortName to $ShortName
+		//  move &XlatLongName  to $LongName
+		//    FROM  PSXLATITEM
+		//    WHERE FIELDNAME   = $FldName
+		//      AND FIELDVALUE  = $FldVal
+		//      AND EFFDT =
+		//          (SELECT MAX(EFFDT)
+		//             FROM   PSXLATITEM
+		//             WHERE  FIELDNAME  = $_FieldName
+		//               AND  FIELDVALUE = $_FieldValue
+		//               AND  EFFDT     <= to_date($_AsOfDate,'YYYY-MM-DD'))
+		// END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		
+		try {
+			List<PsXlatItem> resultList = em.createQuery("SELECT PsXlatItem FROM PsXlatItem p "
+						+ "WHERE UPPER(TRIM(p.fieldName)) = :fieldName "
+						+ "AND UPPER(TRIM(p.fieldValue)) = :fieldValue "
+						+ "AND p.effectiveDate = "
+								+ "(SELECT MAX(p2.effectiveDate) FROM PsXlatItem p2 "
+									+ "WHERE UPPER(TRIM(p2.fieldName)) = :fieldName "
+									+ "AND UPPER(TRIM(p2.fieldValue)) = :fieldValue "
+									+ "AND p2.effectiveDate <= :effectiveDate) "
+					, PsXlatItem.class)
+			    .setParameter("processName", fieldName.trim().toUpperCase())
+			    .setParameter("fieldName", fieldValue.trim().toUpperCase())
+			    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);

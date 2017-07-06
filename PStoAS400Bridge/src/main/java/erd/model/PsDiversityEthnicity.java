@@ -120,8 +120,10 @@ public class PsDiversityEthnicity implements Serializable {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<PsDiversityEthnicity> resultList = (List<PsDiversityEthnicity>) em.createQuery("SELECT p FROM PsDiversityEthnicity p "
-	    				+ "WHERE p.employeeId = :employeeId ", PsDiversityEthnicity.class)
+	    	List<PsDiversityEthnicity> resultList = (List<PsDiversityEthnicity>) em.createQuery(
+	    			"SELECT p FROM PsDiversityEthnicity p "
+	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    			, PsDiversityEthnicity.class)
 	    		    .setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
@@ -143,4 +145,48 @@ public class PsDiversityEthnicity implements Serializable {
 	    }
 	    return null;	
 	}
+	
+	/**
+	 * @see HR05-Get-Diversity in ZHRI105A.SQC
+	 * @param employeeId
+	 * @return ethnicGroupCode
+	 */
+	public static String findEthnicGroupCodeByEmployeeId(String employeeId) {
+		//BEGIN-SELECT
+		//DE1.ETHNIC_GRP_CD
+		//LET $PSETHNIC_GROUP1 = &DE1.ETHNIC_GRP_CD
+		//LET #PS_ETHNIC_COUNT = #PS_ETHNIC_COUNT + 1
+		//FROM PS_DIVERS_ETHNIC DE1
+		//WHERE DE1.EMPLID = $PSEmplid
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = (List<String>) em.createQuery(
+	    			"SELECT p.ethnicGroupCode "
+	    				+ "FROM PsDiversityEthnicity p "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				, String.class)
+	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		if(resultList.size() > 1) {
+		    		//if employee has more than one ethnicity, return "O" for "Other"
+	    			return "O";
+	    		}
+	    		return resultList.get(0);
+	    	}
+	    	else 
+	    		return null;
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
+	
+	
 }

@@ -2,6 +2,7 @@ package erd.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -20,7 +21,7 @@ public class PsPersonalNationalId implements Serializable {
 	private String employeeId;
 
 	@Column(name="COUNTRY", nullable=false, length=3)
-	private String countryIsoAlpha3Code;
+	private String country;
 
 	@Column(name="LASTUPDDTTM", nullable=false)
 	private Timestamp lastUpdatedDateAndTime;
@@ -46,12 +47,12 @@ public class PsPersonalNationalId implements Serializable {
 	public PsPersonalNationalId() {
 	}
 
-	public String getCountryCode() {
-		return this.countryIsoAlpha3Code;
+	public String getCountry() {
+		return this.country;
 	}
 
-	public void setCountryCode(String countryIsoAlpha3Code) {
-		this.countryIsoAlpha3Code = countryIsoAlpha3Code;
+	public void setCountry(String country) {
+		this.country = country;
 	}
 
 	public String getEmployeeId() {
@@ -118,7 +119,7 @@ public class PsPersonalNationalId implements Serializable {
 		this.isNationalRegistrationIdUsedAsTaxReferenceNumber = isNationalRegistrationIdUsedAsTaxReferenceNumber;
 	}
 
-	public PsPersonalNationalId HR01GetPersonalData(String employeeId) {
+	public static PsPersonalNationalId HR01GetPersonalData(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR01-Get-Personal-Data
 //		! Desc:  Gets the employees data from the personal data effdt table that
@@ -247,26 +248,47 @@ public class PsPersonalNationalId implements Serializable {
 		return null;
 	}
 
-	public PsPersonalNationalId findByEmployeeIdHR05(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR05-Get-Pers-Nid
-//		! Desc:  This routine gets the social security number from the Peoplesoft
-//		!        tables and formats them for the legacy system
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR05-Get-Pers-Nid
-//		begin-select
-//		CPN.National_Id
-//		    Let $PSNATIONAL_ID = LTRIM(RTRIM(&CPN.National_Id,' '),' ')
-//		from PS_Pers_Nid CPN
-//		where CPN.Emplid = $PSEmplid
-//		  and CPN.Country = $PS_REG_REGION    !dshen 01/12/2012 replace $PSLOC_COUNTRY with PS_REG_REGION
-//		  and CPN.PRIMARY_NID='Y'
-//		end-select
-//		End-Procedure HR05-Get-Pers-Nid		
-		return null;
+	/**
+	 * This routine gets the social security number from the PeopleSoft tables and formats them for the legacy system.
+	 * @see HR05-Get-Pers-Nid in ZHRI105A.SQC
+	 * @param employeeId
+	 * @return
+	 */
+	public static String findNationalIdByEmployeeIdAndCountry(String employeeId, String country) {
+		//BEGIN-SELECT
+		//CPN.National_Id
+		//LET $PSNATIONAL_ID = LTRIM(RTRIM(&CPN.National_Id,' '),' ')
+		//FROM PS_Pers_Nid CPN
+		//WHERE CPN.Emplid = $PSEmplid
+		//AND CPN.Country = $PS_REG_REGION
+		//AND CPN.PRIMARY_NID='Y'
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		try {
+			List<String> resultList = em.createQuery(
+					"SELECT c.nationalId FROM PsPersonalNationalId c "
+					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+					+ "AND UPPER(TRIM(c.country)) = :country "
+					+ "AND UPPER(TRIM(c.isPrimaryId)) = 'Y' "
+					, String.class)
+					.setParameter("employeeId", employeeId.trim().toUpperCase())
+					.setParameter("country", country.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
 
-	public PsPersonalNationalId HR09GetPersonalData(String employeeId) {
+	public static PsPersonalNationalId HR09GetPersonalData(String employeeId) {
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR09-Get-Personal-Data
 //		! Desc:  Gets the employees National ID from the PERS_NID table

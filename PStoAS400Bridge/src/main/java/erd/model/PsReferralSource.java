@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -142,7 +143,7 @@ public class PsReferralSource implements Serializable {
 		this.specificReferralSource = specificReferralSource;
 	}
 
-	public PsDiversityEthnicity GetPersonalData(String employeeId) {
+	public static PsDiversityEthnicity GetPersonalData(String employeeId) {
 //	!----------------------------------------------------------------------
 //	! Procedure:  HR01-Get-Personal-Data
 //	! Desc:  Gets the employees data from the personal data effdt table that
@@ -271,36 +272,50 @@ public class PsReferralSource implements Serializable {
 		return null;
 	}
 
-	public PsDiversityEthnicity GetReferralSource(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR05-Get-Referral-Source
-//		! Desc:  This routine will get the referral source data for each of the
-//		!        employee numbers entered in the trigger file since it was removed from
-//		!        the Personal Data table to the Pers Appl Info table in 8.3.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR05-Get-Referral-Source
-//		begin-select
-//		CPAI3.HRS_SOURCE_ID
-//		CHSI2.HRS_SOURCE_NAME
-//		CHSI2.HRS_SOURCE_DESCR
-//		    Let $PSRecruit_Source_Code = ltrim(rtrim(&CHSI2.HRS_SOURCE_NAME,' '),' ')
-//		    Do HR05-format-referral-source
-//		    Let $PSReferralSource = ltrim(rtrim(&CHSI2.HRS_SOURCE_NAME,' '),' ')
-//		    Let $PSRefSourceDescr = ltrim(rtrim(&CHSI2.HRS_SOURCE_DESCR,' '),' ')
-//		from PS_PERS_APPL_REF CPAI3,
-//		     PS_HRS_SOURCE_I CHSI2
-//		  where CPAI3.EMPLID = $Wrk_Emplid
-//		    and CPAI3.EFFDT = (SELECT MAX(CPAI3A.EFFDT)
-//		                        FROM PS_PERS_APPL_REF CPAI3A
-//		                          WHERE CPAI3A.EMPLID = CPAI3.EMPLID
-//		                            AND to_char(CPAI3A.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		    and CHSI2.HRS_SOURCE_ID = CPAI3.HRS_SOURCE_ID
-//		end-select
-//		End-Procedure HR05-Get-Referral-Source
-		return null;
+	/**
+	 * This routine will get the referral source data for each of the employee numbers 
+	 * entered in the trigger file since it was removed from the Personal Data table to 
+	 * the PS_PERS_APPL_INFO table in 8.3.
+	 * @see HR05-Get-Referral-Source
+	 * @param employeeId
+	 * @return PsReferralSource
+	 */
+	public static String findRecruitmentSourceIdByEmployeeIdAndEffectiveDate(String employeeId, Date effectiveDate) {
+		//BEGIN-SELECT
+		//CPAI3.HRS_SOURCE_ID
+		//FROM PS_PERS_APPL_REF CPAI3
+		//WHERE CPAI3.EMPLID = $Wrk_Emplid
+		//AND CPAI3.EFFDT = 
+		//		(SELECT MAX(CPAI3A.EFFDT)                                     ! ALS-10/08/2008
+		//			FROM PS_PERS_APPL_REF CPAI3A                                ! ALS-10/08/2008
+		//       	WHERE CPAI3A.EMPLID = CPAI3.EMPLID                        ! ALS-10/08/2008
+		//      		AND TO_CHAR(CPAI3A.EFFDT,'YYYY-MM-DD') <= $PSEffdt)     ! ALS-10/08/2008
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = em.createQuery(
+	    			"SELECT p.recruitmentSourceId FROM PsReferralSource p "
+	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+							+ "AND p.effectiveDate = "
+							+ "(SELECT MAX(p2.effectiveDate) FROM PsReferralSource p2 "
+							+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
+								+ "AND p2.effectiveDate <= :effectiveDate) "
+	    					, String.class)
+	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
-	
-	
-	
 	
 }

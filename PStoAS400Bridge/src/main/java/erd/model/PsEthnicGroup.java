@@ -2,6 +2,7 @@ package erd.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -108,38 +109,64 @@ public class PsEthnicGroup implements Serializable {
 		this.setId = setId;
 	}
 
-	public PsEthnicGroup findByEthnicGroupCode(String ethnicGroupCode) {
-//		!----------------------------------------------------------------------
-//		! Procedure: GET-ETHNIC-CODE
-//		! Desc:  This procedure will get the ethnic code value to send to medstat
-//		!----------------------------------------------------------------------
-//		Begin-procedure GET-ETHNIC-CODE
-//		begin-select
-//		EG.ETHNIC_GROUP
-//		  Let $PS_Ethnic_Group = &EG.ETHNIC_GROUP
-//		  Let $PSEthnicCode = $PS_Ethnic_Group
-//		FROM PS_ETHNIC_GRP_TBL EG
-//		WHERE ETHNIC_GRP_CD = $PS_Ethnic_Group_CD
-//		END-SELECT
-//		End-procedure GET-ETHNIC-CODE
+		
+	/**
+	 * This procedure will get the ethnic code value.
+	 * @see Get-Ethnic-Code
+	 * @return
+	 */
+	public static String findByEthnicGroupCode(String ethnicGroup) {
+		//!----------------------------------------------------------------------
+		//! Procedure: GET-ETHNIC-CODE
+		//! Desc:  This procedure will get the ethnic code value to send to medstat
+		//!----------------------------------------------------------------------
+		//Begin-procedure GET-ETHNIC-CODE
+		//begin-select
+		//EG.ETHNIC_GROUP
+		//  Let $PS_Ethnic_Group = &EG.ETHNIC_GROUP
+		//  Let $PSEthnicCode = $PS_Ethnic_Group
+		//FROM PS_ETHNIC_GRP_TBL EG
+		//WHERE ETHNIC_GRP_CD = $PS_Ethnic_Group_CD
+		//END-SELECT
+		//End-procedure GET-ETHNIC-CODE
 		return null;
 	}
 
-	public PsEthnicGroup findByEthnicGroupCode1(String ethnicGroupCode) {
-//		!----------------------------------------------------------------------
-//		! Procedure: GET-ETHNIC-CODE1
-//		! Desc:  This procedure will get the ethnic code value
-//		!----------------------------------------------------------------------
-//		Begin-procedure GET-ETHNIC-CODE1
-//		begin-select
-//		EG1.ETHNIC_GROUP
-//		  Let $PSEthnic_Group = &EG1.ETHNIC_GROUP
-//		FROM PS_ETHNIC_GRP_TBL EG1
-//		WHERE EG1.ETHNIC_GRP_CD = $PSETHNIC_GROUP1
-//		END-SELECT
-//		 Do HR05-Get-Ethnic-Group
-//		End-procedure GET-ETHNIC-CODE1
-		return null;
+	/**
+	 * This procedure will get the ethnic code value.
+	 * @see Get-Ethnic-Code1 in ZHRI105A.SQC
+	 * @param ethnicGroupCode
+	 * @return
+	 */
+	public static String findEthnicGroupByEthnicGroupCode(String ethnicGroupCode) {
+		//BEGIN-SELECT
+		//EG1.ETHNIC_GROUP
+		//FROM PS_ETHNIC_GRP_TBL EG1
+		//WHERE EG1.ETHNIC_GRP_CD = $PSETHNIC_GROUP1
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = (List<String>) em.createQuery(
+	    			"SELECT p.ethnicGroup "
+	    				+ "FROM PsEthnicGroup p "
+	    				+ "WHERE UPPER(TRIM(p.ethnicGroupCode)) = :ethnicGroupCode "
+	    				, String.class)
+	    		    .setParameter("ethnicGroupCode", ethnicGroupCode.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    	else 
+	    		return null;
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
 	
 }

@@ -108,29 +108,44 @@ public class CrossReferenceEthnicGroup implements Serializable {
 	    return null;	
 	}
 
-	public CrossReferenceEthnicGroup HR05GetEthnicGroup(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR05-Get-Ethnic-Group
-//		! Desc:  This procedure gets the ethnic code from the cross reference
-//		!        table for the legacy system
-//		Begin-Procedure HR05-Get-Ethnic-Group
-//		Let $Found = 'N'
-//		Begin-Select
-//		CPT62.ZHRF_LEGETHNICCD
-//		CPT62.ETHNIC_GROUP
-//		   Let $PSEthnic_Group = &CPT62.ZHRF_LEGETHNICCD
-//		   Let $Found = 'Y'
-//		from PS_ZHRT_ETHCD_CREF CPT62
-//		where CPT62.ETHNIC_GROUP = $PSEthnic_Group
-//		  and CPT62.STATUS = 'A'
-//		End-Select
-//		If $Found = 'N'
-//		     Let $ErrorMessageParm = 'Ethnic Group is not found in XRef table PS_ZHRT_ETHCD_CREF'
-//		     Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-//		     Do Call-Error-Routine        !From ZHRI100A.SQR
-//		End-If    !$Found = 'N'
-//		End-Procedure HR05-Get-Ethnic-Group
-		return null;
+	/**
+	 * This procedure gets the ethnic code from the cross reference table for the legacy system.
+	 * @see HR05-Get-Ethnic-Group in ZHRI105A.SQC
+	 * @return
+	 */
+	public static String findLegacyEthnicCodeByEthnicGroup(String ethnicGroup) {
+		//BEGIN-SELECT
+		//CPT62.ZHRF_LEGETHNICCD
+		//CPT62.ETHNIC_GROUP
+		//LET $PSEthnic_Group = &CPT62.ZHRF_LEGETHNICCD
+		//FROM PS_ZHRT_ETHCD_CREF CPT62
+		//WHERE CPT62.ETHNIC_GROUP = $PSEthnic_Group                                          
+		//AND CPT62.STATUS = 'A'
+		//END-SELECT
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = (List<String>) em.createQuery(
+	    			"SELECT p.legacyEthnicCode "
+	    				+ "FROM CrossReferenceEthnicGroup p "
+	    				+ "WHERE UPPER(TRIM(p.ethnicGroup)) = :ethnicGroup "
+	    				+ "AND UPPER(TRIM(p.status)) = 'A' "
+	    				, String.class)
+	    		    .setParameter("ethnicGroup", ethnicGroup.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    	else 
+	    		return null;
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
 
 }

@@ -125,12 +125,51 @@ public class PsCitizenship implements Serializable {
 	    try {
 	    	List<PsCitizenship> resultList = (List<PsCitizenship>) em.createQuery("SELECT p, (p.countryIsoAlpha2Code = p2.countryIsoAlpha2Code) "
 	    				+ "FROM PsCitizenship p, PsCountry p2 "
-	    				+ "WHERE p.employeeId = :employeeId "
+	    				+ "WHERE UPPER(TRIM(p.employeeId = :employeeId)) "
 	    				+ "AND UPPER(TRIM(p.countryIsoAlpha3Code)) = :countryCode "
 	    				+ "AND UPPER(TRIM(p2.countryIsoAlpha3Code)) = :countryCode "
 	    				, PsCitizenship.class)
-	    		    .setParameter("employeeId", employeeId)
-	    		    .setParameter("countryCode", countryCode.toUpperCase())
+	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    .setParameter("countryCode", countryCode.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    	else 
+	    		return null;
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
+	
+	/**
+	 * Replaces SQC procedure HR05-Get-Citizenship from ZHRI105A.SQC
+	 * This procedure retrieves a record from the Citizenship table 
+	 * with matching Employee ID and Country Code, plus the corresponding 
+	 * two letter country abbreviation from the Country table.
+	 * @see HR05-Get-Citizenship in ZHRI105A.SQC
+	 * @param employeeId
+	 * @param countryCode
+	 * @return
+	 */
+	public static String findCountryIsoAlpha2CodeByEmployeeIdAndCountryCode(String employeeId, String countryCode) {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = (List<String>) em.createQuery(
+	    			"SELECT p.countryIsoAlpha2Code "
+	    				+ "FROM PsCitizenship p, PsCountry p2 "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				+ "AND UPPER(TRIM(p.countryIsoAlpha3Code)) = :countryCode "
+	    				+ "AND UPPER(TRIM(p2.countryIsoAlpha3Code)) = :countryCode "
+	    				, String.class)
+	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    .setParameter("countryCode", countryCode.trim().toUpperCase())
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);

@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * ZHRI205A - Contingent Employee and Multiple EID Demographic Change Process
+ * Contingent Employee and Multiple EID Rehire
+ * @see ZHRI206A.SQC
  * @author John Tutton john@tutton.net
  *
  */
-
-public class NonPersonDemographicChange {
+public class NonPersonRehire {
 	
 	/**
 	 * 
@@ -18,10 +18,10 @@ public class NonPersonDemographicChange {
 	 * @return completionStatus
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** NonPersonDemographicChange.doProcess() ***");
+		System.out.println("*** NonPersonRehire.doProcess() ***");
 		parameterMap = fetchProcessParameters(parameterMap);
 		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
-		return ZHRI100A.doCommand(parameterMap);
+		return null;
 	}
 	
 	/**
@@ -30,23 +30,22 @@ public class NonPersonDemographicChange {
 	 * @return
 	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** NonPersonDemographicChange.fetchProcessParameters() ***");
-		parameterMap.put("errorProgramParameter", "HRZ205A");
+		System.out.println("*** NonPersonRehire.fetchProcessParameters() ***");
 		parameterMap.put("parameterNameList", getParameterNameList());
-		return parameterMap;
-		
+		return null;
 	}
 
 	/**
-	 * @see HR205-Call-RPG-Program
+	 * @see ZHRI206A.SQC
 	 * @return list of parameter names for this process
 	 */
+	//TODO
 	private static List<String> getParameterNameList() {
-		return Arrays.asList("operatorId", "employeeId",
-				"employeeGroup", "employeeBranch",
-				"employeeLastName", "employeeFirstName", "employeeMiddleName", "employeeNickname",
-				"employeeGender", "serviceDate", "employeeDepartmentId",
-				"employeePosition", "referralSource", "employeeAddress", "employeeCity");
+		System.out.println("*** NonPersonRehire.getParameterNameList() ***");
+		return Arrays.asList("operatorId", "employeeId", "indexNumber", 
+				"group", "branch",
+				"lastName", "firstName", "middleInitial", "nickname",
+				"gender", "serviceDate", "department", "position",
+				"referralSource", "address", "city", "hireRehireFlag");
 	}
-	
 }

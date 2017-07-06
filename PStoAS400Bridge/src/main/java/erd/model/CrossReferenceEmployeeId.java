@@ -49,33 +49,6 @@ public class CrossReferenceEmployeeId implements Serializable {
 	}
 
 	/**
-	 * @see HR05-Get-Next-OpId in ZHRI105A.SQC
-	 * This routine gets the operator id for the Recruiter.
-	 */
-	public CrossReferenceEmployeeId ZHRI100A_getNextOpId(String employeeId) {
-//		Let $Found = 'N'
-//		begin-select
-//		COD.ZHRF_LEG_EMPL_ID
-//		COD.Emplid
-//		  Let $PSRecruiter_Id = &COD.ZHRF_LEG_EMPL_ID
-//		  Let $Found = 'Y'
-//		from PS_ZHRT_EMPID_CREF COD
-//		where COD.Emplid = $PSResponsible_Id
-//		end-select
-//		 if ($Found = 'N')
-//		     Let $Hld_Wrk_Emplid = $Wrk_Emplid
-//		     Let $Hld_LegEmplid = $LegEmplid
-//		     Let $Wrk_Emplid = $PSResponsible_Id
-//		     Let $LegEmplid = ''
-//		     Do Get-Legacy-Oprid                              !From ZHRI100A.SQR
-//		     Let $PSRecruiter_ID = $LegEmplid
-//		     Let $Wrk_Emplid = $Hld_Wrk_Emplid
-//		     Let $LegEmplid = $Hld_LegEmplid
-//		 end-if         !Found = 'N'
-		return null;
-	}
-
-	/**
 	 * @see Get-LegId-For-Seq0 procedure in ZHRI100A.SQR
 	 * This routine gets the Legacy ID from Employee CREF Table for Primary EIDs
 	 */
@@ -109,7 +82,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	 * @see Insert-OprId procedure in ZHRI100A.SQR
 	 * This routine will insert a row into the PS_ZHRT_EMPID_CREF table for the employee if the employee has a record in HR006P
 	 */
-	public void ZHRI100A_insertOprId(String employeeId, String legacyEmployeeId) {
+	public static void ZHRI100A_insertOprId(String employeeId, String legacyEmployeeId) {
 //		LET $Insert-Error-Flag = 'N'
 //		!Add to the PS_ZHRT_EMPID_CREF table
 //		Begin-SQL On-Error = Insert-Error
@@ -163,7 +136,12 @@ public class CrossReferenceEmployeeId implements Serializable {
 	    return null;	
 	}
 	
-	public String findLegacyEmployeeIdByEmployeeId(String employeeId) {
+	/**
+	 * This routine gets the legacyEmployeeId for the given employeeIdr.
+	 * @see HR05-Get-Next-OpId in ZHRI105A.SQC
+	 * @return legacyEmployeeId
+	 */
+	public static String findLegacyEmployeeIdByEmployeeId(String employeeId) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {

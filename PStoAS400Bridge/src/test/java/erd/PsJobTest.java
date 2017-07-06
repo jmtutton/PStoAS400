@@ -13,24 +13,24 @@ import erd.model.PsJob;
 
 public class PsJobTest {
 
-	@Test
-	public void testFindMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber() {
-		String employeeId = "558610";
-		Integer employmentRecordNumber = 0;
-		Date result = PsJob.findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber(employeeId, employmentRecordNumber);
-		assertNotNull(result);
-		System.out.println(result);
-	}
+//	@Test
+//	public void testFindMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber() {
+//		String employeeId = "558610";
+//		Integer employmentRecordNumber = 0;
+//		Date result = PsJob.findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber(employeeId, employmentRecordNumber);
+//		assertNotNull(result);
+//		System.out.println(result);
+//	}
 
-	@Test
-	public void testFindMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate() {
-		String employeeId = "99047";
-		Integer employmentRecordNumber = 0;
-		Date effectiveDate = PsJob.findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber(employeeId, employmentRecordNumber);
-		Integer result = PsJob.findMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate(employeeId, employmentRecordNumber, effectiveDate);
-		assertNotNull(result);
-		System.out.println(result);
-	}
+//	@Test
+//	public void testFindMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate() {
+//		String employeeId = "99047";
+//		Integer employmentRecordNumber = 0;
+//		Date effectiveDate = PsJob.findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber(employeeId, employmentRecordNumber);
+//		Integer result = PsJob.findMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate(employeeId, employmentRecordNumber, effectiveDate);
+//		assertNotNull(result);
+//		System.out.println(result);
+//	}
 
 	@Test
 	public void testCheckIfContractor() {
