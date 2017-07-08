@@ -23,10 +23,10 @@ public class EmployeeTerminationTest {
 //			System.out.println("triggerList either null or empty");
 //			java.util.Date effectiveDate = new java.util.Date();
 //			java.util.Date sqlDate = new java.util.Date(effectiveDate.getTime());
-//			BigDecimal effectiveSequence = new BigDecimal(0);
+//			BigInteger effectiveSequence = new BigInteger("0");
 //			String employeeId = "347940";
 //			String operatorId = "OPSHR";
-//			BigDecimal sequenceNumber = new BigDecimal(90727260);
+//			BigInteger sequenceNumber = new BigInteger(90727260);
 //			trigger = new PszTriggerEmployee();
 //			trigger.setCompletionStatus(completionStatus);
 //			trigger.setEffectiveDate(sqlDate);

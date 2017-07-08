@@ -5,11 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * ZHRI104A - Job Profile Change
+ * Job Profile Change Process
+ * @see ZHRI104A.SQC
  * @author John Tutton john@tutton.net
- *
  */
-
 public class EmployeeJobProfileChange {
 
 	/**

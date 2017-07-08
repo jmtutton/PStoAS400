@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * ZHRI109A - Group Transfer
+ * Group Transfer Process
+ * @see ZHRI109A.SQC
  * @author John Tutton john@tutton.net
- *
  */
 public class EmployeeGroupTransfer {
 

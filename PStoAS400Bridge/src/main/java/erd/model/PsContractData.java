@@ -6,6 +6,7 @@ import javax.persistence.*;
 import erd.DateUtil;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -87,7 +88,7 @@ public class PsContractData implements Serializable {
 	private String neeProviderId;
 
 	@Column(name="PROBATION_PERIOD", nullable=false, precision=38)
-	private BigDecimal probationPeriod;
+	private BigInteger probationPeriod;
 
 	@Column(name="RED_CHRG_CAT_BEL", nullable=false, length=6)
 	private String redChrgCatBel;
@@ -117,7 +118,7 @@ public class PsContractData implements Serializable {
 	private String socialBalanceBel;
 
 	@Column(name="VACATION_PERIOD", nullable=false, precision=38)
-	private BigDecimal vacationPeriod;
+	private BigInteger vacationPeriod;
 
 	@Column(name="VACN_PERIOD_UNIT", nullable=false, length=1)
 	private String vacnPeriodUnit;
@@ -299,11 +300,11 @@ public class PsContractData implements Serializable {
 		this.neeProviderId = neeProviderId;
 	}
 
-	public BigDecimal getProbationPeriod() {
+	public BigInteger getProbationPeriod() {
 		return this.probationPeriod;
 	}
 
-	public void setProbationPeriod(BigDecimal probationPeriod) {
+	public void setProbationPeriod(BigInteger probationPeriod) {
 		this.probationPeriod = probationPeriod;
 	}
 
@@ -371,11 +372,11 @@ public class PsContractData implements Serializable {
 		this.socialBalanceBel = socialBalanceBel;
 	}
 
-	public BigDecimal getVacationPeriod() {
+	public BigInteger getVacationPeriod() {
 		return this.vacationPeriod;
 	}
 
-	public void setVacationPeriod(BigDecimal vacationPeriod) {
+	public void setVacationPeriod(BigInteger vacationPeriod) {
 		this.vacationPeriod = vacationPeriod;
 	}
 

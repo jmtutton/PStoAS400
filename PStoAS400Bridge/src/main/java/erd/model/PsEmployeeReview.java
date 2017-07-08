@@ -2,7 +2,9 @@ package erd.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -25,7 +27,7 @@ public class PsEmployeeReview implements Serializable {
 	private Date effectiveDate;
 
 	@Column(name="EMPL_RCD", nullable=false, precision=38)
-	private BigDecimal employmentRecordNumber;
+	private BigInteger employmentRecordNumber;
 
 	@Column(name="EMPL_REVW_STATUS", nullable=false, length=1)
 	private String emplRevwStatus;
@@ -34,7 +36,7 @@ public class PsEmployeeReview implements Serializable {
 	private String finalRvwBandCd;
 
 	@Column(name="FP_REV_RATING", nullable=false, precision=5, scale=2)
-	private BigDecimal fpRevRating;
+	private Float fpRevRating;
 
 	@Column(name="GB_GROUP_ID", nullable=false, length=15)
 	private String gbGroupId;
@@ -77,13 +79,13 @@ public class PsEmployeeReview implements Serializable {
 	private BigDecimal totalEeAmount;
 
 	@Column(name="TOTAL_EE_PERCENT", nullable=false, precision=5, scale=2)
-	private BigDecimal totalEePercent;
+	private Float totalEePercent;
 
 	@Column(name="TOTAL_EE_POINTS", nullable=false, precision=38)
-	private BigDecimal totalEePoints;
+	private BigInteger totalEePoints;
 
 	@Column(name="TOTAL_EE_SAL_PTS", nullable=false, precision=38)
-	private BigDecimal totalEeSalPts;
+	private BigInteger totalEeSalPts;
 
 	public PsEmployeeReview() {
 	}
@@ -96,11 +98,11 @@ public class PsEmployeeReview implements Serializable {
 		this.effectiveDate = effectiveDate;
 	}
 
-	public BigDecimal getEmploymentRecordNumber() {
+	public BigInteger getEmploymentRecordNumber() {
 		return this.employmentRecordNumber;
 	}
 
-	public void setEmploymentRecordNumber(BigDecimal employmentRecordNumber) {
+	public void setEmploymentRecordNumber(BigInteger employmentRecordNumber) {
 		this.employmentRecordNumber = employmentRecordNumber;
 	}
 
@@ -128,11 +130,11 @@ public class PsEmployeeReview implements Serializable {
 		this.finalRvwBandCd = finalRvwBandCd;
 	}
 
-	public BigDecimal getFpRevRating() {
+	public Float getFpRevRating() {
 		return this.fpRevRating;
 	}
 
-	public void setFpRevRating(BigDecimal fpRevRating) {
+	public void setFpRevRating(Float fpRevRating) {
 		this.fpRevRating = fpRevRating;
 	}
 
@@ -232,27 +234,27 @@ public class PsEmployeeReview implements Serializable {
 		this.totalEeAmount = totalEeAmount;
 	}
 
-	public BigDecimal getTotalEePercent() {
+	public Float getTotalEePercent() {
 		return this.totalEePercent;
 	}
 
-	public void setTotalEePercent(BigDecimal totalEePercent) {
+	public void setTotalEePercent(Float totalEePercent) {
 		this.totalEePercent = totalEePercent;
 	}
 
-	public BigDecimal getTotalEePoints() {
+	public BigInteger getTotalEePoints() {
 		return this.totalEePoints;
 	}
 
-	public void setTotalEePoints(BigDecimal totalEePoints) {
+	public void setTotalEePoints(BigInteger totalEePoints) {
 		this.totalEePoints = totalEePoints;
 	}
 
-	public BigDecimal getTotalEeSalPts() {
+	public BigInteger getTotalEeSalPts() {
 		return this.totalEeSalPts;
 	}
 
-	public void setTotalEeSalPts(BigDecimal totalEeSalPts) {
+	public void setTotalEeSalPts(BigInteger totalEeSalPts) {
 		this.totalEeSalPts = totalEeSalPts;
 	}
 
@@ -266,7 +268,7 @@ public class PsEmployeeReview implements Serializable {
 	 * @param employmentRecordNumber
 	 * @return
 	 */
-	public static PsEmployeeReview findByEmployeeIdAndEffectiveDateAndEmploymentRecordNumber(String employeeId, Date effectiveDate, BigDecimal employmentRecordNumber) {
+	public static PsEmployeeReview findByEmployeeIdAndEffectiveDateAndEmploymentRecordNumber(String employeeId, Date effectiveDate, BigInteger employmentRecordNumber) {
 		//BEGIN-SELECT
 		//FROM PS_Employee_Review CER7
 		//WHERE CER7.EmplId = $PSEMPLID

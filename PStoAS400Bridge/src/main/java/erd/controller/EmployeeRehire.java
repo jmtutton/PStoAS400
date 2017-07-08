@@ -5,12 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * ZHRI106A - Rehire
- * @see ZHRI106A.SQC
+ * Employee Rehire Process
+ * @see ZHRI101A.SQC
  * @author John Tutton john@tutton.net
- *
  */
-
 public class EmployeeRehire {
 
 	public String doProcess(HashMap<String, Object> parameterMap) {

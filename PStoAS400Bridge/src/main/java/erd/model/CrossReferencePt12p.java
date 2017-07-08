@@ -1,7 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -28,7 +28,7 @@ public class CrossReferencePt12p implements Serializable {
 	private String department;
 
 	@Column(name="ZGLF_PT2REN", nullable=false, precision=38)
-	private BigDecimal ren;
+	private BigInteger ren;
 
 	@Column(name="ZGLF_PT2PRD", nullable=false, length=5)
 	private String prd;
@@ -48,10 +48,10 @@ public class CrossReferencePt12p implements Serializable {
 	public void setDepartment(String department) {
 		this.department = department;
 	}
-	public BigDecimal getRen() {
+	public BigInteger getRen() {
 		return ren;
 	}
-	public void setRen(BigDecimal ren) {
+	public void setRen(BigInteger ren) {
 		this.ren = ren;
 	}
 	public String getPrd() {

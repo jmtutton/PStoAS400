@@ -2,7 +2,7 @@ package erd.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -22,7 +22,7 @@ public class PsEmployment implements Serializable {
 	private String employeeId;
 
 	@Column(name="BENEFIT_RCD_NBR", nullable=false, precision=38)
-	private BigDecimal benefitRcdNbr;
+	private BigInteger benefitRcdNbr;
 
 	@Column(name="BUSINESS_TITLE", nullable=false, length=30)
 	private String businessTitle;
@@ -32,7 +32,7 @@ public class PsEmployment implements Serializable {
 	private Date cmpnySeniorityDt;
 
 	@Column(name="EMPL_RCD", nullable=false, precision=38)
-	private BigDecimal employmentRecordNumber;
+	private BigInteger employmentRecordNumber;
 
 	@Column(name="EXPECTED_RETURN_DT")
 	@Temporal(TemporalType.DATE)
@@ -109,11 +109,11 @@ public class PsEmployment implements Serializable {
 	public PsEmployment() {
 	}
 
-	public BigDecimal getBenefitRcdNbr() {
+	public BigInteger getBenefitRcdNbr() {
 		return this.benefitRcdNbr;
 	}
 
-	public void setBenefitRcdNbr(BigDecimal benefitRcdNbr) {
+	public void setBenefitRcdNbr(BigInteger benefitRcdNbr) {
 		this.benefitRcdNbr = benefitRcdNbr;
 	}
 
@@ -133,11 +133,11 @@ public class PsEmployment implements Serializable {
 		this.cmpnySeniorityDt = cmpnySeniorityDt;
 	}
 
-	public BigDecimal getEmploymentRecordNumber() {
+	public BigInteger getEmploymentRecordNumber() {
 		return this.employmentRecordNumber;
 	}
 
-	public void setEmploymentRecordNumber(BigDecimal employmentRecordNumber) {
+	public void setEmploymentRecordNumber(BigInteger employmentRecordNumber) {
 		this.employmentRecordNumber = employmentRecordNumber;
 	}
 

@@ -5,11 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * ZHRI101A - Employee New Hire Process
+ * Employee New Hire Process
+ * @see ZHRI101A.SQC
  * @author John Tutton john@tutton.net
- *
  */
-
 public class EmployeeNewHire {
 
 	/**

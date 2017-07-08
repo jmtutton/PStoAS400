@@ -1,7 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 import javax.persistence.*;
@@ -27,7 +27,7 @@ public class HR036P implements Serializable {
 	private Integer employeeNumber;
 	
 	@Column(name = "H36INX")
-	private BigDecimal indexNumber;
+	private BigInteger indexNumber;
 
 	public HR036P() {
 		super();
@@ -57,11 +57,11 @@ public class HR036P implements Serializable {
 		this.employeeNumber = employeeNumber;		
 	}
 	
-	public BigDecimal getIndexNumber() {
+	public BigInteger getIndexNumber() {
 		return indexNumber;
 	}
 
-	public void setIndexNumber(BigDecimal indexNumber) {
+	public void setIndexNumber(BigInteger indexNumber) {
 		this.indexNumber = indexNumber;		
 	}
 	
@@ -75,7 +75,7 @@ public class HR036P implements Serializable {
 
 	/**
 	 */
-	public static HR036P findByEmployeeNumberAndIndexNumber(Integer employeeNumber, BigDecimal indexNumber) {
+	public static HR036P findByEmployeeNumberAndIndexNumber(Integer employeeNumber, BigInteger indexNumber) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {

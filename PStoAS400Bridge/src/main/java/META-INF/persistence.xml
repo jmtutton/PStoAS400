@@ -48,6 +48,7 @@
         <class>erd.model.PsPersonalPhone</class>
         <class>erd.model.PszVariable</class>
         <class>erd.model.PsXlatItem</class>
+        <class>erd.model.PszPoiTermination</class>
         <class>erd.model.PszTriggerEmployee</class>
         <class>erd.model.PszTriggerNonPerson</class>
         <class>erd.model.PszTriggerSuperclass</class>

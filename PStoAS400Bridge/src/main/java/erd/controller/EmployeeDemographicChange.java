@@ -1,6 +1,6 @@
 package erd.controller;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -35,9 +35,7 @@ import erd.model.PsReferralSource;
  * Employee Demographic Change Process
  * @see ZHRI105A.SQC
  * @author John Tutton john@tutton.net
- *
  */
-
 public class EmployeeDemographicChange {
 
 	/**
@@ -342,7 +340,7 @@ public class EmployeeDemographicChange {
 			//LET $Wrk_Emplid = $PSResponsible_Id
 			//LET $LegEmplid //
 			//DO Get-Legacy-OprId                              !From ZHRI100A.SQR
-			recruiterId = ZHRI100A.fetchNewLegacyEmployeeId(responsibleId, new BigDecimal(0));
+			recruiterId = ZHRI100A.fetchNewLegacyEmployeeId(parameterMap);
 			//LET $PSRecruiter_ID = $LegEmplid
 			//LET $Wrk_Emplid = $Hld_Wrk_Emplid
 			//LET $LegEmplid = $Hld_LegEmplid
@@ -407,7 +405,7 @@ public class EmployeeDemographicChange {
 	 * @return
 	 */
 	private static HashMap<String, Object> fetchJob(HashMap<String, Object> parameterMap) {
-		PsJob psJob = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"), (BigDecimal)parameterMap.get("effectiveSequence"));
+		PsJob psJob = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"), (BigInteger)parameterMap.get("effectiveSequence"));
 		if(psJob != null) {
 			parameterMap.put("PSDate", psJob.getLocation());
 			parameterMap.put("PSLocation", psJob.getLocation());

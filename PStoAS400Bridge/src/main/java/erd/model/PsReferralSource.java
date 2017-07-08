@@ -2,7 +2,7 @@ package erd.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -32,16 +32,16 @@ public class PsReferralSource implements Serializable {
 	private String employeeReferralId;
 
 	@Column(name="HRS_PERSON_ID", nullable=false, precision=15)
-	private BigDecimal recruitmentPersonId;
+	private BigInteger recruitmentPersonId;
 
 	@Column(name="HRS_PROFILE_SEQ", nullable=false, precision=38)
-	private BigDecimal recruitmentProfileSeq;
+	private BigInteger recruitmentProfileSeq;
 
 	@Column(name="HRS_SOURCE_ID", nullable=false, precision=15)
-	private BigDecimal recruitmentSourceId;
+	private BigInteger recruitmentSourceId;
 
 	@Column(name="HRS_SUBSOURCE_ID", nullable=false, precision=15)
-	private BigDecimal recruitmentSubsourceId;
+	private BigInteger recruitmentSubsourceId;
 
 	@Column(name="PREV_EMPL_BY_COMPY", nullable=false, length=1)
 	private String previousEmployer;
@@ -87,35 +87,35 @@ public class PsReferralSource implements Serializable {
 		this.employeeId = employeeId;
 	}
 
-	public BigDecimal getRecruitmentPersonId() {
+	public BigInteger getRecruitmentPersonId() {
 		return this.recruitmentPersonId;
 	}
 
-	public void setRecruitmentPersonId(BigDecimal recruitmentPersonId) {
+	public void setRecruitmentPersonId(BigInteger recruitmentPersonId) {
 		this.recruitmentPersonId = recruitmentPersonId;
 	}
 
-	public BigDecimal getRecruitmentProfileSeq() {
+	public BigInteger getRecruitmentProfileSeq() {
 		return this.recruitmentProfileSeq;
 	}
 
-	public void setRecruitmentsProfileSeq(BigDecimal recruitmentProfileSeq) {
+	public void setRecruitmentsProfileSeq(BigInteger recruitmentProfileSeq) {
 		this.recruitmentProfileSeq = recruitmentProfileSeq;
 	}
 
-	public BigDecimal getRecruitmentSourceId() {
+	public BigInteger getRecruitmentSourceId() {
 		return this.recruitmentSourceId;
 	}
 
-	public void setRecruitmentSourceId(BigDecimal recruitmentSourceId) {
+	public void setRecruitmentSourceId(BigInteger recruitmentSourceId) {
 		this.recruitmentSourceId = recruitmentSourceId;
 	}
 
-	public BigDecimal getRecruitmentSubsourceId() {
+	public BigInteger getRecruitmentSubsourceId() {
 		return this.recruitmentSubsourceId;
 	}
 
-	public void setRecruitmentSubsourceId(BigDecimal recruitmentSubsourceId) {
+	public void setRecruitmentSubsourceId(BigInteger recruitmentSubsourceId) {
 		this.recruitmentSubsourceId = recruitmentSubsourceId;
 	}
 

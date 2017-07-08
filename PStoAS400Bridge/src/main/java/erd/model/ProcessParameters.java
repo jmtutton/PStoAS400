@@ -1,6 +1,6 @@
 package erd.model;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 
 public class ProcessParameters {
@@ -10,8 +10,8 @@ public class ProcessParameters {
 		private String completionStatus;
 		private String operatorId; //$PSOperId
 		private String employeeId; //$PSEmpl
-		private BigDecimal effectiveSequence;
-		private BigDecimal eidIndexNumber;
+		private BigInteger effectiveSequence;
+		private BigInteger eidIndexNumber;
 		private Date effectiveDate;
 		
 		private Boolean poiFlag; //$PoiFlag
@@ -40,10 +40,10 @@ public class ProcessParameters {
 		public void setEmployeeId(String employeeId) {
 			this.employeeId = employeeId != null ? employeeId.trim() : employeeId;
 		}
-//		public BigDecimal getIndexNumber() {
+//		public BigInteger getIndexNumber() {
 //			return indexNumber;
 //		}
-//		public void setIndexNumber(BigDecimal indexNumber) {
+//		public void setIndexNumber(BigInteger indexNumber) {
 //			this.indexNumber = indexNumber;
 //		}
 		public Date getEffectiveDate() {
@@ -112,16 +112,16 @@ public class ProcessParameters {
 		public void setErrorTimeParameter(String errorTimeParameter) {
 			this.errorTimeParameter = errorTimeParameter;
 		}
-		public void setEffectiveSequence(BigDecimal effectiveSequence) {
+		public void setEffectiveSequence(BigInteger effectiveSequence) {
 			this.effectiveSequence = effectiveSequence;
 		}
-		public BigDecimal getEffectiveSequence() {
+		public BigInteger getEffectiveSequence() {
 			return this.effectiveSequence;
 		}
-		public BigDecimal getEidIndexNumber() {
+		public BigInteger getEidIndexNumber() {
 			return eidIndexNumber;
 		}
-		public void setEidIndexNumber(BigDecimal eidIndexNumber) {
+		public void setEidIndexNumber(BigInteger eidIndexNumber) {
 			this.eidIndexNumber = eidIndexNumber;
 		}
 		@Override

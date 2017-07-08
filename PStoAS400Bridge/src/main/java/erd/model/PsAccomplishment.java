@@ -6,6 +6,7 @@ import javax.persistence.*;
 import erd.DateUtil;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -83,7 +84,7 @@ public class PsAccomplishment implements Serializable {
 	private String fpSubjectCd;
 
 	@Column(name="GPA", nullable=false, precision=9, scale=2)
-	private BigDecimal gpa;
+	private Float gpa;
 
 	@Column(name="GRADUATE_INDICATOR", nullable=false, length=1)
 	private String graduateIndicator;
@@ -176,7 +177,7 @@ public class PsAccomplishment implements Serializable {
 	private String schoolCode;
 
 	@Column(name="SCORE", nullable=false, precision=9, scale=2)
-	private BigDecimal score;
+	private Float score;
 
 	@Column(name="SPEAK_PROFICIENCY", nullable=false, length=1)
 	private String speakProficiency;
@@ -209,7 +210,7 @@ public class PsAccomplishment implements Serializable {
 	private String writeProficiency;
 
 	@Column(name="YR_ACQUIRED", nullable=false, precision=38)
-	private BigDecimal yrAcquired;
+	private BigInteger yrAcquired;
 
 	public PsAccomplishment() {
 	}
@@ -366,11 +367,11 @@ public class PsAccomplishment implements Serializable {
 		this.fpSubjectCd = fpSubjectCd;
 	}
 
-	public BigDecimal getGpa() {
+	public Float getGpa() {
 		return this.gpa;
 	}
 
-	public void setGpa(BigDecimal gpa) {
+	public void setGpa(Float gpa) {
 		this.gpa = gpa;
 	}
 
@@ -598,11 +599,11 @@ public class PsAccomplishment implements Serializable {
 		this.schoolCode = schoolCode;
 	}
 
-	public BigDecimal getScore() {
+	public Float getScore() {
 		return this.score;
 	}
 
-	public void setScore(BigDecimal score) {
+	public void setScore(Float score) {
 		this.score = score;
 	}
 
@@ -686,11 +687,11 @@ public class PsAccomplishment implements Serializable {
 		this.writeProficiency = writeProficiency;
 	}
 
-	public BigDecimal getYrAcquired() {
+	public BigInteger getYrAcquired() {
 		return this.yrAcquired;
 	}
 
-	public void setYrAcquired(BigDecimal yrAcquired) {
+	public void setYrAcquired(BigInteger yrAcquired) {
 		this.yrAcquired = yrAcquired;
 	}
 	

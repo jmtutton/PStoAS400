@@ -5,10 +5,10 @@
 
     <groupId>com.ehi.erd</groupId>
     <artifactId>PStoAS400Bridge</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1</version>
 
     <name>PStoAS400Bridge</name>
-    <description> between PeopleSoft database tables and legacy AS/400 DB2 tables</description>
+    <description>Bridge between PeopleSoft database tables and legacy AS/400 DB2 tables</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -22,33 +22,7 @@
     </properties>
 
     <dependencies>
-<!--         <dependency>  -->
-<!--             <groupId>org.projectlombok</groupId>  -->
-<!--                 <artifactId>lombok</artifactId>  -->
-<!--                 <version>1.16.16</version>  -->
-<!--                 <scope>provided</scope>  -->
-<!--             </dependency> -->
-<!--         <dependency> -->
-<!--             <groupId>org.springframework.boot</groupId> -->
-<!--             <artifactId>spring-boot-starter-data-jpa</artifactId> -->
-<!--             <exclusions> -->
-<!--                 <exclusion> -->
-<!--                     <groupId>org.hibernate</groupId> -->
-<!--                     <artifactId>hibernate-entitymanager</artifactId> -->
-<!--                 </exclusion> -->
-<!--             </exclusions> -->
-<!--         </dependency> -->
-<!--         <dependency> -->
-<!--             <groupId>com.h2database</groupId> -->
-<!--             <artifactId>h2</artifactId> -->
-<!--         </dependency> -->
-<!--         <dependency> -->
-<!--             <groupId>org.springframework.boot</groupId> -->
-<!--             <artifactId>spring-boot-starter-test</artifactId> -->
-<!--             <scope>test</scope> -->
-<!--         </dependency> -->
-
-
+    
        <!-- ********** JUNIT ********** -->
         <dependency>
             <groupId>junit</groupId>
@@ -57,6 +31,7 @@
         </dependency>
 
        <!-- ********** JAVA PERSISTENCE API ********** -->
+       <!-- The Java Persistence API provides Java developers with an object/relational mapping facility for managing relational data in Java applications. -->
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>javax.persistence</artifactId>
@@ -64,6 +39,7 @@
         </dependency>
         
        <!-- ********** ECLIPSELINK ********** -->
+       <!-- The EclipseLink JPA provides developers with a standards based Object-Relational persistence solution with additional support for many advanced features. -->
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>eclipselink</artifactId>
@@ -88,25 +64,31 @@
 <!--             <artifactId>mysql-connector-java</artifactId> -->
 <!--             <version>5.1.42</version> -->
 <!--         </dependency> -->
+
+        <!-- ********** JSCH - JAVA SECURE CHANNEL ********** -->
+        <!-- JSch is a pure Java implementation of SSH2. -->
 		<dependency>
 		    <groupId>com.jcraft</groupId>
 		    <artifactId>jsch</artifactId>
 		    <version>0.1.54</version>
 		</dependency>
 
+        <!-- ********** APACHE COMMONS NET ********** -->
+        <!-- Apache Commons Net™ library implements the client side of many basic Internet protocols. -->
 		<dependency>
 		    <groupId>commons-net</groupId>
 		    <artifactId>commons-net</artifactId>
 		    <version>3.3</version>
 		</dependency>
 		
+		<!-- ********** APACHE DIRECTORY STUDIO™ ********** -->
+		<!-- Apache Directory Studio is a complete directory tooling platform intended to be used with any LDAP server. -->
 		<dependency>
 		    <groupId>org.apache.directory.studio</groupId>
 		    <artifactId>org.apache.commons.io</artifactId>
 		    <version>2.4</version>
 		</dependency>
 		
-        
     </dependencies>
 
     <build>

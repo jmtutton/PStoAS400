@@ -1,6 +1,6 @@
 package erd.controller;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -13,10 +13,9 @@ import erd.model.PsEmployeeReview;
 
 /**
  * Employee Date Change Process
- * @see ZHRI107A.SQC
  * Employment Review, Accomplishment and Contract Data change
+ * @see ZHRI107A.SQC
  * @author John Tutton john@tutton.net
- *
  */
 public class EmployeeDateChange {
 
@@ -99,7 +98,7 @@ public class EmployeeDateChange {
 		PsEmployeeReview psEmployeeReview = 
 				PsEmployeeReview.findByEmployeeIdAndEffectiveDateAndEmploymentRecordNumber(
 						(String)parameterMap.get("employeeId"), 
-						(Date)parameterMap.get("effectiveDate"), new BigDecimal(0));
+						(Date)parameterMap.get("effectiveDate"), new BigInteger("0"));
 		//!Format next review date and last review date so legacy will accept it (MM field, DD field and CCYY field)
 		if(psEmployeeReview.getNextReviewDt() != null) {
 			parameterMap.put("nextReviewYear", new SimpleDateFormat("yyyy").format(psEmployeeReview.getNextReviewDt()));

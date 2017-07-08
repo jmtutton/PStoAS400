@@ -2,7 +2,9 @@ package erd.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
@@ -269,7 +271,7 @@ public class PsJobCode implements Serializable {
 	private BigDecimal jobAccntabPct;
 
 	@Column(name="JOB_ACCNTAB_POINTS", nullable=false, precision=38)
-	private BigDecimal jobAccntabPoints;
+	private BigInteger jobAccntabPoints;
 
 	@Column(name="JOB_CTG_FRA_CD", nullable=false, length=2)
 	private String jobCtgFraCd;
@@ -284,16 +286,16 @@ public class PsJobCode implements Serializable {
 	private BigDecimal jobKnowhowPct;
 
 	@Column(name="JOB_KNOWHOW_POINTS", nullable=false, precision=38)
-	private BigDecimal jobKnowhowPoints;
+	private BigInteger jobKnowhowPoints;
 
 	@Column(name="JOB_POINTS_TOTAL", nullable=false, precision=38)
-	private BigDecimal jobPointsTotal;
+	private BigInteger jobPointsTotal;
 
 	@Column(name="JOB_PROBSLV_PCT", nullable=false, precision=4, scale=1)
 	private BigDecimal jobProbslvPct;
 
 	@Column(name="JOB_PROBSLV_POINTS", nullable=false, precision=38)
-	private BigDecimal jobProbslvPoints;
+	private BigInteger jobProbslvPoints;
 
 	@Column(name="JOB_SUB_FUNC", nullable=false, length=3)
 	private String jobSubFunc;
@@ -378,16 +380,16 @@ public class PsJobCode implements Serializable {
 	private String stdHrsFrequency;
 
 	@Column(name="STEP", nullable=false, precision=38)
-	private BigDecimal step;
+	private BigInteger step;
 
 	@Column(name="SURVEY_JOB_CODE", nullable=false, length=8)
 	private String surveyJobCode;
 
 	@Column(name="SURVEY_SALARY", nullable=false, precision=38)
-	private BigDecimal surveySalary;
+	private BigInteger surveySalary;
 
 	@Column(name="TEACH_WEEKS_AUS", nullable=false, precision=38)
-	private BigDecimal teachWeeksAus;
+	private BigInteger teachWeeksAus;
 
 	@Column(name="TECHNICAL", nullable=false, length=1)
 	private String technical;
@@ -1056,11 +1058,11 @@ public class PsJobCode implements Serializable {
 		this.jobAccntabPct = jobAccntabPct;
 	}
 
-	public BigDecimal getJobAccntabPoints() {
+	public BigInteger getJobAccntabPoints() {
 		return this.jobAccntabPoints;
 	}
 
-	public void setJobAccntabPoints(BigDecimal jobAccntabPoints) {
+	public void setJobAccntabPoints(BigInteger jobAccntabPoints) {
 		this.jobAccntabPoints = jobAccntabPoints;
 	}
 
@@ -1096,19 +1098,19 @@ public class PsJobCode implements Serializable {
 		this.jobKnowhowPct = jobKnowhowPct;
 	}
 
-	public BigDecimal getJobKnowhowPoints() {
+	public BigInteger getJobKnowhowPoints() {
 		return this.jobKnowhowPoints;
 	}
 
-	public void setJobKnowhowPoints(BigDecimal jobKnowhowPoints) {
+	public void setJobKnowhowPoints(BigInteger jobKnowhowPoints) {
 		this.jobKnowhowPoints = jobKnowhowPoints;
 	}
 
-	public BigDecimal getJobPointsTotal() {
+	public BigInteger getJobPointsTotal() {
 		return this.jobPointsTotal;
 	}
 
-	public void setJobPointsTotal(BigDecimal jobPointsTotal) {
+	public void setJobPointsTotal(BigInteger jobPointsTotal) {
 		this.jobPointsTotal = jobPointsTotal;
 	}
 
@@ -1120,11 +1122,11 @@ public class PsJobCode implements Serializable {
 		this.jobProbslvPct = jobProbslvPct;
 	}
 
-	public BigDecimal getJobProbslvPoints() {
+	public BigInteger getJobProbslvPoints() {
 		return this.jobProbslvPoints;
 	}
 
-	public void setJobProbslvPoints(BigDecimal jobProbslvPoints) {
+	public void setJobProbslvPoints(BigInteger jobProbslvPoints) {
 		this.jobProbslvPoints = jobProbslvPoints;
 	}
 
@@ -1360,11 +1362,11 @@ public class PsJobCode implements Serializable {
 		this.stdHrsFrequency = stdHrsFrequency;
 	}
 
-	public BigDecimal getStep() {
+	public BigInteger getStep() {
 		return this.step;
 	}
 
-	public void setStep(BigDecimal step) {
+	public void setStep(BigInteger step) {
 		this.step = step;
 	}
 
@@ -1376,19 +1378,19 @@ public class PsJobCode implements Serializable {
 		this.surveyJobCode = surveyJobCode;
 	}
 
-	public BigDecimal getSurveySalary() {
+	public BigInteger getSurveySalary() {
 		return this.surveySalary;
 	}
 
-	public void setSurveySalary(BigDecimal surveySalary) {
+	public void setSurveySalary(BigInteger surveySalary) {
 		this.surveySalary = surveySalary;
 	}
 
-	public BigDecimal getTeachWeeksAus() {
+	public BigInteger getTeachWeeksAus() {
 		return this.teachWeeksAus;
 	}
 
-	public void setTeachWeeksAus(BigDecimal teachWeeksAus) {
+	public void setTeachWeeksAus(BigInteger teachWeeksAus) {
 		this.teachWeeksAus = teachWeeksAus;
 	}
 

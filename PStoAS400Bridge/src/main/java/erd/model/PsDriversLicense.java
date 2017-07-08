@@ -2,7 +2,7 @@ package erd.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class PsDriversLicense implements Serializable {
 	private String licenseIsSuspended;
 
 	@Column(name="NUMBER_OF_PTS", nullable=false, precision=38)
-	private BigDecimal numberOfPoints;
+	private BigInteger numberOfPoints;
 
 	@Column(name="\"STATE\"", nullable=false, length=6)
 	private String state;
@@ -54,7 +54,7 @@ public class PsDriversLicense implements Serializable {
 	private Date validFromDate;
 
 	@Column(name="VIOLATIONS", nullable=false, precision=38)
-	private BigDecimal numberOfViolations;
+	private BigInteger numberOfViolations;
 
 	public PsDriversLicense() {
 	}
@@ -123,11 +123,11 @@ public class PsDriversLicense implements Serializable {
 		this.licenseIsSuspended = licenseIsSuspended;
 	}
 
-	public BigDecimal getNumberOfPoints() {
+	public BigInteger getNumberOfPoints() {
 		return this.numberOfPoints;
 	}
 
-	public void setNumberOfPoints(BigDecimal numberOfPoints) {
+	public void setNumberOfPoints(BigInteger numberOfPoints) {
 		this.numberOfPoints = numberOfPoints;
 	}
 
@@ -147,11 +147,11 @@ public class PsDriversLicense implements Serializable {
 		this.validFromDate = validFromDate;
 	}
 
-	public BigDecimal getNumberOfViolations() {
+	public BigInteger getNumberOfViolations() {
 		return this.numberOfViolations;
 	}
 
-	public void setNumberOfViolations(BigDecimal numberOfViolations) {
+	public void setNumberOfViolations(BigInteger numberOfViolations) {
 		this.numberOfViolations = numberOfViolations;
 	}
 

@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * ZHRI201A - Contingent Employee and Multiple EID New Hire
+ * Contingent Employee and Multiple EID New Hire Process
+ * @see ZHRI201A.SQC
  * @author John Tutton john@tutton.net
- *
  */
 public class NonPersonNewHire {
 	

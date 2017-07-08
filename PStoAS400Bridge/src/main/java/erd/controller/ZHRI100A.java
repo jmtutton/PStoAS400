@@ -2,7 +2,7 @@ package erd.controller;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -26,8 +26,11 @@ import erd.model.ServerProperties;
 import java.io.IOException;
 import org.apache.commons.net.bsd.RExecClient;
 import org.apache.commons.io.IOUtils;
-
-
+/**
+ * This is the main process controlling class
+ * @see ZHRI100A.SQR
+ * @author John Tutton john@tutton.net
+ */
 public class ZHRI100A {
 
 	public static void main() {
@@ -39,7 +42,7 @@ public class ZHRI100A {
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		//Reset   !Reset.sqc  //TODO
+		//reset   !Reset.sqc  //TODO: ???
 	}
 
 	/**
@@ -72,22 +75,21 @@ public class ZHRI100A {
 			for(PszTriggerSuperclass trigger : triggerList) {
 				trigger = checkTriggerRecord(trigger);
 				if("P".equalsIgnoreCase(trigger.getCompletionStatus())) {
-					HashMap<String, Object> parameterMap = parameterizeTriggerFields(trigger);
-					trigger.setCompletionStatus(callPrograms(parameterMap));
+					trigger.setCompletionStatus(callPrograms(trigger));
 				}
-//				else {
 				//update trigger record
+				int numberOfRecordsUpdated;
 				if(trigger instanceof PszTriggerEmployee) {
-					PszTriggerEmployee.setCompletionStatusBySequenceNumber(trigger.getCompletionStatus(), trigger.getSequenceNumber());
+					numberOfRecordsUpdated = PszTriggerEmployee.setCompletionStatusBySequenceNumber(trigger.getCompletionStatus(), trigger.getSequenceNumber());
 				}
 				else {
-					PszTriggerNonPerson.setCompletionStatusBySequenceNumber(trigger.getCompletionStatus(), trigger.getSequenceNumber());
+					numberOfRecordsUpdated = PszTriggerNonPerson.setCompletionStatusBySequenceNumber(trigger.getCompletionStatus(), trigger.getSequenceNumber());
 				}
-//				}
+				System.out.println("numberOfRecordsUpdated: " + numberOfRecordsUpdated);
 			}
 			//TRANCTRL.Commit-Transaction
-			//LET $Command = 'sleep 15'  !After interface run wait 15 seconds and do it again  !sree**rehost  !ZHR_MOD_ZHRI100A_sleep
-			//Call System Using $Command #status Wait  !sree**rehost  !ZHR_MOD_ZHRI100A_sleep
+			//LET $Command = 'sleep 15'  !After interface run wait 15 seconds and do it again  !ZHR_MOD_ZHRI100A_sleep
+			//Call System Using $Command #status Wait  !ZHR_MOD_ZHRI100A_sleep
 			//sleep for 15 seconds (15000 milliseconds)
 			Thread.sleep(15000);
 			//****************************************************************************************************
@@ -120,19 +122,6 @@ public class ZHRI100A {
 		//****************************************************************************************************
 		//End-Procedure Process-Main
 	}
-
-	/**
-	 * @see FTP-File in ZHRI100A.SQR
-	 * This procedure will transfer the file from UNIX to NT server
-	 */
-	public static void ZHRI100A_ftpFile() {
-		System.out.println("*** ZHRI100A.ZHRI100A_ftpFile()");
-		//BEGIN-PROCEDURE FTP-FILE
-		//IF #status != 0
-		//END-IF
-		//END-PROCEDURE
-		//*** do nothing ***
-	}
 	
 	/**
 	 * Sets the values common to all processes class that shares the values across the application. 
@@ -141,7 +130,6 @@ public class ZHRI100A {
 	 */
 	public static HashMap<String, Object> parameterizeTriggerFields(PszTriggerSuperclass trigger) {
 		System.out.println("*** ZHRI100A.parameterizeTriggerFields");
-//		System.out.println(((PszTriggerNonPerson)trigger).toString());
 		HashMap<String, Object> parameterMap = new HashMap<String, Object>();
 		parameterMap.put("criticalFlag", false);
 		parameterMap.put("processName", trigger.getProcessName());
@@ -156,7 +144,6 @@ public class ZHRI100A {
 		else {
 			parameterMap.put("poiFlag", true);
 			parameterMap.put("eidIndexNumber", ((PszTriggerNonPerson)trigger).getEidIndexNumber());
-			System.out.println("eidIndexNumber: " + parameterMap.get("eidIndexNumber"));
 		}
 //		System.out.println(parameterMap.get("employeeId"));
 		return parameterMap;
@@ -168,50 +155,62 @@ public class ZHRI100A {
 	 * @param trigger
 	 * @return
 	 */
-	public static String callPrograms(HashMap<String, Object> parameterMap) {
+	public static String callPrograms(PszTriggerSuperclass trigger) {
+		HashMap<String, Object> parameterMap = parameterizeTriggerFields(trigger);
 		System.out.println("*** ZHRI100A.callPrograms");
 		String completionStatus = (String)parameterMap.get("completionStatus");
 		switch((String)parameterMap.get("processName")) {
-		case "ZHRI101A": //Process to hire employee
+		case "ZHRI101A": //process to hire employee
+			parameterMap.put("processName", "HRZ101A");
 			parameterMap.put("hireRehireFlag",  "H");
 			completionStatus = new EmployeeNewHire().doProcess(parameterMap);
 			break;
-		case "ZHRI102A": //Process to terminate an employee
+		case "ZHRI102A": //process to terminate an employee
+			parameterMap.put("processName", "HRZ102A");
 			completionStatus = new EmployeeTermination().doProcess(parameterMap);
 			break;
-		case "ZHRI104A": //Process for employee job profile change
+		case "ZHRI104A": //process for employee job profile change
+			parameterMap.put("processName", "HRZ104A");
 			completionStatus = new EmployeeJobProfileChange().doProcess(parameterMap);
 			break;
-		case "ZHRI105A": //Process for employee demographics change
+		case "ZHRI105A": //process for employee demographics change
+			parameterMap.put("processName", "HRZ105A");
 			completionStatus = new EmployeeDemographicChange().doProcess(parameterMap);
 			break;
-		case "ZHRI106A": //Process for employee rehire
-			//DO HR01-Process-Main       !ZHRI101A.SQC
+		case "ZHRI106A": //process for employee rehire
+			//process combined with new hire process, ZHRI101A
+			parameterMap.put("processName", "HRZ101A");
 			parameterMap.put("hireRehireFlag",  "R");
 			completionStatus =  new EmployeeNewHire().doProcess(parameterMap);
 			break;
-		case "ZHRI107A": //Process for converting employee dates
+		case "ZHRI107A": //process for converting employee dates
+			parameterMap.put("processName", "HRZ107A");
 			completionStatus = new EmployeeDateChange().doProcess(parameterMap);
 			break;
-		case "ZHRI109A": //Process for employee group transfer
+		case "ZHRI109A": //process for employee group transfer
+			parameterMap.put("processName", "HRZ109A");
 			completionStatus = new EmployeeGroupTransfer().doProcess(parameterMap);
 			break;
-		case "ZHRI201A": //Process for non-person new hire
+		case "ZHRI201A": //process for non-person new hire
+			parameterMap.put("processName", "HRZ201A");
 			parameterMap.put("hireRehireFlag",  "H");
 			completionStatus = new NonPersonNewHire().doProcess(parameterMap);
 			break;
-		case "ZHRI202A": //Process for non-person termination
+		case "ZHRI202A": //process for non-person termination
+			parameterMap.put("processName", "HRZ202A");
 			completionStatus = new NonPersonTermination().doProcess(parameterMap);
 			break;
-		case "ZHRI205A": //Process for non-person demographics change
+		case "ZHRI205A": //process for non-person demographics change
+			parameterMap.put("processName", "HRZ205A");
 			completionStatus = new NonPersonDemographicChange().doProcess(parameterMap);
 			break;
-		case "ZHRI206A": //Process for non-person rehire
-			//DO HR201-Process-Main       !ZHRI201A.SQC
+		case "ZHRI206A": //process for non-person rehire
+			//process combined with new hire process, ZHRI201A
+			parameterMap.put("processName", "HRZ201A");
 			parameterMap.put("hireRehireFlag",  "R");
 			completionStatus = new NonPersonNewHire().doProcess(parameterMap);
 			break;
-		case "ZHRI101D": //Row deleted on hire
+		case "ZHRI101D": //row deleted on hire
 			parameterMap.put("errorProgramParameter", "HRZ101A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the hire process");
 			parameterMap.put("criticalFlag", true);
@@ -219,7 +218,7 @@ public class ZHRI100A {
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
-		case "ZHRI102D": //Row deleted on term
+		case "ZHRI102D": //row deleted on term
 			parameterMap.put("errorProgramParameter", "HRZ102A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the termination process");
 			parameterMap.put("criticalFlag", true);
@@ -227,7 +226,7 @@ public class ZHRI100A {
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
-		case "ZHRI104D": //Row deleted on job status change
+		case "ZHRI104D": //row deleted on job status change
 			parameterMap.put("errorProgramParameter", "HRZ104A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the job profile process");
 			parameterMap.put("criticalFlag", true);
@@ -235,7 +234,7 @@ public class ZHRI100A {
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
-		case "ZHRI105D": //Row deleted on demographics change
+		case "ZHRI105D": //row deleted on demographics change
 			parameterMap.put("errorProgramParameter", "HRZ105A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the demographics process");
 			parameterMap.put("criticalFlag", true);
@@ -243,7 +242,7 @@ public class ZHRI100A {
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
-		case "ZHRI106D": //Row deleted on rehire
+		case "ZHRI106D": //row deleted on rehire
 			parameterMap.put("errorProgramParameter", "HRZ101A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the re-hire process");
 			parameterMap.put("criticalFlag", true);
@@ -251,7 +250,7 @@ public class ZHRI100A {
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
-		case "ZHRI107D": //Row deleted on the dates process
+		case "ZHRI107D": //row deleted on the dates process
 			parameterMap.put("errorProgramParameter", "HRZ107A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the dates process");
 			parameterMap.put("criticalFlag", true);
@@ -259,7 +258,7 @@ public class ZHRI100A {
 			parameterMap.put("criticalFlag", false);
 			completionStatus = "C";
 			break;
-		case "ZHRI109D": //Row deleted on the group transfer process
+		case "ZHRI109D": //row deleted on the group transfer process
 			parameterMap.put("errorProgramParameter", "HRZ109A");
 			parameterMap.put("errorMessageParameter", "A row was deleted on the group transfer process");
 			parameterMap.put("criticalFlag", true);
@@ -342,7 +341,13 @@ public class ZHRI100A {
 	public static void doErrorCommand(HashMap<String, Object> parameterMap) {
 		System.out.println("*** ZHRI100A.doErrorCommand()");
 		parameterMap.put("parameterString", composeErrorParameterString(parameterMap));
-		parameterMap.put("processName", "HRZ110A");
+		if((Boolean)parameterMap.get("poiFlag")) {
+			parameterMap.get("poiFlag");
+			parameterMap.put("processName", "HRZ210A");
+		}
+		else {
+			parameterMap.put("processName", "HRZ110A");
+		}
 		ZHRI100A.doCommand(parameterMap);
 	}
 
@@ -401,34 +406,22 @@ public class ZHRI100A {
 	 */
 	public static String fetchLegacyEmployeeId(HashMap<String, Object> parameterMap) {
 		System.out.println("*** ZHRI100A.fetchLegacyEmployeeId()");
-		System.out.println(parameterMap.get("employeeId"));
-		System.out.println(parameterMap.get("eidIndexNumber"));
 		String employeeId;
-		if((Boolean)parameterMap.get("poiFlag")) {
-			employeeId = CrossReferenceMultipleEmployeeId.findLegacyEmployeeIdByEmployeeIdAndSequence((String)parameterMap.get("employeeId"), (BigDecimal)parameterMap.get("eidIndexNumber"));
+		if((Boolean)parameterMap.get("poiFlag") == false) {
+			parameterMap.put("eidIndexNumber", new BigInteger("0"));
 		}
-		else {
+		if(new BigInteger("0").equals((BigInteger)parameterMap.get("eidIndexNumber"))) {
 			employeeId = CrossReferenceEmployeeId.ZHRI100A_getLegIdForSeq0((String)parameterMap.get("employeeId"));
 		}
+		else {
+			employeeId = CrossReferenceMultipleEmployeeId.findLegacyEmployeeIdByEmployeeIdAndSequence((String)parameterMap.get("employeeId"), (BigInteger)parameterMap.get("eidIndexNumber"));
+		}
 		if(employeeId == null || employeeId.isEmpty()) {
-			BigDecimal indexNumber = (Boolean)parameterMap.get("poiFlag") ? (BigDecimal)parameterMap.get("effectiveSequence") : new BigDecimal(0);
-			employeeId = fetchNewLegacyEmployeeId((String)parameterMap.get("employeeId"), indexNumber);
+			employeeId = fetchNewLegacyEmployeeId(parameterMap);
 		}
 		return employeeId;
 	}
 
-	//!----------------------------------------------------------------------
-	//! Procedure:  Insert-Error
-	//! Desc:  This is an error routine to keep the program from abending when
-	//!        an insert fails
-	//!----------------------------------------------------------------------
-
-	//!----------------------------------------------------------------------
-	//! Procedure:  Update-Error
-	//! Desc:  This is an error routine to keep the program from abending when
-	//!        an insert fails
-	//!----------------------------------------------------------------------
-	
 	/**
 	 * initializeServerProperties
 	 * Sets the values for the remote AS400 server in a static class that shares the values across the application. 
@@ -532,34 +525,30 @@ public class ZHRI100A {
 	/**
 	 * Formulates legacy OprId from HR036P where HR036P.H36EM# = #wrk_emplid and HR036P.H36INX = #indexNum UNION
 	 * @see Get-Legacy-OprId in ZHRI100A.SQR
-	 * @param employeeId
-	 * @param indexNumber - value is 0 if employee is false
+	 * @param parameterMap
 	 * @return legacyEmployeeId
 	 */
-	public static String fetchNewLegacyEmployeeId(String employeeId, BigDecimal indexNumber) {
+	public static String fetchNewLegacyEmployeeId(HashMap<String, Object> parameterMap) {
 		System.out.println("*** ZHRI100A.fetchNewLegacyEmployeeId()");
 		String legacyEmployeeId = null;
-		String legacyEmployeeName;
 		Integer employeeNumber = -1;
 		try {
-			employeeNumber = Integer.parseInt(employeeId);
+			employeeNumber = Integer.parseInt((String)parameterMap.get("employeeId"));
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
-		HR036P hr036P = HR036P.findByEmployeeNumberAndIndexNumber(employeeNumber, indexNumber);
+		if((Boolean)parameterMap.get("poiFlag") == false) {
+			parameterMap.put("eidIndexNumber", new BigInteger("0"));
+		}
+		HR036P hr036P = HR036P.findByEmployeeNumberAndIndexNumber(employeeNumber, (BigInteger)parameterMap.get("eidIndexNumber"));
     	if(hr036P != null) {
-			if(hr036P.getEmployeeNumber() == employeeNumber) {
-				legacyEmployeeName = hr036P.getEmployeeName();
-		    	if(legacyEmployeeName != null && !legacyEmployeeName.isEmpty()) {
-		    		legacyEmployeeName = erd.StringUtil.formatLegacyEmployeeNameToPeopleSoftEmployeeName(hr036P.getEmployeeName());
-		    	}
-	    		legacyEmployeeId = hr036P.getEmployeeId();
-		    	if(legacyEmployeeId != null && legacyEmployeeId.length() > 5) {
-		    		legacyEmployeeId = legacyEmployeeId.substring(0, 5);
-		    	}
-		    	CrossReferenceMultipleEmployeeId.saveNewLegacyEmployeeId(employeeId, legacyEmployeeId, indexNumber);
-			}
+    		legacyEmployeeId = hr036P.getEmployeeId();
+    		//TODO: Is this value ever > 5, and is it OK to truncate if it is? Currently, there are no values with length > 5 in table.
+	    	if(legacyEmployeeId != null && legacyEmployeeId.length() > 5) {
+	    		legacyEmployeeId = legacyEmployeeId.substring(0, 5);
+	    	}
+	    	CrossReferenceMultipleEmployeeId.saveNewLegacyEmployeeId((String)parameterMap.get("employeeId"), legacyEmployeeId, (BigInteger)parameterMap.get("eidIndexNumber"));
 			return legacyEmployeeId;
     	}
     	return null;
@@ -576,7 +565,7 @@ public class ZHRI100A {
 		String commandString = 
 						"CALL " + ServerProperties.getAs400Library() + "/" 
 								+ (String)parameterMap.get("processName") + " " 
-								+ "PARM(" + (String)parameterMap.get("paramterString") + ")";
+								+ "PARM(" + (String)parameterMap.get("parameterString") + ")";
 		return commandString;
 	}
 
@@ -611,7 +600,7 @@ public class ZHRI100A {
 		}
 		String errorParameterString = "'" + (String)parameterMap.get("errorProgramParameter") + "' "
 					+ "'" + (String)parameterMap.get("employeeId") + "' " 
-					+ "'" + (BigDecimal)parameterMap.get("effectiveSequence") + "' "
+					+ "'" + (BigInteger)parameterMap.get("effectiveSequence") + "' "
 					+ "'" + blankSpaceParameter + "' " 
 					+ "'" + errorMessageParameter + "' "
 					+ "'" + criticalFlagYN + "' " 
@@ -754,7 +743,7 @@ public class ZHRI100A {
 	}
         
 	/**
-	 * 
+	 * @see Call-System in ZHRI100A.SQR
 	 * @param parameterMap
 	 * @return completionStatus
 	 */
@@ -779,15 +768,18 @@ public class ZHRI100A {
     }
 	
 	/**
-	 * Composes the string of termination process parameters
-	 * @param parameterMap
-	 */
-	@SuppressWarnings("unchecked")
+	 * Composes the string of process parameter values.
+     * @param parameterMap
+     * @return parameterString
+     */
 	public static String composeParameterString(HashMap<String, Object> parameterMap) {
 		System.out.println("*** ZHRI100A.composeParameterString()");
 		String parameterString = "";
-		for(String parameterName : (List<String>)parameterMap.get("parameterNameList")) {
-			parameterString += "'" + (String)parameterMap.get(parameterName) + "' ";
+		List<?> parameterNameList = (List<?>)parameterMap.get("parameterNameList");
+		for(Object parameterName : parameterNameList) {
+			String parameterValue = (String)parameterMap.get((String)parameterName);
+			parameterValue = parameterValue != null ? parameterValue : "";
+			parameterString += "'" + parameterValue + "' ";
 		}
 		return parameterString.trim();
 	}

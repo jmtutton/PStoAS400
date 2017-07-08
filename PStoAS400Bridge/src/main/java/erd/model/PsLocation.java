@@ -2,7 +2,7 @@ package erd.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -152,7 +152,7 @@ public class PsLocation implements Serializable {
 	private String locality;
 
 	@Column(name="MATRICULA_NBR", nullable=false, precision=38)
-	private BigDecimal matriculaNbr;
+	private BigInteger matriculaNbr;
 
 	@Column(name="MESSAGE_TEXT2", nullable=false, length=100)
 	private String messageText2;
@@ -581,11 +581,11 @@ public class PsLocation implements Serializable {
 		this.location = location;
 	}
 
-	public BigDecimal getMatriculaNbr() {
+	public BigInteger getMatriculaNbr() {
 		return this.matriculaNbr;
 	}
 
-	public void setMatriculaNbr(BigDecimal matriculaNbr) {
+	public void setMatriculaNbr(BigInteger matriculaNbr) {
 		this.matriculaNbr = matriculaNbr;
 	}
 

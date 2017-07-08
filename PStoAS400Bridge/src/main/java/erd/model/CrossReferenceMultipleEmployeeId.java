@@ -1,7 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -37,7 +37,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	private Date effectiveDate;
 
 	@Column(name="EFFSEQ", nullable=false, precision=38)
-	private BigDecimal effectiveSequence;
+	private BigInteger effectiveSequence;
 
 	@Column(name="LASTUPDDTTM")
 	private Timestamp lastUpdatedDateAndTime;
@@ -46,7 +46,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	private String lastUpdatedUserId;
 
 	@Column(name="\"SEQUENCE\"", nullable=false, precision=38)
-	private BigDecimal sequence;
+	private BigInteger sequence;
 
 	@Column(name="ZHRF_ALT_EID_TYPE", nullable=false, length=2)
 	private String legacyAltEidType;
@@ -84,11 +84,11 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		this.effectiveDate = effectiveDate;
 	}
 
-	public BigDecimal getEffectiveSequence() {
+	public BigInteger getEffectiveSequence() {
 		return this.effectiveSequence;
 	}
 
-	public void setEffectiveSequence(BigDecimal effectiveSequence) {
+	public void setEffectiveSequence(BigInteger effectiveSequence) {
 		this.effectiveSequence = effectiveSequence;
 	}
 
@@ -116,11 +116,11 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		this.lastUpdatedUserId = lastUpdatedUserId;
 	}
 
-	public BigDecimal getSequence() {
+	public BigInteger getSequence() {
 		return this.sequence;
 	}
 
-	public void setSequence(BigDecimal sequence) {
+	public void setSequence(BigInteger sequence) {
 		this.sequence = sequence;
 	}
 
@@ -336,10 +336,8 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param employeeId
 	 * @param sequence
 	 */
-	public static String findLegacyEmployeeIdByEmployeeIdAndSequence(String employeeId, BigDecimal sequence) {
+	public static String findLegacyEmployeeIdByEmployeeIdAndSequence(String employeeId, BigInteger sequence) {
 		System.out.println("*** CrossReferenceMultipleEmployeeId.findLegacyEmployeeIdByEmployeeIdAndSequence()");
-		System.out.println("String employeeId:" + employeeId);
-		System.out.println("BigDecimal sequence:" + sequence);
 		//BEGIN-SELECT
 		//MULT.ZHRF_LEG_EMPL_ID
 		//FROM PS_ZHRR_MULTPL_EID MULT
@@ -377,7 +375,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param legacyEmployeeId
 	 * @param sequence
 	 */
-	public static void ZHRI100A_updateOprId(String employeeId, String legacyEmployeeId, BigDecimal sequence) {
+	public static void ZHRI100A_updateOprId(String employeeId, String legacyEmployeeId, BigInteger sequence) {
 		System.out.println("*** CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId()");
 		//BEGIN-PROCEDURE UPDATE-OPRID
 		//LET $Update-Error-Flag = 'N'
@@ -462,13 +460,13 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param legacyEmployeeId
 	 * @param indexNumber
 	 */
-	public static void saveNewLegacyEmployeeId(String employeeId, String legacyEmployeeId, BigDecimal indexNumber) {
+	public static void saveNewLegacyEmployeeId(String employeeId, String legacyEmployeeId, BigInteger eidIndexNumber) {
 		System.out.println("*** CrossReferenceMultipleEmployeeId.saveNewLegacyEmployeeId()");
-    	if(new BigDecimal(0).equals(indexNumber)) {
+    	if(new BigInteger("0").equals(eidIndexNumber)) {
     		CrossReferenceMultipleEmployeeId.ZHRI100A_insertOprId(employeeId, legacyEmployeeId);
     	}
     	else {
-    		CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId(employeeId, legacyEmployeeId, indexNumber);
+    		CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId(employeeId, legacyEmployeeId, eidIndexNumber);
     	}
 
 	}

@@ -1,5 +1,8 @@
 tutton
 @tutton.net
+@@tutton.net
+\@tutton.net
+tutton.net
 uppercase
 ltrim
 rtrim

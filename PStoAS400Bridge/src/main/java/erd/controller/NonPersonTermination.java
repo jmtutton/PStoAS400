@@ -1,6 +1,6 @@
 package erd.controller;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -14,7 +14,6 @@ import erd.model.PszPoiTermination;
  * @see ZHRI202A.SQC
  * @author John Tutton john@tutton.net
  */
-
 public class NonPersonTermination {
 
 	/**
@@ -27,13 +26,12 @@ public class NonPersonTermination {
 		System.out.println("*** NonPersonTermination.doProcess()");
 		String completionStatus = "E";
 		parameterMap = fetchProcessParameters(parameterMap);
-		System.out.println("********************* parameterMap.get(\"employeeId\") = " + parameterMap.get("employeeId"));
 		if(parameterMap.get("employeeId") != null && !((String)parameterMap.get("employeeId")).isEmpty()) {
 			parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
 			completionStatus = ZHRI100A.doCommand(parameterMap);
-			if("C".equalsIgnoreCase(completionStatus)) {
+			if("C".equalsIgnoreCase(completionStatus)) { //completed normally
 				//insert POI termination record
-				if(new BigDecimal(0).equals((BigDecimal)parameterMap.get("effectiveSequence"))) {
+				if(new BigInteger("0").equals((BigInteger)parameterMap.get("effectiveSequence"))) {
 					PszPoiTermination.insertTimestamp((String)parameterMap.get("employeeId"));
 				}
 			}
@@ -48,6 +46,7 @@ public class NonPersonTermination {
 	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		System.out.println("*** NonPersonTermination.fetchProcessParameters()");
+		parameterMap.put("errorProgramParameter", "HRZ202A");
 		parameterMap.put("errorProgramParameter", "HRZ202A");
 		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
 			////strip the 'E' off of the operator id to format the legacy employee ID from the PeopleSoft OprId for audit field
@@ -66,7 +65,7 @@ public class NonPersonTermination {
 	 * @see HR202-Call-System in ZHRI202A.SQC
 	 * @return parameterNameList
 	 */
-	private static List<String> getParameterNameList() {
+	public static List<String> getParameterNameList() {
 		System.out.println("*** NonPersonTermination.getParameterNameList()");
 		return Arrays.asList("operatorId", "employeeId", "terminationDate");
 	}

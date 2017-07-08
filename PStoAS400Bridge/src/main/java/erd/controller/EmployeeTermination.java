@@ -1,6 +1,6 @@
 package erd.controller;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -18,7 +18,6 @@ import erd.model.PsJob;
  * @see ZHRI102A.SQC
  * @author John Tutton john@tutton.net
  */
-
 public class EmployeeTermination {
 	
 	/**
@@ -51,7 +50,7 @@ public class EmployeeTermination {
 		parameterMap.put("employeeId", ZHRI100A.fetchLegacyEmployeeId(parameterMap));
 		PsJob psJob = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence(
 				(String)parameterMap.get("employeeId"), effectiveTerminationDate, 
-				(BigDecimal)parameterMap.get("effectiveSequence"));
+				(BigInteger)parameterMap.get("effectiveSequence"));
 		if(psJob != null) {
 			parameterMap = fetchDates(psJob, parameterMap);
 			parameterMap = fetchTerminationCodes(psJob, parameterMap);

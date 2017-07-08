@@ -5,10 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Contingent Employee and Multiple EID Rehire
- * @see ZHRI206A.SQC
+ * Contingent Employee and Multiple EID Rehire Process
+ * @see ZHRI201A.SQC
  * @author John Tutton john@tutton.net
- *
  */
 public class NonPersonRehire {
 	

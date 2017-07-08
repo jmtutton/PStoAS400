@@ -2,7 +2,7 @@ package erd.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.sql.Timestamp;
@@ -226,7 +226,7 @@ public class PsPersonalData implements Serializable {
 	private String gvtMilitaryComp;
 
 	@Column(name="GVT_PAR_NBR_LAST", nullable=false, precision=38)
-	private BigDecimal gvtParNbrLast;
+	private BigInteger gvtParNbrLast;
 
 	@Column(name="GVT_PAY_PLAN", nullable=false, length=2)
 	private String gvtPayPlan;
@@ -978,11 +978,11 @@ public class PsPersonalData implements Serializable {
 		this.gvtMilitaryComp = gvtMilitaryComp;
 	}
 
-	public BigDecimal getGvtParNbrLast() {
+	public BigInteger getGvtParNbrLast() {
 		return this.gvtParNbrLast;
 	}
 
-	public void setGvtParNbrLast(BigDecimal gvtParNbrLast) {
+	public void setGvtParNbrLast(BigInteger gvtParNbrLast) {
 		this.gvtParNbrLast = gvtParNbrLast;
 	}
 

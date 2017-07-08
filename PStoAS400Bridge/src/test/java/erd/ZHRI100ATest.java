@@ -1,12 +1,13 @@
 package erd;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Test;
 
+import erd.controller.NonPersonTermination;
 import erd.controller.ZHRI100A;
 import erd.model.ProcessParameters;
 import erd.model.ProcessParameters.CommonParameters;
@@ -105,7 +106,7 @@ public class ZHRI100ATest {
 		commonParameters.setEmployeeId("12345");
 		commonParameters.setErrorMessageParameter("This is a test. ");
 		commonParameters.setCriticalFlag(false);
-		commonParameters.setEffectiveSequence(new BigDecimal(0));
+		commonParameters.setEffectiveSequence(new BigInteger("0"));
 		commonParameters.setOperatorId("999X9");
 		String parameterString = ZHRI100A.composeErrorParameterString(parameterMap);
 		parameterMap.put("processName", "HRZ110A");
@@ -131,9 +132,14 @@ public class ZHRI100ATest {
 //		return ZHRI100A.composeRexecCommandString("HRZ102A", parameterString);
 //	}
 
-//	@Test
-//	public void test() {
-//		System.out.println("testJUnit");
-//	}
+	@Test
+	public void testComposeParameterString() {
+		HashMap<String, Object> parameterMap = new HashMap<String, Object>();
+		parameterMap.put("processName", "processName");
+		parameterMap.put("parameterNameList", NonPersonTermination.getParameterNameList());
+		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
+		String result = ZHRI100A.composeCommandString(parameterMap);
+		System.out.println(result);
+	}
 
 }

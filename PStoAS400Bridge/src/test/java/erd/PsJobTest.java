@@ -3,7 +3,7 @@ package erd;
 import static org.junit.Assert.*;
 
 import java.util.Date;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -73,7 +73,7 @@ public class PsJobTest {
 			e.printStackTrace();
 		}
 		Date effectiveDatePlusOne = erd.DateUtil.addDays(effectiveDate, 1);
-		BigDecimal effectiveSequence = new BigDecimal(0);
+		BigInteger effectiveSequence = new BigInteger("0");
 		PsJob result = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence(employeeId, effectiveDatePlusOne, effectiveSequence);
 		assertNotNull(result);
 	}

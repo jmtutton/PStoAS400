@@ -5,11 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * ZHRI205A - Contingent Employee and Multiple EID Demographic Change Process
+ * Contingent Employee and Multiple EID Demographic Change Process
+ * @see ZHRI205A.SQC
  * @author John Tutton john@tutton.net
- *
  */
-
 public class NonPersonDemographicChange {
 	
 	/**

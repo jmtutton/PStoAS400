@@ -2,7 +2,7 @@ package erd.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class PsRecruitmentSource implements Serializable {
 
 	@Id
 	@Column(name="HRS_SOURCE_ID", nullable=false, precision=15)
-	private BigDecimal sourceId;
+	private BigInteger sourceId;
 
 	@Column(name="EFF_STATUS", length=1)
 	private String status;
@@ -67,11 +67,11 @@ public class PsRecruitmentSource implements Serializable {
 		this.sourceDescription = sourceDescription;
 	}
 
-	public BigDecimal getSourceId() {
+	public BigInteger getSourceId() {
 		return this.sourceId;
 	}
 
-	public void setSourceId(BigDecimal sourceId) {
+	public void setSourceId(BigInteger sourceId) {
 		this.sourceId = sourceId;
 	}
 
