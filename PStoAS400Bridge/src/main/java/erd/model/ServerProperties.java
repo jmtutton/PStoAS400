@@ -1,23 +1,15 @@
 package erd.model;
 
 public class ServerProperties {
-//	private static String activeDirectoryHomePath; //$AD_HOME 
-	private static String as400Library; //$Library  //"EHRHRMS06#"
-	private static String dbName;
-	private static String oracleSystemId; //$ORACLE_SID  //PS90HRQA
-	private static String peopleSoftHomePath; //$PS_HOME  //"C:/people soft/"
-//	private static String remoteAdServerName; //$RMTNTADSVR
-	private static String remoteExecScript; //$RexecScript
-	private static String remoteServerHostName; //$RMTSVR  //"dev.corp.erac.com"
-	private static String remoteServerUsername; //"PSHRINT"
-	private static String remoteServerPassword; //"SMRHET01"
+	private static String as400Library; //EHRHRMS06#
+	private static String dbName; //PS90HRQA
+	private static String dbUser; //ERDBRIDGE
+	private static String dbPassword; //Tak3S0n$
+	private static String oracleSystemId; //PS90HRQA
+	private static String remoteServerHostName; //dev.corp.erac.com
+	private static String remoteServerUsername; //PSHRINT
+	private static String remoteServerPassword; //SMRHET01
 	
-//	public static String getActiveDirectoryHomePath() {
-//		return ServerProperties.activeDirectoryHomePath != null ? ServerProperties.activeDirectoryHomePath.trim() : ServerProperties.activeDirectoryHomePath;
-//	}
-//	public static void setActiveDirectoryHomePath(String activeDirectoryHomePath) {
-//		ServerProperties.activeDirectoryHomePath = activeDirectoryHomePath != null ? activeDirectoryHomePath.trim() : activeDirectoryHomePath;
-//	}
 	public static String getAs400Library() {
 		return ServerProperties.as400Library != null ? ServerProperties.as400Library.trim() : ServerProperties.as400Library;
 	}
@@ -35,24 +27,6 @@ public class ServerProperties {
 	}
 	public static void setOracleSystemId(String oracleSystemId) {
 		ServerProperties.oracleSystemId = oracleSystemId != null ? oracleSystemId.trim() : oracleSystemId;
-	}
-	public static String getPeopleSoftHomePath() {
-		return peopleSoftHomePath != null ? peopleSoftHomePath.trim() : peopleSoftHomePath;
-	}
-	public static void setPeopleSoftHomePath(String peopleSoftHomePath) {
-		ServerProperties.peopleSoftHomePath = peopleSoftHomePath != null ? peopleSoftHomePath.trim() : peopleSoftHomePath;
-	}
-//	public static String getRemoteAdServerName() {
-//		return remoteAdServerName != null ? remoteAdServerName.trim() : remoteAdServerName;
-//	}
-//	public static void setRemoteAdServerName(String remoteAdServerName) {
-//		ServerProperties.remoteAdServerName = remoteAdServerName != null ? remoteAdServerName.trim() : remoteAdServerName;
-//	}
-	public static String getRemoteExecScript() {
-		return remoteExecScript;
-	}
-	public static void setRemoteExecScript(String remoteExecScript) {
-		ServerProperties.remoteExecScript = remoteExecScript;
 	}
 	public static String getRemoteServerHostName() {
 		return remoteServerHostName != null ? remoteServerHostName.trim() : remoteServerHostName;
@@ -73,16 +47,27 @@ public class ServerProperties {
 	public static void setRemoteServerPassword(String remoteServerPassword) {
 		ServerProperties.remoteServerPassword = remoteServerPassword;
 	}
-	public static String print() {
+	public static String getDbUser() {
+		return dbUser;
+	}
+	public static void setDbUser(String dbUser) {
+		ServerProperties.dbUser = dbUser;
+	}
+	public static String getDbPassword() {
+		return dbPassword;
+	}
+	public static void setDbPassword(String dbPassword) {
+		ServerProperties.dbPassword = dbPassword;
+	}
+	
+	@Override
+	public String toString() {
 		return "\nServerProperties:\n"
-	//			+ "activeDirectoryHomePath: " + ServerProperties.activeDirectoryHomePath + "\n" //$AD_HOME 
-				+ "as400Library: " + ServerProperties.as400Library + "\n" //$Library
+				+ "as400Library: " + ServerProperties.as400Library + "\n"
 				+ "dbName: " + ServerProperties.dbName + "\n"
-				+ "oracleSystemId: " + ServerProperties.oracleSystemId + "\n" //$ORACLE_SID
-				+ "peopleSoftHomePath: " + ServerProperties.peopleSoftHomePath + "\n" //$PS_HOME
-//				+ "remoteAdServerName: " + ServerProperties.remoteAdServerName + "\n" //$RMTNTADSVR
-				+ "remoteServerHostName: " + ServerProperties.remoteServerHostName + "\n" //$RexecScript
-				+ "remoteServerUserName: " + ServerProperties.remoteServerUsername + "\n" //$RexecScript
-				+ "remoteServerPassword: " + ServerProperties.remoteServerPassword + "\n"; //$RMTSVR
+				+ "oracleSystemId: " + ServerProperties.oracleSystemId + "\n"
+				+ "remoteServerHostName: " + ServerProperties.remoteServerHostName + "\n"
+				+ "remoteServerUserName: " + ServerProperties.remoteServerUsername + "\n"
+				+ "remoteServerPassword: " + ServerProperties.remoteServerPassword + "\n";
 	}
 }

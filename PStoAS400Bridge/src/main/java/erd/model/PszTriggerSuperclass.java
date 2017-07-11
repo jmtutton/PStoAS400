@@ -126,7 +126,7 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	 * @return a list of all records from all subclass tables with the completionStatus = 'P'
 	 */
 	public static List<PszTriggerSuperclass> findPending() {
-		logger.debug("*** PszTriggerSuperclass.findPending()");
+		logger.debug("findPending()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -150,8 +150,14 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	    return null;	
     }
 
+	/**
+	 * 
+	 * @param sequenceNumber
+	 * @param triggerTypeClassName
+	 * @return PszTriggerSuperclass record
+	 */
 	public static PszTriggerSuperclass findBySequenceNumber(BigInteger sequenceNumber, String triggerTypeClassName) {
-		logger.debug("*** PszTriggerSuperclass.findBySequenceNumber()");
+		logger.debug("findBySequenceNumber()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -194,7 +200,7 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	 * @return numberOfRecordsUpdated
 	 */
 	public static int setCompletionStatusBySequenceNumber(String completionStatus, BigInteger sequenceNumber, String triggerTypeClassName) {
-		logger.debug("*** PszTriggerSuperclass.setCompletionStatusBySequenceNumber()");
+		logger.debug("setCompletionStatusBySequenceNumber()");
 		int numberOfRecordsUpdated = 0;
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
@@ -222,16 +228,21 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	    return numberOfRecordsUpdated;
 	}
 	
-	public static List<PszTriggerEmployee> findByCompletionStatusOrderBySequenceNumber(String completionStatus) {
-		logger.debug("*** PszTriggerSuperclass.findByCompletionStatusOrderBySequenceNumber()");
+	/**
+	 * 
+	 * @param completionStatus
+	 * @return PszTriggerSuperclass records
+	 */
+	public static List<PszTriggerSuperclass> findByCompletionStatusOrderBySequenceNumber(String completionStatus) {
+		logger.debug("findByCompletionStatusOrderBySequenceNumber()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	return em.createQuery(
-	    		    "SELECT p FROM PszTriggerEmployee p "
+	    		    "SELECT p FROM PszTriggerSuperclass p "
 	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
 	    		    		+ "ORDER BY p.sequenceNumber ASC "
-	    		    , PszTriggerEmployee.class)
+	    		    , PszTriggerSuperclass.class)
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .getResultList();
 	    }
@@ -244,18 +255,24 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	    return null;	
 	}
 
-	public static List<PszTriggerEmployee> findByCompletionStatusAndProcessName(String completionStatus, String processName) {
-		logger.debug("*** PszTriggerEmployee.findByCompletionStatusAndProcessName()");
+	/**
+	 * 
+	 * @param completionStatus
+	 * @param processName
+	 * @return PszTriggerSuperclass records
+	 */
+	public static List<PszTriggerSuperclass> findByCompletionStatusAndProcessName(String completionStatus, String processName) {
+		logger.debug("findByCompletionStatusAndProcessName()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	return em.createQuery(
-	    		    "SELECT p FROM PszTriggerEmployee p "
+	    		    "SELECT p FROM PszTriggerSuperclass p "
 	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
 	    		    		+ "AND TRIM(UPPER(p.processName)) = :processName "
 	    		    		+ "ORDER BY p.sequenceNumber ASC "
 	    		    		+ "LIMIT 150 "
-	    		    , PszTriggerEmployee.class)
+	    		    , PszTriggerSuperclass.class)
 	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
 	    		    .setParameter("processName", processName.toUpperCase().trim())
 	    		    .getResultList();
@@ -269,17 +286,21 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	    return null;	
 	}
 
-
-	public static List<PszTriggerEmployee> findPendingWithLimit(Integer limit) {
-		logger.debug("*** PszTriggerEmployee.findPending()");
+	/**
+	 * 
+	 * @param limit
+	 * @return PszTriggerSuperclass records
+	 */
+	public static List<PszTriggerSuperclass> findPendingWithLimit(Integer limit) {
+		logger.debug("findPending()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	return em.createQuery(
-	    		    "SELECT p FROM PszTriggerEmployee p "
+	    		    "SELECT p FROM PszTriggerSuperclass p "
 	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = 'P' "
 	    		    		+ "ORDER BY p.sequenceNumber ASC "
-	    		    , PszTriggerEmployee.class)
+	    		    , PszTriggerSuperclass.class)
 	    			.setMaxResults(limit)
 	    		    .getResultList();
 	    }
@@ -293,15 +314,14 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	}
 
 	/**
-	 * @param completionStatus
-	 * @param sequenceNumber
-	 * @return numberOfRecordsUpdated
+	 * 
+	 * @param trigger
+	 * @return
 	 */
-	public static int update(PszTriggerNonPerson trigger) {
-		logger.debug("*** PszTriggerNonPerson.setCompletionStatusBySequenceNumber()");
+	public static void update(PszTriggerSuperclass trigger) {
+		logger.debug("update()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
-		int numberOfRecordsUpdated = 0;
 	    try {
 	    	em.getTransaction().begin();
 	    	em.merge(trigger);
@@ -313,16 +333,15 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	    finally {
 	    	em.close();
 	    }
-	    return numberOfRecordsUpdated;
 	}
 
 	/**
-	 * This procedure will get the trigger data that needs to be interfaced
+	 * This procedure will get the trigger data that needs to be interfaced.
 	 * @see Get-Trigger-Data-POI-Emp-Convert in ZHRI100A.SQR
 	 */
 	//TODO: 
-	public static void ZHRI100A_getTriggerDataPoiEmpConvert() {
-		logger.debug("*** Main.ZHRI100A_getTriggerDataPoiEmpConvert()");
+	public static void findByPoiEmpConvert() {
+		logger.debug("findByPoiEmpConvert()");
 		
 	}
 

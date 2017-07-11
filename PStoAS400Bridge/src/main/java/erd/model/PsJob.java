@@ -1461,91 +1461,54 @@ public class PsJob implements Serializable {
 	 * HR01-Get-Job-Data
 	 * Gets the employees data from the job table that needs to be interfaced to the legacy system
 	 * @param employeeId
-	 * @return
+	 * @return PsJob record
 	 */
 	public PsJob hr01GetJobData(String employeeId) {
-		logger.debug("*** PsJob.hr01GetJobData");
-//		Begin-Select
-//		CJ.COMPANY
-//		    Let $PSCompany = ltrim(rtrim(&CJ.COMPANY,' '),' ')              !Remove leading and trailing blanks
-//		CJ.LOCATION
-//		    Let $PSLocation = ltrim(rtrim(&CJ.LOCATION,' '),' ')            !Remove leading and trailing blanks
-//		CJ.BUSINESS_UNIT
-//		    Let $PSBusinessUnit = ltrim(rtrim(&CJ.BUSINESS_UNIT,' '),' ')   !Remove leading and trailing blanks
-//		to_char(CJ.EFFDT, 'YYYY-MM-DD')         &CJ.EFFDT
-//		    Let $PSEffdt = &CJ.EFFDT                                        !Convert date format
-//		CJ.REG_TEMP
-//		    Let $PSRegTemp = ltrim(rtrim(&CJ.REG_TEMP,' '),' ')             !Remove leading and trailing blanks
-//		CJ.FULL_PART_TIME
-//		    Let $PSFullPartTime = ltrim(rtrim(&CJ.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
-//		CJ.EMPL_CLASS
-//		    Let $PSEmplClass = ltrim(rtrim(&CJ.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
-//		CJ.FLSA_STATUS
-//		    Let $PSFlsaStatus = ltrim(rtrim(&CJ.FLSA_STATUS,' '),' ')       !Remove leading and trailing blanks
-//		CJ.EMPL_STATUS
-//		    Let $PSEmplStatus = ltrim(rtrim(&CJ.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
-//		CJ.DEPTID
-//		    Let $PSDeptid = ltrim(rtrim(&CJ.DEPTID,' '),' ')                !Remove leading and trailing blanks
-//		CJ.JOBCODE
-//		    Let $PSJobcode = ltrim(rtrim(&CJ.JOBCODE,' '),' ')              !Remove leading and trailing blanks
-//		CJ.SETID_JOBCODE
-//		    Let $PSSetID = substr(&CJ.SETID_JOBCODE,1,5)                    !Move to a program field
-//		CJ.ACTION
-//		    Let $PSAction = &CJ.ACTION
-//		CJ.ACTION_REASON
-//		    Let $PSAction_Reason = &CJ.ACTION_REASON
-//		CJ.REG_REGION
-//		    let $PS_REG_REGION = ltrim(rtrim(&CJ.REG_REGION,' '),' ')
-//		    Let $PSAction_Reason_All = $PSAction || $PSAction_Reason
-//		    Let $Wrk_AD_JobDataBuild = 'Y'
-//		from PS_JOB CJ
-//		where CJ.EMPLID = $Wrk_Emplid
-//		  and CJ.EMPL_RCD = 0
-//		  and CJ.EFFDT = (SELECT MAX(EFFDT)
-//		                    FROM  PS_JOB CJ2
-//		                   WHERE  CJ2.EMPLID = CJ.EMPLID
-//		                     AND  CJ2.EMPL_RCD = CJ.EMPL_RCD
-//		                     AND  (CJ2.ACTION IN ('HIR','REH')
-//		                     OR (CJ2.ACTION = 'DTA' AND CJ2.ACTION_REASON = 'CNV')
-//		                     OR (CJ2.ACTION = 'TER' AND CJ2.ACTION_REASON = 'CNV'))
-//		                  AND  to_char(CJ2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		  and CJ.EFFSEQ = (SELECT MAX(EFFSEQ)
-//		                     FROM PS_JOB CJ3
-//		                    WHERE CJ3.EMPLID = CJ.EMPLID
-//		                      AND CJ3.EMPL_RCD = CJ.EMPL_RCD
-//		                      AND (CJ3.ACTION IN ('HIR','REH')
-//		                      OR (CJ3.ACTION = 'DTA' AND CJ3.ACTION_REASON = 'CNV')
-//		                      OR (CJ3.ACTION = 'TER' AND CJ3.ACTION_REASON = 'CNV'))
-//		                      AND CJ3.EFFDT = CJ.EFFDT)
-//		End-Select
+		logger.debug("hr01GetJobData() ***");
+		//SELECT
+		//FROM PS_JOB P
+		//WHERE P.EmplId = $Wrk_Emplid
+		//AND P.Empl_Rcd = 0
+		//AND P.EffDt = 
+			//(SELECT MAX(EffDt) FROM  PS_JOB P2
+			//WHERE P2.EmplId = P.EmplId
+			//AND P2.Empl_Rcd = P.Empl_Rcd
+			//AND (P2.ACTION IN ('HIR','REH')
+			//OR (P2.ACTION = 'DTA' AND P2.ACTION_REASON = 'CNV')
+			//OR (P2.ACTION = 'TER' AND P2.ACTION_REASON = 'CNV'))
+			//AND  TO_CHAR(P2.EffDt,'YYYY-MM-DD') <= $PSEffdt)
+		//AND P.EffSeq = 
+			//(SELECT MAX(EffSeq) FROM PS_JOB P3
+			//WHERE P3.EmplId = P.EmplId
+			//AND P3.Empl_Rcd = P.Empl_Rcd
+			//AND (P3.ACTION IN ('HIR','REH')
+			//OR (P3.ACTION = 'DTA' AND P3.ACTION_REASON = 'CNV')
+			//OR (P3.ACTION = 'TER' AND P3.ACTION_REASON = 'CNV'))
+		//AND P3.EffDt = P.EffDt)
 		return null;
 	}
 
 	/**
-	 * This routine will the Job Data row for each of the employee numbers entered in the trigger file.
-	 * finds PsJob records by employeeId, effectiveSequence, effectiveDate, and where employmentRecordNumber = 0
+	 * Finds PsJob records by employeeId, effectiveSequence, effectiveDate, and where employmentRecordNumber = 0
 	 * @see HR02-Get-Job in ZHRI102A.SQC
 	 * @param employeeId
 	 * @param effectiveDate
 	 * @param effectiveSequence
-	 * @return single PsJob record
+	 * @return PsJob record
 	 */
 	public static PsJob findByEmployeeIdAndEffectiveDateAndEffectiveSequence(String employeeId, Date effectiveDate, BigInteger effectiveSequence) {
-		logger.debug("*** PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence");
-//		System.out.println("employeeId: " + employeeId);
-//		System.out.println("effectiveDate: " + effectiveDate);
-//		System.out.println("effectiveSequence: " + effectiveSequence);
-		//BEGIN-SELECT
-		//FROM PS_Job PS_Job
-		//WHERE PS_Job.Emplid = $PSEmplid
-		//  	AND TO_CHAR(PS_Job.EFFDT, 'YYYY-MM-DD') = $PSDate
-		//  	AND PS_Job.EFFSEQ = #PSEFFSEQ
-		//  	AND PS_Job.EMPL_RCD = 0
-		//END-SELECT
+		logger.debug("findByEmployeeIdAndEffectiveDateAndEffectiveSequence() ***");
+		//SELECT
+		//FROM PS_Job P
+		//WHERE P.EmplId = $PsEmplId
+		//AND TO_CHAR(P.EffDt, 'YYYY-MM-DD') = $PsDate
+		//AND P.EffSeq = #PsEffSeq
+		//AND P.Empl_Rcd = 0
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<PsJob> resultList = em.createQuery("SELECT p FROM PsJob p "
+	    	List<PsJob> resultList = em.createQuery(
+	    			"SELECT p FROM PsJob p "
 	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
 	    				+ "AND p.effectiveDate = :effectiveDate "
 	    				+ "AND p.effectiveSequence = :effectiveSequence "
@@ -1556,17 +1519,8 @@ public class PsJob implements Serializable {
 	    		    .setParameter("effectiveSequence", effectiveSequence)
 	    		    .setHint(QueryHints.REFRESH, true)
 	    		    .getResultList();
-//    		System.out.println("getJob.resultList.size(): " + resultList.size());
 	    	if(resultList != null && resultList.size() > 0) {
-	    		PsJob result0 = resultList.get(0);
-//	    		for(PsJob result : resultList) {
-//		    		System.out.println("getJob.result.getAction(): " + result.getAction());
-//		    		System.out.println("getJob.result.getEmployeeId(): " + result.getEmployeeId());
-//		    		System.out.println("getJob.result.getActionReason(): " + result.getActionReason());
-//		    		System.out.println("getJob.result.getEffectiveDate(): " + result.getEffectiveDate());
-//		    		System.out.println("getJob.result.getEffseq(): " + result.getEffseq());
-//	    		}
-	    		return result0;
+	    		return resultList.get(0);
 	    	}
 	    }
 	    catch (Exception e) {
@@ -1579,51 +1533,24 @@ public class PsJob implements Serializable {
 	}
 
 	/**
-	 * HR04-Get-Job-Data
 	 * Gets the employees data from the job table that needs to be interfaced to the legacy system
+	 * HR04-Get-Job-Data
 	 * @param employeeId
 	 * @param effectiveDate
-	 * @return
+	 * @return PsJob records
 	 */
 	public static PsJob hr04GetJobData(String employeeId, Date effectiveDate) {
-		logger.debug("*** PsJob.hr04GetJobData");
-//		Begin-Select
-//		CJ6.COMPANY
-//		    let $PSCompany = ltrim(rtrim(&CJ6.COMPANY,' '),' ')              !Remove leading and trailing blanks
-//		CJ6.BUSINESS_UNIT
-//		    let $PSBusinessUnit = ltrim(rtrim(&CJ6.BUSINESS_UNIT,' '),' ')   !Remove leading and trailing blanks
-//		CJ6.LOCATION
-//		    let $PSLocation = ltrim(rtrim(&CJ6.LOCATION,' '),' ')            !Remove leading and trailing blanks
-//		CJ6.SETID_JOBCODE
-//		    let $PSSetID = ltrim(rtrim(&CJ6.SETID_JOBCODE,' '),' ')          !Remove leading and trailing blanks
-//		CJ6.EMPL_STATUS
-//		    let $PSEmplStatus = ltrim(rtrim(&CJ6.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
-//		CJ6.ACTION
-//		    let $PSAction = ltrim(rtrim(&CJ6.ACTION,' '),' ')                !Remove leading and trailing blanks
-//		CJ6.REG_TEMP
-//		    let $PSRegTemp = ltrim(rtrim(&CJ6.REG_TEMP,' '),' ')             !Remove leading and trailing blanks
-//		CJ6.FULL_PART_TIME
-//		    let $PSFullPartTime = ltrim(rtrim(&CJ6.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
-//		CJ6.EMPL_CLASS
-//		    let $PSEmplClass = ltrim(rtrim(&CJ6.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
-//		CJ6.FLSA_STATUS
-//		    let $PSFlsaStatus = ltrim(rtrim(&CJ6.FLSA_STATUS,' '),' ')       !Remove leading and trailing blanks
-//		CJ6.DEPTID
-//		    let $PSDeptid = ltrim(rtrim(&CJ6.DEPTID,' '),' ')                !Remove leading and trailing blanks
-//		CJ6.JOBCODE
-//		    let $PSJobcode = ltrim(rtrim(&CJ6.JOBCODE,' '),' ')              !Remove leading and trailing blanks
-//		 let $Wrk_AD_JobDataBuild = 'Y'
-//		from PS_JOB CJ6
-//		where CJ6.EMPLID = $Wrk_Emplid
-//		and to_char(CJ6.EFFDT, 'YYYY-MM-DD') =    $PSEffdt
-//		AND CJ6.EFFSEQ =
-//		         (SELECT MAX(CJ6B.EFFSEQ)
-//		          FROM  PS_JOB CJ6B
-//		          WHERE CJ6B.EMPLID   = CJ6.EMPLID
-//		            AND CJ6B.EMPL_RCD = CJ6.EMPL_RCD
-//		            AND CJ6B.EFFDT    = CJ6.EFFDT)
-//		and CJ6.EMPL_RCD = 0
-//		End-Select
+		logger.debug("hr04GetJobData() ***");
+		//SELECT
+		//FROM PS_JOB P
+		//WHERE P.EmplId = $EmplId
+		//AND TO_CHAR(P.EffDt, 'YYYY-MM-DD') = $PSEffDt
+		//AND P.EffSeq =
+			//(SELECT MAX(P2.EffSeq) FROM  PS_JOB P2
+			//WHERE P2.EmplId   = P.EmplId
+			//AND P2.Empl_Rcd = P.Empl_Rcd
+			//AND P2.EffDt    = P.EffDt)
+		//AND P.Empl_Rcd = 0
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -1660,19 +1587,20 @@ public class PsJob implements Serializable {
 	 * @return regulatoryRegion
 	 */
 	public static String findRegulatoryRegionByEmployeeId(String employeeId) {
-		logger.debug("*** PsJob.findRegulatoryRegionByEmployeeId");
-		//BEGIN-SELECT
-		//FROM PS_Job HJ8
-		//WHERE HJ8.Emplid = $PSEmplid
-		//AND HJ8.effdt = (SELECT MAX(effdt) FROM ps_job HJ8a
-		//WHERE HJ8a.emplid = HJ8.emplid
-		//AND HJ8a.empl_rcd = HJ8.empl_rcd)
-		//AND HJ8.effseq = (SELECT MAX(effseq) FROM ps_job HJ8b
-		//WHERE HJ8b.emplid=HJ8.emplid
-		//AND HJ8b.empl_rcd = HJ8.empl_rcd
-		//AND HJ8b.effdt = HJ8.effdt)                     
-		//AND HJ8.EMPL_RCD = 0                   
-		//END-SELECT
+		logger.debug("findRegulatoryRegionByEmployeeId() ***");
+		//SELECT
+		//FROM PS_JOB P
+		//WHERE P.EmplId = $PsEmplId
+		//AND P.EffDt = 
+			//(SELECT MAX(EffDt) FROM PS_JOB P2
+			//WHERE P2.EmplId = P.EmplId
+			//AND P2.Empl_Rcd = P.Empl_Rcd)
+		//AND P.EffSeq = 
+			//(SELECT MAX(EffSeq) FROM PS_JOB P3
+			//WHERE P3.EmplId = P.EmplId
+			//AND P3.Empl_Rcd = P.Empl_Rcd
+			//AND P3.EffDt = P.EffDt)                     
+		//AND P.Empl_Rcd = 0                   
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -1710,19 +1638,19 @@ public class PsJob implements Serializable {
 	 * @param employeeId
 	 * @param employmentRecordNumber
 	 * @param effectiveDate
-	 * @return
+	 * @return max effective sequence
 	 */
 	public static BigInteger findMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate(String employeeId, BigInteger employmentRecordNumber, Date effectiveDate) {
-		logger.debug("*** PsJob.findMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate");
-		//EFFSEQ = (SELECT MAX(EFFSEQ)
-		//FROM PS_JOB RJ3
-		//WHERE RJ3.EMPLID = RJ.EMPLID
-		//AND RJ3.EMPL_RCD = RJ.EMPL_RCD
-		//AND RJ3.EFFDT = RJ.EFFDT)
+		logger.debug("findMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate() ***");
+		//SELECT MAX(EffSeq) FROM PS_JOB P
+		//WHERE P.EmplId = $EmplId
+		//AND P.Empl_Rcd = $Empl_Rcd
+		//AND P.EffDt = $EffDt
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<BigInteger> resultList = em.createQuery("SELECT MAX(p.effectiveSequence) FROM PsJob p "
+	    	List<BigInteger> resultList = em.createQuery(
+	    			"SELECT MAX(p.effectiveSequence) FROM PsJob p "
 	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
 	    				+ "AND p.employmentRecordNumber = :employmentRecordNumber "
 	    				+ "AND p.effectiveDate <= :effectiveDate ",
@@ -1748,19 +1676,19 @@ public class PsJob implements Serializable {
 	 * 
 	 * @param employeeId
 	 * @param employmentRecordNumber
-	 * @return
+	 * @return max effective date
 	 */
 	public static Date findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber(String employeeId, BigInteger employmentRecordNumber) {
-		logger.debug("*** PsJob.findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber");
-		//EFFDT = (SELECT MAX(EFFDT)
-		//FROM PS_JOB RJ2
-		//WHERE RJ2.EMPLID = RJ.EMPLID
-		//AND RJ2.EMPL_RCD = RJ.EMPL_RCD
-		//AND RJ2.EFFDT <= $AsOfToday)
+		logger.debug("findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber() ***");
+		//SELECT MAX(EffDt) FROM PS_JOB P
+		//WHERE P.EmplId = $EmplId
+		//AND P.Empl_Rcd = $Empl_Rcd
+		//AND P.EffDt <= $AsOfToday
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<Date> resultList = em.createQuery("SELECT MAX(p.effectiveDate) FROM PsJob p "
+	    	List<Date> resultList = em.createQuery(
+	    			"SELECT MAX(p.effectiveDate) FROM PsJob p "
 	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
 	    				+ "AND p.employmentRecordNumber = :employmentRecordNumber "
 	    				+ "AND p.effectiveDate <= CURRENT_DATE ",
@@ -1785,14 +1713,15 @@ public class PsJob implements Serializable {
 	 * 
 	 * @param employeeId
 	 * @param effectiveDate
-	 * @return
+	 * @return PsJob records
 	 */
 	public static List<PsJob> findByEmployeeIdAndEffectiveDate(String employeeId, java.util.Date effectiveDate) {
-		logger.debug("*** PsJob.findByEmployeeIdAndEffectiveDate");
+		logger.debug("findByEmployeeIdAndEffectiveDate() ***");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<PsJob> resultList = em.createQuery("SELECT p FROM PsJob p "
+	    	List<PsJob> resultList = em.createQuery(
+	    			"SELECT p FROM PsJob p "
 	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
 	    				+ "AND p.effectiveDate <= :effectiveDate ",
 	    				PsJob.class)
@@ -1811,85 +1740,78 @@ public class PsJob implements Serializable {
 	    }
 	    return null;	
 	}
-	   
+
 	/**
+	 * 
+	 * @param employeeId
+	 * @return employmentRecordNumber
 	 */
-//	public static BigInteger findEmploymentRecordNumberByEmployeeId(String employeeId) {
-//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//		EntityManager em = emfactory.createEntityManager();
-//	    try {
-//	    	List<Date> resultList = em.createQuery("SELECT p.employmentRecordNumber FROM PsJob p "
-//	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-//	    				+ "AND p.employmentRecordNumber = :employmentRecordNumber "
-//	    				+ "AND p.effectiveDate <= CURRENT_DATE ",
-//	    				Date.class)
-//	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-//	    		    .setParameter("employmentRecordNumber", employmentRecordNumber)
-//	    		    .getResultList();
-//	    	if(resultList != null && resultList.size() > 0) {
-//	    		return resultList.get(0);
-//	    	}
-//	    }
-//	    catch (Exception e) {
-//	       e.printStackTrace();
-//	    } 
-//	    return null;	
-//	}
+	public static BigInteger findEmploymentRecordNumberByEmployeeId(String employeeId) {
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<BigInteger> resultList = em.createQuery(
+	    			"SELECT p.employmentRecordNumber FROM PsJob p "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				+ "AND p.employmentRecordNumber = :employmentRecordNumber "
+	    				+ "AND p.effectiveDate <= CURRENT_DATE ",
+	    				BigInteger.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    return null;	
+	}
 	
-	//TODO: Check-If-Correct102A
-	//TODO: findJobStartDateByEmployeeIdAndJobCodeAndEffectiveDateAndEffectiveSequence(String employeeId, String jobCode, Date effectiveDate, BigInteger effectiveSequence)
-	   
 	/**
 	 * Checks to see if the employee is a contractor       
 	 * @see Check-If-Contractor in ZHRI100A.SQR
 	 * @param employeeId
-	 * @return
+	 * @return true if employee is a contractor
 	 */
 	public static Boolean employeeIsContractor(String employeeId) {
-		logger.debug("*** PsJob.employeeIsContractor");
-		//BEGIN-PROCEDURE CHECK-IF-CONTRACTOR
-		//LET $Found = 'N'
-		//BEGIN-SELECT
-		//'X'
-		//LET $Found = 'Y'
-		//FROM PS_JOB RJ
-		//WHERE RJ.EMPLID = $PSEmplid
-		//		AND RJ.EMPL_CLASS = 'R'
-		//		AND RJ.EFFDT = 
-		//				(SELECT MAX(EFFDT) FROM PS_JOB RJ2
-		//					WHERE RJ2.EMPLID = RJ.EMPLID
-		//						AND RJ2.EMPL_RCD = RJ.EMPL_RCD
-		//						AND RJ2.EFFDT <= $AsOfToday)
-		//		AND RJ.EFFSEQ = 
-		//				(SELECT MAX(EFFSEQ) FROM PS_JOB RJ3
-		//					WHERE RJ3.EMPLID = RJ.EMPLID
-		//						AND RJ3.EMPL_RCD = RJ.EMPL_RCD
-		//						AND RJ3.EFFDT = RJ.EFFDT)
-		//END-SELECT
-		//END-PROCEDURE CHECK-IF-CONTRACTOR
+		logger.debug("employeeIsContractor() ***");
+		//SELECT
+		//FROM PS_JOB P
+		//WHERE P.EmplId = $PsEmplId
+		//		AND P.Empl_Class = 'R'
+		//		AND P.EffDt = 
+		//				(SELECT MAX(EffDt) FROM PS_JOB P2
+		//					WHERE P2.EmplId = P.EmplId
+		//						AND P2.Empl_Rcd = P.Empl_Rcd
+		//						AND P2.EffDt <= $AsOfToday)
+		//		AND P.EffSeq = 
+		//				(SELECT MAX(EffSeq) FROM PS_JOB P3
+		//					WHERE P3.EmplId = P.EmplId
+		//						AND P3.Empl_Rcd = P.Empl_Rcd
+		//						AND P3.EffDt = P.EffDt)
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<Date> resultList = em.createQuery("SELECT p FROM PsJob p "
-	    			+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-	    			+ "AND p.employeeClass = 'R' "
-	    			+ "AND p.effectiveDate = "
-	    			+ "		(SELECT MAX(p2.effectiveDate) FROM PsJob p2 "
-	    			+ "			WHERE p2.employeeId = p.employeeId "
-	    			+ "				AND p2.employmentRecordNumber = p.employmentRecordNumber "
-	    			+ "				AND p2.effectiveDate <= :asOfToday) "
-	    			+ "AND p.effectiveSequence = "
-	    			+ "		(SELECT MAX(p3.effectiveSequence) FROM PsJob p3 "
-	    			+ "			WHERE p3.employeeId = p.employeeId "
-	    			+ "				AND p3.employmentRecordNumber = p.employmentRecordNumber "
-	    			+ "				AND p3.effectiveDate = p.effectiveDate) ",
+	    	List<Date> resultList = em.createQuery(
+	    			"SELECT p FROM PsJob p "
+		    			+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+		    			+ "AND p.employeeClass = 'R' "
+		    			+ "AND p.effectiveDate = "
+		    			+ "		(SELECT MAX(p2.effectiveDate) FROM PsJob p2 "
+		    			+ "			WHERE p2.employeeId = p.employeeId "
+		    			+ "				AND p2.employmentRecordNumber = p.employmentRecordNumber "
+		    			+ "				AND p2.effectiveDate <= :asOfToday) "
+		    			+ "AND p.effectiveSequence = "
+		    			+ "		(SELECT MAX(p3.effectiveSequence) FROM PsJob p3 "
+		    			+ "			WHERE p3.employeeId = p.employeeId "
+		    			+ "				AND p3.employmentRecordNumber = p.employmentRecordNumber "
+		    			+ "				AND p3.effectiveDate = p.effectiveDate) ",
 	    				Date.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
 	    		    .setParameter("asOfToday", DateUtil.asOfToday(), TemporalType.DATE)
 	    		    .getResultList();
-	    	if(resultList != null && resultList.size() > 0) {
-	    		return true;
-	    	}
+	    	return (resultList != null && resultList.size() > 0);
 	    }
 	    catch (Exception e) {
 	    	e.printStackTrace();
@@ -1900,61 +1822,6 @@ public class PsJob implements Serializable {
 	    return false;	
 	}
 		   
-//	/**
-//	 * Checks to see if the employee is a contractor       
-//	 * @see Check-If-Contractor in ZHRI100A.SQR
-//	 * @param employeeId
-//	 * @param effectiveDate
-//	 * @param effectiveSequence
-//	 * @return
-//	 */
-//	public static Boolean employeeIsContractor(String employeeId, Date effectiveDate, BigInteger effectiveSequence) {
-//		logger.debug("*** PsJob.correspondingJobRecordExists");
-//		//BEGIN-PROCEDURE CHECK-IF-CONTRACTOR
-//		//LET $Found = 'N'
-//		//BEGIN-SELECT
-//		//'X'
-//		//LET $Found = 'Y'
-//		//FROM PS_JOB RJ
-//		//WHERE RJ.EMPLID = $PSEmplid
-//		//		AND RJ.EMPL_CLASS = 'R'
-//		//		AND RJ.EFFDT = 
-//		//				(SELECT MAX(EFFDT) FROM PS_JOB RJ2
-//		//					WHERE RJ2.EMPLID = RJ.EMPLID
-//		//						AND RJ2.EMPL_RCD = RJ.EMPL_RCD
-//		//						AND RJ2.EFFDT <= $AsOfToday)
-//		//		AND RJ.EFFSEQ = 
-//		//				(SELECT MAX(EFFSEQ) FROM PS_JOB RJ3
-//		//					WHERE RJ3.EMPLID = RJ.EMPLID
-//		//						AND RJ3.EMPL_RCD = RJ.EMPL_RCD
-//		//						AND RJ3.EFFDT = RJ.EFFDT)
-//		//END-SELECT
-//		//END-PROCEDURE CHECK-IF-CONTRACTOR
-//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//		EntityManager em = emfactory.createEntityManager();
-//	    try {
-//	    	List<PsJob> resultList = em.createQuery("SELECT p FROM PsJob p "
-//	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-//	    				+ "AND p.effectiveDate <= :effectiveDate "
-//	    				+ "AND p.effectiveSequence = :effectiveSequence "
-//	    				+ "AND p.employeeClass = :employeeClass ", PsJob.class)
-//	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-//	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
-//	    		    .setParameter("effectiveSequence", effectiveSequence)
-//	    		    .setParameter("employeeClass", "R".toUpperCase())
-//	    		    .getResultList();
-//	    	if(resultList != null && resultList.size() > 0) {
-//	    		return true;
-//	    	}
-//	    }
-//	    catch (Exception e) {
-//	    	e.printStackTrace();
-//	    } 
-//	    finally {
-//	    	em.close();
-//	    }
-//	    return false;	
-//	}
 
 	/**
 	 * Checks to see if 102A process has JOB row
@@ -1965,42 +1832,24 @@ public class PsJob implements Serializable {
 	 * @return true if corresponding PsJob record found
 	 */
 	public static Boolean correspondingJobRecordExists(String employeeId, Date effectiveDate, String processName) {
-		logger.debug("*** PsJob.correspondingJobRecordExists");
-		//BEGIN-PROCEDURE CHECK-IF-CORRECT102A
-		//LET $OK-To-Process = 'N'
-		//IF $WrkProcess = 'ZHRI102A'
-		Date dt102 = effectiveDate;
-		if("ZHRI102A".equalsIgnoreCase(processName)) {
-			//DO DTU-ADD-DAYS($PSEffDt, 1, $Dt102)
-			//add a day to current effective date
-			dt102 = DateUtil.addDays(effectiveDate, 1);
-		}
-		//!ELSE
-			//!LET $Dt102 = $PSEffdt
-			//*do nothing*
-		//END-IF
-		//BEGIN-SELECT
-		//'XX'
-		//LET $OK-To-Process = 'Y'
-		//FROM PS_JOB PS_JOB
-		//WHERE PS_JOB.EMPLID = $PSEmplId
-		//		AND TO_CHAR(PS_JOB.EFFDT, 'YYYY-MM-DD') = $Dt102
-		//END-SELECT
-		//END-PROCEDURE CHECK-IF-CORRECT102A
-//		System.out.println("************** Dt102: " + dt102);
+		logger.debug("correspondingJobRecordExists() ***");
+		//add a day to current effective date
+		Date effectiveDatePlusOne = DateUtil.addDays(effectiveDate, 1);
+		//SELECT
+		//FROM PS_JOB P
+		//WHERE P.EmplId = $PsEmplId
+			//AND TO_CHAR(P.EffDt, 'YYYY-MM-DD') = $effectiveDatePlusOne
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PsJob> resultList = em.createQuery(
 	    			"SELECT p FROM PsJob p "
 	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-	    				+ "AND p.effectiveDate <= :dt102 ", PsJob.class)
+	    				+ "AND p.effectiveDate <= :effectiveDatePlusOne ", PsJob.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-	    		    .setParameter("dt102", dt102, TemporalType.DATE)
+	    		    .setParameter("effectiveDatePlusOne", effectiveDatePlusOne, TemporalType.DATE)
 	    		    .getResultList();
-	    	if(resultList != null && resultList.size() > 0) {
-	    		return true;
-	    	}
+	    	return (resultList != null && resultList.size() > 0);
 	    }
 	    catch (Exception e) {
 	    	e.printStackTrace();
@@ -2011,15 +1860,4 @@ public class PsJob implements Serializable {
 	    return false;	
 	}
 	
-//	public static PsJob findByEmployeeIdAndEffectiveDateAndEffectiveSequence(String employeeId, Date effectiveDate, BigInteger effectiveSequence) {
-//		logger.debug("*** PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence");
-//		return null;
-//		//FROM PS_Job CJ7
-//		//WHERE CJ7.Emplid = $PSEmplid
-//		//AND TO_CHAR(CJ7.EFFDT,'YYYY-MM-DD') = $PSEffdt                        
-//		//AND CJ7.EFFSEQ = #PSEffSeq                                           
-//		//AND CJ7.EMPL_RCD = 0
-//		//END-SELECT
-//	}
-
 }

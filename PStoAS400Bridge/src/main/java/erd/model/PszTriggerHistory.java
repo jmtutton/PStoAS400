@@ -18,7 +18,6 @@ import javax.persistence.TemporalType;
  * The persistent class for the PS_ZHRT_HISTRIGGER database table.
  * 
  */
-//TODO: Can't find this table in database
 @Entity
 @Table(name="PS_ZHRT_HISTRIGGER")
 @NamedQuery(name="PszTriggerHistory.findAll", query="SELECT p FROM PszTriggerHistory p")
@@ -43,10 +42,10 @@ public class PszTriggerHistory implements Serializable {
 	protected BigInteger effectiveSequence;
 	   
 	@Column(name="PROC_NAME", nullable=false, length=10)
-	protected String processName;  //TODO: make enum
+	protected String processName;
 	   
 	@Column(name="TASK_FLAG", nullable=false, length=1)
-	protected String completionStatus;  //TODO: make enum with values 'P', 'C', 'E', 'W'
+	protected String completionStatus;  //'P', 'C', 'E', 'W'
 
 	@Column(name="ARCHIVE_DT")
 	@Temporal(TemporalType.DATE)

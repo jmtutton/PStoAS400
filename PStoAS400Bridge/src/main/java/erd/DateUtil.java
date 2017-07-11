@@ -10,9 +10,12 @@ import java.util.Date;
 public class DateUtil {
 	
 	/**
-	 * From https://stackoverflow.com/questions/428918/how-can-i-increment-a-date-by-one-day-in-java
+	 * 
+	 * @param date
+	 * @param days
+	 * @return date + days
 	 */
-    public static Date addDays(Date date, int days) {
+	public static Date addDays(Date date, int days) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, days); //minus number would decrement the days
@@ -21,13 +24,11 @@ public class DateUtil {
 
     public static Date asOfToday() {
     	Date asOfToday = new Date();
-		//BEGIN-SELECT
+		//SELECT
 		//{DateTimeOut-Prefix}SYSDATE{DateTimeOut-Suffix} &_SysDateTime
 		//FROM PSCLOCK
-		//END-SELECT
-		//                    
-		//LET $tempDate = strtodate(&_SysDateTime,{Native-DateTimeMask})
-		//LET $_AsOfToday = datetostr($tempDate,{Native-DateMask})
+		//LET $tempDate = STRTODATE(&_SysDateTime,{Native-DateTimeMask})
+		//LET $_AsOfToday = DATETOSTR($tempDate,{Native-DateMask})
     	return asOfToday;
     }
 

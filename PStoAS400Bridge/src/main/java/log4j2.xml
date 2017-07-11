@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config>
 <Configuration status="trace">
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">

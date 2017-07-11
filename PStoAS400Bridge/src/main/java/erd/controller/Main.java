@@ -2,10 +2,14 @@ package erd.controller;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -25,8 +29,6 @@ import erd.model.PszVariable;
 import erd.model.ServerProperties;
 import erd.model.TempMast;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import org.apache.commons.net.bsd.RExecClient;
 import org.apache.logging.log4j.Level;
@@ -308,11 +310,11 @@ public class Main {
 		if(ServerProperties.getOracleSystemId() != null) {
 			ServerProperties.setOracleSystemId(ServerProperties.getOracleSystemId().toUpperCase());
 		}
-		ServerProperties.setRemoteServerUsername("PSHRINT");
-		ServerProperties.setRemoteServerPassword("SMRHET01");
 		//get server property values from the variables table
 		ServerProperties.setRemoteServerHostName(PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(processName, ServerProperties.getDbName(), "RMTSVR"));
 		ServerProperties.setAs400Library(PszVariable.findVariableValueByProcessNameAndDbNameAndVariableName(processName, ServerProperties.getDbName(), "AS400library"));
+		ServerProperties.setRemoteServerUsername("PSHRINT");
+		ServerProperties.setRemoteServerPassword("SMRHET01");
 	}
 
 	/**
@@ -572,17 +574,18 @@ public class Main {
 	public static String doCommand(HashMap<String, Object> parameterMap) {
 		logger.debug("doCommand() ***");
 		String commandString = Main.composeCommandString(parameterMap);
-		//open log file for append  //TODO
-		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("command.log", true)))) {
-			//write to log file  //TODO
+		//open log file for append
+//		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("command.log", true)))) {
+		try {
+		    final Path path = Paths.get("command.log");
+			//write to log file
 			logger.info("$Command=> " + commandString);
+		    Files.write(path, Arrays.asList("$Command=> " + commandString), StandardCharsets.UTF_8, Files.exists(path) ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
 			logger.info("Calling Command at: " + (new SimpleDateFormat("dd-MMM-yyyy_hh:mm:ss.SSSSSS_a")).format(new Date()).toUpperCase());
+		    Files.write(path, Arrays.asList("Calling Command at: " + (new SimpleDateFormat("dd-MMM-yyyy_hh:mm:ss.SSSSSS_a")).format(new Date()).toUpperCase()), StandardCharsets.UTF_8, Files.exists(path) ? StandardOpenOption.APPEND : StandardOpenOption.CREATE);
 		}
 		catch (IOException e) {
 		    System.err.println(e);
-		}
-		finally {
-			//close log file
 		}
 		Integer status = doRexec(commandString);
 		if(status == 0) { //no error returned from process; completed normally
@@ -612,7 +615,7 @@ public class Main {
     }
 	
 	/**
-	 * Composes the string of process parameter values.
+	 * Composes the string of parameter values.
      * @param parameterMap
      * @return parameterString
      */
