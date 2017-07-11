@@ -1,10 +1,13 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import javax.persistence.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The persistent class for the HR036P database table.
@@ -15,19 +18,20 @@ import javax.persistence.*;
 @NamedQuery(name="HR036P.findAll", query="SELECT h FROM HR036P h")
 public class HR036P implements Serializable {
 	private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 	
 	@Id
-	@Column(name = "H36EMP") //five digit string left padded with zeros
+	@Column(name="H36EMP", length=5, unique=true, nullable=false) //five digit string left padded with zeros
 	private String employeeId;
 	
-	@Column(name = "H36NAM")
+	@Column(name="H36NAM", length=33)
 	private String employeeName;
 	
-	@Column(name = "H36EM#")
+	@Column(name="H36EM#", precision=9)
 	private Integer employeeNumber;
 	
-	@Column(name = "H36INX")
-	private BigInteger indexNumber;
+	@Column(name="H36INX", precision=5)
+	private Integer indexNumber;
 
 	public HR036P() {
 		super();
@@ -57,11 +61,11 @@ public class HR036P implements Serializable {
 		this.employeeNumber = employeeNumber;		
 	}
 	
-	public BigInteger getIndexNumber() {
+	public Integer getIndexNumber() {
 		return indexNumber;
 	}
 
-	public void setIndexNumber(BigInteger indexNumber) {
+	public void setIndexNumber(Integer indexNumber) {
 		this.indexNumber = indexNumber;		
 	}
 	
@@ -75,7 +79,8 @@ public class HR036P implements Serializable {
 
 	/**
 	 */
-	public static HR036P findByEmployeeNumberAndIndexNumber(Integer employeeNumber, BigInteger indexNumber) {
+	public static HR036P findByEmployeeNumberAndIndexNumber(Integer employeeNumber, Integer indexNumber) {
+		logger.debug("findByEmployeeNumberAndIndexNumber() ***");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {

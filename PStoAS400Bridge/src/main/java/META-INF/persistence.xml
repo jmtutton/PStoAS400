@@ -16,10 +16,13 @@
         <class>erd.model.CrossReferenceJobCode</class>
         <class>erd.model.CrossReferenceMultipleEmployeeId</class>
         <class>erd.model.CrossReferencePersonOfInterest</class>
+        <class>erd.model.CrossReferencePersonOfInterestEmployee</class>
+        <class>erd.model.CrossReferencePt12p</class>
         <class>erd.model.CrossReferenceReferralSource</class>
         <class>erd.model.CrossReferenceTerminationReason</class>
         <class>erd.model.HR006P</class>
         <class>erd.model.HR036P</class>
+        <class>erd.model.HR100P</class>
         <class>erd.model.PsAccomplishment</class>
         <class>erd.model.PsActionReason</class>
         <class>erd.model.PsAddress</class>
@@ -32,6 +35,7 @@
         <class>erd.model.PsDriversLicense</class>
         <class>erd.model.PsEmergencyContact</class>
         <class>erd.model.PsEmployeeChecklist</class>
+        <class>erd.model.PsEmployeeOriginalHire</class>
         <class>erd.model.PsEmployeeReview</class>
         <class>erd.model.PsEmployment</class>
         <class>erd.model.PsEthnicGroup</class>
@@ -40,7 +44,6 @@
         <class>erd.model.PsJobCode</class>
         <class>erd.model.PsLocation</class>
         <class>erd.model.PsName</class>
-        <class>erd.model.PsOriginalHire</class>
         <class>erd.model.PsPerson</class>
         <class>erd.model.PsPersonalData</class>
         <class>erd.model.PsEffectiveDatedPersonalData</class>
@@ -50,9 +53,11 @@
         <class>erd.model.PsXlatItem</class>
         <class>erd.model.PszPoiTermination</class>
         <class>erd.model.PszTriggerEmployee</class>
+        <class>erd.model.PszTriggerHistory</class>
         <class>erd.model.PszTriggerNonPerson</class>
         <class>erd.model.PszTriggerSuperclass</class>
         <class>erd.model.PszXlat</class>
+        <class>erd.model.TempMast</class>
 		<properties>
             <property name="javax.persistence.jdbc.driver" value="oracle.jdbc.OracleDriver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@ppddbl44.corp.erac.com:1521:PS90HRQA"/>
@@ -62,10 +67,6 @@
 <!--             <property name="javax.persistence.jdbc.url" value="jdbc:oracle:thin:@ppddbl44.corp.erac.com:1521:PS90HRQA"/> -->
 <!--             <property name="javax.persistence.jdbc.user" value="e859v1"/> -->
 <!--             <property name="javax.persistence.jdbc.password" value="Chang#m3"/> -->
-<!--            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" /> -->
-<!-- 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://johnny.heliohost.org:3306/tutton_PS90HRQA"/> -->
-<!-- 			<property name="javax.persistence.jdbc.user" value="tutton_e859v1"/> -->
-<!-- 			<property name="javax.persistence.jdbc.password" value="Chang#m3"/> -->
 		</properties>
 	</persistence-unit>
 </persistence>

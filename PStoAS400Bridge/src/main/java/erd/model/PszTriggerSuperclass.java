@@ -1,6 +1,7 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
@@ -23,16 +24,21 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Entity superclass for trigger table entities
  * @author John Tutton john@tutton.net
- * @see TriggerEmployee, TriggerNonPerson
+ * @see TriggerEmployee
+ * @see TriggerNonPerson
  */
 @Entity
 @Inheritance(strategy  = InheritanceType.TABLE_PER_CLASS)
 @MappedSuperclass
 public abstract class PszTriggerSuperclass implements Serializable {
 	public static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 	
 	protected static String ENTITY_NAME = "";
 
@@ -54,10 +60,10 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	protected BigInteger effectiveSequence;
 	   
 	@Column(name="PROC_NAME", nullable=false, length=10)
-	protected String processName;  //TODO: make enum
+	protected String processName;
 	   
-	@Column(name="TASK_FLAG", nullable=false, length=1)
-	protected String completionStatus;  //TODO: make enum with values 'P', 'C', 'E', 'W'
+	@Column(name="TASK_FLAG", nullable=false, length=1)  //'P', 'C', 'E', 'W'
+	protected String completionStatus;
 
 	public BigInteger getSequenceNumber() {
 		return sequenceNumber;
@@ -120,7 +126,7 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	 * @return a list of all records from all subclass tables with the completionStatus = 'P'
 	 */
 	public static List<PszTriggerSuperclass> findPending() {
-		System.out.println("PszTriggerSuperclass.findPending()");
+		logger.debug("*** PszTriggerSuperclass.findPending()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -145,7 +151,7 @@ public abstract class PszTriggerSuperclass implements Serializable {
     }
 
 	public static PszTriggerSuperclass findBySequenceNumber(BigInteger sequenceNumber, String triggerTypeClassName) {
-		System.out.println("PszTriggerSuperclass.findBySequenceNumber()");
+		logger.debug("*** PszTriggerSuperclass.findBySequenceNumber()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -188,7 +194,7 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	 * @return numberOfRecordsUpdated
 	 */
 	public static int setCompletionStatusBySequenceNumber(String completionStatus, BigInteger sequenceNumber, String triggerTypeClassName) {
-		System.out.println("PszTriggerSuperclass.setCompletionStatusBySequenceNumber()");
+		logger.debug("*** PszTriggerSuperclass.setCompletionStatusBySequenceNumber()");
 		int numberOfRecordsUpdated = 0;
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
@@ -216,312 +222,108 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	    return numberOfRecordsUpdated;
 	}
 	
-//	public static List<PszTriggerEmployee> findByCompletionStatusOrderBySequenceNumber(String completionStatus) {
-//	System.out.println("PszTriggerEmployee.findByCompletionStatusOrderBySequenceNumber()");
-//	EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//	EntityManager em = emfactory.createEntityManager();
-//    try {
-//    	return em.createQuery(
-//    		    "SELECT p FROM PszTriggerEmployee p "
-//    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
-//    		    		+ "ORDER BY p.sequenceNumber ASC "
-//    		    , PszTriggerEmployee.class)
-//    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
-//    		    .getResultList();
-//    }
-//    catch (Exception e) {
-//    	e.printStackTrace();
-//    } 
-//    finally {
-//    	em.close();
-//    }
-//    return null;	
-//}
+	public static List<PszTriggerEmployee> findByCompletionStatusOrderBySequenceNumber(String completionStatus) {
+		logger.debug("*** PszTriggerSuperclass.findByCompletionStatusOrderBySequenceNumber()");
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	return em.createQuery(
+	    		    "SELECT p FROM PszTriggerEmployee p "
+	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
+	    		    		+ "ORDER BY p.sequenceNumber ASC "
+	    		    , PszTriggerEmployee.class)
+	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
+	    		    .getResultList();
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
 
-//public static List<PszTriggerEmployee> findByCompletionStatusAndProcessName(String completionStatus, String processName) {
-//	System.out.println("PszTriggerEmployee.findByCompletionStatusAndProcessName()");
-//	EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//	EntityManager em = emfactory.createEntityManager();
-//    try {
-//    	return em.createQuery(
-//    		    "SELECT p FROM PszTriggerEmployee p "
-//    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
-//    		    		+ "AND TRIM(UPPER(p.processName)) = :processName "
-//    		    		+ "ORDER BY p.sequenceNumber ASC "
-//    		    		+ "LIMIT 150 "
-//    		    , PszTriggerEmployee.class)
-//    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
-//    		    .setParameter("processName", processName.toUpperCase().trim())
-//    		    .getResultList();
-//    }
-//    catch (Exception e) {
-//    	e.printStackTrace();
-//    } 
-//    finally {
-//    	em.close();
-//    }
-//    return null;	
-//}
+	public static List<PszTriggerEmployee> findByCompletionStatusAndProcessName(String completionStatus, String processName) {
+		logger.debug("*** PszTriggerEmployee.findByCompletionStatusAndProcessName()");
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	return em.createQuery(
+	    		    "SELECT p FROM PszTriggerEmployee p "
+	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
+	    		    		+ "AND TRIM(UPPER(p.processName)) = :processName "
+	    		    		+ "ORDER BY p.sequenceNumber ASC "
+	    		    		+ "LIMIT 150 "
+	    		    , PszTriggerEmployee.class)
+	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
+	    		    .setParameter("processName", processName.toUpperCase().trim())
+	    		    .getResultList();
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
 
-//public static List<PszTriggerEmployee> findPending() {
-//	System.out.println("*** PszTriggerEmployee.findPending()");
-//	EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//	EntityManager em = emfactory.createEntityManager();
-//    try {
-//    	return em.createQuery(
-//    		    "SELECT p FROM PszTriggerEmployee p "
-//    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = 'P' "
-//    		    		+ "ORDER BY p.sequenceNumber ASC "
-//    		    , PszTriggerEmployee.class)
-//    		    .getResultList();
-//    }
-//    catch (Exception e) {
-//    	e.printStackTrace();
-//    } 
-//    finally {
-//    	em.close();
-//    }
-//    return null;	
-//}
 
-//public static List<PszTriggerEmployee> findPendingWithLimit(Integer limit) {
-//	System.out.println("*** PszTriggerEmployee.findPending()");
-//	EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//	EntityManager em = emfactory.createEntityManager();
-//    try {
-//    	return em.createQuery(
-//    		    "SELECT p FROM PszTriggerEmployee p "
-//    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = 'P' "
-//    		    		+ "ORDER BY p.sequenceNumber ASC "
-//    		    , PszTriggerEmployee.class)
-//    			.setMaxResults(limit)
-//    		    .getResultList();
-//    }
-//    catch (Exception e) {
-//    	e.printStackTrace();
-//    } 
-//    finally {
-//    	em.close();
-//    }
-//    return null;	
-//}
+	public static List<PszTriggerEmployee> findPendingWithLimit(Integer limit) {
+		logger.debug("*** PszTriggerEmployee.findPending()");
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	return em.createQuery(
+	    		    "SELECT p FROM PszTriggerEmployee p "
+	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = 'P' "
+	    		    		+ "ORDER BY p.sequenceNumber ASC "
+	    		    , PszTriggerEmployee.class)
+	    			.setMaxResults(limit)
+	    		    .getResultList();
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
 
-////TODO: fix query
-//public static List<PszTriggerEmployee> findTriggerDataList() {
-//	System.out.println("PszTriggerEmployee.findTriggerDataList()");
-//	EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//	EntityManager em = emfactory.createEntityManager();
-//    try {
-//    	//FROM PS_ZHRT_INTTRIGGER RZ, PS_JOB JB
-//		//WHERE RZ.TASK_FLAG = 'P'
-//		//		AND (RZ.EFFDT <= $AsOfToday 
-//		//		OR RZ.PROC_NAME='ZHRI101A' 
-//		//		OR RZ.PROC_NAME='ZHRI106A')
-//		//  	AND (CASE WHEN PROC_NAME IN ('ZHRI101A', 'ZHRI106A') THEN SEQ_NBR ELSE SEQ_NBR*10 END) = 
-//		//    		(SELECT MIN(CASE WHEN PROC_NAME IN ('ZHRI101A', 'ZHRI106A') THEN SEQ_NBR ELSE SEQ_NBR*10 END)  
-//		//      		FROM  PS_ZHRT_INTTRIGGER RZ2
-//		//            	WHERE RZ2.EMPLID = RZ.EMPLID
-//		//           		AND RZ2.TASK_FLAG = 'P'
-//		//               	AND (RZ2.EFFDT <= SYSDATE
-//		//						OR RZ2.PROC_NAME='ZHRI101A'
-//		//						OR RZ2.PROC_NAME='ZHRI106A'))
-//  	  	// 		AND RZ.EMPLID NOT IN (SELECT I.EMPLID FROM PS_ZHRT_INTTRIGGER I WHERE I.EMPLID = RZ.EMPLID AND I.TASK_FLAG = 'W') 
-//		//  	AND JB.EMPLID = RZ.EMPLID
-//		//		AND JB.EFFDT = 
-//		//			(SELECT MAX(JB2.EFFDT) FROM  PS_JOB JB2
-//		//     			WHERE JB2.EMPLID = JB.EMPLID
-//		//         			AND JB2.EMPL_RCD = JB.EMPL_RCD)
-//		//  	AND JB.EFFSEQ = 
-//		//			(SELECT MAX(JB3.EFFSEQ) FROM PS_JOB JB3
-//		//       		WHERE JB3.EMPLID = JB.EMPLID
-//		//                	AND JB3.EMPL_RCD = JB.EMPL_RCD
-//		//                	AND JB3.EFFDT = JB.EFFDT)
-//    	List<PszTriggerEmployee> resultList = em.createQuery(
-//    		    "SELECT pe FROM PszTriggerEmployee pe, PsJob pj "
-//    		    		+ "WHERE pe.completionStatus = :completionStatus "
-//    		    		+ "		AND (pe.effectiveDate <= :asOfToday OR pe.processName = 'ZHRI101A' OR pe.processName = 'ZHRI106A') "	
-////    		    		+ "		AND (CASE WHEN processName IN ('ZHRI101A', 'ZHRI106A') THEN sequenceNumber ELSE sequenceNumber*10 END) = "
-////    		    		+ "			(SELECT MIN(CASE WHEN processName IN ('ZHRI101A', 'ZHRI106A') THEN sequenceNumber ELSE sequenceNumber*10 END) "
-////    		    		+ "				FROM PszTriggerEmployee pe2 "
-////    		    		+ "				WHERE pe2.employeeId = pe.employeeId "
-////    		    		+ "					AND pe2.completionStatus = :completionStatus "
-////    		    		+ "					AND (pe2.effectiveDate <= CURRENT_DATE "
-////    		    		+ "						OR pe2.processName = 'ZHRI101A' "
-////    		    		+ "						OR pe2.processName = 'ZHRI106A')) "
-//    		    		+ "		AND pe.employeeId NOT IN (SELECT pe3.employeeId FROM PszTriggerEmployee pe3 WHERE pe3.employeeId = pe.employeeId AND pe3.completionStatus = 'W') " 
-//    		    		+ "		AND pj.employeeId = pe.employeeId "
-//    					+ "		AND pj.effectiveDate = "
-//    		    		+ "			(SELECT MAX(pj2.effectiveDate) FROM PsJob pj2 "
-//    		    		+ "				WHERE pj2.employeeId = pj.employeeId "
-//    		    		+ "					AND pj2.employmentRecordNumber = pj.employmentRecordNumber) "
-//    		    		+ "		AND pj.effectiveSequence = "
-//    		    		+ "			(SELECT MAX(pj3.effectiveSequence) FROM PsJob pj3 "
-//    		    		+ "				WHERE pj3.employeeId = pj.employeeId "
-//    		    		+ "					AND pj3.employmentRecordNumber = pj.employmentRecordNumber "
-//    		    		+ "					AND pj3.effectiveDate = pj.effectiveDate) "
-//    		    		+ "LIMIT 150 "
-//    			, PszTriggerEmployee.class)
-//    		    .setParameter("asOfToday", DateUtil.asOfToday(), TemporalType.DATE)
-////    		    .setParameter("completionStatus", "P")
-//    		    .setParameter("completionStatus", "C")
-//    		    .getResultList();
-//    	if(resultList != null && !resultList.isEmpty()) {
-//    		return resultList;
-//    	}
-//    } 
-//    catch (Exception e) {
-//    	e.printStackTrace();
-//    } 
-//    finally {
-//    	em.close();
-//    }
-//	return null;
-//}
+	/**
+	 * @param completionStatus
+	 * @param sequenceNumber
+	 * @return numberOfRecordsUpdated
+	 */
+	public static int update(PszTriggerNonPerson trigger) {
+		logger.debug("*** PszTriggerNonPerson.setCompletionStatusBySequenceNumber()");
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		int numberOfRecordsUpdated = 0;
+	    try {
+	    	em.getTransaction().begin();
+	    	em.merge(trigger);
+	    	em.getTransaction().commit();
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return numberOfRecordsUpdated;
+	}
 
-//public static List<BigInteger> caseTest() {
-//	System.out.println("PszTriggerEmployee.caseTest()");
-//	EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//	EntityManager em = emfactory.createEntityManager();
-//    try {
-//    	List<BigInteger> resultList = em.createQuery(""
-//    			+ "SELECT "
-////	    		+ "(SELECT CASE WHEN processName IN ('ZHRI101A', 'ZHRI106A') THEN sequenceNumber ELSE sequenceNumber*10 END FROM PszTriggerEmployee) = "
-////	    		+ "		(SELECT MIN(CASE WHEN processName IN ('ZHRI101A', 'ZHRI106A') THEN sequenceNumber ELSE sequenceNumber*10 END FROM PszTriggerEmployee) "
-//    			+ "(SELECT CASE WHEN pe2.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe2.sequenceNumber ELSE pe2.sequenceNumber*10 END "
-//	    		+ "				FROM PszTriggerEmployee pe2 "
-//	    		+ "				WHERE pe2.employeeId = '323506' "
-//	    		+ "					AND pe2.completionStatus = 'P' "
-//	    		+ "					AND (pe2.effectiveDate <= CURRENT_DATE "
-//	    		+ "						OR pe2.processName = 'ZHRI101A' "
-//	    		+ "						OR pe2.processName = 'ZHRI106A')) "
-////	    		+ " = "
-////				+ "(SELECT MIN(CASE WHEN pe3.processName IN ('ZHRI101A', 'ZHRI106A') THEN pe3.sequenceNumber ELSE pe3.sequenceNumber*10 END) "
-////	    		+ "				FROM PszTriggerEmployee pe3 "
-////	    		+ "				WHERE pe3.employeeId = '323506' "
-////	    		+ "					AND pe3.completionStatus = 'P' "
-////	    		+ "					AND (pe3.effectiveDate <= CURRENT_DATE "
-////	    		+ "						OR pe3.processName = 'ZHRI101A' "
-////	    		+ "						OR pe3.processName = 'ZHRI106A')) "
-//	    		+ "FROM PszTriggerEmployee pe "
-//    			, BigInteger.class)
-//    		    .getResultList();
-//    	return resultList;
-//    }
-//    catch (Exception e) {
-//    	e.printStackTrace();
-//    } 
-//    finally {
-//    	em.close();
-//    }
-//    return null;
-//}
-	
-//	/**
-//	 * findBySequenceNumber
-//	 * @param sequenceNumber
-//	 * @return PszTriggerNonPerson
-//	 */
-//	public static PszTriggerNonPerson findBySequenceNumber(BigInteger sequenceNumber) {
-//		System.out.println("*** PszTriggerNonPerson.findBySequenceNumber()");
-//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//		EntityManager em = emfactory.createEntityManager();
-//	    try {
-//	    	List<PszTriggerNonPerson> resultList = em.createQuery(
-//	    		    "SELECT p FROM PszTriggerNonPerson p WHERE p.sequenceNumber = :sequenceNumber"
-//	    			, PszTriggerNonPerson.class)
-//	    		    .setParameter("sequenceNumber", sequenceNumber)
-//	    		    .getResultList();
-//	    	if(resultList != null && resultList.size() > 0) {
-//	    		return resultList.get(0);
-//	    	}
-//	    } 
-//	    catch (Exception e) {
-//	    	e.printStackTrace();
-//	    } 
-//	    finally {
-//	    	em.close();
-//	    }
-//	    return null;	
-//	}
-	
-//	/**
-//	 * findByCompletionStatusOrderBySequenceNumber
-//	 * @param completionStatus
-//	 * @return List<PszTriggerNonPerson>
-//	 */
-//	public static List<PszTriggerNonPerson> findByCompletionStatusOrderBySequenceNumber(String completionStatus) {
-//		System.out.println("*** PszTriggerNonPerson.findByCompletionStatusOrderBySequenceNumber()");
-//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//		EntityManager em = emfactory.createEntityManager();
-//	    try {
-//	    	return em.createQuery(
-//	    		    "SELECT p FROM PszTriggerNonPerson p "
-//	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
-//	    		    		+ "ORDER BY p.sequenceNumber ASC "
-//	    		    , PszTriggerNonPerson.class)
-//	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
-//	    		    .getResultList();
-//	    }
-//	    catch (Exception e) {
-//	    	e.printStackTrace();
-//	    } 
-//	    finally {
-//	    	em.close();
-//	    }
-//	    return null;	
-//   }
-	
-//	/**
-//	 * findByCompletionStatusAndProcessName
-//	 * @param completionStatus
-//	 * @param processName
-//	 * @return List<PszTriggerNonPerson>
-//	 */
-//	public static List<PszTriggerNonPerson> findByCompletionStatusAndProcessName(String completionStatus, String processName) {
-//		System.out.println("*** PszTriggerNonPerson.findByCompletionStatusAndProcessName()");
-//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//		EntityManager em = emfactory.createEntityManager();
-//	    try {
-//	    	return em.createQuery(
-//	    		    "SELECT p FROM PszTriggerNonPerson p WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
-//	    		    		+ "AND TRIM(UPPER(p.processName)) = :processName "
-//	    		    		+ "ORDER BY p.sequenceNumber ASC "
-//	    		    , PszTriggerNonPerson.class)
-//	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
-//	    		    .setParameter("processName", processName.toUpperCase().trim())
-//	    		    .getResultList();
-//	    }
-//	    catch (Exception e) {
-//	    	e.printStackTrace();
-//	    } 
-//	    finally {
-//	    	em.close();
-//	    }
-//	    return null;	
-//   }
-
-//	/**
-//	 * @param completionStatus
-//	 * @param sequenceNumber
-//	 * @return numberOfRecordsUpdated
-//	 */
-//	public static int update(PszTriggerNonPerson trigger) {
-//		System.out.println("*** PszTriggerNonPerson.setCompletionStatusBySequenceNumber()");
-//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//		EntityManager em = emfactory.createEntityManager();
-//		int numberOfRecordsUpdated = 0;
-//	    try {
-//	    	em.getTransaction().begin();
-//	    	em.merge(trigger);
-//	    	em.getTransaction().commit();
-//	    }
-//	    catch (Exception e) {
-//	    	e.printStackTrace();
-//	    } 
-//	    finally {
-//	    	em.close();
-//	    }
-//	    return numberOfRecordsUpdated;
-//	}
+	/**
+	 * This procedure will get the trigger data that needs to be interfaced
+	 * @see Get-Trigger-Data-POI-Emp-Convert in ZHRI100A.SQR
+	 */
+	//TODO: 
+	public static void ZHRI100A_getTriggerDataPoiEmpConvert() {
+		logger.debug("*** Main.ZHRI100A_getTriggerDataPoiEmpConvert()");
+		
+	}
 
 }

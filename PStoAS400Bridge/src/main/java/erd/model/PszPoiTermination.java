@@ -1,9 +1,13 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.util.Date;
 
 import javax.persistence.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The persistent class for the PS_ZHRT_POI_TERM database table.
@@ -14,28 +18,29 @@ import javax.persistence.*;
 @NamedQuery(name="PszPoiTermination.findAll", query="SELECT p FROM PszPoiTermination p")
 public class PszPoiTermination implements Serializable {
 	private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	@Id
 	@Column(name="EMPLID", nullable=false, length=11)
 	private String employeeId;
 
-	@Column(name="PROC_NAME", nullable=false, length=11)
+	@Column(name="PROC_NAME", nullable=false, length=10)
 	private String processName;
 
 	@Temporal(TemporalType.DATE)
-	@Column(name="UPDATED_DATETIME", nullable=false, length=11)
+	@Column(name="UPDATED_DATETIME")
 	private Date updatedDateTime;
 
 	public PszPoiTermination() {
 	}
 
-	private void setEmployeeId(String employeeId) {
+	public void setEmployeeId(String employeeId) {
 		this.employeeId = employeeId != null ? employeeId.toUpperCase().trim() : employeeId;
 	}
-	private void setProcessName(String processName) {
+	public void setProcessName(String processName) {
 		this.processName = processName != null ? processName.toUpperCase().trim() : processName;
 	}
-	private void setUpdatedDateTime(Date updatedDateTime) {
+	public void setUpdatedDateTime(Date updatedDateTime) {
 		this.updatedDateTime = updatedDateTime;
 	}
 
@@ -45,11 +50,9 @@ public class PszPoiTermination implements Serializable {
 	 * @param employeeId
 	 */
 	public static void insertTimestamp(String employeeId) {
-		System.out.println("*** PszPoiTermination.insertTimestamp()");
-		//BEGIN-SQL  
+		logger.debug("*** PszPoiTermination.insertTimestamp()");
 		//INSERT INTO PS_ZHRT_POI_TERM (EMPLID, PROC_NAME, UPDATED_DATETIME)
 		//VALUES ( $Wrk_Emplid, 'TERM', $SysDateTime)
-		//END-SQL
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {

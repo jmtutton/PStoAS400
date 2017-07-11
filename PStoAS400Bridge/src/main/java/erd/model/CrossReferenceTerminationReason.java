@@ -1,9 +1,13 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import javax.persistence.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The persistent class for the PS_ZHRT_TRMRS_CREF database table.
@@ -15,6 +19,7 @@ import javax.persistence.*;
 @NamedQuery(name="CrossReferenceTerminationReason.findAll", query="SELECT p FROM CrossReferenceTerminationReason p")
 public class CrossReferenceTerminationReason implements Serializable {
 	private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	@Id
 	@Column(name="ACTION_REASON", nullable=false, length=3)
@@ -68,6 +73,7 @@ public class CrossReferenceTerminationReason implements Serializable {
 	}
 
 	public CrossReferenceTerminationReason HR02_getActionReason(String employeeId) {
+		logger.debug("*** CrossReferenceTerminationReason.HR02_getActionReason()");
 //		!----------------------------------------------------------------------
 //		! Procedure:  HR02-Get-Action-Reason
 //		! Desc:  This routine will determine if a termination was voluntary or
@@ -107,6 +113,7 @@ public class CrossReferenceTerminationReason implements Serializable {
 	 * @see HR02-Get-Action-Reason in ZHRI102A.SQC
 	 */
 	public static CrossReferenceTerminationReason findByActionAndActionReasonAndStatus(String action, String actionReason, String status) {
+		logger.debug("*** CrossReferenceTerminationReason.findByActionAndActionReasonAndStatus()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {

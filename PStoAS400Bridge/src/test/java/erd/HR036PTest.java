@@ -2,7 +2,6 @@ package erd;
 
 import static org.junit.Assert.*;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -22,7 +21,7 @@ public class HR036PTest {
 	@Test
 	public void testGetLegacyOprId() {
 		Integer employeeNumber = 1137;
-		BigInteger indexNumber = new BigInteger("0");
+		Integer indexNumber = 0;
 		HR036P result = HR036P.findByEmployeeNumberAndIndexNumber(employeeNumber, indexNumber);
 		assertNotNull(result);
 		if(result != null) {

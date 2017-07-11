@@ -1,11 +1,15 @@
 package erd.controller;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import erd.model.PsAccomplishment;
 import erd.model.PsContractData;
@@ -18,6 +22,7 @@ import erd.model.PsEmployeeReview;
  * @author John Tutton john@tutton.net
  */
 public class EmployeeDateChange {
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	/**
 	 * @see HR07-Process-Main in ZHRI107A.SQC
@@ -25,11 +30,11 @@ public class EmployeeDateChange {
 	 * @return
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDateChange.doProcess()");
+		logger.debug("*** EmployeeDateChange.doProcess()");
 		parameterMap = fetchProcessParameters(parameterMap);
 		if(parameterMap.get("employeeId") != null && !((String)parameterMap.get("employeeId")).isEmpty()) {
-			parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
-			return ZHRI100A.doCommand(parameterMap);
+			parameterMap.put("parameterString", Main.composeParameterString(parameterMap));
+			return Main.doCommand(parameterMap);
 		}
 		return "E";
 	}
@@ -40,16 +45,16 @@ public class EmployeeDateChange {
 	 * @param parameterMap
 	 */
 	public HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDateChange.fetchProcessParameters()");
+		logger.debug("*** EmployeeDateChange.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ107A");
 		parameterMap = setUnusedParameters(parameterMap);
 		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
-			//!Remove leading 'E' from the PS employee operator ID to comply with the 5 long legacy format
-			parameterMap.put("operatorId", ((String)parameterMap.get("operatorId")).substring(1).trim().toUpperCase()); //strips the 'E' off of the id
+			//remove leading 'E' from the PS employee operator ID to comply with the 5 long legacy format
+			parameterMap.put("operatorId", ((String)parameterMap.get("operatorId")).substring(1).trim().toUpperCase());
 		}
-		parameterMap.put("employeeId", ZHRI100A.fetchLegacyEmployeeId(parameterMap));
+		parameterMap.put("employeeId", Main.fetchLegacyEmployeeId(parameterMap));
 		if(parameterMap.get("employeeId") != null) {
-			parameterMap.put("employeeId", ((String)parameterMap.get("employeeId")).trim().toUpperCase());  //TODO
+			parameterMap.put("employeeId", ((String)parameterMap.get("employeeId")).trim().toUpperCase());
 			parameterMap = fetchEmployeeReviewDates(parameterMap);
 			parameterMap = fetchAccomplishmentDates(parameterMap);
 			parameterMap = fetchContractDate(parameterMap);
@@ -94,12 +99,11 @@ public class EmployeeDateChange {
 	 * @return parameterMap
 	 */
 	public HashMap<String, Object> fetchEmployeeReviewDates(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDateChange.fetchEmployeeReviewDates()");
+		logger.debug("*** EmployeeDateChange.fetchEmployeeReviewDates()");
 		PsEmployeeReview psEmployeeReview = 
 				PsEmployeeReview.findByEmployeeIdAndEffectiveDateAndEmploymentRecordNumber(
 						(String)parameterMap.get("employeeId"), 
 						(Date)parameterMap.get("effectiveDate"), new BigInteger("0"));
-		//!Format next review date and last review date so legacy will accept it (MM field, DD field and CCYY field)
 		if(psEmployeeReview.getNextReviewDt() != null) {
 			parameterMap.put("nextReviewYear", new SimpleDateFormat("yyyy").format(psEmployeeReview.getNextReviewDt()));
 			parameterMap.put("nextReviewMonth", new SimpleDateFormat("mm").format(psEmployeeReview.getNextReviewDt()));
@@ -121,31 +125,26 @@ public class EmployeeDateChange {
 	 * @return parameterMap
 	 */
 	public HashMap<String, Object> fetchAccomplishmentDates(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDateChange.fetchAccomplishmentDates()");
+		logger.debug("*** EmployeeDateChange.fetchAccomplishmentDates()");
 		List<String> accomplishmentCodeList = Arrays.asList("DRUGTST", "PHYS L3", "PHYS L4");
 		PsAccomplishment psAccomplishment = PsAccomplishment.findByEmployeeIdAndAccomplishmentCodes((String)parameterMap.get("employeeId"), accomplishmentCodeList);
 		if(psAccomplishment != null) {
 			switch(psAccomplishment.getAccomplishmentCode().trim().toUpperCase()) {
-				//!when accomplishment is equal to negative drug test
 				case "DRUGTST":
 					if(psAccomplishment.getDateIssued() != null) {
-						//!Format negative drug test date so legacy will accept it (MM field, DD field and CCYY field)
 						parameterMap.put("negDrugTestYear", new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
 						parameterMap.put("negDrugTestMonth", new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
 						parameterMap.put("negDrugTestDay", new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
 					}
 				break;
-				//!when accomplishment is equal to physical test date for level 3 or level 4
 				case "PHYS L3":
 				case "PHYS L4":
 					if(psAccomplishment.getDateIssued() != null) {
-						//!Format physical test date so legacy will accept it (MM field, DD field and CCYY field)
 						parameterMap.put("physTestYear", new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
 						parameterMap.put("physTestMonth", new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
 						parameterMap.put("physTestDay", new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
 					}
 				break;
-				//!when equal to anything else, do not get issue date
 				default:
 				break;
 			}
@@ -160,7 +159,7 @@ public class EmployeeDateChange {
 	 * @return parameterMap
 	 */
 	public HashMap<String, Object> fetchContractDate(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDateChange.fetchContractDate()");
+		logger.debug("*** EmployeeDateChange.fetchContractDate()");
 		PsContractData psContractData = PsContractData.findByEmployeeIdAndMaxBeginDate((String)parameterMap.get("employeeId"));
 		parameterMap.put("contractYear", new SimpleDateFormat("yyyy").format(psContractData.getContractBeginDt()));
 		parameterMap.put("contractMonth", new SimpleDateFormat("mm").format(psContractData.getContractBeginDt()));

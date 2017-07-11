@@ -2,7 +2,7 @@ package erd;
 
 import org.junit.Test;
 
-import erd.controller.ZHRI100A;
+import erd.controller.Main;
 
 public class EmployeeTerminationTest {
 
@@ -45,7 +45,7 @@ public class EmployeeTerminationTest {
 
 	@Test
 	public void testZHRI100A_main() {
-		ZHRI100A.main();
+		Main.main();
 	}
 
 }

@@ -1,11 +1,15 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
 import javax.persistence.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The persistent class for the PS_ACTN_REASON_TBL database table.
@@ -16,6 +20,7 @@ import javax.persistence.*;
 @NamedQuery(name="PsActionReason.findAll", query="SELECT p FROM PsActionReason p")
 public class PsActionReason implements Serializable {
 	private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	@Id
 	@Column(name="ACTION_REASON", nullable=false, length=3)
@@ -128,6 +133,7 @@ public class PsActionReason implements Serializable {
 	 * 
 	 */
 	public PsActionReason findByActionCodeAndActionReason(String actionCode, String actionReasonCode) {
+		logger.debug("*** PsActionReason.findByActionCodeAndActionReason()");
 //	!----------------------------------------------------------------------
 //	! Procedure:  HR02-Get-Reason-Description
 //	! Desc:  This routine gets the description field from the Action
@@ -159,6 +165,7 @@ public class PsActionReason implements Serializable {
 	 * @return
 	 */
 	public static PsActionReason findByActionCodeAndActionReasonCode(String actionCode, String actionReasonCode) {
+		logger.debug("*** PsActionReason.findByActionCodeAndActionReasonCode()");
 //		!----------------------------------------------------------------------
 //		! ERAC
 //		! Procedure:  HR02-Get-Reason-Description
@@ -191,11 +198,13 @@ public class PsActionReason implements Serializable {
 	}
 
 	public static String findReasonDescriptionByActionAndActionReason(String action, String actionReason) {
+		logger.debug("*** PsActionReason.findReasonDescriptionByActionAndActionReason()");
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	public static List<String> findAllActionReasonCode() {
+		logger.debug("*** PsActionReason.findAllActionReasonCode()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -216,6 +225,7 @@ public class PsActionReason implements Serializable {
 	}
 	
 	public static List<PsActionReason> findAll() {
+		logger.debug("*** PsActionReason.findAll()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {

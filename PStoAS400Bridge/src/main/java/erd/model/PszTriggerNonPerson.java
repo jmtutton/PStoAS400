@@ -9,24 +9,29 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Entity implementation class for PS_ZHRT_ALTTRIGGER PeopleSoft non-person event triggers table 
- * @author	John Tutton john@tutton.net
+ * @author John Tutton john@tutton.net
  */
 @Entity
 @Table(name = "PS_ZHRT_ALTTRIGGER")
+@NamedQuery(name="PszTriggerNonPerson.findAll", query="SELECT p FROM PszTriggerNonPerson p")
 public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 	
 	//same properties as TriggerEmployee, with just this one extra field.  	   
 	@Column(name="SEQUENCE", nullable=false, precision=38)
-	private BigInteger eidIndexNumber;  //This field is the index (0-4) of an EID non-persons with multiple EIDs. 0 is the primary.
+	private Integer eidIndexNumber;  //This field is the index (0-4) of an EID non-persons with multiple EIDs. 0 is the primary.
 
-	public BigInteger getEidIndexNumber() {
+	public Integer getEidIndexNumber() {
 		return eidIndexNumber;
 	}
 
-	public void setEidIndexNumber(BigInteger eidIndexNumber) {
+	public void setEidIndexNumber(Integer eidIndexNumber) {
 		this.eidIndexNumber = eidIndexNumber;
 	}
 
@@ -57,7 +62,7 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	 */
 	//TODO: 
 	public static Boolean isPoiToEmpTransfer(String employeeId) {
-		System.out.println("*** PszTriggerNonPerson.ZHRI100A_checkIfPoiTermed()");
+		logger.debug("*** PszTriggerNonPerson.ZHRI100A_checkIfPoiTermed()");
 		//BEGIN-SELECT
 		//SEC.TASK_FLAG
 		//FROM PS_ZHRT_ALTTRIGGER SEC
@@ -103,13 +108,13 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	}
 	
 	public static PszTriggerNonPerson createMockTriggerForNonPersonTermination() {
-		System.out.println("*** PszTriggerNonPerson.createMockTriggerForNonPersonTermination()");
-		BigInteger sequenceNumber = new BigInteger("2110");
+		logger.debug("*** PszTriggerNonPerson.createMockTriggerForNonPersonTermination()");
+		BigInteger sequenceNumber = new BigInteger("2111");
 		String operatorId = "E208T1";
-		String employeeId = "343525";
+		String employeeId = "348017";
 		Date effectiveDate = new Date();
 		try {
-			effectiveDate = (new SimpleDateFormat("dd-MMM-yyyy")).parse("03-JUL-2017");
+			effectiveDate = (new SimpleDateFormat("dd-MMM-yyyy")).parse("27-JUN-2017");
 		} 
 		catch (ParseException e) {
 			e.printStackTrace();
@@ -117,7 +122,7 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 		BigInteger effectiveSequence = new BigInteger("0");
 		String processName = "ZHRI202A";
 		String completionStatus = "P";
-		BigInteger eidIndexNumber = new BigInteger("1");
+		Integer eidIndexNumber = 0;
 		PszTriggerNonPerson trigger = new PszTriggerNonPerson();
 		trigger.setCompletionStatus(completionStatus);
 		trigger.setEffectiveDate(effectiveDate);
@@ -138,7 +143,7 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	 * @return numberOfRecordsUpdated
 	 */
 	public static int setCompletionStatusBySequenceNumber(String completionStatus, BigInteger sequenceNumber) {
-		System.out.println("*** PszTriggerNonPerson.setCompletionStatusBySequenceNumber()");
+		logger.debug("*** PszTriggerNonPerson.setCompletionStatusBySequenceNumber()");
     	String triggerTypeClassName = MethodHandles.lookup().lookupClass().getSimpleName();
 	    return PszTriggerSuperclass.setCompletionStatusBySequenceNumber(completionStatus, sequenceNumber, triggerTypeClassName);
 	}

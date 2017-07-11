@@ -1,11 +1,15 @@
 package erd.controller;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import erd.model.PszPoiTermination;
 
@@ -15,6 +19,7 @@ import erd.model.PszPoiTermination;
  * @author John Tutton john@tutton.net
  */
 public class NonPersonTermination {
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	/**
 	 * This is the main processing procedure
@@ -23,12 +28,13 @@ public class NonPersonTermination {
 	 * @return completionStatus
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** NonPersonTermination.doProcess()");
+		logger.debug("*** NonPersonTermination.doProcess()");
 		String completionStatus = "E";
 		parameterMap = fetchProcessParameters(parameterMap);
+		logger.info("parameterMap.get(employeeId): " + parameterMap.get("employeeId"));
 		if(parameterMap.get("employeeId") != null && !((String)parameterMap.get("employeeId")).isEmpty()) {
-			parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
-			completionStatus = ZHRI100A.doCommand(parameterMap);
+			parameterMap.put("parameterString", Main.composeParameterString(parameterMap));
+			completionStatus = Main.doCommand(parameterMap);
 			if("C".equalsIgnoreCase(completionStatus)) { //completed normally
 				//insert POI termination record
 				if(new BigInteger("0").equals((BigInteger)parameterMap.get("effectiveSequence"))) {
@@ -45,17 +51,15 @@ public class NonPersonTermination {
 	 * @param parameterMap
 	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** NonPersonTermination.fetchProcessParameters()");
+		logger.debug("*** NonPersonTermination.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ202A");
 		parameterMap.put("errorProgramParameter", "HRZ202A");
 		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
-			////strip the 'E' off of the operator id to format the legacy employee ID from the PeopleSoft OprId for audit field
 			parameterMap.put("operatorId", ((String)parameterMap.get("operatorId")).substring(1).toUpperCase()); 
 		}
-		//datetostr($PSDateIn,'YYYYMMDD')
 		String terminationDate = new SimpleDateFormat("yyyyMMdd").format((Date)parameterMap.get("effectiveDate"));
 		parameterMap.put("terminationDate", terminationDate);
-		parameterMap.put("employeeId", ZHRI100A.fetchLegacyEmployeeId(parameterMap));
+		parameterMap.put("employeeId", Main.fetchLegacyEmployeeId(parameterMap));
 		parameterMap.put("parameterNameList", getParameterNameList());
 		return parameterMap;
 	}
@@ -66,7 +70,7 @@ public class NonPersonTermination {
 	 * @return parameterNameList
 	 */
 	public static List<String> getParameterNameList() {
-		System.out.println("*** NonPersonTermination.getParameterNameList()");
+		logger.debug("*** NonPersonTermination.getParameterNameList()");
 		return Arrays.asList("operatorId", "employeeId", "terminationDate");
 	}
 	

@@ -6,7 +6,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.persistence.Entity;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Entity implementation class for PS_ZHRT_INTTRIGGER PeopleSoft employee event triggers table 
@@ -14,8 +18,10 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "PS_ZHRT_INTTRIGGER")
+@NamedQuery(name="PszTriggerEmployee.findAll", query="SELECT p FROM PszTriggerEmployee p")
 public class PszTriggerEmployee extends PszTriggerSuperclass {
 	private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 	   
 	public PszTriggerEmployee() {
 		super();
@@ -23,7 +29,7 @@ public class PszTriggerEmployee extends PszTriggerSuperclass {
 	}
 
 	public static PszTriggerEmployee createMockTriggerForEmployeeTermination() {
-		System.out.println("*** PszTriggerEmployee.createMockTriggerForEmployeeTermination()");
+		logger.debug("*** PszTriggerEmployee.createMockTriggerForEmployeeTermination()");
 		BigInteger sequenceNumber = new BigInteger("9073256");
 		String operatorId = "E208T1";
 		String employeeId = "323506";

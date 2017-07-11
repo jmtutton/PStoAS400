@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import erd.model.PszTriggerEmployee;
 import erd.model.PszTriggerNonPerson;
 import erd.model.PszTriggerSuperclass;
 
@@ -102,12 +101,12 @@ public class PszTriggerTest {
 //		assertNotNull(result);
 //		System.out.println("result: " + result);
 //	}
-//
+
 	@Test 
 	public void testSetCompletionStatusBySequenceNumber() {
 		String completionStatus = "P";
-		BigInteger sequenceNumber = new BigInteger("9072090");
-		int result = PszTriggerEmployee.setCompletionStatusBySequenceNumber(completionStatus, sequenceNumber);
+		BigInteger sequenceNumber = new BigInteger("2111");
+		int result = PszTriggerNonPerson.setCompletionStatusBySequenceNumber(completionStatus, sequenceNumber);
 		assertNotNull(result);
 		System.out.println("result: " + result);
 	}

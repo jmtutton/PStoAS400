@@ -1,11 +1,14 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import javax.persistence.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.persistence.config.QueryHints;
 
 import erd.DateUtil;
@@ -24,6 +27,7 @@ import java.util.List;
 @NamedQuery(name="PsJob.findAll", query="SELECT p FROM PsJob p")
 public class PsJob implements Serializable {
 	private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	@Id
 	@Column(name="EMPLID", nullable=false, length=11)
@@ -1460,7 +1464,7 @@ public class PsJob implements Serializable {
 	 * @return
 	 */
 	public PsJob hr01GetJobData(String employeeId) {
-		System.out.println("*** PsJob.hr01GetJobData");
+		logger.debug("*** PsJob.hr01GetJobData");
 //		Begin-Select
 //		CJ.COMPANY
 //		    Let $PSCompany = ltrim(rtrim(&CJ.COMPANY,' '),' ')              !Remove leading and trailing blanks
@@ -1527,7 +1531,7 @@ public class PsJob implements Serializable {
 	 * @return single PsJob record
 	 */
 	public static PsJob findByEmployeeIdAndEffectiveDateAndEffectiveSequence(String employeeId, Date effectiveDate, BigInteger effectiveSequence) {
-		System.out.println("*** PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence");
+		logger.debug("*** PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence");
 //		System.out.println("employeeId: " + employeeId);
 //		System.out.println("effectiveDate: " + effectiveDate);
 //		System.out.println("effectiveSequence: " + effectiveSequence);
@@ -1582,7 +1586,7 @@ public class PsJob implements Serializable {
 	 * @return
 	 */
 	public static PsJob hr04GetJobData(String employeeId, Date effectiveDate) {
-		System.out.println("*** PsJob.hr04GetJobData");
+		logger.debug("*** PsJob.hr04GetJobData");
 //		Begin-Select
 //		CJ6.COMPANY
 //		    let $PSCompany = ltrim(rtrim(&CJ6.COMPANY,' '),' ')              !Remove leading and trailing blanks
@@ -1656,7 +1660,7 @@ public class PsJob implements Serializable {
 	 * @return regulatoryRegion
 	 */
 	public static String findRegulatoryRegionByEmployeeId(String employeeId) {
-		System.out.println("*** PsJob.findRegulatoryRegionByEmployeeId");
+		logger.debug("*** PsJob.findRegulatoryRegionByEmployeeId");
 		//BEGIN-SELECT
 		//FROM PS_Job HJ8
 		//WHERE HJ8.Emplid = $PSEmplid
@@ -1709,7 +1713,7 @@ public class PsJob implements Serializable {
 	 * @return
 	 */
 	public static BigInteger findMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate(String employeeId, BigInteger employmentRecordNumber, Date effectiveDate) {
-		System.out.println("*** PsJob.findMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate");
+		logger.debug("*** PsJob.findMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate");
 		//EFFSEQ = (SELECT MAX(EFFSEQ)
 		//FROM PS_JOB RJ3
 		//WHERE RJ3.EMPLID = RJ.EMPLID
@@ -1747,7 +1751,7 @@ public class PsJob implements Serializable {
 	 * @return
 	 */
 	public static Date findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber(String employeeId, BigInteger employmentRecordNumber) {
-		System.out.println("*** PsJob.findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber");
+		logger.debug("*** PsJob.findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber");
 		//EFFDT = (SELECT MAX(EFFDT)
 		//FROM PS_JOB RJ2
 		//WHERE RJ2.EMPLID = RJ.EMPLID
@@ -1784,7 +1788,7 @@ public class PsJob implements Serializable {
 	 * @return
 	 */
 	public static List<PsJob> findByEmployeeIdAndEffectiveDate(String employeeId, java.util.Date effectiveDate) {
-		System.out.println("*** PsJob.findByEmployeeIdAndEffectiveDate");
+		logger.debug("*** PsJob.findByEmployeeIdAndEffectiveDate");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -1842,7 +1846,7 @@ public class PsJob implements Serializable {
 	 * @return
 	 */
 	public static Boolean employeeIsContractor(String employeeId) {
-		System.out.println("*** PsJob.employeeIsContractor");
+		logger.debug("*** PsJob.employeeIsContractor");
 		//BEGIN-PROCEDURE CHECK-IF-CONTRACTOR
 		//LET $Found = 'N'
 		//BEGIN-SELECT
@@ -1905,7 +1909,7 @@ public class PsJob implements Serializable {
 //	 * @return
 //	 */
 //	public static Boolean employeeIsContractor(String employeeId, Date effectiveDate, BigInteger effectiveSequence) {
-//		System.out.println("*** PsJob.correspondingJobRecordExists");
+//		logger.debug("*** PsJob.correspondingJobRecordExists");
 //		//BEGIN-PROCEDURE CHECK-IF-CONTRACTOR
 //		//LET $Found = 'N'
 //		//BEGIN-SELECT
@@ -1961,7 +1965,7 @@ public class PsJob implements Serializable {
 	 * @return true if corresponding PsJob record found
 	 */
 	public static Boolean correspondingJobRecordExists(String employeeId, Date effectiveDate, String processName) {
-		System.out.println("*** PsJob.correspondingJobRecordExists");
+		logger.debug("*** PsJob.correspondingJobRecordExists");
 		//BEGIN-PROCEDURE CHECK-IF-CORRECT102A
 		//LET $OK-To-Process = 'N'
 		//IF $WrkProcess = 'ZHRI102A'
@@ -2008,7 +2012,7 @@ public class PsJob implements Serializable {
 	}
 	
 //	public static PsJob findByEmployeeIdAndEffectiveDateAndEffectiveSequence(String employeeId, Date effectiveDate, BigInteger effectiveSequence) {
-//		System.out.println("*** PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence");
+//		logger.debug("*** PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence");
 //		return null;
 //		//FROM PS_Job CJ7
 //		//WHERE CJ7.Emplid = $PSEmplid

@@ -1,8 +1,12 @@
 package erd.controller;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Job Profile Change Process
@@ -10,6 +14,7 @@ import java.util.List;
  * @author John Tutton john@tutton.net
  */
 public class EmployeeJobProfileChange {
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	/**
 	 * 
@@ -17,10 +22,18 @@ public class EmployeeJobProfileChange {
 	 * @return completionStatus
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeJobProfileChange.doProcess()");
+		if(Main.DEBUG) logger.debug("*** EmployeeJobProfileChange.doProcess()");
+		//HR04-Initialize-Fields
+		//HR04-Process-Main
+		//HR04-Get-Job-Data
+		//HR04-Massage-Data
+		//HR04-Call-RPG
+		//HR04-Get-Position
+		//HR04-Get-Branch
+		//HR04-Get-Group
 		parameterMap = fetchProcessParameters(parameterMap);
-		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
-		return ZHRI100A.doCommand(parameterMap);
+		parameterMap.put("parameterString", Main.composeParameterString(parameterMap));
+		return Main.doCommand(parameterMap);
 	}
 	
 	/**
@@ -29,7 +42,7 @@ public class EmployeeJobProfileChange {
 	 * @return
 	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeJobProfileChange.fetchProcessParameters()");
+		if(Main.DEBUG) logger.debug("*** EmployeeJobProfileChange.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ109A");
 		parameterMap.put("parameterNameList", getParameterNameList());
 		return parameterMap;

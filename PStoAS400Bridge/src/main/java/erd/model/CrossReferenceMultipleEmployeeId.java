@@ -1,9 +1,14 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 
 import javax.persistence.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.Date;
 import java.sql.Timestamp;
 import java.util.List;
@@ -18,6 +23,7 @@ import java.util.List;
 @NamedQuery(name="CrossReferenceMultipleEmployeeId.findAll", query="SELECT c FROM CrossReferenceMultipleEmployeeId c")
 public class CrossReferenceMultipleEmployeeId implements Serializable {
 	private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	@Id
 	@Column(name="EMPLID", nullable=false, length=11)
@@ -163,7 +169,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param employeeId
 	 */
 	public CrossReferenceMultipleEmployeeId HR205_getEmpData(String employeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.HR205_getEmpData()");
+		logger.debug("HR205_getEmpData() ***");
 //		BEGIN-PROCEDURE HR205-GET-EMP-DATA
 //		BEGIN-SELECT
 //		EMP5.ZHRF_GRP_NBR,
@@ -196,7 +202,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	public CrossReferenceMultipleEmployeeId MainSqlEmp(String employeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.MainSqlEmp()");
+		logger.debug("MainSqlEmp() ***");
 //		!******************************
 //		!get the max effdt for every employee
 //		!  -store the last inactive row before the max effdt into s_dt. If null, use dummy date.
@@ -226,7 +232,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	public CrossReferenceMultipleEmployeeId getMinEffdtEmp(String employeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.getMinEffdtEmp()");
+		logger.debug("getMinEffdtEmp() ***");
 		//!****************************
 		//begin-procedure get-min-effdt-emp
 		//LET $LegServiceDate =''
@@ -244,7 +250,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	public CrossReferenceMultipleEmployeeId getLastInactiveDtEmp(String employeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.getLastInactiveDtEmp()");
+		logger.debug("getLastInactiveDtEmp() ***");
 		//!*************************************
 		//begin-procedure get-last-inactive-dt-emp
 		//begin-select
@@ -265,7 +271,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param employeeId
 	 */
 	public CrossReferenceMultipleEmployeeId HR202_getTermDate(String employeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.HR202_getTermDate()");
+		logger.debug("HR202_getTermDate() ***");
 		//Begin-Procedure HR202-get-term-date
 		//Begin-Select
 		//POI2.EFFDT
@@ -297,7 +303,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param employeeId
 	 */
 	public CrossReferenceMultipleEmployeeId HR201_getEmpData(String employeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.HR201_getEmpData()");
+		logger.debug("HR201_getEmpData() ***");
 		//Begin-Procedure HR201-Get-EMP-data
 		//Begin-Select
 		//EMP.ZHRF_GRP_NBR,
@@ -336,8 +342,8 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param employeeId
 	 * @param sequence
 	 */
-	public static String findLegacyEmployeeIdByEmployeeIdAndSequence(String employeeId, BigInteger sequence) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.findLegacyEmployeeIdByEmployeeIdAndSequence()");
+	public static String findLegacyEmployeeIdByEmployeeIdAndSequence(String employeeId, Integer sequence) {
+		logger.debug("findLegacyEmployeeIdByEmployeeIdAndSequence() ***");
 		//BEGIN-SELECT
 		//MULT.ZHRF_LEG_EMPL_ID
 		//FROM PS_ZHRR_MULTPL_EID MULT
@@ -375,8 +381,8 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param legacyEmployeeId
 	 * @param sequence
 	 */
-	public static void ZHRI100A_updateOprId(String employeeId, String legacyEmployeeId, BigInteger sequence) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.ZHRI100A_updateOprId()");
+	public static void ZHRI100A_updateOprId(String employeeId, String legacyEmployeeId, Integer sequence) {
+		logger.debug("ZHRI100A_updateOprId() ***");
 		//BEGIN-PROCEDURE UPDATE-OPRID
 		//LET $Update-Error-Flag = 'N'
 		//!Update the PS_ZHRR_MULTPL_EID table for Multiple EIDs 
@@ -415,7 +421,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	}
 
 	public static Date findEffectiveDateByEmployeeIdAndSequence(String wrkEmplId, Integer wrkIndexNum, Date date) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.findEffectiveDateByEmployeeIdAndSequence()");
+		logger.debug("findEffectiveDateByEmployeeIdAndSequence() ***");
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -427,7 +433,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param legacyEmployeeId
 	 */
 	public static void ZHRI100A_insertOprId(String employeeId, String legacyEmployeeId) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.ZHRI100A_insertOprId()");
+		logger.debug("ZHRI100A_insertOprId() ***");
 		//BEGIN-PROCEDURE INSERT-OPRID
 		//LET $Insert-Error-Flag = 'N'
 		//!Add to the PS_ZHRT_EMPID_CREF table
@@ -460,9 +466,9 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	 * @param legacyEmployeeId
 	 * @param indexNumber
 	 */
-	public static void saveNewLegacyEmployeeId(String employeeId, String legacyEmployeeId, BigInteger eidIndexNumber) {
-		System.out.println("*** CrossReferenceMultipleEmployeeId.saveNewLegacyEmployeeId()");
-    	if(new BigInteger("0").equals(eidIndexNumber)) {
+	public static void saveNewLegacyEmployeeId(String employeeId, String legacyEmployeeId, Integer eidIndexNumber) {
+		logger.debug("saveNewLegacyEmployeeId() ***");
+    	if(eidIndexNumber == 0) {
     		CrossReferenceMultipleEmployeeId.ZHRI100A_insertOprId(employeeId, legacyEmployeeId);
     	}
     	else {

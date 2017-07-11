@@ -1,11 +1,15 @@
 package erd.controller;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import erd.DateUtil;
 import erd.StringUtil;
@@ -21,10 +25,10 @@ import erd.model.PsDriversLicense;
 import erd.model.PsEffectiveDatedPersonalData;
 import erd.model.PsEmergencyContact;
 import erd.model.PsEmployeeChecklist;
+import erd.model.PsEmployeeOriginalHire;
 import erd.model.PsEthnicGroup;
 import erd.model.PsJob;
 import erd.model.PsName;
-import erd.model.PsOriginalHire;
 import erd.model.PsPersonalData;
 import erd.model.PsPersonalNationalId;
 import erd.model.PsPersonalPhone;
@@ -37,6 +41,7 @@ import erd.model.PsReferralSource;
  * @author John Tutton john@tutton.net
  */
 public class EmployeeDemographicChange {
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	/**
 	 * @param parameterMap
@@ -77,10 +82,10 @@ public class EmployeeDemographicChange {
 		//DO HR05-Get-Employee-Checklist
 		//DO HR05-Process-Data
 		
-		System.out.println("*** EmployeeDemographicChange.doProcess()");
+		if(Main.DEBUG) logger.debug("*** EmployeeDemographicChange.doProcess()");
 		parameterMap = fetchProcessParameters(parameterMap);
-		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
-		return ZHRI100A.doCommand(parameterMap);
+		parameterMap.put("parameterString", Main.composeParameterString(parameterMap));
+		return Main.doCommand(parameterMap);
 	}
 	
 	/**
@@ -88,7 +93,7 @@ public class EmployeeDemographicChange {
 	 * @return parameterMap
 	 */
 	private static HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeDemographicChange.fetchProcessParameters()");
+		if(Main.DEBUG) logger.debug("*** EmployeeDemographicChange.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ105A");
 		parameterMap = fetchDriversLicense(parameterMap);
 		parameterMap = fetchEmergencyContact(parameterMap);
@@ -239,7 +244,7 @@ public class EmployeeDemographicChange {
 	 * @param parameterMap
 	 * @return parameterMap
 	 */
-	//TODO: not sure if this is 100% correct
+	//TODO: NEEDS MORE TESTING; not sure if this is 100% correct
 	private static HashMap<String, Object> fetchReferralSource(HashMap<String, Object> parameterMap) {
 		//BEGIN-PROCEDURE HR05-GET-REFERRAL-SOURCE
 		String recruitmentSourceId = PsReferralSource.findRecruitmentSourceIdByEmployeeIdAndEffectiveDate((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate")); //PS_PERS_APPL_REF
@@ -264,7 +269,7 @@ public class EmployeeDemographicChange {
 					parameterMap.put("errorMessageParameter", "Referral source not selected in PeopleSoft.");
 					//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 					//DO Call-Error-Routine                 !From ZHRI100A.SQR
-					ZHRI100A.doErrorCommand(parameterMap);
+					Main.doErrorCommand(parameterMap);
 				}
 				//ELSE
 				else {
@@ -340,7 +345,7 @@ public class EmployeeDemographicChange {
 			//LET $Wrk_Emplid = $PSResponsible_Id
 			//LET $LegEmplid //
 			//DO Get-Legacy-OprId                              !From ZHRI100A.SQR
-			recruiterId = ZHRI100A.fetchNewLegacyEmployeeId(parameterMap);
+			recruiterId = Main.fetchNewLegacyEmployeeId(parameterMap);
 			//LET $PSRecruiter_ID = $LegEmplid
 			//LET $Wrk_Emplid = $Hld_Wrk_Emplid
 			//LET $LegEmplid = $Hld_LegEmplid
@@ -370,7 +375,7 @@ public class EmployeeDemographicChange {
 			//LET $PSBirthdate = $Second || $Third || $first
 			parameterMap.put("birthDate", new SimpleDateFormat("yyyyMMdd").format(psPersonalData.getBirthdate()).toUpperCase());
 		}
-		Date originalHireDate = PsOriginalHire.findOriginalHireDateByEmployeeId((String)parameterMap.get("employeeId"));
+		Date originalHireDate = PsEmployeeOriginalHire.findOriginalHireDateByEmployeeId((String)parameterMap.get("employeeId"));
 		//IF &CPD2Orig_Hire_Dt = ''
 		if(originalHireDate != null) {
 			//UNSTRING &CPD2Orig_Hire_dt by '-' into $first $second $Third
@@ -394,7 +399,7 @@ public class EmployeeDemographicChange {
 		if(legacyEthnicCode == null || legacyEthnicCode.isEmpty()) {
 			parameterMap.put("errorProgramParameter", "ZHRI105A");
 			parameterMap.put("errorMessageParameter", "Ethnic Group is not found in XRef table PS_ZHRT_ETHCD_CREF");
-			ZHRI100A.doErrorCommand(parameterMap);
+			Main.doErrorCommand(parameterMap);
 		}
 		return legacyEthnicCode;
 	}
@@ -424,7 +429,7 @@ public class EmployeeDemographicChange {
 			else {
 				parameterMap.put("errorProgramParameter", "ZHRI105A");
 				parameterMap.put("errorMessageParameter", "Location not in XRef table");
-				ZHRI100A.doErrorCommand(parameterMap);
+				Main.doErrorCommand(parameterMap);
 			}
 			parameterMap.put("region", CrossReferenceCompany.findLegacyRegionByBusinessUnit(psJob.getBusinessUnit()));
 			if("P".equalsIgnoreCase(psJob.getFullPartTime())) {

@@ -1,8 +1,12 @@
 package erd.controller;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Group Transfer Process
@@ -10,6 +14,7 @@ import java.util.List;
  * @author John Tutton john@tutton.net
  */
 public class EmployeeGroupTransfer {
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	/**
 	 * 
@@ -17,10 +22,20 @@ public class EmployeeGroupTransfer {
 	 * @return completionStatus
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeGroupTransfer.doProcess()");
+		if(Main.DEBUG) logger.debug("*** EmployeeGroupTransfer.doProcess()");
+		//HR09-Initialize-Fields
+		//HR09-Process-Main
+		//HR09-Get-Personal-Data
+		//HR09-Get-job-data
+		//HR09-Massage-Data
+		//HR09-Call-RPG
+		//HR09-Get-Group
+		//HR09-Get-Branch
+		//HR09-Get-Country
+		//HR09-Get-Region
 		parameterMap = fetchProcessParameters(parameterMap);
-		parameterMap.put("parameterString", ZHRI100A.composeParameterString(parameterMap));
-		return ZHRI100A.doCommand(parameterMap);
+		parameterMap.put("parameterString", Main.composeParameterString(parameterMap));
+		return Main.doCommand(parameterMap);
 	}
 	
 	/**
@@ -29,7 +44,7 @@ public class EmployeeGroupTransfer {
 	 * @return parameterMap
 	 */
 	private HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		System.out.println("*** EmployeeGroupTransfer.fetchProcessParameters()");
+		if(Main.DEBUG) logger.debug("*** EmployeeGroupTransfer.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ109A");
 		parameterMap.put("parameterNameList", getParameterNameList());
 		return parameterMap;
