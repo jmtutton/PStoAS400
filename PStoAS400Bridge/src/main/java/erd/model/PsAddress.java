@@ -460,29 +460,29 @@ public class PsAddress implements Serializable {
 	}
 
 	/**
+	 * @see HR01-Get-Personal-Data in ZHRI101A.SQC
 	 * @see HR05-Get-Info in ZHRI105A.SQC
 	 * @param employeeId
-	 * @param effectiveDate
 	 * @param addressType
+	 * @param effectiveDate
 	 * @return PsAddress record
 	 */
-	public static PsAddress findByEmployeeIdAndEffectiveDateAndAddressType(String employeeId, Date effectiveDate, String addressType) {
-		//BEGIN-SELECT
-		//FROM PS_ADDRESSES CAD3
+	public static PsAddress findHomeByEmployeeIdAndEffectiveDate(String employeeId, Date effectiveDate) {
+		//SELECT FROM PS_ADDRESSES CAD3
 		//WHERE CAD3.EmplId = $PSEmplId
 		//AND CAD3.ADDRESS_TYPE = 'HOME'
-		//AND CAD3.EFFDT  = (SELECT MAX(EFFDT) FROM PS_ADDRESSES CAD4
-		//		WHERE CAD4.EMPLID   = CAD3.EMPLID
-		//			AND CAD4.ADDRESS_TYPE  = CAD3.ADDRESS_TYPE
-		//			AND TO_CHAR(CAD4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-		//END-SELECT
+		//AND CAD3.EFFDT  = 
+			//(SELECT MAX(EFFDT) FROM PS_ADDRESSES CAD4
+			//WHERE CAD4.EMPLID   = CAD3.EMPLID
+			//AND CAD4.ADDRESS_TYPE  = CAD3.ADDRESS_TYPE
+			//AND TO_CHAR(CAD4.EFFDT,'YYYY-MM-DD') <= $PsEffdt)
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		try {
 			List<PsAddress> resultList = em.createQuery(
 					"SELECT PsAddress FROM PsAddress p "
 							+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-							+ "WHERE UPPER(TRIM(p.addressType)) = :addressType "
+							+ "WHERE UPPER(TRIM(p.addressType)) = 'HOME' "
 							+ "AND p.effectiveDate = "
 							+ "(SELECT MAX(p2.effectiveDate) FROM PsAddress p2 "
 								+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
@@ -490,7 +490,6 @@ public class PsAddress implements Serializable {
 									+ "AND p2.effectiveDate <= :effectiveDate) "
 					, PsAddress.class)
 					.setParameter("employeeId", employeeId.trim().toUpperCase())
-					.setParameter("addressType", addressType.trim().toUpperCase())
 					.setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {

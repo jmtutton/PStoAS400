@@ -1659,17 +1659,16 @@ public class PsPersonalData implements Serializable {
 		return null;
 	}
 
-	
 	/**
-	 * This routine will get the Personal Data row for each of the employee numbers entered in the trigger file.
 	 * @see HR05-Get-Personal-Data in ZHRI105A.SQC
+	 * @param employeeId
+	 * @return PsPersonalData record
 	 */
-	public static PsPersonalData findByEmployeeId(String employeeId) {
-		//BEGIN-SELECT
-		//FROM PS_Personal_Data CPD2, PS_ORIG_HIR_EMP_VW COHE                                                        
-		//WHERE CPD2.Emplid = $PSEmplid
-		//AND COHE.EMPLID = CPD2.EMPLID                                                     
-		//END-SELECT
+	public static PsPersonalData findByOriginalHireEmployeeId(String employeeId) {
+		//SELECT
+		//FROM PS_PERSONAL_DATA P, PS_ORIG_HIR_EMP_VW P2                                                        
+		//WHERE P.EMPLID = $PSEmplid
+		//AND P2.EMPLID = P.EMPLID                                                     
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -1695,9 +1694,39 @@ public class PsPersonalData implements Serializable {
 	    }
 	    return null;	
 	}
-
-	public String findLanguageCodeByEmployeeId(String employeeId) {
-		return null;
+	
+	/**
+	 * @see HR01-Get-Personal-Data in ZHRI101A.SQC
+	 * @param employeeId
+	 * @return PsPersonalData record
+	 */
+	public static PsPersonalData findByEmployeeId(String employeeId) {
+		//SELECT P.LANG_CD
+		//FROM PS_PERSONAL_DATA P
+		//WHERE P.EMPLID = $EmplId
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<PsPersonalData> resultList = (List<PsPersonalData>) em.createQuery(
+	    			"SELECT PsPersonalData "
+	    				+ "FROM PsPersonalData p "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				, PsPersonalData.class)
+	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    	else 
+	    		return null;
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
 
 }

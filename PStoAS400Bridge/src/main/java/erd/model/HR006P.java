@@ -1,8 +1,6 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
@@ -16,7 +14,6 @@ import javax.persistence.*;
 @NamedQuery(name="HR006P.findAll", query="SELECT h FROM HR006P h")
 public class HR006P implements Serializable {
 	private static final long serialVersionUID = 1L;
-	SimpleDateFormat simpleDateFormatYyyyMmDd = new SimpleDateFormat("yyyyMMdd");
 
 	@Id
 	@Column(name="HMREMP", length=5, unique=true, nullable=false) //five digit string left padded with zeros
@@ -103,9 +100,9 @@ public class HR006P implements Serializable {
 	private String gender;
 	
 	@Column(name="HMRBDT", length=8) //YYYYMMDD
-	@Temporal(TemporalType.DATE)
-	private Date birthDate;
-//	private String birthDate;
+//	@Temporal(TemporalType.DATE)
+//	private Date birthDate;
+	private String birthDate;
 	
 	@Column(name="HMRGP", length=2)
 	private String group;
@@ -205,14 +202,6 @@ public class HR006P implements Serializable {
 	
 	public HR006P() {
 		super();
-	}
-
-	public SimpleDateFormat getSimpleDateFormatYyyyMmDd() {
-		return simpleDateFormatYyyyMmDd;
-	}
-
-	public void setSimpleDateFormatYyyyMmDd(SimpleDateFormat simpleDateFormatYyyyMmDd) {
-		this.simpleDateFormatYyyyMmDd = simpleDateFormatYyyyMmDd;
 	}
 
 	public String getEmployeeId() {
@@ -443,11 +432,19 @@ public class HR006P implements Serializable {
 		this.gender = gender;
 	}
 
-	public Date getBirthDate() {
+//	public Date getBirthDate() {
+//		return birthDate;
+//	}
+//
+//	public void setBirthDate(Date birthDate) {
+//		this.birthDate = birthDate;
+//	}
+
+	public String getBirthDate() {
 		return birthDate;
 	}
 
-	public void setBirthDate(Date birthDate) {
+	public void setBirthDate(String birthDate) {
 		this.birthDate = birthDate;
 	}
 

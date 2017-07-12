@@ -90,7 +90,7 @@ public class CrossReferenceReferralSource implements Serializable {
 	 * @param parameterMap
 	 * @return referralSource
 	 */
-	public static String findLegacyRecruiterSourceByReferralSource(String referralSource) {
+	public static String findActiveLegacyRecruiterSourceByReferralSource(String referralSource) {
 		//BEGIN-SELECT
 		//CPT101.ZHRF_LEGRECRUITSRC
 		//LET $PSReferral_Source = &CPT101.ZHRF_LEGRECRUITSRC

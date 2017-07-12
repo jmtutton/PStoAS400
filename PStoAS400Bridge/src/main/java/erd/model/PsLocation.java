@@ -809,16 +809,15 @@ public class PsLocation implements Serializable {
 
 	/**
 	 * This routine gets the country in which an employee is currently working.
+	 * @see HR01-Get-Personal-Data
 	 * @see HR05-Get-Location-Country
 	 * @param location
 	 * @return countryIsoAlpha3Code
 	 */
 	public static String findCountryByLocation(String location) {
-		//BEGIN-SELECT
-		//CLT2.Country
-		//FROM PS_Location_Tbl CLT2
-		//WHERE CLT2.Location = $PSLocation
-		//END-SELECT
+		//SELECT P.Country
+		//FROM PS_Location_Tbl P
+		//WHERE P.Location = $PSLocation
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {

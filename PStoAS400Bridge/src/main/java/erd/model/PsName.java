@@ -341,38 +341,37 @@ public class PsName implements Serializable {
 		this.secondLastNameSpecialCharactersRemoved = secondLastNameSpecialCharactersRemoved;
 	}
 
-	
-
 	/**
+	 * @see HR01-Get-Personal-Data in ZHRI101A.SQC
 	 * @see HR05-Get-Names-Table in ZHRI105A.SQC
+	 * @see HR05-Get-Info in ZHRI105A.SQC
 	 * @param employeeId
 	 * @param nameType
 	 * @param effectiveDate
 	 * @return PsName record
 	 */
 	public static PsName findByEmployeeIdAndNameTypeAndEffectiveDate(String employeeId, String nameType, Date effectiveDate) {
-		//BEGIN-SELECT
-		//FROM PS_Names CN5
-		//WHERE CN5.Emplid = $PSEmplid
-		//AND CN5.NAME_TYPE = 'PRF'
-		//AND CN5.EFFDT = 
-		//		(SELECT MAX(EFFDT) FROM PS_Names CN6
-		//			WHERE CN6.EMPLID = CN5.EMPLID
-		//       		AND CN6.NAME_TYPE = CN5.NAME_TYPE
-		//           	AND TO_CHAR(CN6.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-		//END-SELECT
+		//SELECT
+		//FROM PS_Names P
+		//WHERE P.Emplid = $PSEmplId
+		//AND P.NAME_TYPE = 'PRF'
+		//AND P.EFFDT = 
+				//(SELECT MAX(EFFDT) FROM PS_Names P2
+				//WHERE P2.EMPLID = P.EMPLID
+				//AND P2.NAME_TYPE = P.NAME_TYPE
+				//AND TO_CHAR(P2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		try {
 			List<PsName> resultList = em.createQuery(
 					"SELECT PsName FROM PsName p "
-					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-						+ "AND UPPER(TRIM(p.nameType)) = :nameType "
-						+ "AND p.effectiveDate = "
+							+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+							+ "WHERE UPPER(TRIM(p.nameType)) = :nameType "
+							+ "AND p.effectiveDate = "
 							+ "(SELECT MAX(p2.effectiveDate) FROM PsName p2 "
 								+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
-									+ "AND UPPER(TRIM(p2.nameType)) = UPPER(TRIM(p.nameType)) "
-									+ "AND p2.effectiveDate <= :effectiveDate) "
+								+ "AND UPPER(TRIM(p2.nameType)) = UPPER(TRIM(p.nameType)) "
+								+ "AND p2.effectiveDate <= :effectiveDate) "
 					, PsName.class)
 					.setParameter("employeeId", employeeId.trim().toUpperCase())
 					.setParameter("nameType", nameType.trim().toUpperCase())
@@ -471,134 +470,6 @@ public class PsName implements Serializable {
 		return null;
 	}
 
-	public static PsName findByEmployeeId01(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR01-Get-Personal-Data
-//		! Desc:  Gets the employees data from the personal data effdt table that
-//		!        needs to be interfaced to the legacy system.
-//		!        All this data used to come from pers_data_effdt.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR01-Get-Personal-Data
-//		Begin-Select
-//		CPDE.MAR_STATUS
-//		CPDE.SEX            !Z_MOD_SUFFIX_GENDER_BD
-//		     Let $PSMaritalStatus = ltrim(rtrim(&CPDE.MAR_STATUS,' '),' ')
-//		     Let $PSSex = ltrim(rtrim(&CPDE.SEX,' '),' ')                 !Z_MOD_SUFFIX_GENDER_BD
-//		from  PS_PERS_DATA_EFFDT CPDE
-//		where CPDE.EMPLID = $Wrk_Emplid
-//		  and CPDE.EFFDT = (SELECT MAX(EFFDT)
-//		                      FROM PS_PERS_DATA_EFFDT CPDE2
-//		                     WHERE CPDE2.EMPLID = CPDE.EMPLID
-//		                       AND  to_char(CPDE2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		End-Select
-//		Begin-Select                                    !Z_MOD_SUFFIX_GENDER_BD
-//		to_char(PPD.BIRTHDATE, 'YYYY-MM-DD')            &PPDBIRTHDATE
-//		    Let $PSBirthdate = &PPDBIRTHDATE
-//		from PS_PERSON PPD
-//		where PPD.EMPLID = $Wrk_Emplid
-//		End-Select                                      !Z_MOD_SUFFIX_GENDER_BD
-//		Begin-Select
-//		!CPD.SEX                                                  !Z_MOD_SUFFIX_GENDER_BD
-//		!    Let $PSSex = ltrim(rtrim(&CPD.SEX,' '),' ')
-//		!to_char(CPD.BIRTHDATE, 'YYYY-MM-DD')            &CPDBIRTHDATE
-//		   ! Let $PSBirthdate = &CPDBIRTHDATE                     !Z_MOD_SUFFIX_GENDER_BD
-//		CPD.LANG_CD   &CPD.Lang_Cd
-//		    Let $Wrk_AD_PersDataBuild = 'Y'
-//		    Let $PSLangCd = RTRIM(LTRIM(&CPD.Lang_Cd,' '),' ')
-//		from PS_PERSONAL_DATA CPD
-//		where CPD.EMPLID = $Wrk_Emplid
-//		End-Select
-//		Do HR01-get-location-country        !Get the country used to get the national id  
-//		Begin-Select  !added for Defect 981
-//		CPNID.NATIONAL_ID
-//		    Let $PSNid = ltrim(rtrim(&CPNID.NATIONAL_ID,' '),' ')
-//		CPNID.NATIONAL_ID_TYPE
-//		    Let $PSNidType = ltrim(rtrim(&CPNID.NATIONAL_ID_TYPE,' '),' ')
-//		from PS_PERS_NID CPNID
-//		where CPNID.EMPLID = $Wrk_Emplid
-//		  and CPNID.COUNTRY = $PS_REG_REGION     !dshen 01/11/2012 replace $PSloc_country with PS_REG_REGION
-//		  and CPNID.primary_nid='Y'
-//		End-Select
-//		DO GET-2CHAR-COUNTRY 
-//		Begin-Select
-//		CPAI.HRS_SOURCE_ID
-//		CHSI.HRS_SOURCE_NAME
-//		CHSI.HRS_SOURCE_DESCR
-//		    Let $PSReferralSource = ltrim(rtrim(&CHSI.HRS_SOURCE_NAME,' '),' ')
-//		    Let $PSRefSourceDescr = ltrim(rtrim(&CHSI.HRS_SOURCE_DESCR,' '),' ')
-//		from PS_PERS_APPL_REF CPAI,
-//		     PS_HRS_SOURCE_I CHSI
-//		  where CPAI.EMPLID = $Wrk_Emplid
-//		    and CPAI.EFFDT = (SELECT MAX(CPAI2.EFFDT)
-//		                        FROM PS_PERS_APPL_REF CPAI2
-//		                          WHERE CPAI2.EMPLID = CPAI.EMPLID
-//		                            AND to_char(CPAI2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		    and CHSI.HRS_SOURCE_ID = CPAI.HRS_SOURCE_ID
-//		End-Select
-//		Begin-Select
-//		CN.NAME
-//		    Let $PSName = ltrim(rtrim(&CN.NAME,' '),' ')
-//		CN.MIDDLE_NAME
-//		    Let $PSMiddleName = ltrim(rtrim(&CN.MIDDLE_NAME,' '),' ')
-//		CN.FIRST_NAME
-//		    Let $PSFirstName = ltrim(rtrim(&CN.FIRST_NAME,' '),' ')
-//		CN.LAST_NAME
-//		    Let $PSLastName = ltrim(rtrim(&CN.LAST_NAME,' '),' ')
-//		CN.NAME_SUFFIX                                              !Z_MOD_SUFFIX_GENDER_BD
-//		CN.NAME_PREFIX
-//		    Let $PSNamePrefix = ltrim(rtrim(&CN.NAME_PREFIX,' '),' ')
-//		    Let $PSNamePrefix = SUBSTR($PSNamePrefix,1,3)
-//		    UPPERCASE $PSNamePrefix
-//		 If &CN.NAME_SUFFIX <> ' '                                  !Z_MOD_SUFFIX_GENDER_BD
-//		    Let $PSSuffix =   RTRIM(LTRIM(&CN.NAME_SUFFIX,' '),' ')  !Z_MOD_SUFFIX_GENDER_BD
-//		    Let $PSLastName = $PSLastName || ' ' || $PSSuffix        !Z_MOD_SUFFIX_GENDER_BD
-//		 End-if    !&CN.Name_Suffix <> ' '                          !Z_MOD_SUFFIX_GENDER_BD
-//		    Let $ADPSLastName   = RTRIM(LTRIM(&CN.Last_Name,' '),' ')
-//		    Let $ADPSFirstName  = RTRIM(LTRIM(&CN.First_Name,' '),' ')
-//		    Let $ADPSMiddleName = RTRIM(LTRIM(&CN.Middle_Name,' '),' ')
-//		    Let $ADPSMiddleName = SUBSTR($ADPSMiddleName,1,1)
-//		    Let $Wrk_AD_PersDataEffdtBuild = 'Y'
-//		from  PS_NAMES CN
-//		where CN.EMPLID = $Wrk_Emplid
-//		and CN.NAME_TYPE = 'PRI'
-//		and CN.EFFDT     = (SELECT MAX(EFFDT) FROM PS_NAMES CN2
-//		                      WHERE CN2.EMPLID   = CN.EMPLID
-//		                      AND   CN2.NAME_TYPE  = CN.NAME_TYPE
-//		                      AND   to_char(CN2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		End-Select
-//		Begin-Select
-//		CNAME.FIRST_NAME
-//		    Let $PSPreferredName = ltrim(rtrim(&CNAME.FIRST_NAME,' '),' ')
-//		from  PS_NAMES CNAME
-//		where CNAME.EMPLID = $Wrk_Emplid
-//		and CNAME.NAME_TYPE = 'PRF'
-//		and CNAME.EFFDT     = (SELECT MAX(EFFDT) FROM PS_NAMES CNAME2
-//		                      WHERE CNAME2.EMPLID   = CNAME.EMPLID
-//		                      AND   CNAME2.NAME_TYPE  = CNAME.NAME_TYPE
-//		                      AND   to_char(CNAME2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		End-Select
-//		Begin-Select
-//		CAD.ADDRESS1
-//		    Let $PSAddress1 = ltrim(rtrim(&CAD.ADDRESS1,' '),' ')
-//		CAD.CITY
-//		    Let $PSCity = ltrim(rtrim(&CAD.CITY,' '),' ')
-//		CAD.STATE
-//		    Let $PSState = ltrim(rtrim(&CAD.STATE,' '),' ')
-//		CAD.POSTAL
-//		    Let $PSPostal = ltrim(rtrim(&CAD.POSTAL,' '),' ')
-//		CAD.COUNTY
-//		    Let $PSCounty = ltrim(rtrim(&CAD.COUNTY,' '),' ')
-//		from PS_ADDRESSES CAD
-//		where CAD.EMPLID = $Wrk_Emplid
-//		  and CAD.ADDRESS_TYPE = 'HOME'
-//		  and CAD.EFFDT    = (SELECT MAX(EFFDT) FROM PS_ADDRESSES CAD2
-//		                      WHERE CAD2.EMPLID   = CAD.EMPLID
-//		                      AND   CAD2.ADDRESS_TYPE  = CAD.ADDRESS_TYPE
-//		                      AND   to_char(CAD2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		End-Select
-//		End-Procedure HR01-Get-Personal-Data
-		return null;
-	}
 
 	/**
 	 * This routine Gets the nickname for employee and formats it in the form acceptable to the legacy system.
@@ -657,125 +528,4 @@ public class PsName implements Serializable {
 	    return null;	
 	}
 
-	/**
-	 * @see HR05-Get-Info in ZHRI105A.SQC
-	 * @param employeeId
-	 * @param effectiveDate
-	 * @param addressType
-	 * @return PsName record
-	 */
-	public static PsName findByEmployeeIdAndEffectiveDateAndNameType(String employeeId, Date effectiveDate, String nameType) {
-		//BEGIN-SELECT
-		//FROM PS_NAMES CN3
-		//WHERE CN3.NAME_TYPE = 'PRI'
-		//  	AND CN3.EmplId = $PSEmplId
-		//  	AND CN3.EFFDT = 
-		//			(SELECT MAX(EFFDT) FROM PS_NAMES CN4
-		//    			WHERE CN4.EMPLID   = CN3.EMPLID
-		//           		AND CN4.NAME_TYPE  = CN3.NAME_TYPE
-		//            		AND TO_CHAR(CN4.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-		//END-SELECT
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-		EntityManager em = emfactory.createEntityManager();
-		try {
-			List<PsName> resultList = em.createQuery(
-					"SELECT PsName FROM PsName p "
-							+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-							+ "WHERE UPPER(TRIM(p.nameType)) = :nameType "
-							+ "AND p.effectiveDate = "
-							+ "(SELECT MAX(p2.effectiveDate) FROM PsName p2 "
-								+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
-									+ "AND UPPER(TRIM(p2.nameType)) = UPPER(TRIM(p.nameType)) "
-									+ "AND p2.effectiveDate <= :effectiveDate) "
-					, PsName.class)
-					.setParameter("employeeId", employeeId.trim().toUpperCase())
-					.setParameter("nameType", nameType.trim().toUpperCase())
-					.setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
-	    		    .getResultList();
-	    	if(resultList != null && resultList.size() > 0) {
-	    		return resultList.get(0);
-	    	}
-	    }
-	    catch (Exception e) {
-	    	e.printStackTrace();
-	    } 
-	    finally {
-	    	em.close();
-	    }
-	    return null;	
-	}
-
-	public static String GetPersDataEffdt(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  AD-Get-Pers-Data-Effdt
-//		! Desc:  This routine will get the Personal Data row for each of the
-//		!        employee numbers entered in the trigger file.  Pers_Data_Effdt table
-//		!        no longer has name info, so are using Names table.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure AD-Get-Pers-Data-effdt
-//		begin-select
-//		ADPDE2A.First_Name
-//		ADPDE2A.Last_Name
-//		ADPDE2A.Middle_Name
-//		  Let $ADPSLastName   = RTRIM(LTRIM(&ADPDE2A.Last_Name,' '),' ')
-//		  Let $ADPSFirstName  = RTRIM(LTRIM(&ADPDE2A.First_Name,' '),' ')
-//		  Let $ADPSMiddleName = RTRIM(LTRIM(&ADPDE2A.Middle_Name,' '),' ')
-//		  Let $ADPSMiddleName = SUBSTR($ADPSMiddleName,1,1)
-//		from PS_NAMES ADPDE2A
-//		where ADPDE2A.Emplid = $PSEmplid
-//		  and ADPDE2A.NAME_TYPE = 'PRI'
-//		  and ADPDE2A.Effdt = (select max(ADPDE2B.effdt) from  PS_NAMES ADPDE2B
-//		                       where ADPDE2B.emplid    = ADPDE2A.emplid
-//		                       and   ADPDE2B.NAME_TYPE = ADPDE2A.NAME_TYPE
-//		                       and   to_char(ADPDE2B.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		end-select
-//		end-procedure AD-Get-Pers_Data-Effdt
-		return null;
-	}
-
-	public static PsName findNameSuffix(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  AD-Get-NameSuffix
-//		! Desc:  This routine will get the Name Suffix row for each of the
-//		!        employee numbers entered in the trigger file.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure AD-Get-NameSuffix
-//		begin-select
-//		ANAME.Name_Suffix
-//		  Let $ADNameSuffix  = RTRIM(LTRIM(&ANAME.Name_Suffix,' '),' ')
-//		  Let $ADNameSuffix  = SUBSTR($ADNameSuffix,1,5)
-//		from PS_NAMES ANAME
-//		where ANAME.Emplid = $PSEmplid
-//		  and ANAME.NAME_TYPE = 'PRI'
-//		  and ANAME.Effdt = (select max(ANAME2.effdt) from  PS_NAMES ANAME2
-//		                       where ANAME2.emplid     = ANAME.emplid
-//		                       and   ANAME2.NAME_TYPE  = ANAME.NAME_TYPE
-//		                       and   to_char(ANAME2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		end-select
-//		end-procedure AD-Get-NameSuffix
-		return null;
-	}
-	
-	public static String findPreferredName(String employeeId) {
-		return employeeId;
-//	!----------------------------------------------------------------------
-//	! Procedure:  AD-Get-Names
-//	! Desc:  This routine gets the Preferred Name from PS_Names for Active Directory File Build
-//	!----------------------------------------------------------------------
-//	Begin-Procedure AD-Get-Names
-//	Let $PSPrfName = ''
-//	begin-select
-//	ADN.First_Name   !changed for v8.3 and defect 993
-//	  Let $PSPrfName = RTRIM(LTRIM(&ADN.First_Name,' '),' ')
-//	from PS_Names ADN
-//	where ADN.Emplid = $PSEmplid
-//	  and ADN.NAME_TYPE = 'PRF'
-//	  and ADN.EFFDT     = (SELECT MAX(EFFDT) FROM PS_Names ADN2
-//	                      WHERE ADN2.EMPLID   = ADN.EMPLID
-//	                      AND ADN2.NAME_TYPE  = ADN.NAME_TYPE
-//	                      AND to_char(ADN2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//	end-select
-//	end-procedure AD-Get-Names
-	}
-	
 }

@@ -1835,10 +1835,9 @@ public class PsJob implements Serializable {
 		logger.debug("correspondingJobRecordExists() ***");
 		//add a day to current effective date
 		Date effectiveDatePlusOne = DateUtil.addDays(effectiveDate, 1);
-		//SELECT
-		//FROM PS_JOB P
-		//WHERE P.EmplId = $PsEmplId
-			//AND TO_CHAR(P.EffDt, 'YYYY-MM-DD') = $effectiveDatePlusOne
+		//SELECT FROM PS_JOB P
+		//WHERE P.EMPLID = $PsEmplId
+			//AND TO_CHAR(P.EFFDT, 'YYYY-MM-DD') = $effectiveDatePlusOne
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -1858,6 +1857,63 @@ public class PsJob implements Serializable {
 	    	em.close();
 	    }
 	    return false;	
+	}
+
+	public static PsJob findJobData(String employeeId, Date effectiveDate) {
+		logger.debug("findJobData() ***");
+		//SELECT FROM PS_JOB CJ
+		//WHERE CJ.EMPLID = $Wrk_Emplid
+		//AND CJ.EMPL_RCD = 0
+		//AND CJ.EFFDT = 
+				//(SELECT MAX(EFFDT) FROM PS_JOB CJ2
+				//WHERE CJ2.EMPLID = CJ.EMPLID
+				//AND CJ2.EMPL_RCD = CJ.EMPL_RCD
+				//AND (CJ2.ACTION IN ('HIR','REH') OR (CJ2.ACTION = 'DTA' AND CJ2.ACTION_REASON = 'CNV') OR (CJ2.ACTION = 'TER' AND CJ2.ACTION_REASON = 'CNV'))     
+				//AND TO_CHAR(CJ2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+		//AND CJ.EFFSEQ = 
+				//(SELECT MAX(EFFSEQ) FROM PS_JOB CJ3
+				//WHERE CJ3.EMPLID = CJ.EMPLID
+				//AND CJ3.EMPL_RCD = CJ.EMPL_RCD
+				//AND (CJ3.ACTION IN ('HIR','REH') OR (CJ3.ACTION = 'DTA' AND CJ3.ACTION_REASON = 'CNV') OR (CJ3.ACTION = 'TER' AND CJ3.ACTION_REASON = 'CNV'))    
+				//AND CJ3.EFFDT = CJ.EFFDT)
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<PsJob> resultList = em.createQuery(
+					"SELECT p FROM PsJob p "
+					+ "WHERE TRIM(UPPER(p.employeeId)) = :employeeId "
+					+ "AND p.employmentRecordNumber = 0 "
+					+ "AND p.effectiveDate = "
+							+ "(SELECT MAX(p2.effectiveDate) FROM PsJob p2 "
+							+ "WHERE p2.employeeId = p.employeeId "
+							+ "AND p2.employmentRecordNumber = p.employmentRecordNumber "
+							+ "AND (p2.action IN ('HIR','REH') "
+									+ "OR (p2.action = 'DTA' AND p2.actionReason = 'CNV') "
+									+ "OR (p2.action = 'TER' AND p2.actionReason = 'CNV')) "
+							+ "AND p2.effectiveDate <= :effectiveDate) "
+					+ "AND p.effectiveSequence = "
+							+ "(SELECT MAX(p3.effectiveSequence) FROM PsJob p3 "
+							+ "WHERE p3.employeeId = p.employeeId "
+							+ "AND p3.employmentRecordNumber = p.employmentRecordNumber "
+							+ "AND (p3.action IN ('HIR','REH') "
+									+ "OR (p3.action = 'DTA' AND p3.actionReason = 'CNV') "
+									+ "OR (p3.action = 'TER' AND p3.actionReason = 'CNV')) "
+					+ "AND p3.effectiveDate = p.effectiveDate) "
+	    			, PsJob.class)
+	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
 	}
 	
 }

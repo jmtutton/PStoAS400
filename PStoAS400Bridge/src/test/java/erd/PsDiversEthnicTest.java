@@ -11,7 +11,7 @@ public class PsDiversEthnicTest {
 	@Test
 	public void testPsDiversEthnic() {
 		String employeeId = "100600";
-		PsDiversityEthnicity result = PsDiversityEthnicity.findByEmployeeId(employeeId);
+		String result = PsDiversityEthnicity.findEthnicGroupCodeByEmployeeId(employeeId);
 		assertNotNull(result);
 		System.out.println(result);
 	}

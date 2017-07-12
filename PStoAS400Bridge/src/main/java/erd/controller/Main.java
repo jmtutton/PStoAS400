@@ -107,21 +107,25 @@ public class Main {
 		logger.debug("parameterizeTriggerFields() ***");
 		HashMap<String, Object> parameterMap = new HashMap<String, Object>();
 		parameterMap.put("criticalFlag", false);
-		parameterMap.put("processName", trigger.getProcessName());
-		parameterMap.put("employeeId", trigger.getEmployeeId());
-		parameterMap.put("operatorId", trigger.getOperatorId());
+		String processName = trigger.getProcessName() != null ? trigger.getProcessName().trim().toUpperCase() : trigger.getProcessName();
+		parameterMap.put("processName", processName);
+		String employeeId = trigger.getEmployeeId();
+		employeeId = employeeId != null ? employeeId.trim().toUpperCase() : employeeId;
+		parameterMap.put("employeeId", employeeId);
+		String operatorId = trigger.getOperatorId();
+		operatorId = operatorId != null ? operatorId.trim().toUpperCase() : operatorId;
+		parameterMap.put("operatorId", operatorId);
 		parameterMap.put("effectiveDate", trigger.getEffectiveDate());
 		parameterMap.put("effectiveSequence", trigger.getEffectiveSequence());
-		parameterMap.put("completionStatus", trigger.getCompletionStatus());
+		String completionStatus = trigger.getCompletionStatus();
+		completionStatus = completionStatus != null ? completionStatus.trim().toUpperCase() : completionStatus;
+		parameterMap.put("completionStatus", completionStatus);
 		if(trigger instanceof PszTriggerEmployee) {
 			parameterMap.put("poiFlag", false);
 		}
-		else {
-			logger.info("poiFlag: " + true);
-			logger.info("eidIndexNumber: " + ((PszTriggerNonPerson)trigger).getEidIndexNumber());
+		else if(trigger instanceof PszTriggerNonPerson) {
 			parameterMap.put("poiFlag", true);
 			parameterMap.put("eidIndexNumber", ((PszTriggerNonPerson)trigger).getEidIndexNumber());
-			logger.info("parameterMap.eidIndexNumber: " + parameterMap.get("eidIndexNumber"));
 		}
 		return parameterMap;
 	}

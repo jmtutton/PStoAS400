@@ -51,7 +51,8 @@ public class EmployeeDemographicChange {
 		//DO HR05-Initialize-Fields
 		parameterMap = setUnusedParameters(parameterMap);
 		//DO HR05-Get-Info
-		parameterMap.put("maritalStatus", PsEffectiveDatedPersonalData.findMaritalStatusByEmployeeIdAndEffectiveDate((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate")));
+		PsEffectiveDatedPersonalData psEffectiveDatedPersonalData = PsEffectiveDatedPersonalData.findByEmployeeIdAndEffectiveDate((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"));
+		parameterMap.put("maritalStatus", psEffectiveDatedPersonalData.getMaritalStatus());
 		parameterMap = fetchAddress(parameterMap);
 		//DO HR05-Get-Personal-Data
 		parameterMap = fetchPersonalData(parameterMap);
@@ -103,7 +104,7 @@ public class EmployeeDemographicChange {
 		parameterMap.put("homePhone", PsPersonalPhone.findPhoneByEmployeeIdAndPhoneType((String)parameterMap.get("employeeId"), "MAIN"));
 		parameterMap.put("businessPhone", PsPersonalPhone.findPhoneByEmployeeIdAndPhoneType((String)parameterMap.get("employeeId"), "BUSN"));
 		parameterMap.put("citizenshipCountry", PsCountry.findCountryIsoAlpha2CodeByEmployeeId((String)parameterMap.get("employeeId")));
-		parameterMap.put("nationalIdCountry", PsCountry.findCountryIsoAlpha2CodeByCountryCode((String)parameterMap.get("region")));
+		parameterMap.put("nationalIdCountry", PsCountry.findCountryIsoAlpha2CodeByCountryIsoAlpha3Code((String)parameterMap.get("region")));
 		parameterMap.put("recruiterId", fetchRecruiterId(parameterMap));
 		parameterMap.put("nickname", fetchNickname(parameterMap));
 		parameterMap.put("ethnicGroup", fetchLegacyEthnicCode(parameterMap));
@@ -140,7 +141,7 @@ public class EmployeeDemographicChange {
 	 */
 	private static String fetchNickname(HashMap<String, Object> parameterMap) {
 		String nickname = "";
-		PsName psName = PsName.findByEmployeeIdAndEffectiveDateAndNameType((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"), "PRF");
+		PsName psName = PsName.findByEmployeeIdAndNameTypeAndEffectiveDate((String)parameterMap.get("employeeId"), "PRF", (Date)parameterMap.get("effectiveDate"));
 		if(psName != null && psName.getFirstName() != null) {
 			nickname = psName.getFirstName().trim().toUpperCase().replaceAll("'", "''");
 			if(nickname.length() > 20) {
@@ -199,7 +200,7 @@ public class EmployeeDemographicChange {
 	 * @return parameterMap
 	 */
 	private static HashMap<String, Object> fetchAddress(HashMap<String, Object> parameterMap) {
-		PsAddress psAddress = PsAddress.findByEmployeeIdAndEffectiveDateAndAddressType((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"), "HOME");
+		PsAddress psAddress = PsAddress.findHomeByEmployeeIdAndEffectiveDate((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"));
 		if(psAddress != null) {
 			if(psAddress.getAddress1() != null) {
 				parameterMap.put("address", psAddress.getAddress1().trim().toUpperCase().replaceAll("'", "''"));
@@ -224,7 +225,7 @@ public class EmployeeDemographicChange {
 	 * @return parameterMap
 	 */
 	private static HashMap<String, Object> fetchName(HashMap<String, Object> parameterMap) {
-		PsName psName = PsName.findByEmployeeIdAndEffectiveDateAndNameType((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"), "PRI");
+		PsName psName = PsName.findByEmployeeIdAndNameTypeAndEffectiveDate((String)parameterMap.get("employeeId"), "PRI", (Date)parameterMap.get("effectiveDate"));
 		if(psName != null) {
 			if(psName.getName() != null) {
 			    String name = StringUtil.formatPeopleSoftEmployeeNameToLegacyEmployeeName(psName.getFirstName(), psName.getMiddleName(), psName.getLastName(), psName.getNameSuffix());
@@ -247,17 +248,21 @@ public class EmployeeDemographicChange {
 	//TODO: NEEDS MORE TESTING; not sure if this is 100% correct
 	private static HashMap<String, Object> fetchReferralSource(HashMap<String, Object> parameterMap) {
 		//BEGIN-PROCEDURE HR05-GET-REFERRAL-SOURCE
-		String recruitmentSourceId = PsReferralSource.findRecruitmentSourceIdByEmployeeIdAndEffectiveDate((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate")); //PS_PERS_APPL_REF
-		PsRecruitmentSource psRecruitmentSource = PsRecruitmentSource.findByRecruitmentSourceId(recruitmentSourceId); //PS_HRS_SOURCE_I
+		PsReferralSource psReferralSource = PsReferralSource.findByEmployeeIdAndEffectiveDate((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate")); //PS_PERS_APPL_REF
+		BigInteger referralSourceId = psReferralSource.getSourceId();
+		PsRecruitmentSource psRecruitmentSource = PsRecruitmentSource.findBySourceId(referralSourceId); //PS_HRS_SOURCE_I
+		String referralSourceDescription = psRecruitmentSource.getSourceDescription();
+//		PsRecruitmentSource psRecruitmentSource = PsRecruitmentSource.findByRecruitmentSourceId(recruitmentSourceId); //PS_HRS_SOURCE_I
 		//LET $PSRecruit_Source_Code = LTRIM(RTRIM(&CHSI2.HRS_SOURCE_NAME,' '),' ')       
 		String referralSourceName = psRecruitmentSource.getSourceName();
+		String psSpecificReferralSource = "";
 		//DO HR05-FORMAT-REFERRAL-SOURCE                                                  
 			//BEGIN-PROCEDURE HR05-FORMAT-REFERRAL-SOURCE
 			//Let $Found = 'N'  !Initialize the found indicator
 			//!Based on the value in the PeopleSoft Recruit Source Code assign the
 			//!corresponding legacy system code that will be passed.
 			//Let $PSReferral_Source = &CPT101.ZHRF_LEGRECRUITSRC
-			String referralSource = CrossReferenceReferralSource.findLegacyRecruiterSourceByReferralSource(referralSourceName); //PS_ZHRT_RFSRC_CREF
+			String referralSource = CrossReferenceReferralSource.findActiveLegacyRecruiterSourceByReferralSource(referralSourceName); //PS_ZHRT_RFSRC_CREF
 			//IF ($Found = 'N')
 			if(referralSource == null) {
 				//LET $PSReferral_Source = ' '
@@ -273,7 +278,8 @@ public class EmployeeDemographicChange {
 				}
 				//ELSE
 				else {
-					//LET $PSSpecific_Refer_Src = SUBSTR($PSRefSourceDescr,1,35)                 
+					//LET $PSSpecific_Refer_Src = SUBSTR($PSRefSourceDescr,1,35)
+					psSpecificReferralSource = referralSourceDescription;
 //					PSSpecific_Refer_Src = PSRefSourceDescr;
 				//END-IF    !$PSRecruit_Source_Code = ' '
 				}
@@ -281,23 +287,24 @@ public class EmployeeDemographicChange {
 			}
 			//!Make sure not less than 35 long
 			//LET $PSSpecific_Refer_Src = SUBSTR($PSRefSourceDescr,1,35)                 
-			//LET $PSSpecific_Refer_Src = RPAD($PSSpecific_Refer_Src,35,' ')
-			String referralSourceId  = psRecruitmentSource.getSourceDescription();
-			if(referralSourceId != null) {
-				referralSourceId = referralSourceId.trim();
-				if(referralSourceId.length() > 35) {
-					referralSourceId = referralSourceId.substring(0, 35);
+			//TODO: //LET $PSSpecific_Refer_Src = RPAD($PSSpecific_Refer_Src,35,' ')
+			psSpecificReferralSource = psSpecificReferralSource.substring(0, 35);
+			String recruitmentSourceId  = psRecruitmentSource.getSourceDescription();
+			if(recruitmentSourceId != null) {
+				recruitmentSourceId = recruitmentSourceId.trim();
+				if(recruitmentSourceId.length() > 35) {
+					recruitmentSourceId = recruitmentSourceId.substring(0, 35);
 				}
-				else if(referralSourceId.length() < 35) {
-					referralSourceId = String.format("%1$-35s", referralSourceId);
+				else if(recruitmentSourceId.length() < 35) {
+					recruitmentSourceId = String.format("%1$-35s", recruitmentSourceId);
 				}
 			}
-			parameterMap.put("referralSourceId", referralSourceId);
+			parameterMap.put("recruitmentSourceId", recruitmentSourceId);
 			//END-PROCEDURE HR05-FORMAT-REFERRAL-SOURCE
 		//Let $PSReferralSource = LTRIM(RTRIM(&CHSI2.HRS_SOURCE_NAME,' '),' ')            
 //		String PSReferralSource = psRecruitmentSource.getSourceName();
 		//END-PROCEDURE HR05-GET-REFERRAL-SOURCE
-		referralSource = referralSource.trim();
+		referralSource = referralSource != null ? referralSource.trim() : referralSource;
 		parameterMap.put("referralSource", referralSource);
 		return parameterMap;
 	}
@@ -363,7 +370,7 @@ public class EmployeeDemographicChange {
 	 */
 	private static HashMap<String, Object> fetchPersonalData (HashMap<String, Object> parameterMap) {
 		//BEGIN-PROCEDURE HR05-GET-PERSONAL-DATA
-		PsPersonalData psPersonalData = PsPersonalData.findByEmployeeId((String)parameterMap.get("employeeId"));
+		PsPersonalData psPersonalData = PsPersonalData.findByOriginalHireEmployeeId((String)parameterMap.get("employeeId"));
 		if(psPersonalData != null) {
 			//TO_CHAR(COHE.ORIG_HIRE_DT, 'YYYY-MM-DD')  &CPD2Orig_Hire_Dt                         
 			//CPD2.SEX
@@ -395,7 +402,7 @@ public class EmployeeDemographicChange {
 	private static String fetchLegacyEthnicCode(HashMap<String, Object> parameterMap) {
 		String ethnicGroupCode = PsDiversityEthnicity.findEthnicGroupCodeByEmployeeId((String)parameterMap.get("employeeId"));
 		String ethnicGroup = PsEthnicGroup.findEthnicGroupByEthnicGroupCode(ethnicGroupCode);
-		String legacyEthnicCode = CrossReferenceEthnicGroup.findLegacyEthnicCodeByEthnicGroup(ethnicGroup);
+		String legacyEthnicCode = CrossReferenceEthnicGroup.findActiveLegacyEthnicCodeByEthnicGroup(ethnicGroup);
 		if(legacyEthnicCode == null || legacyEthnicCode.isEmpty()) {
 			parameterMap.put("errorProgramParameter", "ZHRI105A");
 			parameterMap.put("errorMessageParameter", "Ethnic Group is not found in XRef table PS_ZHRT_ETHCD_CREF");

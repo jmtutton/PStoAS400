@@ -110,5 +110,40 @@ public class CrossReferencePt12p implements Serializable {
 	    }
 	    return null;	
 	}
+	
+	/**
+	 * Gets the branch from the cross reference file using location.
+	 * @see HR01-Get-Branch
+	 * @param department
+	 * @return branch
+	 */
+	public static String findActiveBranchByDepartment(String department) {
+		//SELECT P.ZGLF_PT2OBR
+		//FROM ZPS_ZGLT_PT12P_CREF C
+		//WHERE C.ZGLF_PT2DPT = $WrkSrchLoc
+		//AND C.ZGLF_PT2STS = 'A'
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = (List<String>) em.createQuery(
+	    			"SELECT UPPER(TRIM(p.branch)) "
+	    				+ "FROM CrossReferencePt12p p "
+	    				+ "WHERE UPPER(TRIM(p.department)) = :department "
+	    				+ "AND UPPER(TRIM(p.status)) = 'A' "
+	    				, String.class)
+	    		    .setParameter("department", department.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
 
 }

@@ -306,5 +306,16 @@ public class PsPersonalNationalId implements Serializable {
 		return null;
 	}
 
+	/**
+	 * @see HR01-Get-Personal-Data
+	 * @param employeeId
+	 * @param region
+	 * @return
+	 */
+	public static PsPersonalNationalId findPrimaryByEmployeeIdAndCountry(String employeeId, String country) {
+		//primary_nid='Y'
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

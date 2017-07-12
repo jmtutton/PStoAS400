@@ -74,4 +74,5 @@ public class PsOriginalHire implements Serializable {
 //		End-Procedure HR05-Get-Personal-Data
 		return null;
 	}
+	
 }

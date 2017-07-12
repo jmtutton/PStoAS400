@@ -107,51 +107,17 @@ public class PsCountry implements Serializable {
 		this.isPostSearchAvailable = isPostSearchAvailable;
 	}
 	
-	public static String findCountryIsoAlpha2CodeByCountryCode(String country) {
-		//!----------------------------------------------------------------------------
-		//! Procedure: GET-2CHAR-COUNTRY
-		//! DESC: This procedure will get the 2 character country code
-		//!-----------------------------------------------------------------------------
-		//BEGIN-PROCEDURE GET-2CHAR-COUNTRY
-		//BEGIN-SELECT
-		//CTRY.COUNTRY_2CHAR
-		//let $PS_NID_COUNTRY=ltrim(rtrim(&CTRY.COUNTRY_2CHAR,' '),' ')
-		//let $PS_NID_COUNTRY=substr($PS_NID_COUNTRY,1,2)
-		//FROM PS_COUNTRY_TBL  CTRY
-		//WHERE CTRY.country=$PS_REG_REGION
-		//END-SELECT
-		//END-PROCEDURE
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-		EntityManager em = emfactory.createEntityManager();
-	    try {
-	    	List<String> resultList = em.createQuery(
-	    			"SELECT c.countryIsoAlpha2Code FROM PsCountry c "
-	    					+ "WHERE UPPER(TRIM(c.country)) = :country ", String.class)
-	    		    .setParameter("country", country.toUpperCase().trim())
-	    		    .getResultList();
-	    	if(resultList != null && !resultList.isEmpty()) {
-	    		String result  = resultList.get(0).trim().toUpperCase();
-	    		if(result.length() > 2) {
-	    			result = result.substring(0, 2);
-	    		}
-	    		return result;
-	    	}
-	    }
-	    catch (Exception e) {
-	       e.printStackTrace();
-	    } 
-	    finally {
-	    	em.close();
-	    }
-	    return null;	
-	}
-
 	/**
+	 * Gets the two character country code for the employee's country of citizenship.
 	 * @see HR05-Get-Citizenship in ZHRI105A.SQC
 	 * @param employeeId
 	 * @return countryIsoAlpha2Code
 	 */
 	public static String findCountryIsoAlpha2CodeByEmployeeId(String employeeId) {
+		//SELECT P2.COUNTRY_2CHAR
+		//FROM PS_CITIZENSHIP P, PS_COUNTRY_TBL P2
+		//WHERE P.EMPLID = $PSEmplid
+		//AND P2.COUNTRY = P.COUNTRY
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -171,6 +137,38 @@ public class PsCountry implements Serializable {
 	    }
 	    catch (Exception e) {
 	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
+
+	/**
+	 * Gets the two character ISO country code for the given three character ISO country code.
+	 * @see Get-2Char-Country in ZHRI101A.SQC
+	 * @param countryIsoAlpha3Code
+	 * @return countryIsoAlpha2Code
+	 */
+	public static String findCountryIsoAlpha2CodeByCountryIsoAlpha3Code(String countryIsoAlpha3Code) {
+		//SELECT P.COUNTRY_2CHAR
+		//FROM PS_COUNTRY_TBL  P
+		//WHERE P.country = $PsRegRegion
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<String> resultList = em.createQuery(
+	    			"SELECT c.countryIsoAlpha2Code FROM PsCountry c "
+	    					+ "WHERE UPPER(TRIM(c.countryIsoAlpha3Code)) = :countryIsoAlpha3Code "
+	    			, String.class)
+	    		    .setParameter("countryIsoAlpha3Code", countryIsoAlpha3Code.toUpperCase().trim())
+	    		    .getResultList();
+	    	if(resultList != null && !resultList.isEmpty()) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
 	    } 
 	    finally {
 	    	em.close();

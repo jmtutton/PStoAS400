@@ -86,109 +86,29 @@ public class CrossReferenceCompany implements Serializable {
 		this.legacyRegion = legacyRegion;
 	}
 
-	public static CrossReferenceCompany HR01GetGroup(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR01-Get-Group
-//		! Desc:  Gets the group from the cross reference file using Company
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR01-Get-Group
-//		Let $Found = 'N'
-//		Begin-Select
-//		CPT5.ZHRF_LEGGROUP
-//		    Let $LegGroup = ltrim(rtrim(&CPT5.ZHRF_LEGGROUP,' '),' ')              !Remove leading and trailing blanks
-//		    Let $Found = 'Y'
-//		from PS_ZHRT_CMPNY_CREF CPT5
-//		where CPT5.COMPANY = $PSCompany
-//		  and CPT5.STATUS = 'A'
-//		End-Select
-//		If $Found = 'N'
-//		     Let $WrkCriticalFlag = 'Y'
-//		     Let $CallRPG = 'N'
-//		     Let $ErrorMessageParm = 'The Company entered is not in the cross reference table PS_ZHRT_CMPNY_CREF'
-//		     Do Call-Error-Routine
-//		     Let $WrkCriticalFlag = 'N'
-//		End-If    !$Found = 'N'
-//		End-Procedure HR01-Get-Group
-		return null;
-	}
-
-	public static CrossReferenceCompany HR04GetGroup(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR04-Get-Group
-//		! Desc:  Gets the group from the cross reference file using Company
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR04-Get-Group
-//		Let $Found = 'N'
-//		Begin-Select
-//		CPT52.ZHRF_LEGGROUP
-//		    let $LegGroup = ltrim(rtrim(&CPT52.ZHRF_LEGGROUP,' '),' ')   !Remove leading and trailing blanks
-//		    Let $Found = 'Y'
-//		from PS_ZHRT_CMPNY_CREF CPT52
-//		where CPT52.COMPANY = $PSCompany
-//		and CPT52.STATUS = 'A'
-//		End-Select
-//		If $Found = 'N'
-//		     Let $ErrorMessageParm = 'Company not found in XRef Table PS_ZHRT_CMPNY_CREF'
-//		     Let $WrkCriticalFlag = 'Y'
-//		 Let $CallRpg = 'N'
-//		Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-//		     Do Call-Error-Routine     !From ZHRI100A.SQR
-//		End-If    !$Found = 'N'
-//		End-Procedure HR04-Get-Group		
-		return null;
-	}
-
-	public static CrossReferenceCompany HR09GetGroup(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR09-Get-Group
-//		! Desc:  Gets the group from the cross reference file using Company
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR09-Get-Group
-//		Let $Found = 'N'
-//		Begin-Select
-//		CPT53.ZHRF_LEGGROUP
-//		    let $LegGroup = ltrim(rtrim(&CPT53.ZHRF_LEGGROUP,' '),' ')  !Remove leading and trailing blanks
-//		    Let $Found = 'Y'
-//		from PS_ZHRT_CMPNY_CREF CPT53
-//		where CPT53.COMPANY = $PSCompany
-//		  and CPT53.STATUS = 'A'
-//		End-Select
-//		If $Found = 'N'
-//		     Let $ErrorMessageParm = 'Company not found in XRef Table PS_ZHRT_CMPNY_CREF'
-//		     Let $WrkCriticalFlag = 'Y'
-//		     Let $CallRpg = 'N'
-//		     Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR     Do Prepare-Error-Parms    !From ZHRI100A.SQR
-//		     Do Call-Error-Routine  !ZHRI100A.SQR
-//		End-If    !$Found = 'N'
-//		End-Procedure HR09-Get-Group
-		return null;
-	}
-	
 	/**
 	 * This routine gets the business unit and old region from the cross reference table PT005P.
 	 * @see HR05-Get-Business-Unit in ZHRI105A.SQC
-	 * @return region
+	 * @param businessUnit
+	 * @return legacyRegion
 	 */
 	public static String findLegacyRegionByBusinessUnit(String businessUnit) {
-		//BEGIN-SELECT
-		//CPT51.ZHRF_LEGREGION
-		//LET $PSReg = &CPT51.ZHRF_LEGREGION
-		//FROM PS_ZHRT_CMPNY_CREF CPT51
-		//WHERE CPT51.BUSINESS_UNIT = &CJ7.Business_Unit
-		//AND CPT51.STATUS = 'A'
-		//END-SELECT
+		//SELECT C.ZHRF_LEGREGION
+		//FROM PS_ZHRT_CMPNY_CREF C
+		//WHERE C.BUSINESS_UNIT = $BusinessUnit
+		//AND C.STATUS = 'A'
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		try {
-			List<CrossReferenceCompany> resultList = em.createQuery(
-					"SELECT CrossReferenceCompany FROM CrossReferenceCompany c "
+			List<String> resultList = em.createQuery(
+					"SELECT UPPER(TRIM(c.legacyRegion)) FROM CrossReferenceCompany c "
 					+ "WHERE UPPER(TRIM(c.businessUnit)) = :businessUnit "
 					+ "AND UPPER(TRIM(c.status)) = 'A' "
-					, CrossReferenceCompany.class)
+					, String.class)
 					.setParameter("businessUnit", businessUnit.trim().toUpperCase())
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
-	    		return resultList.get(0).getLegacyRegion();
+	    		return resultList.get(0);
 	    	}
 	    }
 	    catch (Exception e) {
@@ -200,5 +120,39 @@ public class CrossReferenceCompany implements Serializable {
 	    return null;	
 	}
 
+	/**
+	 * @see HR01-Get-Group
+	 * @see HR04-Get-Group
+	 * @see HR09-Get-Group
+	 * @param company
+	 * @return legacyGroup
+	 */
+	public static String findActiveLegacyGroupByCompany(String company) {
+		//SELECT C.ZHRF_LEGGROUP
+		//FROM PS_ZHRT_CMPNY_CREF C
+		//WHERE C.COMPANY = $PsCompany
+		//AND C.STATUS = 'A'
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+		try {
+			List<String> resultList = em.createQuery(
+					"SELECT UPPER(TRIM(c.legacyGroup)) FROM CrossReferenceCompany c "
+					+ "WHERE UPPER(TRIM(c.company)) = :company "
+					+ "AND UPPER(TRIM(c.status)) = 'A' "
+					, String.class)
+					.setParameter("company", company.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
+	    }
+	    catch (Exception e) {
+	    	e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
 	
 }

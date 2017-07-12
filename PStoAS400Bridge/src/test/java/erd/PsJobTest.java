@@ -85,6 +85,17 @@ public class PsJobTest {
 		assertNotNull(result);
 		System.out.println("\nresult = " + result);
 	}
+	
+	@Test
+	public void testFindJobData() throws ParseException {
+		String employeeId = "100310";
+		Date effectiveDate = (new SimpleDateFormat("dd-MMM-yyyy")).parse("01-DEC-2017");
+		System.out.println("employeeId = " + employeeId);
+		System.out.println("effectiveDate = " + effectiveDate);
+		PsJob result = PsJob.findJobData(employeeId, effectiveDate);
+		assertNotNull(result);
+		System.out.println("\nresult = " + result);
+	}
 
 
 }

@@ -232,7 +232,7 @@ public class CrossReferenceJobCode implements Serializable {
 	 * @param fullOrPartTime
 	 * @param regularOrTemporary
 	 * @param department
-	 * @return resultList - record set result from query
+	 * @return CrossReferenceJobCode records
 	 */
 	public static List<CrossReferenceJobCode> findPosition(String setIdJobCode, String jobCode, String employeeClass, 
 			String fullOrPartTime, String regularOrTemporary, String department) {
@@ -253,8 +253,54 @@ public class CrossReferenceJobCode implements Serializable {
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList;
 	    	}
-	    	else 
-	    		return null;
+	    }
+	    catch (Exception e) {
+	       e.printStackTrace();
+	    } 
+	    finally {
+	    	em.close();
+	    }
+	    return null;	
+	}
+
+	/**
+	 * @see HR01-Get-Position
+	 * @param setIdJobCode
+	 * @param jobCode
+	 * @param employeeClass
+	 * @param fullOrPartTime
+	 * @param regularOrTemporary
+	 * @param department
+	 * @return CrossReferenceJobCode record
+	 */
+	public static CrossReferenceJobCode findActiveBySetIdJobCodeAndJobCodeAndEmployeeClassAndFullOrPartTimeAndRegularOrTemporaryAndDepartment(
+			String setIdJobCode, String jobCode, String employeeClass, String fullOrPartTime, String regularOrTemporary, String department) {
+		//SELECT
+		//FROM PS_ZHRT_JOBCD_CREF C
+		//WHERE C.SETID_JOBCODE = $PSSetID AND C.JOBCODE = $PSJobCode
+		//AND C.EMPL_CLASS = $PSEmplClass AND C.FULL_PART_TIME = $PSFullPartTime
+		//AND C.REG_TEMP = $PSRegTemp AND C.DEPARTMENT = $PSDeptid
+		//AND C.STATUS = 'A'
+		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
+		EntityManager em = emfactory.createEntityManager();
+	    try {
+	    	List<CrossReferenceJobCode> resultList = (List<CrossReferenceJobCode>) em.createQuery(
+	    			"SELECT p FROM CrossReferenceJobCode p "
+	    					+ "WHERE TRIM(UPPER(p.setIdJobCode)) = :setIdJobCode AND TRIM(UPPER(p.jobCode)) = :jobCode "
+	    					+ "AND TRIM(UPPER(p.employeeClass)) = :employeeClass AND TRIM(UPPER(p.fullOrPartTime)) = :fullOrPartTime "
+	    					+ "AND TRIM(UPPER(p.regularOrTemporary)) = :regularOrTemporary AND TRIM(UPPER(p.department)) = :department "
+	    					+" AND TRIM(UPPER(p.status)) = 'A' "
+	    			, CrossReferenceJobCode.class)
+	    		    .setParameter("setIdJobCode", setIdJobCode.trim().toUpperCase())
+	    		    .setParameter("jobCode", jobCode.trim().toUpperCase())
+	    		    .setParameter("employeeClass", employeeClass.trim().toUpperCase())
+	    		    .setParameter("fullOrPartTime", fullOrPartTime.trim().toUpperCase())
+	    		    .setParameter("regularOrTemporary", regularOrTemporary.trim().toUpperCase())
+	    		    .setParameter("department", department.trim().toUpperCase())
+	    		    .getResultList();
+	    	if(resultList != null && resultList.size() > 0) {
+	    		return resultList.get(0);
+	    	}
 	    }
 	    catch (Exception e) {
 	       e.printStackTrace();

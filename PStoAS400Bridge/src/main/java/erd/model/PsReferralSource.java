@@ -29,19 +29,19 @@ public class PsReferralSource implements Serializable {
 	private Date effectiveDate;
 
 	@Column(name="EMPL_REFERRAL_ID", nullable=false, length=11)
-	private String employeeReferralId;
+	private String referralId;
 
 	@Column(name="HRS_PERSON_ID", nullable=false, precision=15)
-	private BigInteger recruitmentPersonId;
+	private BigInteger recruiterId;
 
 	@Column(name="HRS_PROFILE_SEQ", nullable=false, precision=38)
-	private BigInteger recruitmentProfileSeq;
+	private BigInteger profileSequence;
 
 	@Column(name="HRS_SOURCE_ID", nullable=false, precision=15)
-	private BigInteger recruitmentSourceId;
+	private BigInteger sourceId;
 
 	@Column(name="HRS_SUBSOURCE_ID", nullable=false, precision=15)
-	private BigInteger recruitmentSubsourceId;
+	private BigInteger subsourceId;
 
 	@Column(name="PREV_EMPL_BY_COMPY", nullable=false, length=1)
 	private String previousEmployer;
@@ -71,12 +71,12 @@ public class PsReferralSource implements Serializable {
 		this.effectiveDate = effectiveDate;
 	}
 
-	public String getEmployeeReferralId() {
-		return this.employeeReferralId;
+	public String getReferralId() {
+		return this.referralId;
 	}
 
-	public void setEmployeeReferralId(String employeeReferralId) {
-		this.employeeReferralId = employeeReferralId;
+	public void setReferralId(String referralId) {
+		this.referralId = referralId;
 	}
 
 	public String getEmployeeId() {
@@ -87,36 +87,36 @@ public class PsReferralSource implements Serializable {
 		this.employeeId = employeeId;
 	}
 
-	public BigInteger getRecruitmentPersonId() {
-		return this.recruitmentPersonId;
+	public BigInteger getRecruiterId() {
+		return this.recruiterId;
 	}
 
-	public void setRecruitmentPersonId(BigInteger recruitmentPersonId) {
-		this.recruitmentPersonId = recruitmentPersonId;
+	public void setRecruiterId(BigInteger recruiterId) {
+		this.recruiterId = recruiterId;
 	}
 
-	public BigInteger getRecruitmentProfileSeq() {
-		return this.recruitmentProfileSeq;
+	public BigInteger getProfileSequence() {
+		return this.profileSequence;
 	}
 
-	public void setRecruitmentsProfileSeq(BigInteger recruitmentProfileSeq) {
-		this.recruitmentProfileSeq = recruitmentProfileSeq;
+	public void setsProfileSequence(BigInteger profileSequence) {
+		this.profileSequence = profileSequence;
 	}
 
-	public BigInteger getRecruitmentSourceId() {
-		return this.recruitmentSourceId;
+	public BigInteger getSourceId() {
+		return this.sourceId;
 	}
 
-	public void setRecruitmentSourceId(BigInteger recruitmentSourceId) {
-		this.recruitmentSourceId = recruitmentSourceId;
+	public void setSourceId(BigInteger sourceId) {
+		this.sourceId = sourceId;
 	}
 
-	public BigInteger getRecruitmentSubsourceId() {
-		return this.recruitmentSubsourceId;
+	public BigInteger getSubsourceId() {
+		return this.subsourceId;
 	}
 
-	public void setRecruitmentSubsourceId(BigInteger recruitmentSubsourceId) {
-		this.recruitmentSubsourceId = recruitmentSubsourceId;
+	public void setSubsourceId(BigInteger subsourceId) {
+		this.subsourceId = subsourceId;
 	}
 
 	public String getPreviousEmployer() {
@@ -280,7 +280,7 @@ public class PsReferralSource implements Serializable {
 	 * @param employeeId
 	 * @return PsReferralSource
 	 */
-	public static String findRecruitmentSourceIdByEmployeeIdAndEffectiveDate(String employeeId, Date effectiveDate) {
+	public static PsReferralSource findByEmployeeIdAndEffectiveDate(String employeeId, Date effectiveDate) {
 		//BEGIN-SELECT
 		//CPAI3.HRS_SOURCE_ID
 		//FROM PS_PERS_APPL_REF CPAI3
@@ -294,14 +294,14 @@ public class PsReferralSource implements Serializable {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<String> resultList = em.createQuery(
-	    			"SELECT p.recruitmentSourceId FROM PsReferralSource p "
+	    	List<PsReferralSource> resultList = em.createQuery(
+	    			"SELECT PsReferralSource FROM PsReferralSource p "
 	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
 							+ "AND p.effectiveDate = "
 							+ "(SELECT MAX(p2.effectiveDate) FROM PsReferralSource p2 "
 							+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
 								+ "AND p2.effectiveDate <= :effectiveDate) "
-	    					, String.class)
+	    					, PsReferralSource.class)
 	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
 	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();

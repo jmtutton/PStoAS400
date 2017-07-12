@@ -262,13 +262,10 @@ public class PsRecruitmentSource implements Serializable {
 	 * @param recruitmentSourceId
 	 * @return
 	 */
-	public static PsRecruitmentSource findByRecruitmentSourceId(String sourceId) {
-		//BEGIN-SELECT
-		//CHSI2.HRS_SOURCE_NAME                                                               ! ALS-10/08/2008
-		//CHSI2.HRS_SOURCE_DESCR                                                              ! ALS-10/08/2008
-		//FROM PS_HRS_SOURCE_I CHSI2                                                          ! ALS-10/08/2008
-		//WHERE CHSI2.HRS_SOURCE_ID = CPAI3.HRS_SOURCE_ID                                   ! ALS-10/08/2008
-		//END-SELECT
+	public static PsRecruitmentSource findBySourceId(BigInteger sourceId) {
+		//SELECT P.HRS_SOURCE_NAME, P.HRS_SOURCE_DESCR
+		//FROM PS_HRS_SOURCE_I P
+		//WHERE P.HRS_SOURCE_ID = $SourceId
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
@@ -276,7 +273,7 @@ public class PsRecruitmentSource implements Serializable {
 	    			"SELECT p FROM PsRecruitmentSource p "
 	    					+ "WHERE UPPER(TRIM(p.sourceId)) = :sourceId ",
 	    					PsRecruitmentSource.class)
-	    		    .setParameter("sourceId", sourceId.trim().toUpperCase())
+	    		    .setParameter("sourceId", sourceId)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
