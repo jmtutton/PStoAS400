@@ -16,8 +16,8 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="PSXLATITEM")
-@NamedQuery(name="PsXlatItem.findAll", query="SELECT p FROM PsXlatItem p")
-public class PsXlatItem implements Serializable {
+@NamedQuery(name="PsTranslationItem.findAll", query="SELECT p FROM PsTranslationItem p")
+public class PsTranslationItem implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
@@ -49,7 +49,7 @@ public class PsXlatItem implements Serializable {
 	@Column(name="LASTUPDOPRID", nullable=false, length=30)
 	private String lastUpdatedUserId;
 
-	public PsXlatItem() {
+	public PsTranslationItem() {
 		super();
 	}   
 	public String getFieldName() {
@@ -199,7 +199,7 @@ public class PsXlatItem implements Serializable {
 	 * @param fieldValue
 	 * @return PsXlatItem record
 	 */
-	public static PsXlatItem findByFieldNameAndFieldValueAndEffectiveDate(String fieldName, String fieldValue, Date effectiveDate) {
+	public static PsTranslationItem findByFieldNameAndFieldValueAndEffectiveDate(String fieldName, String fieldValue, Date effectiveDate) {
 		//BEGIN-SELECT
 		//XLATSHORTNAME
 		//XLATLONGNAME
@@ -219,15 +219,15 @@ public class PsXlatItem implements Serializable {
 		EntityManager em = emfactory.createEntityManager();
 		
 		try {
-			List<PsXlatItem> resultList = em.createQuery("SELECT PsXlatItem FROM PsXlatItem p "
+			List<PsTranslationItem> resultList = em.createQuery("SELECT p FROM PsTranslationItem p "
 						+ "WHERE UPPER(TRIM(p.fieldName)) = :fieldName "
 						+ "AND UPPER(TRIM(p.fieldValue)) = :fieldValue "
 						+ "AND p.effectiveDate = "
-								+ "(SELECT MAX(p2.effectiveDate) FROM PsXlatItem p2 "
+								+ "(SELECT MAX(p2.effectiveDate) FROM PsTranslationItem p2 "
 									+ "WHERE UPPER(TRIM(p2.fieldName)) = :fieldName "
 									+ "AND UPPER(TRIM(p2.fieldValue)) = :fieldValue "
 									+ "AND p2.effectiveDate <= :effectiveDate) "
-					, PsXlatItem.class)
+					, PsTranslationItem.class)
 			    .setParameter("processName", fieldName.trim().toUpperCase())
 			    .setParameter("fieldName", fieldValue.trim().toUpperCase())
 			    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)

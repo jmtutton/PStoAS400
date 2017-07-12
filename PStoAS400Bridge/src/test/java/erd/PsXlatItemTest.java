@@ -6,7 +6,7 @@ import java.util.Date;
 
 import org.junit.Test;
 
-import erd.model.PsXlatItem;
+import erd.model.PsTranslationItem;
 
 public class PsXlatItemTest {
 
@@ -21,7 +21,7 @@ public class PsXlatItemTest {
 //		}
 //		catch(Exception name) {
 //		}
-		Date result = PsXlatItem.findMaxEffectiveDateByFieldNameAndFieldValue(fieldName, fieldValue);
+		Date result = PsTranslationItem.findMaxEffectiveDateByFieldNameAndFieldValue(fieldName, fieldValue);
 		assertNotNull(result);
 		System.out.println(result);
 	}

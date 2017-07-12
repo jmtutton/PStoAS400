@@ -20,6 +20,7 @@ import erd.model.PsAddress;
 import erd.model.PsCountry;
 import erd.model.PsDiversityEthnicity;
 import erd.model.PsEffectiveDatedPersonalData;
+import erd.model.PsEthnicGroup;
 import erd.model.PsJob;
 import erd.model.PsName;
 import erd.model.PsPerson;
@@ -58,11 +59,19 @@ public class EmployeeNewHireRehire {
 		if(Main.DEBUG) logger.debug("fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ101A");
 		parameterMap.put("parameterNameList", getParameterNameList());
+		parameterMap.put("operatorId", formatOperatorId((String)parameterMap.get("operatorId")));
 		parameterMap = fetchJobData(parameterMap);
+		parameterMap = fetchEffectiveDatedPersonalData(parameterMap);
+		parameterMap = fetchPersonData(parameterMap);
 		parameterMap = fetchPersonalData(parameterMap);
+//		parameterMap = fetchLocationData(parameterMap);
+		parameterMap = fetchPersonalNationalIdData(parameterMap);
+		parameterMap = fetchReferralSourceData(parameterMap);
+		parameterMap = fetchNameData(parameterMap);
+		parameterMap = fetchAddressData(parameterMap);
 		parameterMap = fetchPhoneData(parameterMap);
 		parameterMap = fetchDiversityEthnicityData(parameterMap);
-		parameterMap = massageData(parameterMap);
+		parameterMap = fetchServiceDateData(parameterMap);
 		parameterMap = fetchJobProfileData(parameterMap);
 		return parameterMap;
 	}
@@ -116,23 +125,6 @@ public class EmployeeNewHireRehire {
 	}
 	
 	/**
-	 * @see HR01-Get-Personal-Data
-	 * @param parameterMap
-	 * @return parameterMap
-	 */
-	private static HashMap<String, Object> fetchPersonalData(HashMap<String, Object> parameterMap) {
-		parameterMap = fetchEffectiveDatedPersonalData(parameterMap);
-		parameterMap = fetchPersonData(parameterMap);
-		parameterMap = fetchPersonalDataData(parameterMap);
-//		parameterMap = fetchLocationData(parameterMap);
-		parameterMap = fetchPersonalNationalIdData(parameterMap);
-		parameterMap = fetchReferralSourceData(parameterMap);
-		parameterMap = fetchNameData(parameterMap);
-		parameterMap = fetchAddressData(parameterMap);
-		return parameterMap;
-	}
-	
-	/**
 	 * @see HR01-Get-Main-Phone
 	 * @see HR01-Get-Office-Phone
 	 * @param parameterMap
@@ -145,26 +137,28 @@ public class EmployeeNewHireRehire {
 		String businessPhoneAreaCode = "";
 		String homePhoneError = "N";
 		String businessPhoneError = "N";
-		//TODO://Do Remove-Non-Letters-Numbers ($WrkOldPhone,$WrkNewPhone)        !ZRmvSpcChr.sqc
+		//TODO://DO Remove-Non-Letters-Numbers ($WrkOldPhone,$WrkNewPhone)        !ZRmvSpcChr.sqc
 		if(homePhoneNumber != null) {
+			homePhoneNumber = homePhoneNumber.trim().replaceAll("[^a-zA-Z0-9]", "");
 			homePhoneError = homePhoneNumber.length() > 10 ? "Y" : "N";
 			if(homePhoneNumber.length() == 10) {
-				//Let $LegHomeAreaCode = substr($WrkNewPhone,1,3)    !Get Area Code
+				//LET $LegHomeAreaCode = SUBSTR($WrkNewPhone,1,3)    !Get Area Code
 				homePhoneAreaCode = homePhoneNumber.substring(0, 3);
-				//Let $LegHomePhone = substr($WrkNewPhone,4,7)       !Get rest of number
+				//LET $LegHomePhone = SUBSTR($WrkNewPhone,4,7)       !Get rest of number
 				homePhoneNumber = homePhoneNumber.substring(3);
 			}
 		}
 		parameterMap.put("homePhoneError", homePhoneError);
 		parameterMap.put("homePhoneNumber", homePhoneNumber);
 		parameterMap.put("homePhoneAreaCode", homePhoneAreaCode);
-		//TODO://Do Remove-Non-Letters-Numbers($WrkOldPhone,$WrkNewPhone)        !ZRmvSpcChr.sqc
+		//TODO://DO Remove-Non-Letters-Numbers($WrkOldPhone,$WrkNewPhone)        !ZRmvSpcChr.sqc
 		if(businessPhoneNumber != null) {
+			businessPhoneNumber = businessPhoneNumber.trim().replaceAll("[^a-zA-Z0-9]", "");
 			businessPhoneError = businessPhoneNumber.length() > 10 ? "Y" : "N";
 			if(businessPhoneNumber.length() == 10) {
-				//Let $LegHomeAreaCode = substr($WrkNewPhone,1,3)    !Get Area Code
+				//LET $LegHomeAreaCode = SUBSTR($WrkNewPhone,1,3)    !Get Area Code
 				businessPhoneAreaCode = businessPhoneNumber.substring(0, 3);
-				//Let $LegHomePhone = substr($WrkNewPhone,4,7)       !Get rest of number
+				//LET $LegHomePhone = SUBSTR($WrkNewPhone,4,7)       !Get rest of number
 				businessPhoneNumber = businessPhoneNumber.substring(3);
 			}
 		}
@@ -175,40 +169,35 @@ public class EmployeeNewHireRehire {
 	}
 
 	/**
-	 * @see HR01-Get-Ethnic-Group
-	 * @see HR01-Get-Legacy-Ethnic-Code
+	 * @see HR01-Get-Ethnic-Group in ZHRI101A.SQC
+	 * @see Get-Ethnic-Code in ZHRI101A.SQC
+	 * @see HR01-Get-Legacy-Ethnic-Code in ZHRI101A.SQC
 	 * @param parameterMap
 	 * @return parameterMap
 	 */
 	//TODO:
 	private static HashMap<String, Object> fetchDiversityEthnicityData(HashMap<String, Object>  parameterMap) {
+		//DO HR01-Get-Ethnic-Group
 		String ethnicGroupCode = PsDiversityEthnicity.findEthnicGroupCodeByEmployeeId((String)parameterMap.get("employeeId"));
+		if(!"O".equalsIgnoreCase(ethnicGroupCode)) {
+		    //DO Get-Ethnic-Code
+			ethnicGroupCode = PsEthnicGroup.findEthnicGroupByEthnicGroupCode(ethnicGroupCode);
+		}
 		String legacyEthnicCode = CrossReferenceEthnicGroup.findActiveLegacyEthnicCodeByEthnicGroup(ethnicGroupCode);
-		parameterMap.put("race", legacyEthnicCode); //??
-		//!Format employee race
 		//DO HR01-Get-Legacy-Ethnic-Code
-//		parameterMap.put("race", fetchEthnicCode((String)parameterMap.get("ethnicGroupCode")));
-		//Uppercase $LegRace      !Make Sure in all CAPS
+		legacyEthnicCode = legacyEthnicCode != null ? legacyEthnicCode.trim().toUpperCase() : legacyEthnicCode;
+		parameterMap.put("race", legacyEthnicCode);
 		return parameterMap;
 	}
 	
-	/**
-	 * Will massage the data to get it in the form that the RPG program needs it in to process.
-	 * @see HR01-Massage-Data
-	 * @param parameterMap
-	 * @return
-	 */
-	private static HashMap<String, Object> massageData(HashMap<String, Object> parameterMap) {
-		String operatorId = (String)parameterMap.get("operatorId");
+	private static String formatOperatorId(String operatorId) {
 		if(operatorId != null) {
 			operatorId = operatorId.trim().toUpperCase();
 			if(operatorId.startsWith("E")) {
 				operatorId = operatorId.substring(1); //strip the E off of the front of the operator ID
 			}
 		}
-		parameterMap.put("operatorId", operatorId);
-		parameterMap = fetchServiceDateData(parameterMap);
-		return parameterMap;
+		return operatorId;
 	}
 	
 	/**
@@ -269,7 +258,7 @@ public class EmployeeNewHireRehire {
 	 * @param parameterMap
 	 * @return parameterMap
 	 */
-	private static HashMap<String, Object> fetchPersonalDataData(HashMap<String, Object> parameterMap) {
+	private static HashMap<String, Object> fetchPersonalData(HashMap<String, Object> parameterMap) {
 		PsPersonalData psPersonalData = PsPersonalData.findByEmployeeId((String)parameterMap.get("employeeId"));
 		String languageCode = psPersonalData.getLanguageCode();
 		if(languageCode != null) {
@@ -314,33 +303,22 @@ public class EmployeeNewHireRehire {
 		String psReferralSourceDescription = psRecruitmentSource.getSourceDescription();
 		String legReferralSource = CrossReferenceReferralSource.findActiveLegacyRecruiterSourceByReferralSource((String)parameterMap.get(""));
 		String referralSourceId = "";
-		//!Format Recruit Source Information
-		//Uppercase $LegReferralSource  !Make Sure in all CAPS
 		legReferralSource = legReferralSource != null ? legReferralSource.trim().toUpperCase() : legReferralSource;
-		//if ($Found = 'N')
 		if(legReferralSource == null || legReferralSource.isEmpty()) {
-			//If $PSReferralSource = ' '   !If the Referral Source code was not entered in PS
 			if(psReferralSource == null || psReferralSource.isEmpty()) {
-				//Let $LegReferralSource = ' '
 				legReferralSource = "";
-				//Let $ErrorMessageParm = 'Referral source not selected in PeopleSoft.'
-				//Do Call-Error-Routine
 				parameterMap.put("errorMessageParameter", "Referral source not selected in PeopleSoft.");
 				Main.doErrorCommand(parameterMap);
-			//Else
 			}
 			else {
-				//Let $LegReferralSource = 'O'   !If not found default to O (Other)
-				legReferralSource = "O";
-				//Let $PSSpecific_Refer_Src = substr($PSRefSourceDescr,1,35)
-				referralSourceId = psReferralSourceDescription.substring(0, 35);
-				
-			//End-If    !$PSReferralSource = ' '
+				legReferralSource = "O";  //if not found default to O (Other)
+				referralSourceId = psReferralSourceDescription;
 			}
-		//end-if    !$Found = 'N'
 		}
 		parameterMap.put("referralSource", legReferralSource);
-		//Let $PSSpecific_Refer_Src = Rpad($PSSpecific_Refer_Src,35,' ')  !Make sure not less than 35 long
+		//LET $PSSpecific_Refer_Src = SUBSTR($PSRefSourceDescr,1,35)
+		//TODO //Let $PSSpecific_Refer_Src = RPAD($PSSpecific_Refer_Src,35,' ')  !Make sure not less than 35 long
+		referralSourceId = psReferralSourceDescription.substring(0, 35);
 		parameterMap.put("referralSourceId", referralSourceId);
 		return null;
 	}
@@ -351,29 +329,29 @@ public class EmployeeNewHireRehire {
 	 * @return parameterMap
 	 */
 	private static HashMap<String, Object> fetchNameData(HashMap<String, Object> parameterMap) {
-		PsName psName = PsName.findByEmployeeIdAndNameTypeAndEffectiveDate((String)parameterMap.get("employeeId"), "PRI", (Date)parameterMap.get("effectiveDate"));
-		String middleName = psName.getMiddleName() != null ? psName.getMiddleName().trim() : psName.getMiddleName();
+		PsName psPrimaryName = PsName.findByEmployeeIdAndNameTypeAndEffectiveDate((String)parameterMap.get("employeeId"), "PRI", (Date)parameterMap.get("effectiveDate"));
+		String middleName = psPrimaryName.getMiddleName() != null ? psPrimaryName.getMiddleName().trim() : psPrimaryName.getMiddleName();
 		String middleInitial = middleName!= null && !middleName.isEmpty() ? middleName.substring(0, 1).toUpperCase() : middleName;
-		String firstName = psName.getFirstName();
+		String firstName = psPrimaryName.getFirstName();
 		if(firstName != null) {
 			firstName = firstName.trim().toUpperCase();
 			firstName = firstName.replaceAll("'", "''");
 		}
-		String lastName = psName.getLastName();
+		String lastName = psPrimaryName.getLastName();
 		if(lastName != null) {
 			lastName = lastName.trim().toUpperCase();
 			lastName = lastName.replaceAll("'", "''");
 		}
-		String namePrefix = psName.getNamePrefix();
+		String namePrefix = psPrimaryName.getNamePrefix();
 		if(namePrefix != null) {
-			namePrefix = psName.getNamePrefix().trim().toUpperCase();
+			namePrefix = psPrimaryName.getNamePrefix().trim().toUpperCase();
 			if(namePrefix.length() > 3) { 
 				namePrefix = namePrefix.substring(0, 3);
 			}
 		}
-		String nameSuffix = psName.getNameSuffix();
+		String nameSuffix = psPrimaryName.getNameSuffix();
 		if(nameSuffix != null && !nameSuffix.isEmpty()) {
-			nameSuffix = psName.getNameSuffix().trim().toUpperCase();
+			nameSuffix = psPrimaryName.getNameSuffix().trim().toUpperCase();
 			lastName = lastName + nameSuffix;
 		}
 		parameterMap.put("lastName", lastName);
@@ -472,7 +450,7 @@ public class EmployeeNewHireRehire {
 	 * @return parameterMap
 	 */
 	private static HashMap<String, Object> fetchServiceDateData(HashMap<String, Object> parameterMap) {
-		Date serviceDate = (Date)parameterMap.get(""); //TODO: ??
+		Date serviceDate = (Date)parameterMap.get("effectiveDate"); //TODO: ??
 		if(serviceDate != null) {
 			parameterMap.put("serviceYear", new SimpleDateFormat("yyyy").format(serviceDate));
 			parameterMap.put("serviceMonth", new SimpleDateFormat("mm").format(serviceDate));

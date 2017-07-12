@@ -9,3 +9,4 @@ rtrim
 strtodate
 datetostr
 oprid
+rehire

@@ -12,8 +12,8 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="PS_ZPTT_XLAT_TBL")
-@NamedQuery(name="PszXlat.findAll", query="SELECT p FROM PszXlat p")
-public class PszXlat implements Serializable {
+@NamedQuery(name="PszTranslation.findAll", query="SELECT p FROM PszTranslation p")
+public class PszTranslation implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -65,7 +65,7 @@ public class PszXlat implements Serializable {
 	@Column(name="STATUS")
 	private String status;
 
-	public PszXlat() {
+	public PszTranslation() {
 	}
 
 	public String getComments254() {

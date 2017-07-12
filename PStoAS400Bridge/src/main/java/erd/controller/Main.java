@@ -298,6 +298,7 @@ public class Main {
 		if(employeeId == null || employeeId.isEmpty()) {
 			employeeId = fetchNewLegacyEmployeeId(parameterMap);
 		}
+		employeeId = employeeId != null ? employeeId.trim().toUpperCase() : employeeId;
 		return employeeId;
 	}
 
@@ -514,6 +515,7 @@ public class Main {
 	 * @param remoteOutput
 	 * @param localInput
 	 * @param localOutput
+	 * @return status
 	 */
 	public static final Integer readWrite(InputStream remoteInput, OutputStream remoteOutput, InputStream localInput, OutputStream localOutput) {
 		logger.debug("readWrite() ***");

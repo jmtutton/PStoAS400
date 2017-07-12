@@ -30,7 +30,7 @@ public class EmployeeDateChange {
 	 * @return
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
-		logger.debug("*** EmployeeDateChange.doProcess()");
+		logger.debug("doProcess()");
 		parameterMap = fetchProcessParameters(parameterMap);
 		if(parameterMap.get("employeeId") != null && !((String)parameterMap.get("employeeId")).isEmpty()) {
 			parameterMap.put("parameterString", Main.composeParameterString(parameterMap));
@@ -40,30 +40,32 @@ public class EmployeeDateChange {
 	}
 
 	/**
-	 * This will initialize the fields at each call.
 	 * @see HR07-Initialize-Fields in ZHRI107A.SQC
 	 * @param parameterMap
+	 * @return parameterMap
 	 */
 	public HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
-		logger.debug("*** EmployeeDateChange.fetchProcessParameters()");
+		logger.debug("fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ107A");
-		parameterMap = setUnusedParameters(parameterMap);
+		parameterMap.put("parameterNameList", getParameterNameList());
+		parameterMap = initializeParameters(parameterMap);
+		parameterMap.put("employeeId", Main.fetchLegacyEmployeeId(parameterMap));
 		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
 			//remove leading 'E' from the PS employee operator ID to comply with the 5 long legacy format
 			parameterMap.put("operatorId", ((String)parameterMap.get("operatorId")).substring(1).trim().toUpperCase());
+		parameterMap = fetchEmployeeReviewDates(parameterMap);
+		parameterMap = fetchAccomplishmentDates(parameterMap);
+		parameterMap = fetchContractDate(parameterMap);
 		}
-		parameterMap.put("employeeId", Main.fetchLegacyEmployeeId(parameterMap));
-		if(parameterMap.get("employeeId") != null) {
-			parameterMap.put("employeeId", ((String)parameterMap.get("employeeId")).trim().toUpperCase());
-			parameterMap = fetchEmployeeReviewDates(parameterMap);
-			parameterMap = fetchAccomplishmentDates(parameterMap);
-			parameterMap = fetchContractDate(parameterMap);
-		}
-		parameterMap.put("parameterNameList", getParameterNameList());
 		return parameterMap;
 	}
 
-	private HashMap<String, Object> setUnusedParameters(HashMap<String, Object> parameterMap) {
+	/**
+	 * @see HR07-Initialize-Fields in ZHRI107A.SQC
+	 * @param parameterMap
+	 * @return parameterMap
+	 */
+	private HashMap<String, Object> initializeParameters(HashMap<String, Object> parameterMap) {
 		parameterMap.put("hireYear", "");
 		parameterMap.put("hireMonth", "");
 		parameterMap.put("hireDay", "");
@@ -93,13 +95,13 @@ public class EmployeeDateChange {
 
 	/**
 	 * This procedure retrieves the Next Review Date and Last Review Date from the 
-	 * PeopleSoft Employee Review Table to send back to Option 7 of AAHR01 in legacy.
+	 * PeopleSoft Employee Review Table.
 	 * @see HR07-Get-Employee-Review in ZHRI107A.SQC
 	 * @param parameterMap
 	 * @return parameterMap
 	 */
 	public HashMap<String, Object> fetchEmployeeReviewDates(HashMap<String, Object> parameterMap) {
-		logger.debug("*** EmployeeDateChange.fetchEmployeeReviewDates()");
+		logger.debug("fetchEmployeeReviewDates()");
 		PsEmployeeReview psEmployeeReview = 
 				PsEmployeeReview.findByEmployeeIdAndEffectiveDateAndEmploymentRecordNumber(
 						(String)parameterMap.get("employeeId"), 
@@ -109,7 +111,7 @@ public class EmployeeDateChange {
 			parameterMap.put("nextReviewMonth", new SimpleDateFormat("mm").format(psEmployeeReview.getNextReviewDt()));
 			parameterMap.put("nextReviewDay", new SimpleDateFormat("dd").format(psEmployeeReview.getNextReviewDt()));
 		}
-		if(psEmployeeReview.getNextReviewDt() != null) {
+		if(psEmployeeReview.getEffectiveDate() != null) {
 			parameterMap.put("lastReviewYear", new SimpleDateFormat("yyyy").format(psEmployeeReview.getEffectiveDate()));
 			parameterMap.put("lastReviewMonth", new SimpleDateFormat("mm").format(psEmployeeReview.getEffectiveDate()));
 			parameterMap.put("lastReviewDay", new SimpleDateFormat("dd").format(psEmployeeReview.getEffectiveDate()));
@@ -119,13 +121,13 @@ public class EmployeeDateChange {
 	
 	/**
 	 * This procedure retrieves the Negative Drug Test Date and Physical Test Date from the 
-	 * PeopleSoft Accomplishments Table to send back to Option 7 of AAHR01.
+	 * PeopleSoft Accomplishments Table.
 	 * @see HR07-Get-Accomplishments in ZHRI107A.SQC
 	 * @param parameterMap
 	 * @return parameterMap
 	 */
 	public HashMap<String, Object> fetchAccomplishmentDates(HashMap<String, Object> parameterMap) {
-		logger.debug("*** EmployeeDateChange.fetchAccomplishmentDates()");
+		logger.debug("fetchAccomplishmentDates()");
 		List<String> accomplishmentCodeList = Arrays.asList("DRUGTST", "PHYS L3", "PHYS L4");
 		PsAccomplishment psAccomplishment = PsAccomplishment.findByEmployeeIdAndAccomplishmentCodes((String)parameterMap.get("employeeId"), accomplishmentCodeList);
 		if(psAccomplishment != null) {
@@ -159,12 +161,14 @@ public class EmployeeDateChange {
 	 * @return parameterMap
 	 */
 	public HashMap<String, Object> fetchContractDate(HashMap<String, Object> parameterMap) {
-		logger.debug("*** EmployeeDateChange.fetchContractDate()");
+		logger.debug("fetchContractDate()");
 		PsContractData psContractData = PsContractData.findByEmployeeIdAndMaxBeginDate((String)parameterMap.get("employeeId"));
-		parameterMap.put("contractYear", new SimpleDateFormat("yyyy").format(psContractData.getContractBeginDt()));
-		parameterMap.put("contractMonth", new SimpleDateFormat("mm").format(psContractData.getContractBeginDt()));
-		parameterMap.put("contractDay", new SimpleDateFormat("dd").format(psContractData.getContractBeginDt()));
-		return null;
+		if(psContractData != null) {
+			parameterMap.put("contractYear", new SimpleDateFormat("yyyy").format(psContractData.getContractBeginDt()));
+			parameterMap.put("contractMonth", new SimpleDateFormat("mm").format(psContractData.getContractBeginDt()));
+			parameterMap.put("contractDay", new SimpleDateFormat("dd").format(psContractData.getContractBeginDt()));
+		}
+		return parameterMap;
 	}
 
 	/**

@@ -373,7 +373,7 @@ public class PsEmergencyContact implements Serializable {
 		//LET $FieldValue = $Relations
 		//LET $AsOfDate = $AsOfToday
 		//DO Read-Translate-Table  !From ZREADXLT.SQC
-		PsXlatItem psXlatItem = PsXlatItem.findByFieldNameAndFieldValueAndEffectiveDate("RELATIONSHIP", relationship, asofToday);
+		PsTranslationItem psXlatItem = PsTranslationItem.findByFieldNameAndFieldValueAndEffectiveDate("RELATIONSHIP", relationship, asofToday);
 		relationship = psXlatItem.getXlatLongName();
 		//LET $PSRelation = SUBSTR($XlatLongName, 1, 20)
 		//UPPERCASE $PSRelation

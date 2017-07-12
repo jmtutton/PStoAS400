@@ -9,7 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Contingent Employee and Multiple EID New Hire Process
+ * Contingent Employee and Multiple EID New Hire / Rehire Process
  * @see ZHRI201A.SQC
  * @author John Tutton john@tutton.net
  */
@@ -31,25 +31,27 @@ public class NonPersonNewHireRehire {
 		//massageData
 		//HR201-Get-Personal-Data
 		//fetchPersonalData
-			//PsEffectiveDatedPersonalData.findByEmployeeIdAndEffectiveDate
-			//PsNames.findByEmployeeIdAndNameTypeAndEffectiveDate
+			//fetchEffectiveDatedPersonalData
+				//PsEffectiveDatedPersonalData.findByEmployeeIdAndEffectiveDate  //PS_PERS_DATA_EFFDT
+			//fetchPsNamesData
+				//PsNames.findByEmployeeIdAndNameTypeAndEffectiveDate  //PS_NAMES
 		//HR201-Get-POI-Data
-		//fetchPoiData
-			//CrossReferencePersonOfInterest.findByEmployeeIdAndEffectiveDate
+		//fetchPersonOfInterestData
+			//CrossReferencePersonOfInterest.findByEmployeeIdAndEffectiveDate  //PS_ZHRT_PER_POI_TR
 		//HR201-Get-Emp-Data
-		//fetchEmployeeData
-			//CrossReferenceMultipleEmployeeId.findByEmployeeIdAndSequenceAndEffectiveDate
-		//HR201-GET-Emp-POI
-		//fetchEmployeePoi
-			//CrossReferencePersonOfInterestEmployee.findByEmployeeId
+		//fetchMultipleEmployeeIdData
+			//CrossReferenceMultipleEmployeeId.findByEmployeeIdAndSequenceAndEffectiveDate  //PS_ZHRR_MULTPL_EID
+		//HR201-Get-Emp-POI
+		//fetchPersonOfInterestEmployeeData
+			//CrossReferencePersonOfInterestEmployee.findByEmployeeId  //PS_ZHRR_POI_EMP_VW
 		//HR201-Get-PrimEid-POIdata
-		//fetchPrimaryEidPoi
-			//CrossReferencePersonOfInterest.findActiveByEmployeeId
+		//fetchPersonOfInterestData
+			//CrossReferencePersonOfInterest.findActiveByEmployeeId  //PS_ZHRT_PER_POI_TR
 		//HR201-Get-POI-LegPosNo
-		//fetchPoiLegacyPositionNumber
+		//fetchPoiLegacyPositionNumberData
 			//PszXlat.findActiveByInput01AndInput02AndInput03
 		//HR201-Get-Alternate_Type
-		//fetchAlternateType
+		//fetchAlternateTypeData
 			//PszXlat.findActiveByInput01AndInput02AndInput03
 	}
 	
