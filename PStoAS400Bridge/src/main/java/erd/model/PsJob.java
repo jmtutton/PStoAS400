@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.persistence.config.QueryHints;
 
-import erd.DateUtil;
+import erd.ErdUtil;
 
 import java.util.Date;
 import java.sql.Timestamp;
@@ -1809,7 +1809,7 @@ public class PsJob implements Serializable {
 		    			+ "				AND p3.effectiveDate = p.effectiveDate) ",
 	    				Date.class)
 	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-	    		    .setParameter("asOfToday", DateUtil.asOfToday(), TemporalType.DATE)
+	    		    .setParameter("asOfToday", ErdUtil.asOfToday(), TemporalType.DATE)
 	    		    .getResultList();
 	    	return (resultList != null && resultList.size() > 0);
 	    }
@@ -1834,7 +1834,7 @@ public class PsJob implements Serializable {
 	public static Boolean correspondingJobRecordExists(String employeeId, Date effectiveDate, String processName) {
 		logger.debug("correspondingJobRecordExists() ***");
 		//add a day to current effective date
-		Date effectiveDatePlusOne = DateUtil.addDays(effectiveDate, 1);
+		Date effectiveDatePlusOne = ErdUtil.addDays(effectiveDate, 1);
 		//SELECT FROM PS_JOB P
 		//WHERE P.EMPLID = $PsEmplId
 			//AND TO_CHAR(P.EFFDT, 'YYYY-MM-DD') = $effectiveDatePlusOne

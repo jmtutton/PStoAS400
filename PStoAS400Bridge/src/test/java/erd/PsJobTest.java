@@ -72,7 +72,7 @@ public class PsJobTest {
 		catch (ParseException e) {
 			e.printStackTrace();
 		}
-		Date effectiveDatePlusOne = erd.DateUtil.addDays(effectiveDate, 1);
+		Date effectiveDatePlusOne = ErdUtil.addDays(effectiveDate, 1);
 		BigInteger effectiveSequence = new BigInteger("0");
 		PsJob result = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence(employeeId, effectiveDatePlusOne, effectiveSequence);
 		assertNotNull(result);

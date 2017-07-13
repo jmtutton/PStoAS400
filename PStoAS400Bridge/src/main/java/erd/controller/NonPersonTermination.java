@@ -31,7 +31,6 @@ public class NonPersonTermination {
 		logger.debug("*** NonPersonTermination.doProcess()");
 		String completionStatus = "E";
 		parameterMap = fetchProcessParameters(parameterMap);
-		logger.info("parameterMap.get(employeeId): " + parameterMap.get("employeeId"));
 		if(parameterMap.get("employeeId") != null && !((String)parameterMap.get("employeeId")).isEmpty()) {
 			parameterMap.put("parameterString", Main.composeParameterString(parameterMap));
 			completionStatus = Main.doCommand(parameterMap);
@@ -54,8 +53,8 @@ public class NonPersonTermination {
 		logger.debug("*** NonPersonTermination.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ202A");
 		parameterMap.put("errorProgramParameter", "HRZ202A");
-		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
-			parameterMap.put("operatorId", ((String)parameterMap.get("operatorId")).substring(1).toUpperCase()); 
+		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).startsWith("E")) {
+			parameterMap.put("operatorId", ((String)parameterMap.get("operatorId")).substring(1).trim().toUpperCase()); 
 		}
 		String terminationDate = new SimpleDateFormat("yyyyMMdd").format((Date)parameterMap.get("effectiveDate"));
 		parameterMap.put("terminationDate", terminationDate);

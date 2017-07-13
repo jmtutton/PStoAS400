@@ -50,13 +50,13 @@ public class EmployeeDateChange {
 		parameterMap.put("parameterNameList", getParameterNameList());
 		parameterMap = initializeParameters(parameterMap);
 		parameterMap.put("employeeId", Main.fetchLegacyEmployeeId(parameterMap));
-		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).length() > 1) {
+		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).startsWith("E")) {
 			//remove leading 'E' from the PS employee operator ID to comply with the 5 long legacy format
 			parameterMap.put("operatorId", ((String)parameterMap.get("operatorId")).substring(1).trim().toUpperCase());
+		}
 		parameterMap = fetchEmployeeReviewDates(parameterMap);
 		parameterMap = fetchAccomplishmentDates(parameterMap);
 		parameterMap = fetchContractDate(parameterMap);
-		}
 		return parameterMap;
 	}
 

@@ -33,6 +33,7 @@ import erd.model.PsLocation;
 import erd.model.PsName;
 import erd.model.PsReferralSource;
 import erd.model.PsTranslationItem;
+import erd.model.PszPeopleToolsTranslation;
 import erd.model.PszPoiTermination;
 import erd.model.PszTriggerEmployee;
 import erd.model.PszTriggerHistory;
@@ -56,7 +57,6 @@ import erd.model.HR006P;
 import erd.model.HR036P;
 import erd.model.HR100P;
 import erd.model.PszVariable;
-import erd.model.PszTranslation;
 import erd.model.TempMast;
 
 /**
@@ -497,7 +497,7 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPsXlatItem() {
+	public void testPsTranslationItem() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		TypedQuery<PsTranslationItem> query =
@@ -562,13 +562,13 @@ public class CrudTest {
 	}
 	
 	@Test
-	public void testPszXlat() {
+	public void testPszPeopleToolsTranslation() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
-		TypedQuery<PszTranslation> query =
-				em.createNamedQuery("PszTranslation.findAll", PszTranslation.class);
+		TypedQuery<PszPeopleToolsTranslation> query =
+				em.createNamedQuery("PszPeopleToolsTranslation.findAll", PszPeopleToolsTranslation.class);
 		query.setMaxResults(MAX_RESULTS);
-		List<PszTranslation> results = query.getResultList();
+		List<PszPeopleToolsTranslation> results = query.getResultList();
 		assertNotNull(results);
 	}
 	

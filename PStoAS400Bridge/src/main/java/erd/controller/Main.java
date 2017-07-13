@@ -106,7 +106,8 @@ public class Main {
 	public static HashMap<String, Object> parameterizeTriggerFields(PszTriggerSuperclass trigger) {
 		logger.debug("parameterizeTriggerFields() ***");
 		HashMap<String, Object> parameterMap = new HashMap<String, Object>();
-		parameterMap.put("criticalFlag", false);
+		parameterMap.put("blankSpace", "");
+		parameterMap.put("criticalFlag", "N");
 		String processName = trigger.getProcessName() != null ? trigger.getProcessName().trim().toUpperCase() : trigger.getProcessName();
 		parameterMap.put("processName", processName);
 		String employeeId = trigger.getEmployeeId();
@@ -192,59 +193,59 @@ public class Main {
 			completionStatus = new NonPersonNewHireRehire().doProcess(parameterMap);
 			break;
 		case "ZHRI101D": //row deleted on hire
-			parameterMap.put("errorProgramParameter", "HRZ101A");
-			parameterMap.put("errorMessageParameter", "A row was deleted on the hire process");
-			parameterMap.put("criticalFlag", true);
+			parameterMap.put("errorProgram", "HRZ101A");
+			parameterMap.put("errorMessage", "A row was deleted on the hire process");
+			parameterMap.put("criticalFlag", "Y");
 			doErrorCommand(parameterMap);
-			parameterMap.put("criticalFlag", false);
+			parameterMap.put("criticalFlag", "N");
 			completionStatus = "C";
 			break;
 		case "ZHRI102D": //row deleted on term
-			parameterMap.put("errorProgramParameter", "HRZ102A");
-			parameterMap.put("errorMessageParameter", "A row was deleted on the termination process");
-			parameterMap.put("criticalFlag", true);
+			parameterMap.put("errorProgram", "HRZ102A");
+			parameterMap.put("errorMessage", "A row was deleted on the termination process");
+			parameterMap.put("criticalFlag", "Y");
 			doErrorCommand(parameterMap);
-			parameterMap.put("criticalFlag", false);
+			parameterMap.put("criticalFlag", "N");
 			completionStatus = "C";
 			break;
 		case "ZHRI104D": //row deleted on job status change
-			parameterMap.put("errorProgramParameter", "HRZ104A");
-			parameterMap.put("errorMessageParameter", "A row was deleted on the job profile process");
-			parameterMap.put("criticalFlag", true);
+			parameterMap.put("errorProgram", "HRZ104A");
+			parameterMap.put("errorMessage", "A row was deleted on the job profile process");
+			parameterMap.put("criticalFlag", "Y");
 			doErrorCommand(parameterMap);
-			parameterMap.put("criticalFlag", false);
+			parameterMap.put("criticalFlag", "N");
 			completionStatus = "C";
 			break;
 		case "ZHRI105D": //row deleted on demographics change
-			parameterMap.put("errorProgramParameter", "HRZ105A");
-			parameterMap.put("errorMessageParameter", "A row was deleted on the demographics process");
-			parameterMap.put("criticalFlag", true);
+			parameterMap.put("errorProgram", "HRZ105A");
+			parameterMap.put("errorMessage", "A row was deleted on the demographics process");
+			parameterMap.put("criticalFlag", "Y");
 			doErrorCommand(parameterMap);
-			parameterMap.put("criticalFlag", false);
+			parameterMap.put("criticalFlag", "N");
 			completionStatus = "C";
 			break;
 		case "ZHRI106D": //row deleted on rehire
-			parameterMap.put("errorProgramParameter", "HRZ101A");
-			parameterMap.put("errorMessageParameter", "A row was deleted on the re-hire process");
-			parameterMap.put("criticalFlag", true);
+			parameterMap.put("errorProgram", "HRZ101A");
+			parameterMap.put("errorMessage", "A row was deleted on the re-hire process");
+			parameterMap.put("criticalFlag", "Y");
 			doErrorCommand(parameterMap);
-			parameterMap.put("criticalFlag", false);
+			parameterMap.put("criticalFlag", "N");
 			completionStatus = "C";
 			break;
 		case "ZHRI107D": //row deleted on the dates process
-			parameterMap.put("errorProgramParameter", "HRZ107A");
-			parameterMap.put("errorMessageParameter", "A row was deleted on the dates process");
-			parameterMap.put("criticalFlag", true);
+			parameterMap.put("errorProgram", "HRZ107A");
+			parameterMap.put("errorMessage", "A row was deleted on the dates process");
+			parameterMap.put("criticalFlag", "Y");
 			doErrorCommand(parameterMap);
-			parameterMap.put("criticalFlag", false);
+			parameterMap.put("criticalFlag", "N");
 			completionStatus = "C";
 			break;
 		case "ZHRI109D": //row deleted on the group transfer process
-			parameterMap.put("errorProgramParameter", "HRZ109A");
-			parameterMap.put("errorMessageParameter", "A row was deleted on the group transfer process");
-			parameterMap.put("criticalFlag", true);
+			parameterMap.put("errorProgram", "HRZ109A");
+			parameterMap.put("errorMessage", "A row was deleted on the group transfer process");
+			parameterMap.put("criticalFlag", "Y");
 			doErrorCommand(parameterMap);
-			parameterMap.put("criticalFlag", false);
+			parameterMap.put("criticalFlag", "N");
 			completionStatus = "C";
 			break;
 		default: //ERROR
@@ -263,21 +264,24 @@ public class Main {
 	 */
 	public static void doErrorCommand(HashMap<String, Object> parameterMap) {
 		logger.debug("doErrorCommand() ***");
+		Calendar now = Calendar.getInstance();
+		String errorDate = //format date to YYYYMMDD
+				String.format("%04d", now.get(Calendar.YEAR)) + String.format("%02d", now.get(Calendar.MONTH)) + String.format("%02d", now.get(Calendar.DATE));
+		parameterMap.put("errorDate", errorDate);
+		String errorTime =  //format time to HHMMSS
+				String.format("%02d", now.get(Calendar.HOUR_OF_DAY)) + String.format("%02d", now.get(Calendar.MINUTE)) + String.format("%02d", now.get(Calendar.SECOND));
+		parameterMap.put("errorTime", errorTime);
+		parameterMap.put("yesOrNo", "Y"); //TODO: What should this value really be called, and when is it not 'Y'??
 		String originalProcessName = (String)parameterMap.get("processName");
-		parameterMap.put("parameterString", composeErrorParameterString(parameterMap));
-		if((Boolean)parameterMap.get("poiFlag")) {
-			parameterMap.get("poiFlag");
-			parameterMap.put("processName", "HRZ210A");
-		}
-		else {
-			parameterMap.put("processName", "HRZ110A");
-		}
+		parameterMap.put("processName", (Boolean)parameterMap.get("poiFlag") ? "HRZ210A" : "HRZ110A");
+		parameterMap.put("parameterNameList", getErrorParameterNameList());
+		parameterMap.put("parameterString", composeParameterString(parameterMap));
 		doCommand(parameterMap);
 		parameterMap.put("processName", originalProcessName);
 	}
 
 	/**
-	 * This routine gets the legacy employee ID from the cross reference table
+	 * This routine gets the legacy employee ID from the cross reference table.
 	 * @see Get-OprId in ZHRI100A.SQR
 	 * @param commonParameters
 	 * @param eidIndexNumber
@@ -293,7 +297,7 @@ public class Main {
 			employeeId = CrossReferenceEmployeeId.findLegacyEmployeeIdByEmployeeId((String)parameterMap.get("employeeId"));
 		}
 		else {
-			employeeId = CrossReferenceMultipleEmployeeId.findLegacyEmployeeIdByEmployeeIdAndSequence((String)parameterMap.get("employeeId"), (Integer)parameterMap.get("eidIndexNumber"));
+			employeeId = CrossReferenceMultipleEmployeeId.findLegacyEmployeeIdByEmployeeIdAndEidIndexNumber((String)parameterMap.get("employeeId"), (Integer)parameterMap.get("eidIndexNumber"));
 		}
 		if(employeeId == null || employeeId.isEmpty()) {
 			employeeId = fetchNewLegacyEmployeeId(parameterMap);
@@ -378,6 +382,7 @@ public class Main {
 		logger.info("employeeNumber: " + employeeNumber);
 		logger.info("eidIndexNumber: " + (Integer)parameterMap.get("eidIndexNumber"));
 		HR036P hr036P = HR036P.findByEmployeeNumberAndIndexNumber(employeeNumber, (Integer)parameterMap.get("eidIndexNumber"));
+	    //if ID doesn't already exists, add the new employee as a PeopleSoft Operator
     	if(hr036P != null) {
     		legacyEmployeeId = hr036P.getEmployeeId();
 	    	if(legacyEmployeeId != null && legacyEmployeeId.length() > 5) {
@@ -402,48 +407,6 @@ public class Main {
 								+ (String)parameterMap.get("processName") + " " 
 								+ "PARM(" + (String)parameterMap.get("parameterString") + ")";
 		return commandString;
-	}
-
-	/**
-	 * Composes a parameter string for the AS400 error program.
-	 * Makes sure that the parameters are the correct format for the error routine RPG program to receive them
-	 * @see Prepare-Error-Parms in ZHRI100A.SQR
-	 * @param commonParameters
-	 * @return errorParameterString
-	 */
-	public static String composeErrorParameterString(HashMap<String, Object> parameterMap) {
-		logger.debug("composeErrorParameterString() ***");
-		String blankSpaceParameter = " ";
-		String criticalFlagYN = (Boolean)parameterMap.get("criticalFlag") != null && (Boolean)parameterMap.get("criticalFlag") ? "Y" : "N";
-		Calendar now = Calendar.getInstance();
-		//format date to YYYYMMDD
-		String errorDateParameter =
-				String.format("%04d", now.get(Calendar.YEAR)) + String.format("%02d", now.get(Calendar.MONTH)) + String.format("%02d", now.get(Calendar.DATE));
-		//format time to HHMMSS
-		String errorTimeParameter = 
-				String.format("%02d", now.get(Calendar.HOUR_OF_DAY)) + String.format("%02d", now.get(Calendar.MINUTE)) + String.format("%02d", now.get(Calendar.SECOND));
-		//TODO: What should this value really be called, and when is it not 'Y'??
-		String yesOrNoParameter = "Y";
-		//error message parameter must be 75 characters long
-		String errorMessageParameter = String.format("%1$-75s", (String)parameterMap.get("errorMessageParameter"));
-		String operatorIdParameter = (String)parameterMap.get("operatorId");
-		if(operatorIdParameter != null) {
-			operatorIdParameter = operatorIdParameter.toUpperCase();
-			if(operatorIdParameter.startsWith("E")) {
-				operatorIdParameter = operatorIdParameter.substring(1); //strip the E off of the front of the employee ID
-			}
-		}
-		String errorParameterString = "'" + (String)parameterMap.get("errorProgramParameter") + "' "
-					+ "'" + (String)parameterMap.get("employeeId") + "' " 
-					+ "'" + (BigInteger)parameterMap.get("effectiveSequence") + "' "
-					+ "'" + blankSpaceParameter + "' " 
-					+ "'" + errorMessageParameter + "' "
-					+ "'" + criticalFlagYN + "' " 
-					+ "'" + errorDateParameter + "' "
-					+ "'" + errorTimeParameter + "' " 
-					+ "'" + operatorIdParameter + "' "
-					+ "'" + yesOrNoParameter + "'";
-		return errorParameterString;
 	}
 
 	/**
@@ -612,9 +575,9 @@ public class Main {
 			return "C";
 		}
 		else { //!error
-			parameterMap.put("errorProgramParameter", "ZHRI100A");
-			parameterMap.put("errorMessageParameter", "Error executing Call System command, contact HR-PeopleSoft On-Call");
-			parameterMap.put("criticalFlag", true);
+			parameterMap.put("errorProgram", "ZHRI100A");
+			parameterMap.put("errorMessage", "Error executing Call System command, contact HR-PeopleSoft On-Call");
+			parameterMap.put("criticalFlag", "Y");
 			doErrorCommand(parameterMap);
 		}
 		return "E";
@@ -627,6 +590,7 @@ public class Main {
      */
 	public static String composeParameterString(HashMap<String, Object> parameterMap) {
 		logger.debug("composeParameterString() ***");
+		parameterMap = formatParameters(parameterMap);
 		String parameterString = "";
 		List<?> parameterNameList = (List<?>)parameterMap.get("parameterNameList");
 		for(Object key : parameterNameList) {
@@ -637,4 +601,30 @@ public class Main {
 		return parameterString.trim();
 	}
 	
+	/**
+	 * Makes sure that the parameters are the correct format RPG program to receive them
+     * @param parameterMap
+     * @return parameterMap
+     */
+	public static HashMap<String, Object> formatParameters(HashMap<String, Object> parameterMap) {
+		logger.debug("formatParameter() ***");
+		parameterMap.put("errorMessage", String.format("%1$-75s", (String)parameterMap.get("errorMessage")));
+		parameterMap.put("employeeId", String.format("%09d", (String)parameterMap.get("employeeId")));  //TODO: verify this is the correct format for the legacy employee ID
+		BigInteger effectiveSequence = (BigInteger)parameterMap.get("effectiveSequence");
+		parameterMap.put("effectiveSequence", effectiveSequence != null ? effectiveSequence.toString() : effectiveSequence);
+		String operatorId = (String)parameterMap.get("operatorId");
+		operatorId = operatorId != null && operatorId.startsWith("E") ? operatorId.substring(1).trim().toUpperCase() : operatorId;
+		parameterMap.put("operatorId", operatorId);
+		return parameterMap;
+	}
+
+	/**
+	 * @see HR201-Build-Call-Statement in ZHRI201A.SQC
+	 * @return list of parameter names for this process
+	 */
+	private static List<String> getErrorParameterNameList() {
+		return Arrays.asList("errorProgram", "employeeId", "effectiveSequence", "blankSpace", 
+				"errorMessage", "criticalFlag", "errorDate", "errorTime", "operatorId", "yesOrNo");
+	}
+
 }

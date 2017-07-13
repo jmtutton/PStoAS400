@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 
-import erd.DateUtil;
+import erd.ErdUtil;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -706,7 +706,7 @@ public class PsAccomplishment implements Serializable {
 	 */
 	public static PsAccomplishment findByEmployeeIdAndAccomplishmentCodes(String employeeId, List<String> accomplishmentCodeList) {
 		System.out.println("PsAccomplishment.findByEmployeeIdAndAccomplishmentCodes()");
-		Date asofToday = DateUtil.asOfToday();
+		Date asofToday = ErdUtil.asOfToday();
 		//BEGIN-PROCEDURE HR07-GET-ACCOMPLISHMENTS
 		//BEGIN-SELECT
 		//!select the maximum issue date in order to get the most current physical/drug test date because an employee could have multiple rows

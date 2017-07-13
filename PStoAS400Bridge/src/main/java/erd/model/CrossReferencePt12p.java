@@ -85,10 +85,8 @@ public class CrossReferencePt12p implements Serializable {
 	 * @return CrossReferencePt12p record
 	 */
 	public static CrossReferencePt12p findByDepartment(String department) {
-		//BEGIN-SELECT
-		//FROM ZPS_ZGLT_PT12P_CREF CPT21
-		//WHERE CPT21.ZGLF_PT2DPT = $PSLocation
-		//END-SELECT
+		//SELECT FROM ZPS_ZGLT_PT12P_CREF C
+		//WHERE C.ZGLF_PT2DPT = $PSLocation
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		
@@ -120,8 +118,7 @@ public class CrossReferencePt12p implements Serializable {
 	public static String findActiveBranchByDepartment(String department) {
 		//SELECT P.ZGLF_PT2OBR
 		//FROM ZPS_ZGLT_PT12P_CREF C
-		//WHERE C.ZGLF_PT2DPT = $WrkSrchLoc
-		//AND C.ZGLF_PT2STS = 'A'
+		//WHERE C.ZGLF_PT2DPT = $WrkSrchLoc AND C.ZGLF_PT2STS = 'A'
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {

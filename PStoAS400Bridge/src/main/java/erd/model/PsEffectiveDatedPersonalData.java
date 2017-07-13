@@ -192,17 +192,17 @@ public class PsEffectiveDatedPersonalData implements Serializable {
 //		!----------------------------------------------------------------------
 //		Begin-Procedure HR201-Get-Personal-Data
 //		Begin-Select  
-//		PER1.SEX            
-//		     Let $PSSex = ltrim(rtrim(&PER1.SEX,' '),' ') 
+//		P.SEX            
+//		     Let $PSSex = ltrim(rtrim(&P.SEX,' '),' ') 
 //		     IF  $PSSex = 'U' 
 //		      LET  $PSSex = ''
 //		     END-IF            
-//		from  PS_PERS_DATA_EFFDT PER1
-//		where PER1.EMPLID = $Wrk_Emplid
-//		  and PER1.EFFDT = (SELECT MAX(PER12.EFFDT)
-//		                      FROM PS_PERS_DATA_EFFDT PER12
-//		                     WHERE PER12.EMPLID = PER1.EMPLID
-//		                       AND  to_char(PER12.EFFDT,'YYYY-MM-DD') <= $Wrk_Effdt)
+//		from  PS_PERS_DATA_EFFDT P
+//		where P.EMPLID = $Wrk_Emplid
+//		  and P.EFFDT = (SELECT MAX(P2.EFFDT)
+//		                      FROM PS_PERS_DATA_EFFDT P2
+//		                     WHERE P2.EMPLID = P.EMPLID
+//		                       AND  to_char(P2.EFFDT,'YYYY-MM-DD') <= $Wrk_Effdt)
 //		End-Select 
 //		Begin-Select  
 //		N1.MIDDLE_NAME
@@ -257,21 +257,27 @@ public class PsEffectiveDatedPersonalData implements Serializable {
 	/**
 	 * @see HR01-Get-Personal-Data
 	 * @see HR05-Get-Info
+	 * @see HR201-Get-Personal-Data
 	 * @param employeeId
 	 * @param effectiveDate
 	 * @return
 	 */
 	public static PsEffectiveDatedPersonalData findByEmployeeIdAndEffectiveDate(String employeeId, Date effectiveDate) {
+		//SELECT FROM PS_PERS_DATA_EFFDT P
+		//WHERE P.EMPLID = $Wrk_Emplid
+		//AND P.EFFDT = 
+				//(SELECT MAX(P2.EFFDT) FROM PS_PERS_DATA_EFFDT P2
+				//WHERE P2.EMPLID = P.EMPLID AND TO_CHAR(P2.EFFDT,'YYYY-MM-DD') <= $EffDt)
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		try {
 			List<PsEffectiveDatedPersonalData> resultList = em.createQuery(
 					"SELECT p FROM PsEffectiveDatedPersonalData p "
 					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-						+ "AND p.effectiveDate = "
+					+ "AND p.effectiveDate = "
 							+ "(SELECT MAX(p2.effectiveDate) FROM PsEffectiveDatedPersonalData p2 "
 							+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
-								+ "AND p2.effectiveDate <= :effectiveDate) "
+							+ "AND p2.effectiveDate <= :effectiveDate) "
 					, PsEffectiveDatedPersonalData.class)
 					.setParameter("employeeId", employeeId.trim().toUpperCase())
 					.setParameter("effectiveDate", effectiveDate, TemporalType.DATE)

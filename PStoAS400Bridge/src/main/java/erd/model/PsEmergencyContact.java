@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import erd.DateUtil;
+import erd.ErdUtil;
 
 /**
  * The persistent class for the PS_EMERGENCY_CNTCT database table.
@@ -367,7 +367,7 @@ public class PsEmergencyContact implements Serializable {
 	 * @return relationship
 	 */
 	public static String formatRelationship(String relationship) {
-		Date asofToday = DateUtil.asOfToday();
+		Date asofToday = ErdUtil.asOfToday();
 		//BEGIN-PROCEDURE HR05-FORMAT-RELATIONSHIPS
 		//LET $FieldName = 'RELATIONSHIP'
 		//LET $FieldValue = $Relations

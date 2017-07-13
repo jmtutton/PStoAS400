@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 
-import erd.DateUtil;
+import erd.ErdUtil;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -413,7 +413,7 @@ public class PsContractData implements Serializable {
 	 */
 	public static PsContractData findByEmployeeIdAndMaxBeginDate(String employeeId) {
 		System.out.println("PsContractData.findByEmployeeIdAndMaxBeginDate()");
-		Date asofToday = DateUtil.asOfToday();
+		Date asofToday = ErdUtil.asOfToday();
 		//BEGIN-PROCEDURE HR07-GET-CONTRACT-DATA
 		//BEGIN-SELECT
 		//TO_CHAR(CCD7.CONTRACT_BEGIN_DT, 'YYYY-MM-DD')  &CCD7EFFDT

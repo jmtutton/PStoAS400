@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import erd.ErdUtil;
+
 /**
  * Entity implementation class for Entity: HR006P
  * @author John Tutton john@tutton.net
@@ -736,7 +738,7 @@ public class HR006P implements Serializable {
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		HR006P hr036P = resultList.get(0);
 		    	if(hr036P.getEmployeeName() != null && !hr036P.getEmployeeName().isEmpty()) {
-		    		hr036P.setEmployeeName(erd.StringUtil.formatLegacyEmployeeNameToPeopleSoftEmployeeName(hr036P.getEmployeeName()));
+		    		hr036P.setEmployeeName(ErdUtil.formatLegacyEmployeeNameToPeopleSoftEmployeeName(hr036P.getEmployeeName()));
 	    		}
 //		    	LET $LegEmplid = substr($LegEmplid,1,5)
 		    	if(hr036P.getEmployeeId() != null && !hr036P.getEmployeeId().isEmpty()) {

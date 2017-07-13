@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import erd.ErdUtil;
 import erd.model.CrossReferenceTerminationReason;
 import erd.model.PsActionReason;
 import erd.model.PsJob;
@@ -51,7 +52,7 @@ public class EmployeeTermination {
 	private static HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		logger.debug("*** EmployeeTermination.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ102A");
-		Date effectiveTerminationDate = erd.DateUtil.addDays((Date)parameterMap.get("effectiveDate"), 1);
+		Date effectiveTerminationDate = ErdUtil.addDays((Date)parameterMap.get("effectiveDate"), 1);
 		parameterMap.put("employeeId", Main.fetchLegacyEmployeeId(parameterMap));
 		PsJob psJob = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence(
 				(String)parameterMap.get("employeeId"), effectiveTerminationDate, 

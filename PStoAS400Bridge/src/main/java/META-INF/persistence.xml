@@ -50,13 +50,11 @@
         <class>erd.model.PsPersonalNationalId</class>
         <class>erd.model.PsPersonalPhone</class>
         <class>erd.model.PszVariable</class>
-        <class>erd.model.PsXlatItem</class>
         <class>erd.model.PszPoiTermination</class>
         <class>erd.model.PszTriggerEmployee</class>
         <class>erd.model.PszTriggerHistory</class>
         <class>erd.model.PszTriggerNonPerson</class>
         <class>erd.model.PszTriggerSuperclass</class>
-        <class>erd.model.PszXlat</class>
         <class>erd.model.TempMast</class>
         <shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode>
 		<properties>

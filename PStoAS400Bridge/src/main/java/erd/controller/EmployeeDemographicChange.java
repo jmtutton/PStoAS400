@@ -11,14 +11,12 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import erd.DateUtil;
-import erd.StringUtil;
+import erd.ErdUtil;
 import erd.model.CrossReferenceCompany;
 import erd.model.CrossReferenceEmployeeId;
 import erd.model.CrossReferenceEthnicGroup;
 import erd.model.CrossReferencePt12p;
 import erd.model.CrossReferenceReferralSource;
-import erd.model.PsAddress;
 import erd.model.PsCountry;
 import erd.model.PsDiversityEthnicity;
 import erd.model.PsDriversLicense;
@@ -40,7 +38,7 @@ import erd.model.PsReferralSource;
  * @see ZHRI105A.SQC
  * @author John Tutton john@tutton.net
  */
-public class EmployeeDemographicChange {
+public class EmployeeDemographicChange extends Employee {
     private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	/**
@@ -99,7 +97,7 @@ public class EmployeeDemographicChange {
 		parameterMap = fetchDriversLicenseData(parameterMap);
 		parameterMap = fetchEmergencyContactData(parameterMap);
 		parameterMap = fetchNameData(parameterMap);
-		parameterMap.put("changeDate", new SimpleDateFormat("yyyyMMdd").format(DateUtil.asOfToday()).toUpperCase());
+		parameterMap.put("changeDate", new SimpleDateFormat("yyyyMMdd").format(ErdUtil.asOfToday()).toUpperCase());
 		parameterMap.put("nationalId", PsPersonalNationalId.findNationalIdByEmployeeIdAndCountry((String)parameterMap.get("employeeId"), (String)parameterMap.get("region")));
 		parameterMap.put("homePhone", PsPersonalPhone.findPhoneByEmployeeIdAndPhoneType((String)parameterMap.get("employeeId"), "MAIN"));
 		parameterMap.put("businessPhone", PsPersonalPhone.findPhoneByEmployeeIdAndPhoneType((String)parameterMap.get("employeeId"), "BUSN"));
@@ -193,30 +191,30 @@ public class EmployeeDemographicChange {
 		return parameterMap;
 	}
 	
-	/**
-	 * This routine will get the address info for the employee number.
-	 * @see HR05-Get-Info in ZHRI105A.SQC
-	 * @param parameterMap
-	 * @return parameterMap
-	 */
-	private static HashMap<String, Object> fetchAddressData(HashMap<String, Object> parameterMap) {
-		PsAddress psAddress = PsAddress.findHomeByEmployeeIdAndEffectiveDate((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"));
-		if(psAddress != null) {
-			if(psAddress.getAddress1() != null) {
-				parameterMap.put("address", psAddress.getAddress1().trim().toUpperCase().replaceAll("'", "''"));
-			}
-			if(psAddress.getCity() != null) {
-				parameterMap.put("city", psAddress.getCity().trim().toUpperCase().replaceAll("'", "''"));
-			}
-			if(psAddress.getState() != null) {
-				parameterMap.put("state", psAddress.getState().trim().toUpperCase());
-			}
-			if(psAddress.getPostal() != null) {
-				parameterMap.put("postalCode", psAddress.getPostal().trim());
-			}
-		}
-		return parameterMap;
-	}
+//	/**
+//	 * This routine will get the address info for the employee number.
+//	 * @see HR05-Get-Info in ZHRI105A.SQC
+//	 * @param parameterMap
+//	 * @return parameterMap
+//	 */
+//	private static HashMap<String, Object> fetchAddressData(HashMap<String, Object> parameterMap) {
+//		PsAddress psAddress = PsAddress.findHomeByEmployeeIdAndEffectiveDate((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"));
+//		if(psAddress != null) {
+//			if(psAddress.getAddress1() != null) {
+//				parameterMap.put("address", psAddress.getAddress1().trim().toUpperCase().replaceAll("'", "''"));
+//			}
+//			if(psAddress.getCity() != null) {
+//				parameterMap.put("city", psAddress.getCity().trim().toUpperCase().replaceAll("'", "''"));
+//			}
+//			if(psAddress.getState() != null) {
+//				parameterMap.put("state", psAddress.getState().trim().toUpperCase());
+//			}
+//			if(psAddress.getPostal() != null) {
+//				parameterMap.put("postalCode", psAddress.getPostal().trim());
+//			}
+//		}
+//		return parameterMap;
+//	}
 	
 	/**
 	 * This routine will get the name info for the employee number.
@@ -224,10 +222,10 @@ public class EmployeeDemographicChange {
 	 * @param parameterMap
 	 * @return parameterMap
 	 */
-	private static HashMap<String, Object> fetchNameData(HashMap<String, Object> parameterMap) {
+	public static HashMap<String, Object> fetchNameData(HashMap<String, Object> parameterMap) {
 		PsName psName = PsName.findByEmployeeIdAndNameTypeAndEffectiveDate((String)parameterMap.get("employeeId"), "PRI", (Date)parameterMap.get("effectiveDate"));
 		if(psName != null) {
-		    String name = StringUtil.formatPeopleSoftEmployeeNameToLegacyEmployeeName(psName.getFirstName(), psName.getMiddleName(), psName.getLastName(), psName.getNameSuffix());
+		    String name = ErdUtil.formatPeopleSoftEmployeeNameToLegacyEmployeeName(psName.getFirstName(), psName.getMiddleName(), psName.getLastName(), psName.getNameSuffix());
 			if(name != null) {
 				parameterMap.put("name", name.trim().toUpperCase().replaceAll("'", "''"));
 			}
@@ -301,12 +299,7 @@ public class EmployeeDemographicChange {
 			String recruitmentSourceId  = psRecruitmentSource.getSourceDescription();
 			if(recruitmentSourceId != null) {
 				recruitmentSourceId = recruitmentSourceId.trim();
-				if(recruitmentSourceId.length() > 35) {
-					recruitmentSourceId = recruitmentSourceId.substring(0, 35);
-				}
-				else if(recruitmentSourceId.length() < 35) {
-					recruitmentSourceId = String.format("%1$-35s", recruitmentSourceId);
-				}
+				recruitmentSourceId = String.format("%1$-35s", recruitmentSourceId);
 			}
 			parameterMap.put("recruitmentSourceId", recruitmentSourceId);
 			//END-PROCEDURE HR05-FORMAT-REFERRAL-SOURCE
@@ -377,7 +370,7 @@ public class EmployeeDemographicChange {
 	 * @param parameterMap
 	 * @return parameterMap
 	 */
-	private static HashMap<String, Object> fetchPersonalData (HashMap<String, Object> parameterMap) {
+	public static HashMap<String, Object> fetchPersonalData (HashMap<String, Object> parameterMap) {
 		//BEGIN-PROCEDURE HR05-GET-PERSONAL-DATA
 		PsPersonalData psPersonalData = PsPersonalData.findByOriginalHireEmployeeId((String)parameterMap.get("employeeId"));
 		if(psPersonalData != null) {
@@ -425,7 +418,7 @@ public class EmployeeDemographicChange {
 	 * @param parameterMap
 	 * @return
 	 */
-	private static HashMap<String, Object> fetchJobData(HashMap<String, Object> parameterMap) {
+	public static HashMap<String, Object> fetchJobData(HashMap<String, Object> parameterMap) {
 		PsJob psJob = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"), (BigInteger)parameterMap.get("effectiveSequence"));
 		if(psJob != null) {
 			parameterMap.put("PSDate", psJob.getLocation());

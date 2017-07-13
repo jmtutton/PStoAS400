@@ -63,7 +63,7 @@ public class CrossReferenceEmployeeId implements Serializable {
 	 */
 	public static String findLegacyEmployeeIdByEmployeeId(String employeeId) {
 		logger.debug("*** CrossReferenceEmployeeId.()");
-		//ZHRF_LEG_EMPL_ID
+		//SELECT ZHRF_LEG_EMPL_ID
 		//FROM PS_ZHRT_EMPID_CREF
 		//WHERE RPOD.Emplid = $Wrk_Emplid         
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");

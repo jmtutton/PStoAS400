@@ -345,6 +345,7 @@ public class PsName implements Serializable {
 	 * @see HR01-Get-Personal-Data in ZHRI101A.SQC
 	 * @see HR05-Get-Names-Table in ZHRI105A.SQC
 	 * @see HR05-Get-Info in ZHRI105A.SQC
+	 * @see HR201-Get-Personal-Data
 	 * @param employeeId
 	 * @param nameType
 	 * @param effectiveDate
@@ -353,13 +354,13 @@ public class PsName implements Serializable {
 	public static PsName findByEmployeeIdAndNameTypeAndEffectiveDate(String employeeId, String nameType, Date effectiveDate) {
 		//SELECT
 		//FROM PS_Names P
-		//WHERE P.Emplid = $PSEmplId
+		//WHERE P.Emplid = $PsEmplId
 		//AND P.NAME_TYPE = 'PRF'
 		//AND P.EFFDT = 
 				//(SELECT MAX(EFFDT) FROM PS_Names P2
 				//WHERE P2.EMPLID = P.EMPLID
 				//AND P2.NAME_TYPE = P.NAME_TYPE
-				//AND TO_CHAR(P2.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
+				//AND TO_CHAR(P2.EFFDT,'YYYY-MM-DD') <= $PsEffDt)
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		try {
