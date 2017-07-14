@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 
-import erd.ErdUtil;
+import erd.ErdUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * The persistent class for the PS_CONTRACT_DATA database table.
+ * Employment Contract Details
  * @author	John Tutton john@tutton.net
  */
 @Entity
@@ -413,35 +414,27 @@ public class PsContractData implements Serializable {
 	 */
 	public static PsContractData findByEmployeeIdAndMaxBeginDate(String employeeId) {
 		System.out.println("PsContractData.findByEmployeeIdAndMaxBeginDate()");
-		Date asofToday = ErdUtil.asOfToday();
-		//BEGIN-PROCEDURE HR07-GET-CONTRACT-DATA
-		//BEGIN-SELECT
-		//TO_CHAR(CCD7.CONTRACT_BEGIN_DT, 'YYYY-MM-DD')  &CCD7EFFDT
-		//LET $LegContractDate = &CCD7EFFDT
-		//!Format contract date so legacy will accept it (MM field, DD field and CCYY field)
-		//UNSTRING $LegContractDate BY '-' INTO $LegContractDtYear $LegContractDtMonth $LegContractDtDay
-		//!select the maximum contract date to get the most current one because an employee can have more than 1 active contract
-		//FROM PS_CONTRACT_DATA CCD7
-		//WHERE CCD7.Emplid = $PSEmplid
-		//		AND CCD7.CONTRACT_BEGIN_DT = 
-		//			(SELECT MAX(CONTRACT_BEGIN_DT) 
-		//				FROM PS_CONTRACT_DATA CCD8
-		//				WHERE CCD8.EMPLID = CCD7.EMPLID
-		//					AND CCD8.CONTRACT_BEGIN_DT <= $AsofToday)
-		//END-SELECT
-		//END-PROCEDURE HR07-GET-CONTRACT-DATA
+		Date asofToday = ErdUtils.asOfToday();
+		//SELECT FROM PS_CONTRACT_DATA CCD7
+		//WHERE CCD7.EMPLID = $PSEmplid
+		//AND CCD7.CONTRACT_BEGIN_DT = 
+				//(SELECT MAX(CONTRACT_BEGIN_DT) 
+				//FROM PS_CONTRACT_DATA CCD8
+				//WHERE CCD8.EMPLID = CCD7.EMPLID
+				//AND CCD8.CONTRACT_BEGIN_DT <= $AsofToday)
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<PsContractData> resultList = (List<PsContractData>) em.createQuery("SELECT p FROM PsContractData p "
-    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    	List<PsContractData> resultList = (List<PsContractData>) em.createQuery(
+	    			"SELECT p FROM PsContractData p "
+    				+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
     				+ "AND p.contractBeginDate = "
-    				+ 		"(SELECT MAX(p2.contractBeginDate) "
-    				+ 			"FROM PsContractData p2 "
-	            	+ 			"WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
-	            	+ 				"AND p2.contractBeginDate <= :asofToday)"
+    						+ "(SELECT MAX(p2.contractBeginDate) "
+    						+ "FROM PsContractData p2 "
+    						+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
+    						+ "AND p2.contractBeginDate <= :asofToday)"
 	             	, PsContractData.class)
-    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+    		    .setParameter("employeeId", employeeId)
     		    .setParameter("asofToday", asofToday, TemporalType.DATE)
     		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {

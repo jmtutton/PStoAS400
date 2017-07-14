@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * The persistent class for the PS_DRIVERS_LIC database table.
+ * Employee Driver’s License Information
  * @author	John Tutton john@tutton.net
  */
 @Entity
@@ -161,25 +162,15 @@ public class PsDriversLicense implements Serializable {
 	 * @return PsDriversLicense record
 	 */
 	public static PsDriversLicense findByEmployeeId(String employeeId) {
-		//BEGIN-PROCEDURE HR05-GET-DRIVERS-LIC
-		//BEGIN-SELECT
-		//CDL.DRIVERS_LIC_NBR
-		//CDL.STATE
-		//LET $PSDRIVER_LIC = RTRIM(LTRIM(&CDL.DRIVERS_LIC_NBR, ' '), ' ')
-		//DO REPLACE-CHARACTER($PSDriver_Lic, '''', '''''', $PSDriver_Lic)    !From ZRmvSpcChr.sqc
-		//LET $PSDLState = &CDL.State
-		//UPPERCASE $PSDLState
-		//FROM PS_Drivers_Lic CDL
-		//WHERE CDL.Emplid = $PSEmplid
-		//END-SELECT
-		//END-PROCEDURE HR05-GET-DRIVERS-LIC
+		//SELECT FROM PS_DRIVERS_LIC CDL
+		//WHERE CDL.EMPLID = $PSEmplid
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PsDriversLicense> resultList = em.createQuery(
 	    		    "SELECT p FROM PsDriversLicense p "
-	    		    		+ "WHERE TRIM(UPPER(p.employeeId)) = :employeeId ", PsDriversLicense.class)
-	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    		+ "WHERE TRIM(UPPER(p.employeeId)) = UPPER(TRIM(:employeeId)) ", PsDriversLicense.class)
+	    		    .setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList.get(0);

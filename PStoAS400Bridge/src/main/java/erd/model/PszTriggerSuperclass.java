@@ -209,9 +209,9 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	    	transaction.begin();
 	    	numberOfRecordsUpdated = em.createQuery(
 	    			"UPDATE " + triggerTypeClassName + " p "
-	    		    		+ "SET p.completionStatus = :completionStatus "
+	    		    		+ "SET p.completionStatus = UPPER(TRIM(:completionStatus)) "
 	    		    		+ "WHERE p.sequenceNumber = :sequenceNumber")
-	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
+	    		    .setParameter("completionStatus", completionStatus)
 	    		    .setParameter("sequenceNumber", sequenceNumber)
 	    		    .executeUpdate();
 	    	transaction.commit();
@@ -240,10 +240,10 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	    try {
 	    	return em.createQuery(
 	    		    "SELECT p FROM PszTriggerSuperclass p "
-	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
+	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = TRIM(UPPER(:completionStatus)) "
 	    		    		+ "ORDER BY p.sequenceNumber ASC "
 	    		    , PszTriggerSuperclass.class)
-	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
+	    		    .setParameter("completionStatus", completionStatus)
 	    		    .getResultList();
 	    }
 	    catch (Exception e) {
@@ -268,13 +268,13 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	    try {
 	    	return em.createQuery(
 	    		    "SELECT p FROM PszTriggerSuperclass p "
-	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = :completionStatus "
-	    		    		+ "AND TRIM(UPPER(p.processName)) = :processName "
+	    		    		+ "WHERE TRIM(UPPER(p.completionStatus)) = TRIM(UPPER(:completionStatus)) "
+	    		    		+ "AND TRIM(UPPER(p.processName)) = TRIM(UPPER(:processName)) "
 	    		    		+ "ORDER BY p.sequenceNumber ASC "
 	    		    		+ "LIMIT 150 "
 	    		    , PszTriggerSuperclass.class)
-	    		    .setParameter("completionStatus", completionStatus.toUpperCase().trim())
-	    		    .setParameter("processName", processName.toUpperCase().trim())
+	    		    .setParameter("completionStatus", completionStatus)
+	    		    .setParameter("processName", processName)
 	    		    .getResultList();
 	    }
 	    catch (Exception e) {
@@ -318,13 +318,14 @@ public abstract class PszTriggerSuperclass implements Serializable {
 	 * @param trigger
 	 * @return
 	 */
-	public static void update(PszTriggerSuperclass trigger) {
+	public void update() {
 		logger.debug("update()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	em.getTransaction().begin();
-	    	em.merge(trigger);
+	    	em.merge(this);
+	    	em.flush();
 	    	em.getTransaction().commit();
 	    }
 	    catch (Exception e) {

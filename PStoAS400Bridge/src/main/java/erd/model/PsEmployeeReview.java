@@ -269,22 +269,20 @@ public class PsEmployeeReview implements Serializable {
 	 * @return
 	 */
 	public static PsEmployeeReview findByEmployeeIdAndEffectiveDateAndEmploymentRecordNumber(String employeeId, Date effectiveDate, BigInteger employmentRecordNumber) {
-		//BEGIN-SELECT
-		//FROM PS_Employee_Review CER7
-		//WHERE CER7.EmplId = $PSEMPLID
-		//		AND CER7.EMPL_RCD = 0
-		//		AND TO_CHAR(CER7.EFFDT, 'YYYY-MM-DD') = $PSEFFDT
-		//END-SELECT
+		//SELECT FROM PS_EMPLOYEE_REVIEW CER7
+		//WHERE CER7.EMPLID = $PSEMPLID
+		//AND CER7.EMPL_RCD = 0
+		//AND TO_CHAR(CER7.EFFDT, 'YYYY-MM-DD') = $PSEFFDT
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PsEmployeeReview> resultList = em.createQuery(
 	    			"SELECT p FROM PsEmployeeReview p "
-	    					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    					+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    					+ "AND employmentRecordNumber = :employmentRecordNumber "
 	    					+ "AND effectiveDate = :effectiveDate "
-	    					, PsEmployeeReview.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    			, PsEmployeeReview.class)
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .setParameter("employmentRecordNumber", employmentRecordNumber)
 	    		    .getResultList();

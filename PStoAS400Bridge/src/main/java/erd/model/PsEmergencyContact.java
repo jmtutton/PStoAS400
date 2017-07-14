@@ -1,15 +1,13 @@
 package erd.model;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
 
-import erd.ErdUtil;
-
 /**
  * The persistent class for the PS_EMERGENCY_CNTCT database table.
+ * Employee Emergency Contacts
  * @author	John Tutton john@tutton.net
  */
 @Entity
@@ -334,18 +332,18 @@ public class PsEmergencyContact implements Serializable {
 	 * This routine gets the emergency contact information from the PS_EMERGENCY_CNTCT table and converts it to the legacy system format.
 	 * @see HR05-Get-Emergency-Cntct in ZHRI105A.SQC
 	 * @param employeeId
-	 * @return PsEmergencyContact record
+	 * @return PsEmergencyContact
 	 */
-	public static PsEmergencyContact findByEmployeeIdAndPrimaryContact(String employeeId) {
+	public static PsEmergencyContact findPrimaryByEmployeeId(String employeeId) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PsEmergencyContact> resultList = em.createQuery(
-	    			"SELECT PsEmergencyContact FROM PsEmergencyContact c "
-	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
-	    					+ "AND UPPER(TRIM(isPrimaryContact)) = 'Y' "
+	    			"SELECT p FROM PsEmergencyContact p "
+	    					+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
+	    					+ "AND UPPER(TRIM(p.isPrimaryContact)) = 'Y' "
 	    					, PsEmergencyContact.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList.get(0);
@@ -358,30 +356,6 @@ public class PsEmergencyContact implements Serializable {
 	    	em.close();
 	    }
 	    return null;	
-	}
-	
-	/**
-	 * This procedure converts the PeopleSoft relationship codes to legacy system relationship descriptions.
-	 * @see HR05-Format-Relationships in ZHRI105A.SQC
-	 * @param relationship
-	 * @return relationship
-	 */
-	public static String formatRelationship(String relationship) {
-		Date asofToday = ErdUtil.asOfToday();
-		//BEGIN-PROCEDURE HR05-FORMAT-RELATIONSHIPS
-		//LET $FieldName = 'RELATIONSHIP'
-		//LET $FieldValue = $Relations
-		//LET $AsOfDate = $AsOfToday
-		//DO Read-Translate-Table  !From ZREADXLT.SQC
-		PsTranslationItem psXlatItem = PsTranslationItem.findByFieldNameAndFieldValueAndEffectiveDate("RELATIONSHIP", relationship, asofToday);
-		relationship = psXlatItem.getXlatLongName();
-		//LET $PSRelation = SUBSTR($XlatLongName, 1, 20)
-		//UPPERCASE $PSRelation
-		if(relationship != null && relationship.length() > 20) {
-			relationship = relationship.substring(0, 20).toUpperCase();
-		}
-		//END-PROCEDURE HR05-FORMAT-RELATIONSHIPS
-		return relationship;
 	}
 
 }

@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * The persistent class for the PS_EMPL_CHECKLIST database table.
+ * Employee Assignment Checklist
  * @author	John Tutton john@tutton.net
  */
 @Entity
@@ -95,21 +96,19 @@ public class PsEmployeeChecklist implements Serializable {
 	 * @return responsibleId
 	 */
 	public static String findByEmployeeIdAndChecklistDate(String employeeId, Date checklistDate) {
-		//BEGIN-SELECT
-		//CECT.Responsible_Id
+		//SELECT CECT.Responsible_Id
 		//FROM PS_Empl_Checklist CECT
 		//WHERE CECT.Emplid = $PSEmplid
 		//AND TO_CHAR(CECT.Checklist_Dt,'YYYY-MM-DD') = $PSEffdt
-		//END-SELECT
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<String> resultList = em.createQuery(
 	    			"SELECT UPPER(TRIM(c.responsibleId)) FROM PsEmployeeChecklist c "
-	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    					+ "AND checklistDate = :checklistDate "
 	    					, String.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("checklistDate", checklistDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {

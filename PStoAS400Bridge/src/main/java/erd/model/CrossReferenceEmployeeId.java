@@ -71,8 +71,9 @@ public class CrossReferenceEmployeeId implements Serializable {
 	    try {
 	    	List<String> resultList = em.createQuery(
 	    			"SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceEmployeeId c "
-	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId ", String.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
+	    					, String.class)
+	    		    .setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList.get(0);
@@ -85,20 +86,22 @@ public class CrossReferenceEmployeeId implements Serializable {
 	}
 
 	/**
-	 * This routine will insert a row into the PS_ZHRT_EMPID_CREF table for the employee if the employee has a record in HR006P
 	 * @see Insert-OprId procedure in ZHRI100A.SQR
 	 * @param employeeId
 	 * @param legacyEmployeeId
 	 */
-	public static void ZHRI100A_insertOprId(String employeeId, String legacyEmployeeId) {
+	public static void insert(String employeeId, String legacyEmployeeId) {
 		logger.debug("*** CrossReferenceEmployeeId.()");
 		//INSERT INTO PS_ZHRT_EMPID_CREF (EMPLID, ZHRF_LEG_EMPL_ID) VALUES ($Wrk_Emplid, $LegEmplId)
+		employeeId = employeeId != null ? employeeId.trim().toUpperCase() : employeeId;
+		legacyEmployeeId = legacyEmployeeId != null ? legacyEmployeeId.trim().toUpperCase() : legacyEmployeeId;
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	CrossReferenceEmployeeId xrefEmployeeId = new CrossReferenceEmployeeId(employeeId, legacyEmployeeId);
 	    	em.getTransaction().begin();
 	    	em.persist(xrefEmployeeId);
+	    	em.flush();
 	    	em.getTransaction().commit();	   
 	    }
 	    catch (Exception e) {

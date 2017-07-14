@@ -8,6 +8,7 @@ import javax.persistence.*;
 
 /**
  * The persistent class for the PS_CITIZENSHIP database table.
+ * Employee/Dependent Citizenship
  * @author	John Tutton john@tutton.net
  */
 @Entity
@@ -90,25 +91,6 @@ public class PsCitizenship implements Serializable {
 		this.workerTypeSgp = workerTypeSgp;
 	}
 	
-	public static PsCitizenship HR05GetCitizenship(String employeeId, String countryCode) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR05-Get-Citizenship
-//		! Desc:  This routine gets the countryIsoAlpha3Code of citizenship for each employee
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR05-Get-Citizenship
-//		begin-select
-//		CC.Country
-//		CCT.COUNTRY_2CHAR
-//		   Let $PSCOUNTRY = &CCT.COUNTRY_2CHAR
-//		FROM PS_Citizenship CC,
-//		     PS_COUNTRY_TBL CCT
-//		where CC.Emplid = $PSEmplid
-//		and   CCT.COUNTRY = CC.COUNTRY
-//		end-select
-//		End-Procedure HR05-Get-Citizenship
-	    return null;	
-	}
-	
 	/**
 	 * Replaces SQC procedure HR05-Get-Citizenship from ZHRI105A.SQC
 	 * This procedure retrieves a record from the Citizenship table 
@@ -125,12 +107,12 @@ public class PsCitizenship implements Serializable {
 	    try {
 	    	List<PsCitizenship> resultList = (List<PsCitizenship>) em.createQuery("SELECT p, (p.countryIsoAlpha2Code = p2.countryIsoAlpha2Code) "
 	    				+ "FROM PsCitizenship p, PsCountry p2 "
-	    				+ "WHERE UPPER(TRIM(p.employeeId = :employeeId)) "
-	    				+ "AND UPPER(TRIM(p.countryIsoAlpha3Code)) = :countryCode "
-	    				+ "AND UPPER(TRIM(p2.countryIsoAlpha3Code)) = :countryCode "
+	    				+ "WHERE UPPER(TRIM(p.employeeId = UPPER(TRIM(:employeeId)) "
+	    				+ "AND UPPER(TRIM(p.countryIsoAlpha3Code)) = UPPER(TRIM(:countryCode)) "
+	    				+ "AND UPPER(TRIM(p2.countryIsoAlpha3Code)) = UPPER(TRIM(:countryCode)) "
 	    				, PsCitizenship.class)
-	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
-	    		    .setParameter("countryCode", countryCode.trim().toUpperCase())
+	    		    .setParameter("employeeId", employeeId)
+	    		    .setParameter("countryCode", countryCode)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
@@ -162,14 +144,14 @@ public class PsCitizenship implements Serializable {
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<String> resultList = (List<String>) em.createQuery(
-	    			"SELECT p.countryIsoAlpha2Code "
+	    			"SELECT UPPER(TRIM(p.countryIsoAlpha2Code)) "
 	    				+ "FROM PsCitizenship p, PsCountry p2 "
-	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-	    				+ "AND UPPER(TRIM(p.countryIsoAlpha3Code)) = :countryCode "
-	    				+ "AND UPPER(TRIM(p2.countryIsoAlpha3Code)) = :countryCode "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
+	    				+ "AND UPPER(TRIM(p.countryIsoAlpha3Code)) = UPPER(TRIM(:countryCode)) "
+	    				+ "AND UPPER(TRIM(p2.countryIsoAlpha3Code)) = UPPER(TRIM(:countryCode)) "
 	    				, String.class)
-	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
-	    		    .setParameter("countryCode", countryCode.trim().toUpperCase())
+	    		    .setParameter("employeeId", employeeId)
+	    		    .setParameter("countryCode", countryCode)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);

@@ -3,7 +3,7 @@ package erd.model;
 import java.io.Serializable;
 import javax.persistence.*;
 
-import erd.ErdUtil;
+import erd.ErdUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -698,52 +698,43 @@ public class PsAccomplishment implements Serializable {
 	/**
 	 * Replaces SQC procedure HR07-Get-Accomplishments in ZHRI107A.SQC
 	 * This procedure retrieves the PsAccomplishment record for the Negative Drug Test or Physical Test, 
-	 * with matching employeeId and the latest dateIssued value up to today, from the PeopleSoft Accomplishments Table 
-	 * to send back to Option 7 of AAHR01.
+	 * with matching employeeId and the latest dateIssued value up to today.
+	 * Selects the maximum issue date in order to get the most current physical/drug test date because an 
+	 * employee could have multiple rows.
 	 * @param employeeId
 	 * @param accomplishmentCodeList
-	 * @return
+	 * @return PsAccomplishment
 	 */
 	public static PsAccomplishment findByEmployeeIdAndAccomplishmentCodes(String employeeId, List<String> accomplishmentCodeList) {
 		System.out.println("PsAccomplishment.findByEmployeeIdAndAccomplishmentCodes()");
-		Date asofToday = ErdUtil.asOfToday();
-		//BEGIN-PROCEDURE HR07-GET-ACCOMPLISHMENTS
-		//BEGIN-SELECT
-		//!select the maximum issue date in order to get the most current physical/drug test date because an employee could have multiple rows
-		//FROM PS_ACCOMPLISHMENTS CA7
-		//WHERE CA7.EMPLID = $PSEMPLID
-		//		AND CA7.ACCOMPLISHMENT IN ('DRUGTST', 'PHYS L3', 'PHYS L4')
-		//    	AND CA7.DT_ISSUED = 
-		//			(SELECT MAX(CA72.DT_ISSUED)
-		//        		FROM PS_ACCOMPLISHMENTS CA72
-		//        		WHERE CA72.EMPLID = CA7.EMPLID
-		//            		AND CA72.ACCOMPLISHMENT = CA7.ACCOMPLISHMENT
-		//              	AND CA72.DT_ISSUED <= $AsofToday)
-		//END-SELECT
-		//END-PROCEDURE HR07-GET-ACCOMPLISHMENTS
-		String accomplishmentCodeListCsv = "";
-		//concatenate list of accomplishment codes into comma separated values 
-		for(String accomplishmentCode : accomplishmentCodeList) {
-			accomplishmentCodeListCsv += "'" + accomplishmentCode.toUpperCase().trim() + "'" + ",";
-		}
-		if (accomplishmentCodeListCsv != null && accomplishmentCodeListCsv.endsWith(",")) {
-			//remove last comma
-			accomplishmentCodeListCsv = accomplishmentCodeListCsv.substring(0, accomplishmentCodeListCsv.length() - 1);
-		}
+		Date asofToday = ErdUtils.asOfToday();
+		//SELECT FROM PS_ACCOMPLISHMENTS CA7
+		//WHERE CA7.EMPLID = $EmplId
+		//AND CA7.ACCOMPLISHMENT IN ('DRUGTST', 'PHYS L3', 'PHYS L4')
+		//AND CA7.DT_ISSUED = 
+				//(SELECT MAX(CA72.DT_ISSUED)
+				//FROM PS_ACCOMPLISHMENTS CA72
+				//WHERE CA72.EMPLID = CA7.EMPLID
+				//AND CA72.ACCOMPLISHMENT = CA7.ACCOMPLISHMENT
+				//AND CA72.DT_ISSUED <= $AsofToday)
+		//concatenate list of accomplishment codes into uppercase comma separated values
+		accomplishmentCodeList.replaceAll(String::toUpperCase);
+		String csvCodeList = "'" + String.join("','", accomplishmentCodeList) + "'";
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<PsAccomplishment> resultList = (List<PsAccomplishment>) em.createQuery("SELECT p FROM PsAccomplishment p "
-    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-    				+ "AND UPPER(TRIM(p.accomplishmentCode)) IN (" + accomplishmentCodeListCsv + ") "
+	    	List<PsAccomplishment> resultList = (List<PsAccomplishment>) em.createQuery(
+	    			"SELECT p FROM PsAccomplishment p "
+    				+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
+    				+ "AND UPPER(TRIM(p.accomplishmentCode)) IN (" + csvCodeList + ") "
     				+ "AND p.dateIssued = "
-    				+ 		"(SELECT MAX(p2.dateIssued) "
-    				+ 			"FROM PsAccomplishment p2 "
-	            	+ 			"WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
-	             	+ 				"AND UPPER(TRIM(p2.accomplishmentCode)) = UPPER(TRIM(p.accomplishmentCode)) "
-	            	+ 				"AND p2.dateIssued <= :asofToday)"
+    						+ "(SELECT MAX(p2.dateIssued) "
+    						+ "FROM PsAccomplishment p2 "
+    						+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
+    						+ "AND UPPER(TRIM(p2.accomplishmentCode)) = UPPER(TRIM(p.accomplishmentCode)) "
+    						+ "AND p2.dateIssued <= :asofToday)"
 	             	, PsAccomplishment.class)
-    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+    		    .setParameter("employeeId", employeeId)
     		    .setParameter("asofToday", asofToday, TemporalType.DATE)
     		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {

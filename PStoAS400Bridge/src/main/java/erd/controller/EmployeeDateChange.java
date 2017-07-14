@@ -2,7 +2,6 @@ package erd.controller;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +10,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import erd.ErdUtils;
+import erd.ErdUtils.SplitDate;
 import erd.model.PsAccomplishment;
 import erd.model.PsContractData;
 import erd.model.PsEmployeeReview;
@@ -50,12 +51,8 @@ public class EmployeeDateChange {
 		parameterMap.put("parameterNameList", getParameterNameList());
 		parameterMap = initializeParameters(parameterMap);
 		parameterMap.put("employeeId", Main.fetchLegacyEmployeeId(parameterMap));
-		if(parameterMap.get("operatorId") != null && ((String)parameterMap.get("operatorId")).startsWith("E")) {
-			//remove leading 'E' from the PS employee operator ID to comply with the 5 long legacy format
-			parameterMap.put("operatorId", ((String)parameterMap.get("operatorId")).substring(1).trim().toUpperCase());
-		}
 		parameterMap = fetchEmployeeReviewDates(parameterMap);
-		parameterMap = fetchAccomplishmentDates(parameterMap);
+		parameterMap = fetchAccomplishmentDate(parameterMap);
 		parameterMap = fetchContractDate(parameterMap);
 		return parameterMap;
 	}
@@ -106,15 +103,19 @@ public class EmployeeDateChange {
 				PsEmployeeReview.findByEmployeeIdAndEffectiveDateAndEmploymentRecordNumber(
 						(String)parameterMap.get("employeeId"), 
 						(Date)parameterMap.get("effectiveDate"), new BigInteger("0"));
-		if(psEmployeeReview.getNextReviewDt() != null) {
-			parameterMap.put("nextReviewYear", new SimpleDateFormat("yyyy").format(psEmployeeReview.getNextReviewDt()));
-			parameterMap.put("nextReviewMonth", new SimpleDateFormat("mm").format(psEmployeeReview.getNextReviewDt()));
-			parameterMap.put("nextReviewDay", new SimpleDateFormat("dd").format(psEmployeeReview.getNextReviewDt()));
-		}
-		if(psEmployeeReview.getEffectiveDate() != null) {
-			parameterMap.put("lastReviewYear", new SimpleDateFormat("yyyy").format(psEmployeeReview.getEffectiveDate()));
-			parameterMap.put("lastReviewMonth", new SimpleDateFormat("mm").format(psEmployeeReview.getEffectiveDate()));
-			parameterMap.put("lastReviewDay", new SimpleDateFormat("dd").format(psEmployeeReview.getEffectiveDate()));
+		if(psEmployeeReview != null ) {
+			if(psEmployeeReview.getNextReviewDt() != null) {
+				SplitDate splitDate = new ErdUtils().new SplitDate(psEmployeeReview.getNextReviewDt());
+				parameterMap.put("nextReviewYear", splitDate.getYear());
+				parameterMap.put("nextReviewMonth", splitDate.getMonth());
+				parameterMap.put("nextReviewDay", splitDate.getDay());
+			}
+			if(psEmployeeReview.getEffectiveDate() != null) {
+				SplitDate splitDate = new ErdUtils().new SplitDate(psEmployeeReview.getEffectiveDate());
+				parameterMap.put("lastReviewYear", splitDate.getYear());
+				parameterMap.put("lastReviewMonth", splitDate.getMonth());
+				parameterMap.put("lastReviewDay", splitDate.getDay());
+			}
 		}
 		return parameterMap;
 	}
@@ -126,29 +127,24 @@ public class EmployeeDateChange {
 	 * @param parameterMap
 	 * @return parameterMap
 	 */
-	public HashMap<String, Object> fetchAccomplishmentDates(HashMap<String, Object> parameterMap) {
-		logger.debug("fetchAccomplishmentDates()");
+	public HashMap<String, Object> fetchAccomplishmentDate(HashMap<String, Object> parameterMap) {
+		logger.debug("fetchAccomplishmentDate()");
 		List<String> accomplishmentCodeList = Arrays.asList("DRUGTST", "PHYS L3", "PHYS L4");
 		PsAccomplishment psAccomplishment = PsAccomplishment.findByEmployeeIdAndAccomplishmentCodes((String)parameterMap.get("employeeId"), accomplishmentCodeList);
-		if(psAccomplishment != null) {
-			switch(psAccomplishment.getAccomplishmentCode().trim().toUpperCase()) {
-				case "DRUGTST":
-					if(psAccomplishment.getDateIssued() != null) {
-						parameterMap.put("negDrugTestYear", new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
-						parameterMap.put("negDrugTestMonth", new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
-						parameterMap.put("negDrugTestDay", new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
-					}
-				break;
-				case "PHYS L3":
-				case "PHYS L4":
-					if(psAccomplishment.getDateIssued() != null) {
-						parameterMap.put("physTestYear", new SimpleDateFormat("yyyy").format(psAccomplishment.getDateIssued()));
-						parameterMap.put("physTestMonth", new SimpleDateFormat("mm").format(psAccomplishment.getDateIssued()));
-						parameterMap.put("physTestDay", new SimpleDateFormat("dd").format(psAccomplishment.getDateIssued()));
-					}
-				break;
-				default:
-				break;
+		if(psAccomplishment != null && psAccomplishment.getDateIssued() != null) {
+			String accomplishmentCode = psAccomplishment.getAccomplishmentCode();
+			accomplishmentCode = accomplishmentCode != null ? accomplishmentCode.trim() : accomplishmentCode;
+			if("DRUGTST".equalsIgnoreCase(accomplishmentCode)) {
+				SplitDate splitDate = new ErdUtils().new SplitDate(psAccomplishment.getDateIssued());
+				parameterMap.put("negDrugTestYear", splitDate.getYear());
+				parameterMap.put("negDrugTestMonth", splitDate.getMonth());
+				parameterMap.put("negDrugTestDay", splitDate.getDay());
+			}
+			else if("PHYS L3".equalsIgnoreCase(accomplishmentCode) || "PHYS L4".equalsIgnoreCase(accomplishmentCode)) {
+				SplitDate splitDate = new ErdUtils().new SplitDate(psAccomplishment.getDateIssued());
+				parameterMap.put("physTestYear", splitDate.getYear());
+				parameterMap.put("physTestMonth", splitDate.getMonth());
+				parameterMap.put("physTestDay", splitDate.getDay());
 			}
 		}
 		return parameterMap;
@@ -163,10 +159,11 @@ public class EmployeeDateChange {
 	public HashMap<String, Object> fetchContractDate(HashMap<String, Object> parameterMap) {
 		logger.debug("fetchContractDate()");
 		PsContractData psContractData = PsContractData.findByEmployeeIdAndMaxBeginDate((String)parameterMap.get("employeeId"));
-		if(psContractData != null) {
-			parameterMap.put("contractYear", new SimpleDateFormat("yyyy").format(psContractData.getContractBeginDt()));
-			parameterMap.put("contractMonth", new SimpleDateFormat("mm").format(psContractData.getContractBeginDt()));
-			parameterMap.put("contractDay", new SimpleDateFormat("dd").format(psContractData.getContractBeginDt()));
+		if(psContractData != null && psContractData.getContractBeginDt() != null) {
+			SplitDate splitDate = new ErdUtils().new SplitDate(psContractData.getContractBeginDt());
+			parameterMap.put("contractYear", splitDate.getYear());
+			parameterMap.put("contractMonth", splitDate.getMonth());
+			parameterMap.put("contractDay", splitDate.getDay());
 		}
 		return parameterMap;
 	}

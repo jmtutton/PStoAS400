@@ -11,7 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.persistence.config.QueryHints;
 
-import erd.ErdUtil;
+import erd.ErdUtils;
 
 import java.util.Date;
 import java.sql.Timestamp;
@@ -19,6 +19,7 @@ import java.util.List;
 
 /**
  * The persistent class for the PS_JOB database table.
+ * Employee Job History
  * Contains job records along with other data. Effective dated someone's job history will be stored in this table.
  * @author John Tutton john@tutton.net
  */
@@ -34,113 +35,113 @@ public class PsJob implements Serializable {
 	private String employeeId;
 
 	@Column(name="EMPL_RCD", nullable=false, precision=38)
-	private BigInteger employmentRecordNumber;
+	private BigInteger employeeRecordNumber;
 
 	@Column(name="ABSENCE_SYSTEM_CD", nullable=false, length=3)
-	private String absenceSystemCd;
+	private String absenceSystem;
 
 	@Column(name="ACCDNT_CD_FRA", nullable=false, length=1)
-	private String accdntCdFra;
+	private String accidentCode;
 
 	@Column(name="ACCT_CD", nullable=false, length=25)
-	private String acctCd;
+	private String accountCode;
 
 	@Column(name="\"ACTION\"", nullable=false, length=3)
 	private String action;
 
 	@Column(name="ACTION_DT")
 	@Temporal(TemporalType.DATE)
-	private Date actionDt;
+	private Date actionDate;
 
 	@Column(name="ACTION_REASON", nullable=false, length=3)
 	private String actionReason;
 
 	@Column(name="ADDS_TO_FTE_ACTUAL", nullable=false, length=1)
-	private String addsToFteActual;
+	private String addsToFteActualCount;
 
 	@Column(name="ANNL_BENEF_BASE_RT", nullable=false, precision=18, scale=3)
-	private BigDecimal annlBenefBaseRt;
+	private BigDecimal annualBenefitsBaseRate;
 
 	@Column(name="ANNUAL_RT", nullable=false, precision=18, scale=3)
-	private BigDecimal annualRt;
+	private BigDecimal annualRate;
 
 	@Column(name="APPT_TYPE", nullable=false, length=1)
-	private String apptType;
+	private String appointmentType;
 
 	@Column(name="ASGN_END_DT")
 	@Temporal(TemporalType.DATE)
-	private Date asgnEndDt;
+	private Date assignmentEndDate;
 
 	@Column(name="ASGN_START_DT")
 	@Temporal(TemporalType.DATE)
-	private Date asgnStartDt;
+	private Date assignmentStartDate;
 
 	@Column(name="AUTO_END_FLG", nullable=false, length=1)
-	private String autoEndFlg;
+	private String autoEndJob;
 
 	@Column(name="BARG_UNIT", nullable=false, length=4)
-	private String bargUnit;
+	private String bargainingUnit;
 
 	@Column(name="BAS_ACTION", nullable=false, length=3)
-	private String basAction;
+	private String benefitsAdministrationAction;
 
 	@Column(name="BAS_GROUP_ID", nullable=false, length=3)
-	private String basGroupId;
+	private String benefitsAdministrationGroupId;
 
 	@Column(name="BEN_STATUS", nullable=false, length=4)
-	private String benStatus;
+	private String benefitsEmployeeStatus;
 
 	@Column(name="BENEFIT_SYSTEM", nullable=false, length=2)
-	private String benefitSystem;
+	private String benefitsSystem;
 
 	@Column(name="BORDER_WALKER", nullable=false, length=1)
-	private String borderWalker;
+	private String crossBorderWorker;
 
 	@Column(name="BUSINESS_UNIT", nullable=false, length=5)
 	private String businessUnit;
 
 	@Column(name="CHANGE_AMT", nullable=false, precision=18, scale=6)
-	private BigDecimal changeAmt;
+	private BigDecimal changeAmount;
 
 	@Column(name="CHANGE_PCT", nullable=false, precision=6, scale=3)
-	private BigDecimal changePct;
+	private BigDecimal changePercent;
 
 	@Column(name="CLASS_INDC", nullable=false, length=1)
-	private String classIndc;
+	private String classifiedOrUnclassified;
 
 	@Column(name="COBRA_ACTION", nullable=false, length=3)
 	private String cobraAction;
 
 	@Column(name="COMP_FREQUENCY", nullable=false, length=5)
-	private String compFrequency;
+	private String compensationFrequency;
 
 	@Column(name="COMPANY", nullable=false, length=3)
 	private String company;
 
 	@Column(name="COMPRATE", nullable=false, precision=18, scale=6)
-	private BigDecimal comprate;
+	private BigDecimal compensationRate;
 
 	@Column(name="CONTRACT_NUM", nullable=false, length=25)
-	private String contractNum;
+	private String contractNumber;
 
 	@Column(name="CTG_RATE", nullable=false, precision=38)
-	private BigInteger ctgRate;
+	private BigInteger categoryRate;
 
 	@Column(name="CUR_RT_TYPE", nullable=false, length=5)
-	private String curRtType;
+	private String currencyRateType;
 
 	@Column(name="CURRENCY_CD", nullable=false, length=3)
-	private String currencyCd;
+	private String currencyCode;
 
 	@Column(name="CURRENCY_CD1", nullable=false, length=3)
-	private String currencyCd1;
+	private String currencyCode1;
 
 	@Column(name="DAILY_RT", nullable=false, precision=18, scale=3)
-	private BigDecimal dailyRt;
+	private BigDecimal dailyRate;
 
 	@Column(name="DEPT_ENTRY_DT")
 	@Temporal(TemporalType.DATE)
-	private Date deptEntryDt;
+	private Date departmentEntryDate;
 
 	@Column(name="DEPTID", nullable=false, length=10)
 	private String departmentId;
@@ -149,7 +150,7 @@ public class PsJob implements Serializable {
 	private String directlyTipped;
 
 	@Column(name="EARNS_DIST_TYPE", nullable=false, length=1)
-	private String earnsDistType;
+	private String earningsDistributionType;
 
 	@Column(name="EEO_CLASS", nullable=false, length=1)
 	private String eeoClass;
@@ -162,65 +163,65 @@ public class PsJob implements Serializable {
 	private BigInteger effectiveSequence;
 
 	@Column(name="ELIG_CONFIG1", nullable=false, length=10)
-	private String eligConfig1;
+	private String eligibilityConfiguration1;
 
 	@Column(name="ELIG_CONFIG2", nullable=false, length=10)
-	private String eligConfig2;
+	private String eligibilityConfiguration2;
 
 	@Column(name="ELIG_CONFIG3", nullable=false, length=10)
-	private String eligConfig3;
+	private String eligibilityConfiguration3;
 
 	@Column(name="ELIG_CONFIG4", nullable=false, length=10)
-	private String eligConfig4;
+	private String eligibilityConfiguration4;
 
 	@Column(name="ELIG_CONFIG5", nullable=false, length=10)
-	private String eligConfig5;
+	private String eligibilityConfiguration5;
 
 	@Column(name="ELIG_CONFIG6", nullable=false, length=10)
-	private String eligConfig6;
+	private String eligibilityConfiguration6;
 
 	@Column(name="ELIG_CONFIG7", nullable=false, length=10)
-	private String eligConfig7;
+	private String eligibilityConfiguration7;
 
 	@Column(name="ELIG_CONFIG8", nullable=false, length=10)
-	private String eligConfig8;
+	private String eligibilityConfiguration8;
 
 	@Column(name="ELIG_CONFIG9", nullable=false, length=10)
-	private String eligConfig9;
+	private String eligibilityConfiguration9;
 
 	@Column(name="EMPL_CLASS", nullable=false, length=3)
 	private String employeeClass;
 
 	@Column(name="EMPL_CTG", nullable=false, length=6)
-	private String emplCtg;
+	private String employeeCategory;
 
 	@Column(name="EMPL_CTG_L1", nullable=false, length=6)
-	private String emplCtgL1;
+	private String employeeSubcategory;
 
 	@Column(name="EMPL_CTG_L2", nullable=false, length=6)
-	private String emplCtgL2;
+	private String employeeSubcategory2;
 
 	@Column(name="EMPL_STATUS", nullable=false, length=1)
-	private String emplStatus;
+	private String employeeStatus;
 
 	@Column(name="EMPL_TYPE", nullable=false, length=1)
-	private String emplType;
+	private String employeeType;
 
 	@Column(name="ENCUMB_OVERRIDE", nullable=false, length=1)
-	private String encumbOverride;
+	private String encumbranceOverride;
 
 	@Column(name="ENTRY_DATE")
 	@Temporal(TemporalType.DATE)
 	private Date entryDate;
 
 	@Column(name="ESTABID", nullable=false, length=12)
-	private String estabid;
+	private String establishmentId;
 
 	@Column(name="EXEMPT_HOURS_MONTH", nullable=false, precision=38)
-	private BigInteger exemptHoursMonth;
+	private BigInteger exemptedHoursMonth;
 
 	@Column(name="EXEMPT_JOB_LBR", nullable=false, length=1)
-	private String exemptJobLbr;
+	private String exempted;
 
 	@Column(name="EXPECTED_END_DATE")
 	@Temporal(TemporalType.DATE)
@@ -228,10 +229,10 @@ public class PsJob implements Serializable {
 
 	@Column(name="EXPECTED_RETURN_DT")
 	@Temporal(TemporalType.DATE)
-	private Date expectedReturnDt;
+	private Date expectedReturnDate;
 
 	@Column(name="FICA_STATUS_EE", nullable=false, length=1)
-	private String ficaStatusEe;
+	private String ficaStatus;
 
 	@Column(name="FLSA_STATUS", nullable=false, length=1)
 	private String flsaStatus;
@@ -247,61 +248,61 @@ public class PsJob implements Serializable {
 	private String fullOrPartTime;
 
 	@Column(name="FUNCTION_CD", nullable=false, length=2)
-	private String functionCd;
+	private String functionCode;
 
 	@Column(name="GL_PAY_TYPE", nullable=false, length=6)
 	private String glPayType;
 
 	@Column(name="GP_ASOF_DT_EXG_RT", nullable=false, length=1)
-	private String gpAsofDtExgRt;
+	private String useRateAsOf;
 
 	@Column(name="GP_DFLT_CURRTTYP", nullable=false, length=1)
-	private String gpDfltCurrttyp;
+	private String usePayGroupRateType;
 
 	@Column(name="GP_DFLT_ELIG_GRP", nullable=false, length=1)
-	private String gpDfltEligGrp;
+	private String usePayGroupEligibility;
 
 	@Column(name="GP_DFLT_EXRTDT", nullable=false, length=1)
-	private String gpDfltExrtdt;
+	private String usePayGroupAsOfDate;
 
 	@Column(name="GP_ELIG_GRP", nullable=false, length=10)
-	private String gpEligGrp;
+	private String eligibilityGroup;
 
 	@Column(name="GP_PAYGROUP", nullable=false, length=10)
-	private String gpPaygroup;
+	private String gpPayGroup;
 
 	@Column(name="GRADE", nullable=false, length=3)
 	private String grade;
 
 	@Column(name="GRADE_ENTRY_DT")
 	@Temporal(TemporalType.DATE)
-	private Date gradeEntryDt;
+	private Date gradeEntryDate;
 
 	@Column(name="HIRE_DT")
 	@Temporal(TemporalType.DATE)
-	private Date hireDt;
+	private Date hireDate;
 
 	@Column(name="HOLIDAY_SCHEDULE", nullable=false, length=6)
 	private String holidaySchedule;
 
 	@Column(name="HOURLY_RT", nullable=false, precision=18, scale=6)
-	private BigDecimal hourlyRt;
+	private BigDecimal hourlyRate;
 
 	@Column(name="HOURLY_RT_FRA", nullable=false, length=3)
-	private String hourlyRtFra;
+	private String hourlyRateFrance;
 
 	@Column(name="HR_STATUS", nullable=false, length=1)
 	private String hrStatus;
 
 	@Column(name="INTERCTR_WRKS_CNCL", nullable=false, length=1)
-	private String interctrWrksCncl;
+	private String worksCouncilRole;
 
 	@Column(name="JOB_DATA_SRC_CD", nullable=false, length=3)
-	private String jobDataSrcCd;
+	private String jobSorceCode;
 
 	@Column(name="JOB_ENTRY_DT")
 	@Temporal(TemporalType.DATE)
-	private Date jobEntryDt;
+	private Date jobEntryDate;
 
 	@Column(name="JOB_INDICATOR", nullable=false, length=1)
 	private String jobIndicator;
@@ -316,7 +317,7 @@ public class PsJob implements Serializable {
 	private String laborFacilityId;
 
 	@Column(name="LABOR_TYPE_GER", nullable=false, length=1)
-	private String laborTypeGer;
+	private String laborType;
 
 	@Column(name="LAST_DATE_WORKED")
 	@Temporal(TemporalType.DATE)
@@ -324,7 +325,7 @@ public class PsJob implements Serializable {
 
 	@Column(name="LAST_HIRE_DT")
 	@Temporal(TemporalType.DATE)
-	private Date lastHireDt;
+	private Date lastHireDate;
 
 	@Column(name="LASTUPDDTTM")
 	private Timestamp lastUpdatedDateAndTime;
@@ -336,36 +337,36 @@ public class PsJob implements Serializable {
 	private String layoffExemptFlag;
 
 	@Column(name="LAYOFF_EXEMPT_RSN", nullable=false, length=11)
-	private String layoffExemptRsn;
+	private String layoffExemptReason;
 
 	@Column(name="LBR_FAC_ENTRY_DT")
 	@Temporal(TemporalType.DATE)
-	private Date lbrFacEntryDt;
+	private Date laborFacilityEntryDate;
 
 	@Column(name="LDW_OVR", nullable=false, length=1)
-	private String ldwOvr;
+	private String overrideLastDateWorked;
 
 	@Column(name="LOCATION", nullable=false, length=10)
 	private String location;
 
 	@Column(name="LST_ASGN_START_DT")
 	@Temporal(TemporalType.DATE)
-	private Date lstAsgnStartDt;
+	private Date lastAssignmentStartDate;
 
 	@Column(name="LUMP_SUM_PAY", nullable=false, length=1)
 	private String lumpSumPay;
 
 	@Column(name="MAIN_APPT_NUM_JPN", nullable=false, precision=38)
-	private BigInteger mainApptNumJpn;
+	private BigInteger mainAppointmentNumber;
 
 	@Column(name="MATRICULA_NBR", nullable=false, precision=38)
-	private BigInteger matriculaNbr;
+	private BigInteger matriculaNumber;
 
 	@Column(name="MONTHLY_RT", nullable=false, precision=18, scale=3)
-	private BigDecimal monthlyRt;
+	private BigDecimal monthlyRate;
 
 	@Column(name="OFFICER_CD", nullable=false, length=1)
-	private String officerCd;
+	private String officerCode;
 
 	@Column(name="PAID_FTE", nullable=false, precision=7, scale=6)
 	private BigDecimal paidFte;
@@ -374,44 +375,44 @@ public class PsJob implements Serializable {
 	private BigDecimal paidHours;
 
 	@Column(name="PAID_HRS_FREQUENCY", nullable=false, length=5)
-	private String paidHrsFrequency;
+	private String paidHoursFrequency;
 
 	@Column(name="PAY_SYSTEM_FLG", nullable=false, length=2)
-	private String paySystemFlg;
+	private String paySystemFlag;
 
 	@Column(name="PAY_UNION_FEE", nullable=false, length=1)
 	private String payUnionFee;
 
 	@Column(name="PAYGROUP", nullable=false, length=3)
-	private String paygroup;
+	private String payGroup;
 
 	@Column(name="PER_ORG", nullable=false, length=3)
-	private String perOrg;
+	private String organizationalRelationship;
 
 	@Column(name="PERFORM_GROUP_GER", nullable=false, length=2)
-	private String performGroupGer;
+	private String performanceGroup;
 
 	@Column(name="POI_TYPE", nullable=false, length=5)
-	private String poiType;
+	private String personOfInterestType;
 
 	@Column(name="POSITION_ENTRY_DT")
 	@Temporal(TemporalType.DATE)
-	private Date positionEntryDt;
+	private Date positionEntryDate;
 
 	@Column(name="POSITION_NBR", nullable=false, length=8)
-	private String positionNbr;
+	private String positionNumber;
 
 	@Column(name="POSITION_OVERRIDE", nullable=false, length=1)
 	private String positionOverride;
 
 	@Column(name="POSN_CHANGE_RECORD", nullable=false, length=1)
-	private String posnChangeRecord;
+	private String positionChangeRecord;
 
 	@Column(name="PRORATE_CNT_AMT", nullable=false, length=1)
-	private String prorateCntAmt;
+	private String prorateContractChangeAmount;
 
 	@Column(name="REG_REGION", nullable=false, length=5)
-	private String regulatoryRegion;
+	private String region;
 
 	@Column(name="REG_TEMP", nullable=false, length=1)
 	private String regularOrTemporary;
@@ -420,25 +421,25 @@ public class PsJob implements Serializable {
 	private String reportsTo;
 
 	@Column(name="SAL_ADMIN_PLAN", nullable=false, length=4)
-	private String salAdminPlan;
+	private String salaryAdministrationPlan;
 
 	@Column(name="SETID_DEPT", nullable=false, length=5)
-	private String setIdDept;
+	private String setIdDepartment;
 
 	@Column(name="SETID_JOBCODE", nullable=false, length=5)
 	private String setIdJobCode;
 
 	@Column(name="SETID_LBR_AGRMNT", nullable=false, length=5)
-	private String setidLbrAgrmnt;
+	private String setIdLaborAgreement;
 
 	@Column(name="SETID_LOCATION", nullable=false, length=5)
-	private String setidLocation;
+	private String setIdLocation;
 
 	@Column(name="SETID_SALARY", nullable=false, length=5)
 	private String setIdSalary;
 
 	@Column(name="SETID_SUPV_LVL", nullable=false, length=5)
-	private String setIdSupvLvl;
+	private String setIdSupervisorLevel;
 
 	@Column(name="SHIFT", nullable=false, length=1)
 	private String shift;
@@ -447,130 +448,130 @@ public class PsJob implements Serializable {
 	private BigDecimal shiftFactor;
 
 	@Column(name="SHIFT_RT", nullable=false, precision=18, scale=6)
-	private BigDecimal shiftRt;
+	private BigDecimal shiftRate;
 
 	@Column(name="SOC_SEC_RISK_CODE", nullable=false, length=3)
 	private String socSecRiskCode;
 
 	@Column(name="SPK_COMM_ID_GER", nullable=false, length=9)
-	private String spkCommIdGer;
+	private String spokesmanCommitteeId;
 
 	@Column(name="STD_HOURS", nullable=false, precision=6, scale=2)
-	private BigDecimal stdHours;
+	private BigDecimal standardHours;
 
 	@Column(name="STD_HRS_FREQUENCY", nullable=false, length=5)
-	private String stdHrsFrequency;
+	private String standardHoursFrequency;
 
 	@Column(name="STEP", nullable=false, precision=38)
-	private BigInteger step;
+	private BigInteger frequencyStep;
 
 	@Column(name="STEP_ENTRY_DT")
 	@Temporal(TemporalType.DATE)
-	private Date stepEntryDt;
+	private Date stepEntryDate;
 
 	@Column(name="SUPERVISOR_ID", nullable=false, length=11)
 	private String supervisorId;
 
 	@Column(name="SUPV_LVL_ID", nullable=false, length=8)
-	private String supvLvlId;
+	private String supervisorLevelId;
 
 	@Column(name="TARIFF_AREA_GER", nullable=false, length=3)
-	private String tariffAreaGer;
+	private String tariffArea;
 
 	@Column(name="TARIFF_GER", nullable=false, length=2)
-	private String tariffGer;
+	private String tariff;
 
 	@Column(name="TAX_LOCATION_CD", nullable=false, length=10)
-	private String taxLocationCd;
+	private String taxLocationCode;
 
 	@Column(name="TERMINATION_DT")
 	@Temporal(TemporalType.DATE)
-	private Date terminationDt;
+	private Date terminationDate;
 
 	@Column(name="UNION_CD", nullable=false, length=3)
-	private String unionCd;
+	private String unionCode;
 
 	@Column(name="UNION_FEE_AMOUNT", nullable=false, precision=8, scale=2)
 	private BigDecimal unionFeeAmount;
 
 	@Column(name="UNION_FEE_END_DT")
 	@Temporal(TemporalType.DATE)
-	private Date unionFeeEndDt;
+	private Date unionFeeEndDate;
 
 	@Column(name="UNION_FEE_START_DT")
 	@Temporal(TemporalType.DATE)
-	private Date unionFeeStartDt;
+	private Date unionFeeStartDate;
 
 	@Column(name="UNION_FULL_PART", nullable=false, length=1)
-	private String unionFullPart;
+	private String unionParticipation;
 
 	@Column(name="UNION_POS", nullable=false, length=1)
-	private String unionPos;
+	private String unionPosition;
 
 	@Column(name="UNION_SENIORITY_DT")
 	@Temporal(TemporalType.DATE)
-	private Date unionSeniorityDt;
+	private Date unionSeniorityDate;
 
 	@Column(name="VALUE_1_FRA", nullable=false, length=5)
-	private String value1Fra;
+	private String value1;
 
 	@Column(name="VALUE_2_FRA", nullable=false, length=5)
-	private String value2Fra;
+	private String value2;
 
 	@Column(name="VALUE_3_FRA", nullable=false, length=5)
-	private String value3Fra;
+	private String value3;
 
 	@Column(name="VALUE_4_FRA", nullable=false, length=5)
-	private String value4Fra;
+	private String value4;
 
 	@Column(name="VALUE_5_FRA", nullable=false, length=5)
-	private String value5Fra;
+	private String value5;
 
 	@Column(name="WORK_DAY_HOURS", nullable=false, precision=6, scale=2)
 	private BigDecimal workDayHours;
 
 	@Column(name="WPP_STOP_FLAG", nullable=false, length=1)
-	private String wppStopFlag;
+	private String stopWageProgression;
 
 	@Column(name="WRKS_CNCL_FUNCTION", nullable=false, length=1)
-	private String wrksCnclFunction;
+	private String workCouncilFunction;
 
 	@Column(name="WRKS_CNCL_ROLE_CHE", nullable=false, length=30)
-	private String wrksCnclRoleChe;
+	private String workCouncilRole;
 
 	public PsJob() {
 	}
 
-	public String getAbsenceSystemCd() {
-		return absenceSystemCd != null ? absenceSystemCd.trim() : absenceSystemCd;
+	public String getAbsenceSystem() {
+		return absenceSystem != null ? absenceSystem.trim() : absenceSystem;
 	}
 
-	public void setAbsenceSystemCd(String absenceSystemCd) {
-		this.absenceSystemCd = absenceSystemCd != null ? absenceSystemCd.trim() : absenceSystemCd;
+	public void setAbsenceSystem(String absenceSystem) {
+		this.absenceSystem = absenceSystem != null ? absenceSystem.trim() : absenceSystem;
 	}
 
-	public String getAccdntCdFra() {
-		return accdntCdFra != null ? accdntCdFra.trim() : accdntCdFra;
+	public String getAccidentCode() {
+		return accidentCode != null ? accidentCode.trim() : accidentCode;
 	}
 
-	public void setAccdntCdFra(String accdntCdFra) {
-		this.accdntCdFra = accdntCdFra != null ? accdntCdFra.trim() : accdntCdFra;
+	public void setAccidentCode(String accidentCode) {
+		this.accidentCode = accidentCode != null ? accidentCode.trim() : accidentCode;
 	}
 
-	public String getAcctCd() {
-		return acctCd != null ? acctCd.trim() : acctCd;
+	public String getAccountCode() {
+		return accountCode != null ? accountCode.trim() : accountCode;
 	}
 
-	public void setAcctCd(String acctCd) {
-		this.acctCd = acctCd != null ? acctCd.trim() : acctCd;
+	public void setAccountCode(String accountCode) {
+		this.accountCode = accountCode != null ? accountCode.trim() : accountCode;
 	}
 
 	public String getAction() {
 		return action != null ? action.trim() : action;
 	}
 
-	public Date getActionDt() {
-		return this.actionDt;
+	public Date getActionDate() {
+		return this.actionDate;
 	}
 
 	public String getActionReason() {
@@ -581,119 +582,119 @@ public class PsJob implements Serializable {
 		this.actionReason = actionReason != null ? actionReason.trim() : actionReason;
 	}
 
-	public String getAddsToFteActual() {
-		return addsToFteActual != null ? addsToFteActual.trim() : addsToFteActual;
+	public String getAddsToFteActualCount() {
+		return addsToFteActualCount != null ? addsToFteActualCount.trim() : addsToFteActualCount;
 	}
 
-	public BigDecimal getAnnlBenefBaseRt() {
-		return this.annlBenefBaseRt;
+	public BigDecimal getAnnualBenefitsBaseRate() {
+		return this.annualBenefitsBaseRate;
 	}
 
-	public BigDecimal getAnnualRt() {
-		return this.annualRt;
+	public BigDecimal getAnnualRate() {
+		return this.annualRate;
 	}
 
-	public String getApptType() {
-		return apptType != null ? apptType.trim() : apptType;
+	public String getAppointmentType() {
+		return appointmentType != null ? appointmentType.trim() : appointmentType;
 	}
 
-	public Date getAsgnEndDt() {
-		return this.asgnEndDt;
+	public Date getAssignmentEndDate() {
+		return this.assignmentEndDate;
 	}
 
-	public Date getAsgnStartDt() {
-		return this.asgnStartDt;
+	public Date getAssignmentStartDate() {
+		return this.assignmentStartDate;
 	}
 
-	public String getAutoEndFlg() {
-		return autoEndFlg != null ? autoEndFlg.trim() : autoEndFlg;
+	public String getAutoEndJob() {
+		return autoEndJob != null ? autoEndJob.trim() : autoEndJob;
 	}
 
-	public String getBargUnit() {
-		return bargUnit != null ? bargUnit.trim() : bargUnit;
+	public String getBargainingUnit() {
+		return bargainingUnit != null ? bargainingUnit.trim() : bargainingUnit;
 	}
 
-	public String getBasAction() {
-		return basAction != null ? basAction.trim() : basAction;
+	public String getBenefitsAdministrationAction() {
+		return benefitsAdministrationAction != null ? benefitsAdministrationAction.trim() : benefitsAdministrationAction;
 	}
 
-	public String getBasGroupId() {
-		return basGroupId != null ? basGroupId.trim() : basGroupId;
+	public String getBenefitsAdministrationGroupId() {
+		return benefitsAdministrationGroupId != null ? benefitsAdministrationGroupId.trim() : benefitsAdministrationGroupId;
 	}
 
-	public String getBenStatus() {
-		return benStatus != null ? benStatus.trim() : benStatus;
+	public String getBenefitsEmployeeStatus() {
+		return benefitsEmployeeStatus != null ? benefitsEmployeeStatus.trim() : benefitsEmployeeStatus;
 	}
 
-	public String getBenefitSystem() {
-		return benefitSystem != null ? benefitSystem.trim() : benefitSystem;
+	public String getBenefitsSystem() {
+		return benefitsSystem != null ? benefitsSystem.trim() : benefitsSystem;
 	}
 
-	public String getBorderWalker() {
-		return borderWalker != null ? borderWalker.trim() : borderWalker;
+	public String getCrossBorderWorker() {
+		return crossBorderWorker != null ? crossBorderWorker.trim() : crossBorderWorker;
 	}
 
 	public String getBusinessUnit() {
 		return businessUnit != null ? businessUnit.trim() : businessUnit;
 	}
 
-	public BigDecimal getChangeAmt() {
-		return this.changeAmt;
+	public BigDecimal getChangeAmount() {
+		return this.changeAmount;
 	}
 
-	public BigDecimal getChangePct() {
-		return this.changePct;
+	public BigDecimal getChangePercent() {
+		return this.changePercent;
 	}
 
-	public String getClassIndc() {
-		return classIndc != null ? classIndc.trim() : classIndc;
+	public String getClassifiedOrUnclassified() {
+		return classifiedOrUnclassified != null ? classifiedOrUnclassified.trim() : classifiedOrUnclassified;
 	}
 
 	public String getCobraAction() {
 		return cobraAction != null ? cobraAction.trim() : cobraAction;
 	}
 
-	public String getCompFrequency() {
-		return compFrequency != null ? compFrequency.trim() : compFrequency;
+	public String getCompensationFrequency() {
+		return compensationFrequency != null ? compensationFrequency.trim() : compensationFrequency;
 	}
 
 	public String getCompany() {
 		return company != null ? company.trim() : company;
 	}
 
-	public BigDecimal getComprate() {
-		return this.comprate;
+	public BigDecimal getCompensationRate() {
+		return this.compensationRate;
 	}
 
-	public String getContractNum() {
-		return contractNum != null ? contractNum.trim() : contractNum;
+	public String getContractNumber() {
+		return contractNumber != null ? contractNumber.trim() : contractNumber;
 	}
 
-	public BigInteger getCtgRate() {
-		return this.ctgRate;
+	public BigInteger getCategoryRate() {
+		return this.categoryRate;
 	}
 
-	public String getCurRtType() {
-		return curRtType != null ? curRtType.trim() : curRtType;
+	public String getCurrencyRateType() {
+		return currencyRateType != null ? currencyRateType.trim() : currencyRateType;
 	}
 
-	public String getCurrencyCd() {
-		return currencyCd != null ? currencyCd.trim() : currencyCd;
+	public String getCurrencyCode() {
+		return currencyCode != null ? currencyCode.trim() : currencyCode;
 	}
 
-	public String getCurrencyCd1() {
-		return currencyCd1 != null ? currencyCd1.trim() : currencyCd1;
+	public String getCurrencyCode1() {
+		return currencyCode1 != null ? currencyCode1.trim() : currencyCode1;
 	}
 
-	public BigDecimal getDailyRt() {
-		return this.dailyRt;
+	public BigDecimal getDailyRate() {
+		return this.dailyRate;
 	}
 
-	public Date getDeptEntryDt() {
-		return this.deptEntryDt;
+	public Date getDepartmentEntryDate() {
+		return this.departmentEntryDate;
 	}
 
-	public String getDeptId() {
+	public String getDepartmentId() {
 		return departmentId != null ? departmentId.trim() : departmentId;
 	}
 
@@ -701,8 +702,8 @@ public class PsJob implements Serializable {
 		return directlyTipped != null ? directlyTipped.trim() : directlyTipped;
 	}
 
-	public String getEarnsDistType() {
-		return earnsDistType != null ? earnsDistType.trim() : earnsDistType;
+	public String getEarningsDistributionType() {
+		return earningsDistributionType != null ? earningsDistributionType.trim() : earningsDistributionType;
 	}
 
 	public String getEeoClass() {
@@ -717,104 +718,104 @@ public class PsJob implements Serializable {
 		return this.effectiveSequence;
 	}
 
-	public String getEligConfig1() {
-		return eligConfig1 != null ? eligConfig1.trim() : eligConfig1;
+	public String getEligibilityConfiguration1() {
+		return eligibilityConfiguration1 != null ? eligibilityConfiguration1.trim() : eligibilityConfiguration1;
 	}
 
-	public String getEligConfig2() {
-		return eligConfig2 != null ? eligConfig2.trim() : eligConfig2;
+	public String getEligibilityConfiguration2() {
+		return eligibilityConfiguration2 != null ? eligibilityConfiguration2.trim() : eligibilityConfiguration2;
 	}
 
-	public String getEligConfig3() {
-		return eligConfig3 != null ? eligConfig3.trim() : eligConfig3;
+	public String getEligibilityConfiguration3() {
+		return eligibilityConfiguration3 != null ? eligibilityConfiguration3.trim() : eligibilityConfiguration3;
 	}
 
-	public String getEligConfig4() {
-		return eligConfig4 != null ? eligConfig4.trim() : eligConfig4;
+	public String getEligibilityConfiguration4() {
+		return eligibilityConfiguration4 != null ? eligibilityConfiguration4.trim() : eligibilityConfiguration4;
 	}
 
-	public String getEligConfig5() {
-		return eligConfig5 != null ? eligConfig5.trim() : eligConfig5;
+	public String getEligibilityConfiguration5() {
+		return eligibilityConfiguration5 != null ? eligibilityConfiguration5.trim() : eligibilityConfiguration5;
 	}
 
-	public String getEligConfig6() {
-		return eligConfig6 != null ? eligConfig6.trim() : eligConfig6;
+	public String getEligibilityConfiguration6() {
+		return eligibilityConfiguration6 != null ? eligibilityConfiguration6.trim() : eligibilityConfiguration6;
 	}
 
-	public String getEligConfig7() {
-		return eligConfig7 != null ? eligConfig7.trim() : eligConfig7;
+	public String getEligibilityConfiguration7() {
+		return eligibilityConfiguration7 != null ? eligibilityConfiguration7.trim() : eligibilityConfiguration7;
 	}
 
-	public String getEligConfig8() {
-		return eligConfig8 != null ? eligConfig8.trim() : eligConfig8;
+	public String getEligibilityConfiguration8() {
+		return eligibilityConfiguration8 != null ? eligibilityConfiguration8.trim() : eligibilityConfiguration8;
 	}
 
-	public String getEligConfig9() {
-		return eligConfig9 != null ? eligConfig9.trim() : eligConfig9;
+	public String getEligibilityConfiguration9() {
+		return eligibilityConfiguration9 != null ? eligibilityConfiguration9.trim() : eligibilityConfiguration9;
 	}
 
-	public String getEmplClass() {
+	public String getEmployeeClass() {
 		return employeeClass != null ? employeeClass.trim() : employeeClass;
 	}
 
-	public String getEmplCtg() {
-		return emplCtg != null ? emplCtg.trim() : emplCtg;
+	public String getEmployeeCategory() {
+		return employeeCategory != null ? employeeCategory.trim() : employeeCategory;
 	}
 
-	public String getEmplCtgL1() {
-		return emplCtgL1 != null ? emplCtgL1.trim() : emplCtgL1;
+	public String getEmployeeSubcategory() {
+		return employeeSubcategory != null ? employeeSubcategory.trim() : employeeSubcategory;
 	}
 
-	public String getEmplCtgL2() {
-		return emplCtgL2 != null ? emplCtgL2.trim() : emplCtgL2;
+	public String getEmployeeSubcategory2() {
+		return employeeSubcategory2 != null ? employeeSubcategory2.trim() : employeeSubcategory2;
 	}
 
-	public BigInteger getEmploymentRecordNumber() {
-		return this.employmentRecordNumber;
+	public BigInteger getEmployeeRecordNumber() {
+		return this.employeeRecordNumber;
 	}
 
-	public String getEmplStatus() {
-		return emplStatus != null ? emplStatus.trim() : emplStatus;
+	public String getEmployeeStatus() {
+		return employeeStatus != null ? employeeStatus.trim() : employeeStatus;
 	}
 
-	public String getEmplType() {
-		return emplType != null ? emplType.trim() : emplType;
+	public String getEmployeeType() {
+		return employeeType != null ? employeeType.trim() : employeeType;
 	}
 
 	public String getEmployeeId() {
 		return employeeId != null ? employeeId.trim() : employeeId;
 	}
 
-	public String getEncumbOverride() {
-		return encumbOverride != null ? encumbOverride.trim() : encumbOverride;
+	public String getEncumbranceOverride() {
+		return encumbranceOverride != null ? encumbranceOverride.trim() : encumbranceOverride;
 	}
 
 	public Date getEntryDate() {
 		return this.entryDate;
 	}
 
-	public String getEstabid() {
-		return estabid != null ? estabid.trim() : estabid;
+	public String getEstablishmentId() {
+		return establishmentId != null ? establishmentId.trim() : establishmentId;
 	}
 
-	public BigInteger getExemptHoursMonth() {
-		return this.exemptHoursMonth;
+	public BigInteger getExemptedHoursMonth() {
+		return this.exemptedHoursMonth;
 	}
 
-	public String getExemptJobLbr() {
-		return exemptJobLbr != null ? exemptJobLbr.trim() : exemptJobLbr;
+	public String getExempted() {
+		return exempted != null ? exempted.trim() : exempted;
 	}
 
 	public Date getExpectedEndDate() {
 		return this.expectedEndDate;
 	}
 
-	public Date getExpectedReturnDt() {
-		return this.expectedReturnDt;
+	public Date getExpectedReturnDate() {
+		return this.expectedReturnDate;
 	}
 
-	public String getFicaStatusEe() {
-		return ficaStatusEe != null ? ficaStatusEe.trim() : ficaStatusEe;
+	public String getFicaStatus() {
+		return ficaStatus != null ? ficaStatus.trim() : ficaStatus;
 	}
 
 	public String getFlsaStatus() {
@@ -833,76 +834,76 @@ public class PsJob implements Serializable {
 		return fullOrPartTime != null ? fullOrPartTime.trim() : fullOrPartTime;
 	}
 
-	public String getFunctionCd() {
-		return functionCd != null ? functionCd.trim() : functionCd;
+	public String getFunctionCode() {
+		return functionCode != null ? functionCode.trim() : functionCode;
 	}
 
 	public String getGlPayType() {
 		return glPayType != null ? glPayType.trim() : glPayType;
 	}
 
-	public String getGpAsofDtExgRt() {
-		return gpAsofDtExgRt != null ? gpAsofDtExgRt.trim() : gpAsofDtExgRt;
+	public String getUseRateAsOf() {
+		return useRateAsOf != null ? useRateAsOf.trim() : useRateAsOf;
 	}
 
-	public String getGpDfltCurrttyp() {
-		return gpDfltCurrttyp != null ? gpDfltCurrttyp.trim() : gpDfltCurrttyp;
+	public String getUsePayGroupRateType() {
+		return usePayGroupRateType != null ? usePayGroupRateType.trim() : usePayGroupRateType;
 	}
 
-	public String getGpDfltEligGrp() {
-		return gpDfltEligGrp != null ? gpDfltEligGrp.trim() : gpDfltEligGrp;
+	public String getUsePayGroupEligibility() {
+		return usePayGroupEligibility != null ? usePayGroupEligibility.trim() : usePayGroupEligibility;
 	}
 
-	public String getGpDfltExrtdt() {
-		return gpDfltExrtdt != null ? gpDfltExrtdt.trim() : gpDfltExrtdt;
+	public String getUsePayGroupAsOfDate() {
+		return usePayGroupAsOfDate != null ? usePayGroupAsOfDate.trim() : usePayGroupAsOfDate;
 	}
 
-	public String getGpEligGrp() {
-		return gpDfltExrtdt != null ? gpDfltExrtdt.trim() : gpDfltExrtdt;
+	public String getEligibilityGroup() {
+		return eligibilityGroup != null ? eligibilityGroup.trim() : eligibilityGroup;
 	}
 
-	public String getGpPaygroup() {
-		return gpPaygroup != null ? gpPaygroup.trim() : gpPaygroup;
+	public String getPayGroup() {
+		return payGroup != null ? payGroup.trim() : payGroup;
 	}
 
 	public String getGrade() {
 		return grade != null ? grade.trim() : grade;
 	}
 
-	public Date getGradeEntryDt() {
-		return this.gradeEntryDt;
+	public Date getGradeEntryDate() {
+		return this.gradeEntryDate;
 	}
 
-	public Date getHireDt() {
-		return this.hireDt;
+	public Date getHireDate() {
+		return this.hireDate;
 	}
 
 	public String getHolidaySchedule() {
 		return holidaySchedule != null ? holidaySchedule.trim() : holidaySchedule;
 	}
 
-	public BigDecimal getHourlyRt() {
-		return this.hourlyRt;
+	public BigDecimal getHourlyRate() {
+		return this.hourlyRate;
 	}
 
-	public String getHourlyRtFra() {
-		return hourlyRtFra != null ? hourlyRtFra.trim() : hourlyRtFra;
+	public String getHourlyRateFrance() {
+		return hourlyRateFrance != null ? hourlyRateFrance.trim() : hourlyRateFrance;
 	}
 
 	public String getHrStatus() {
 		return hrStatus != null ? hrStatus.trim() : hrStatus;
 	}
 
-	public String getInterctrWrksCncl() {
-		return interctrWrksCncl != null ? interctrWrksCncl.trim() : interctrWrksCncl;
+	public String getWorksCouncilRole() {
+		return worksCouncilRole != null ? worksCouncilRole.trim() : worksCouncilRole;
 	}
 
-	public String getJobDataSrcCd() {
-		return jobDataSrcCd != null ? jobDataSrcCd.trim() : jobDataSrcCd;
+	public String getJobSorceCode() {
+		return jobSorceCode != null ? jobSorceCode.trim() : jobSorceCode;
 	}
 
-	public Date getJobEntryDt() {
-		return this.jobEntryDt;
+	public Date getJobEntryDate() {
+		return this.jobEntryDate;
 	}
 
 	public String getJobIndicator() {
@@ -921,16 +922,16 @@ public class PsJob implements Serializable {
 		return laborFacilityId != null ? laborFacilityId.trim() : laborFacilityId;
 	}
 
-	public String getLaborTypeGer() {
-		return laborTypeGer != null ? laborTypeGer.trim() : laborTypeGer;
+	public String getLaborType() {
+		return laborType != null ? laborType.trim() : laborType;
 	}
 
 	public Date getLastDateWorked() {
 		return this.lastDateWorked;
 	}
 
-	public Date getLastHireDt() {
-		return this.lastHireDt;
+	public Date getLastHireDate() {
+		return this.lastHireDate;
 	}
 
 	public Timestamp getLastUpdatedDateAndTime() {
@@ -945,20 +946,20 @@ public class PsJob implements Serializable {
 		return layoffExemptFlag != null ? layoffExemptFlag.trim() : layoffExemptFlag;
 	}
 
-	public String getLayoffExemptRsn() {
-		return layoffExemptRsn != null ? layoffExemptRsn.trim() : layoffExemptRsn;
+	public String getLayoffExemptReason() {
+		return layoffExemptReason != null ? layoffExemptReason.trim() : layoffExemptReason;
 	}
 
-	public Date getLbrFacEntryDt() {
-		return this.lbrFacEntryDt;
+	public Date getLaborFacilityEntryDate() {
+		return this.laborFacilityEntryDate;
 	}
 
-	public String getLdwOvr() {
-		return ldwOvr != null ? ldwOvr.trim() : ldwOvr;
+	public String getOverrideLastDateWorked() {
+		return overrideLastDateWorked != null ? overrideLastDateWorked.trim() : overrideLastDateWorked;
 	}
 
-	public void setLdwOvr(String ldwOvr) {
-		this.ldwOvr = ldwOvr != null ? ldwOvr.trim() : ldwOvr;
+	public void setOverrideLastDateWorked(String overrideLastDateWorked) {
+		this.overrideLastDateWorked = overrideLastDateWorked != null ? overrideLastDateWorked.trim() : overrideLastDateWorked;
 	}
 
 	public String getLocation() {
@@ -969,12 +970,12 @@ public class PsJob implements Serializable {
 		this.location = location != null ? location.trim() : location;
 	}
 
-	public Date getLstAsgnStartDt() {
-		return this.lstAsgnStartDt;
+	public Date getLastAssignmentStartDate() {
+		return this.lastAssignmentStartDate;
 	}
 
-	public void setLstAsgnStartDt(Date lstAsgnStartDt) {
-		this.lstAsgnStartDt = lstAsgnStartDt;
+	public void setLastAssignmentStartDate(Date lastAssignmentStartDate) {
+		this.lastAssignmentStartDate = lastAssignmentStartDate;
 	}
 
 	public String getLumpSumPay() {
@@ -985,36 +986,36 @@ public class PsJob implements Serializable {
 		this.lumpSumPay = lumpSumPay != null ? lumpSumPay.trim() : lumpSumPay;
 	}
 
-	public BigInteger getMainApptNumJpn() {
-		return this.mainApptNumJpn;
+	public BigInteger getMainAppointmentNumber() {
+		return this.mainAppointmentNumber;
 	}
 
-	public void setMainApptNumJpn(BigInteger mainApptNumJpn) {
-		this.mainApptNumJpn = mainApptNumJpn;
+	public void setMainAppointmentNumber(BigInteger mainAppointmentNumber) {
+		this.mainAppointmentNumber = mainAppointmentNumber;
 	}
 
-	public BigInteger getMatriculaNbr() {
-		return this.matriculaNbr;
+	public BigInteger getMatriculaNumber() {
+		return this.matriculaNumber;
 	}
 
-	public void setMatriculaNbr(BigInteger matriculaNbr) {
-		this.matriculaNbr = matriculaNbr;
+	public void setMatriculaNumber(BigInteger matriculaNumber) {
+		this.matriculaNumber = matriculaNumber;
 	}
 
-	public BigDecimal getMonthlyRt() {
-		return this.monthlyRt;
+	public BigDecimal getMonthlyRate() {
+		return this.monthlyRate;
 	}
 
-	public void setMonthlyRt(BigDecimal monthlyRt) {
-		this.monthlyRt = monthlyRt;
+	public void setMonthlyRate(BigDecimal monthlyRate) {
+		this.monthlyRate = monthlyRate;
 	}
 
-	public String getOfficerCd() {
-		return officerCd != null ? officerCd.trim() : officerCd;
+	public String getOfficerCode() {
+		return officerCode != null ? officerCode.trim() : officerCode;
 	}
 
-	public void setOfficerCd(String officerCd) {
-		this.officerCd = officerCd != null ? officerCd.trim() : officerCd;
+	public void setOfficerCode(String officerCode) {
+		this.officerCode = officerCode != null ? officerCode.trim() : officerCode;
 	}
 
 	public BigDecimal getPaidFte() {
@@ -1033,20 +1034,20 @@ public class PsJob implements Serializable {
 		this.paidHours = paidHours;
 	}
 
-	public String getPaidHrsFrequency() {
-		return paidHrsFrequency != null ? paidHrsFrequency.trim() : paidHrsFrequency;
+	public String getPaidHoursFrequency() {
+		return paidHoursFrequency != null ? paidHoursFrequency.trim() : paidHoursFrequency;
 	}
 
-	public void setPaidHrsFrequency(String paidHrsFrequency) {
-		this.paidHrsFrequency = paidHrsFrequency != null ? paidHrsFrequency.trim() : paidHrsFrequency;
+	public void setPaidHoursFrequency(String paidHoursFrequency) {
+		this.paidHoursFrequency = paidHoursFrequency != null ? paidHoursFrequency.trim() : paidHoursFrequency;
 	}
 
-	public String getPaySystemFlg() {
-		return paySystemFlg != null ? paySystemFlg.trim() : paySystemFlg;
+	public String getPaySystemFlag() {
+		return paySystemFlag != null ? paySystemFlag.trim() : paySystemFlag;
 	}
 
-	public void setPaySystemFlg(String paySystemFlg) {
-		this.paySystemFlg = paySystemFlg != null ? paySystemFlg.trim() : paySystemFlg;
+	public void setPaySystemFlag(String paySystemFlag) {
+		this.paySystemFlag = paySystemFlag != null ? paySystemFlag.trim() : paySystemFlag;
 	}
 
 	public String getPayUnionFee() {
@@ -1058,51 +1059,51 @@ public class PsJob implements Serializable {
 	}
 
 	public String getPaygroup() {
-		return paygroup != null ? paygroup.trim() : paygroup;
+		return payGroup != null ? payGroup.trim() : payGroup;
 	}
 
-	public void setPaygroup(String paygroup) {
-		this.paygroup = paygroup != null ? paygroup.trim() : paygroup;
+	public void setPaygroup(String payGroup) {
+		this.payGroup = payGroup != null ? payGroup.trim() : payGroup;
 	}
 
-	public String getPerOrg() {
-		return perOrg != null ? perOrg.trim() : perOrg;
+	public String getOrganizationalRelationship() {
+		return organizationalRelationship != null ? organizationalRelationship.trim() : organizationalRelationship;
 	}
 
-	public void setPerOrg(String perOrg) {
-		this.perOrg = perOrg != null ? perOrg.trim() : perOrg;
+	public void setOrganizationalRelationship(String organizationalRelationship) {
+		this.organizationalRelationship = organizationalRelationship != null ? organizationalRelationship.trim() : organizationalRelationship;
 	}
 
-	public String getPerformGroupGer() {
-		return performGroupGer != null ? performGroupGer.trim() : performGroupGer;
+	public String getPerformanceGroup() {
+		return performanceGroup != null ? performanceGroup.trim() : performanceGroup;
 	}
 
-	public void setPerformGroupGer(String performGroupGer) {
-		this.performGroupGer = performGroupGer != null ? performGroupGer.trim() : performGroupGer;
+	public void setPerformanceGroup(String performanceGroup) {
+		this.performanceGroup = performanceGroup != null ? performanceGroup.trim() : performanceGroup;
 	}
 
-	public String getPoiType() {
-		return poiType != null ? poiType.trim() : poiType;
+	public String getPersonOfInterestType() {
+		return personOfInterestType != null ? personOfInterestType.trim() : personOfInterestType;
 	}
 
-	public void setPoiType(String poiType) {
-		this.poiType = poiType != null ? poiType.trim() : poiType;
+	public void setPersonOfInterestType(String personOfInterestType) {
+		this.personOfInterestType = personOfInterestType != null ? personOfInterestType.trim() : personOfInterestType;
 	}
 
-	public Date getPositionEntryDt() {
-		return this.positionEntryDt;
+	public Date getPositionEntryDate() {
+		return this.positionEntryDate;
 	}
 
-	public void setPositionEntryDt(Date positionEntryDt) {
-		this.positionEntryDt = positionEntryDt;
+	public void setPositionEntryDate(Date positionEntryDate) {
+		this.positionEntryDate = positionEntryDate;
 	}
 
-	public String getPositionNbr() {
-		return positionNbr != null ? positionNbr.trim() : positionNbr;
+	public String getPositionNumber() {
+		return positionNumber != null ? positionNumber.trim() : positionNumber;
 	}
 
-	public void setPositionNbr(String positionNbr) {
-		this.positionNbr = positionNbr != null ? positionNbr.trim() : positionNbr;
+	public void setPositionNumber(String positionNumber) {
+		this.positionNumber = positionNumber != null ? positionNumber.trim() : positionNumber;
 	}
 
 	public String getPositionOverride() {
@@ -1113,35 +1114,35 @@ public class PsJob implements Serializable {
 		this.positionOverride = positionOverride != null ? positionOverride.trim() : positionOverride;
 	}
 
-	public String getPosnChangeRecord() {
-		return posnChangeRecord != null ? posnChangeRecord.trim() : posnChangeRecord;
+	public String getPositionChangeRecord() {
+		return positionChangeRecord != null ? positionChangeRecord.trim() : positionChangeRecord;
 	}
 
-	public void setPosnChangeRecord(String posnChangeRecord) {
-		this.posnChangeRecord = posnChangeRecord != null ? posnChangeRecord.trim() : posnChangeRecord;
+	public void setPositionChangeRecord(String positionChangeRecord) {
+		this.positionChangeRecord = positionChangeRecord != null ? positionChangeRecord.trim() : positionChangeRecord;
 	}
 
-	public String getProrateCntAmt() {
-		return prorateCntAmt != null ? prorateCntAmt.trim() : prorateCntAmt;
+	public String getProrateContractChangeAmount() {
+		return prorateContractChangeAmount != null ? prorateContractChangeAmount.trim() : prorateContractChangeAmount;
 	}
 
-	public void setProrateCntAmt(String prorateCntAmt) {
-		this.prorateCntAmt = prorateCntAmt != null ? prorateCntAmt.trim() : prorateCntAmt;
+	public void setProrateContractChangeAmount(String prorateContractChangeAmount) {
+		this.prorateContractChangeAmount = prorateContractChangeAmount != null ? prorateContractChangeAmount.trim() : prorateContractChangeAmount;
 	}
 
-	public String getRegulatoryRegion() {
-		return regulatoryRegion != null ? regulatoryRegion.trim() : regulatoryRegion;
+	public String getRegion() {
+		return region != null ? region.trim() : region;
 	}
 
-	public void setRegulatoryRegion(String regulatoryRegion) {
-		this.regulatoryRegion = regulatoryRegion != null ? regulatoryRegion.trim() : regulatoryRegion;
+	public void setRegion(String region) {
+		this.region = region != null ? region.trim() : region;
 	}
 
-	public String getRegTemp() {
+	public String getRegularOrTemporary() {
 		return regularOrTemporary != null ? regularOrTemporary.trim() : regularOrTemporary;
 	}
 
-	public void setRegTemp(String regularOrTemporary) {
+	public void setRegularOrTemporary(String regularOrTemporary) {
 		this.regularOrTemporary = regularOrTemporary != null ? regularOrTemporary.trim() : regularOrTemporary;
 	}
 
@@ -1153,20 +1154,20 @@ public class PsJob implements Serializable {
 		this.reportsTo = reportsTo != null ? reportsTo.trim() : reportsTo;
 	}
 
-	public String getSalAdminPlan() {
-		return salAdminPlan != null ? salAdminPlan.trim() : salAdminPlan;
+	public String getSalaryAdministrationPlan() {
+		return salaryAdministrationPlan != null ? salaryAdministrationPlan.trim() : salaryAdministrationPlan;
 	}
 
-	public void setSalAdminPlan(String salAdminPlan) {
-		this.salAdminPlan = salAdminPlan != null ? salAdminPlan.trim() : salAdminPlan;
+	public void setSalaryAdministrationPlan(String salaryAdministrationPlan) {
+		this.salaryAdministrationPlan = salaryAdministrationPlan != null ? salaryAdministrationPlan.trim() : salaryAdministrationPlan;
 	}
 
-	public String getSetIdDept() {
-		return setIdDept != null ? setIdDept.trim() : setIdDept;
+	public String getSetIdDepartment() {
+		return setIdDepartment != null ? setIdDepartment.trim() : setIdDepartment;
 	}
 
-	public void setSetIdDept(String setIdDept) {
-		this.setIdDept = setIdDept != null ? setIdDept.trim() : setIdDept;
+	public void setSetIdDepartment(String setIdDepartment) {
+		this.setIdDepartment = setIdDepartment != null ? setIdDepartment.trim() : setIdDepartment;
 	}
 
 	public String getSetIdJobCode() {
@@ -1177,20 +1178,20 @@ public class PsJob implements Serializable {
 		this.setIdJobCode = setIdJobCode != null ? setIdJobCode.trim() : setIdJobCode;
 	}
 
-	public String getSetIdLbrAgrmnt() {
-		return setidLbrAgrmnt != null ? setidLbrAgrmnt.trim() : setidLbrAgrmnt;
+	public String getSetIdLaborAgreement() {
+		return setIdLaborAgreement != null ? setIdLaborAgreement.trim() : setIdLaborAgreement;
 	}
 
-	public void setSetidLbrAgrmnt(String setidLbrAgrmnt) {
-		this.setidLbrAgrmnt = setidLbrAgrmnt != null ? setidLbrAgrmnt.trim() : setidLbrAgrmnt;
+	public void setSetidLbrAgrmnt(String setIdLaborAgreement) {
+		this.setIdLaborAgreement = setIdLaborAgreement != null ? setIdLaborAgreement.trim() : setIdLaborAgreement;
 	}
 
-	public String getSetidLocation() {
-		return setidLocation != null ? setidLocation.trim() : setidLocation;
+	public String getSetIdLocation() {
+		return setIdLocation != null ? setIdLocation.trim() : setIdLocation;
 	}
 
-	public void setSetidLocation(String setidLocation) {
-		this.setidLocation = setidLocation != null ? setidLocation.trim() : setidLocation;
+	public void setSetIdLocation(String setIdLocation) {
+		this.setIdLocation = setIdLocation != null ? setIdLocation.trim() : setIdLocation;
 	}
 
 	public String getSetIdSalary() {
@@ -1201,12 +1202,12 @@ public class PsJob implements Serializable {
 		this.setIdSalary = setIdSalary != null ? setIdSalary.trim() : setIdSalary;
 	}
 
-	public String getSetIdSupvLvl() {
-		return setIdSupvLvl != null ? setIdSupvLvl.trim() : setIdSupvLvl;
+	public String getSetIdSupervisorLevel() {
+		return setIdSupervisorLevel != null ? setIdSupervisorLevel.trim() : setIdSupervisorLevel;
 	}
 
-	public void setSetIdSupvLvl(String setIdSupvLvl) {
-		this.setIdSupvLvl = setIdSupvLvl != null ? setIdSupvLvl.trim() : setIdSupvLvl;
+	public void setSetIdSupervisorLevel(String setIdSupervisorLevel) {
+		this.setIdSupervisorLevel = setIdSupervisorLevel != null ? setIdSupervisorLevel.trim() : setIdSupervisorLevel;
 	}
 
 	public String getShift() {
@@ -1225,12 +1226,12 @@ public class PsJob implements Serializable {
 		this.shiftFactor = shiftFactor;
 	}
 
-	public BigDecimal getShiftRt() {
-		return this.shiftRt;
+	public BigDecimal getShiftRate() {
+		return this.shiftRate;
 	}
 
-	public void setShiftRt(BigDecimal shiftRt) {
-		this.shiftRt = shiftRt;
+	public void setShiftRate(BigDecimal shiftRate) {
+		this.shiftRate = shiftRate;
 	}
 
 	public String getSocSecRiskCode() {
@@ -1241,44 +1242,44 @@ public class PsJob implements Serializable {
 		this.socSecRiskCode = socSecRiskCode != null ? socSecRiskCode.trim() : socSecRiskCode;
 	}
 
-	public String getSpkCommIdGer() {
-		return spkCommIdGer != null ? spkCommIdGer.trim() : spkCommIdGer;
+	public String getSpokesmanCommitteeId() {
+		return spokesmanCommitteeId != null ? spokesmanCommitteeId.trim() : spokesmanCommitteeId;
 	}
 
-	public void setSpkCommIdGer(String spkCommIdGer) {
-		this.spkCommIdGer = spkCommIdGer != null ? spkCommIdGer.trim() : spkCommIdGer;
+	public void setSpokesmanCommitteeId(String spokesmanCommitteeId) {
+		this.spokesmanCommitteeId = spokesmanCommitteeId != null ? spokesmanCommitteeId.trim() : spokesmanCommitteeId;
 	}
 
-	public BigDecimal getStdHours() {
-		return this.stdHours;
+	public BigDecimal getStandardHours() {
+		return this.standardHours;
 	}
 
-	public void setStdHours(BigDecimal stdHours) {
-		this.stdHours = stdHours;
+	public void setStandardHours(BigDecimal standardHours) {
+		this.standardHours = standardHours;
 	}
 
-	public String getStdHrsFrequency() {
-		return stdHrsFrequency != null ? stdHrsFrequency.trim() : stdHrsFrequency;
+	public String getStandardHoursFrequency() {
+		return standardHoursFrequency != null ? standardHoursFrequency.trim() : standardHoursFrequency;
 	}
 
-	public void setStdHrsFrequency(String stdHrsFrequency) {
-		this.stdHrsFrequency = stdHrsFrequency != null ? stdHrsFrequency.trim() : stdHrsFrequency;
+	public void setStandardHoursFrequency(String standardHoursFrequency) {
+		this.standardHoursFrequency = standardHoursFrequency != null ? standardHoursFrequency.trim() : standardHoursFrequency;
 	}
 
-	public BigInteger getStep() {
-		return this.step;
+	public BigInteger getFrequencyStep() {
+		return this.frequencyStep;
 	}
 
-	public void setStep(BigInteger step) {
-		this.step = step;
+	public void setFrequencyStep(BigInteger frequencyStep) {
+		this.frequencyStep = frequencyStep;
 	}
 
-	public Date getStepEntryDt() {
-		return this.stepEntryDt;
+	public Date getStepEntryDate() {
+		return this.stepEntryDate;
 	}
 
-	public void setStepEntryDt(Date stepEntryDt) {
-		this.stepEntryDt = stepEntryDt;
+	public void setStepEntryDate(Date stepEntryDate) {
+		this.stepEntryDate = stepEntryDate;
 	}
 
 	public String getSupervisorId() {
@@ -1289,52 +1290,52 @@ public class PsJob implements Serializable {
 		this.supervisorId = supervisorId != null ? supervisorId.trim() : supervisorId;
 	}
 
-	public String getSupvLvlId() {
-		return supvLvlId != null ? supvLvlId.trim() : supvLvlId;
+	public String getSupervisorLevelId() {
+		return supervisorLevelId != null ? supervisorLevelId.trim() : supervisorLevelId;
 	}
 
-	public void setSupvLvlId(String supvLvlId) {
-		this.supvLvlId = supvLvlId != null ? supvLvlId.trim() : supvLvlId;
+	public void setSupervisorLevelId(String supervisorLevelId) {
+		this.supervisorLevelId = supervisorLevelId != null ? supervisorLevelId.trim() : supervisorLevelId;
 	}
 
-	public String getTariffAreaGer() {
-		return tariffAreaGer != null ? tariffAreaGer.trim() : tariffAreaGer;
+	public String getTariffArea() {
+		return tariffArea != null ? tariffArea.trim() : tariffArea;
 	}
 
-	public void setTariffAreaGer(String tariffAreaGer) {
-		this.tariffAreaGer = tariffAreaGer != null ? tariffAreaGer.trim() : tariffAreaGer;
+	public void setTariffArea(String tariffArea) {
+		this.tariffArea = tariffArea != null ? tariffArea.trim() : tariffArea;
 	}
 
-	public String getTariffGer() {
-		return tariffGer != null ? tariffGer.trim() : tariffGer;
+	public String getTariff() {
+		return tariff != null ? tariff.trim() : tariff;
 	}
 
-	public void setTariffGer(String tariffGer) {
-		this.tariffGer = tariffGer != null ? tariffGer.trim() : tariffGer;
+	public void setTariff(String tariff) {
+		this.tariff = tariff != null ? tariff.trim() : tariff;
 	}
 
-	public String getTaxLocationCd() {
-		return taxLocationCd != null ? taxLocationCd.trim() : taxLocationCd;
+	public String getTaxLocationCode() {
+		return taxLocationCode != null ? taxLocationCode.trim() : taxLocationCode;
 	}
 
-	public void setTaxLocationCd(String taxLocationCd) {
-		this.taxLocationCd = taxLocationCd != null ? taxLocationCd.trim() : taxLocationCd;
+	public void setTaxLocationCode(String taxLocationCode) {
+		this.taxLocationCode = taxLocationCode != null ? taxLocationCode.trim() : taxLocationCode;
 	}
 
-	public Date getTerminationDt() {
-		return this.terminationDt;
+	public Date getTerminationDate() {
+		return this.terminationDate;
 	}
 
-	public void setTerminationDt(Date terminationDt) {
-		this.terminationDt = terminationDt;
+	public void setTerminationDate(Date terminationDate) {
+		this.terminationDate = terminationDate;
 	}
 
-	public String getUnionCd() {
-		return unionCd != null ? unionCd.trim() : unionCd;
+	public String getUnionCode() {
+		return unionCode != null ? unionCode.trim() : unionCode;
 	}
 
-	public void setUnionCd(String unionCd) {
-		this.unionCd = unionCd != null ? unionCd.trim() : unionCd;
+	public void setUnionCode(String unionCode) {
+		this.unionCode = unionCode != null ? unionCode.trim() : unionCode;
 	}
 
 	public BigDecimal getUnionFeeAmount() {
@@ -1345,84 +1346,84 @@ public class PsJob implements Serializable {
 		this.unionFeeAmount = unionFeeAmount;
 	}
 
-	public Date getUnionFeeEndDt() {
-		return this.unionFeeEndDt;
+	public Date getUnionFeeEndDate() {
+		return this.unionFeeEndDate;
 	}
 
-	public void setUnionFeeEndDt(Date unionFeeEndDt) {
-		this.unionFeeEndDt = unionFeeEndDt;
+	public void setUnionFeeEndDate(Date unionFeeEndDate) {
+		this.unionFeeEndDate = unionFeeEndDate;
 	}
 
-	public Date getUnionFeeStartDt() {
-		return this.unionFeeStartDt;
+	public Date getUnionFeeStartDate() {
+		return this.unionFeeStartDate;
 	}
 
-	public void setUnionFeeStartDt(Date unionFeeStartDt) {
-		this.unionFeeStartDt = unionFeeStartDt;
+	public void setUnionFeeStartDate(Date unionFeeStartDate) {
+		this.unionFeeStartDate = unionFeeStartDate;
 	}
 
-	public String getUnionFullPart() {
-		return unionFullPart != null ? unionFullPart.trim() : unionFullPart;
+	public String getUnionParticipation() {
+		return unionParticipation != null ? unionParticipation.trim() : unionParticipation;
 	}
 
-	public void setUnionFullPart(String unionFullPart) {
-		this.unionFullPart = unionFullPart != null ? unionFullPart.trim() : unionFullPart;
+	public void setUnionParticipation(String unionParticipation) {
+		this.unionParticipation = unionParticipation != null ? unionParticipation.trim() : unionParticipation;
 	}
 
-	public String getUnionPos() {
-		return unionPos != null ? unionPos.trim() : unionPos;
+	public String getUnionPosition() {
+		return unionPosition != null ? unionPosition.trim() : unionPosition;
 	}
 
-	public void setUnionPos(String unionPos) {
-		this.unionPos = unionPos != null ? unionPos.trim() : unionPos;
+	public void setUnionPosition(String unionPosition) {
+		this.unionPosition = unionPosition != null ? unionPosition.trim() : unionPosition;
 	}
 
-	public Date getUnionSeniorityDt() {
-		return this.unionSeniorityDt;
+	public Date getUnionSeniorityDate() {
+		return this.unionSeniorityDate;
 	}
 
-	public void setUnionSeniorityDt(Date unionSeniorityDt) {
-		this.unionSeniorityDt = unionSeniorityDt;
+	public void setUnionSeniorityDate(Date unionSeniorityDate) {
+		this.unionSeniorityDate = unionSeniorityDate;
 	}
 
-	public String getValue1Fra() {
-		return value1Fra != null ? value1Fra.trim() : value1Fra;
+	public String getValue1() {
+		return value1 != null ? value1.trim() : value1;
 	}
 
-	public void setValue1Fra(String value1Fra) {
-		this.value1Fra = value1Fra != null ? value1Fra.trim() : value1Fra;
+	public void setValue1(String value1) {
+		this.value1 = value1 != null ? value1.trim() : value1;
 	}
 
-	public String getValue2Fra() {
-		return value2Fra != null ? value2Fra.trim() : value2Fra;
+	public String getValue2() {
+		return value2 != null ? value2.trim() : value2;
 	}
 
-	public void setValue2Fra(String value2Fra) {
-		this.value2Fra = value2Fra != null ? value2Fra.trim() : value2Fra;
+	public void setValue2(String value2) {
+		this.value2 = value2 != null ? value2.trim() : value2;
 	}
 
-	public String getValue3Fra() {
-		return value3Fra != null ? value3Fra.trim() : value3Fra;
+	public String getValue3() {
+		return value3 != null ? value3.trim() : value3;
 	}
 
-	public void setValue3Fra(String value3Fra) {
-		this.value3Fra = value3Fra != null ? value3Fra.trim() : value3Fra;
+	public void setValue3(String value3) {
+		this.value3 = value3 != null ? value3.trim() : value3;
 	}
 
-	public String getValue4Fra() {
-		return value4Fra != null ? value4Fra.trim() : value4Fra;
+	public String getValue4() {
+		return value4 != null ? value4.trim() : value4;
 	}
 
-	public void setValue4Fra(String value4Fra) {
-		this.value4Fra = value4Fra != null ? value4Fra.trim() : value4Fra;
+	public void setValue4(String value4) {
+		this.value4 = value4 != null ? value4.trim() : value4;
 	}
 
-	public String getValue5Fra() {
-		return value5Fra != null ? value5Fra.trim() : value5Fra;
+	public String getValue5() {
+		return value5 != null ? value5.trim() : value5;
 	}
 
-	public void setValue5Fra(String value5Fra) {
-		this.value5Fra = value5Fra != null ? value5Fra.trim() : value5Fra;
+	public void setValue5(String value5) {
+		this.value5 = value5 != null ? value5.trim() : value5;
 	}
 
 	public BigDecimal getWorkDayHours() {
@@ -1433,64 +1434,34 @@ public class PsJob implements Serializable {
 		this.workDayHours = workDayHours;
 	}
 
-	public String getWppStopFlag() {
-		return wppStopFlag != null ? wppStopFlag.trim() : wppStopFlag;
+	public String getStopWageProgression() {
+		return stopWageProgression != null ? stopWageProgression.trim() : stopWageProgression;
 	}
 
-	public void setWppStopFlag(String wppStopFlag) {
-		this.wppStopFlag = wppStopFlag != null ? wppStopFlag.trim() : wppStopFlag;
+	public void setStopWageProgression(String stopWageProgression) {
+		this.stopWageProgression = stopWageProgression != null ? stopWageProgression.trim() : stopWageProgression;
 	}
 
-	public String getWrksCnclFunction() {
-		return wrksCnclFunction != null ? wrksCnclFunction.trim() : wrksCnclFunction;
+	public String getWorkCouncilFunction() {
+		return workCouncilFunction != null ? workCouncilFunction.trim() : workCouncilFunction;
 	}
 
-	public void setWrksCnclFunction(String wrksCnclFunction) {
-		this.wrksCnclFunction = wrksCnclFunction != null ? wrksCnclFunction.trim() : wrksCnclFunction;
+	public void setWrksCnclFunction(String workCouncilFunction) {
+		this.workCouncilFunction = workCouncilFunction != null ? workCouncilFunction.trim() : workCouncilFunction;
 	}
 
-	public String getWrksCnclRoleChe() {
-		return wrksCnclRoleChe != null ? wrksCnclRoleChe.trim() : wrksCnclRoleChe;
+	public String getWorkCouncilRole() {
+		return workCouncilRole != null ? workCouncilRole.trim() : workCouncilRole;
 	}
 
-	public void setWrksCnclRoleChe(String wrksCnclRoleChe) {
-		this.wrksCnclRoleChe = wrksCnclRoleChe != null ? wrksCnclRoleChe.trim() : wrksCnclRoleChe;
-	}
-
-	/**
-	 * HR01-Get-Job-Data
-	 * Gets the employees data from the job table that needs to be interfaced to the legacy system
-	 * @param employeeId
-	 * @return PsJob record
-	 */
-	public PsJob hr01GetJobData(String employeeId) {
-		logger.debug("hr01GetJobData() ***");
-		//SELECT
-		//FROM PS_JOB P
-		//WHERE P.EmplId = $Wrk_Emplid
-		//AND P.Empl_Rcd = 0
-		//AND P.EffDt = 
-			//(SELECT MAX(EffDt) FROM  PS_JOB P2
-			//WHERE P2.EmplId = P.EmplId
-			//AND P2.Empl_Rcd = P.Empl_Rcd
-			//AND (P2.ACTION IN ('HIR','REH')
-			//OR (P2.ACTION = 'DTA' AND P2.ACTION_REASON = 'CNV')
-			//OR (P2.ACTION = 'TER' AND P2.ACTION_REASON = 'CNV'))
-			//AND  TO_CHAR(P2.EffDt,'YYYY-MM-DD') <= $PSEffdt)
-		//AND P.EffSeq = 
-			//(SELECT MAX(EffSeq) FROM PS_JOB P3
-			//WHERE P3.EmplId = P.EmplId
-			//AND P3.Empl_Rcd = P.Empl_Rcd
-			//AND (P3.ACTION IN ('HIR','REH')
-			//OR (P3.ACTION = 'DTA' AND P3.ACTION_REASON = 'CNV')
-			//OR (P3.ACTION = 'TER' AND P3.ACTION_REASON = 'CNV'))
-		//AND P3.EffDt = P.EffDt)
-		return null;
+	public void setWorkCouncilRole(String workCouncilRole) {
+		this.workCouncilRole = workCouncilRole != null ? workCouncilRole.trim() : workCouncilRole;
 	}
 
 	/**
-	 * Finds PsJob records by employeeId, effectiveSequence, effectiveDate, and where employmentRecordNumber = 0
+	 * Finds PsJob records by employeeId, effectiveSequence, effectiveDate, and where employeeRecordNumber = 0
 	 * @see HR02-Get-Job in ZHRI102A.SQC
+	 * @see HR05-Get-Job in ZHRI105A.SQC
 	 * @param employeeId
 	 * @param effectiveDate
 	 * @param effectiveSequence
@@ -1498,23 +1469,22 @@ public class PsJob implements Serializable {
 	 */
 	public static PsJob findByEmployeeIdAndEffectiveDateAndEffectiveSequence(String employeeId, Date effectiveDate, BigInteger effectiveSequence) {
 		logger.debug("findByEmployeeIdAndEffectiveDateAndEffectiveSequence() ***");
-		//SELECT
-		//FROM PS_Job P
-		//WHERE P.EmplId = $PsEmplId
-		//AND TO_CHAR(P.EffDt, 'YYYY-MM-DD') = $PsDate
-		//AND P.EffSeq = #PsEffSeq
-		//AND P.Empl_Rcd = 0
+		//SELECT FROM PS_JOB P
+		//WHERE P.EMPLID = $EmplId
+		//AND TO_CHAR(P.EFFDT, 'YYYY-MM-DD') = $EffDt
+		//AND P.EFFSEQ = #EffSeq
+		//AND P.EMPL_RCD = 0
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PsJob> resultList = em.createQuery(
 	    			"SELECT p FROM PsJob p "
-	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    				+ "AND p.effectiveDate = :effectiveDate "
 	    				+ "AND p.effectiveSequence = :effectiveSequence "
-	    				+ "AND p.employmentRecordNumber = 0 "
+	    				+ "AND p.employeeRecordNumber = 0 "
 	    				, PsJob.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .setParameter("effectiveSequence", effectiveSequence)
 	    		    .setHint(QueryHints.REFRESH, true)
@@ -1541,30 +1511,30 @@ public class PsJob implements Serializable {
 	 */
 	public static PsJob hr04GetJobData(String employeeId, Date effectiveDate) {
 		logger.debug("hr04GetJobData() ***");
-		//SELECT
-		//FROM PS_JOB P
-		//WHERE P.EmplId = $EmplId
-		//AND TO_CHAR(P.EffDt, 'YYYY-MM-DD') = $PSEffDt
-		//AND P.EffSeq =
-			//(SELECT MAX(P2.EffSeq) FROM  PS_JOB P2
-			//WHERE P2.EmplId   = P.EmplId
-			//AND P2.Empl_Rcd = P.Empl_Rcd
-			//AND P2.EffDt    = P.EffDt)
+		//SELECT FROM PS_JOB P
+		//WHERE P.EMPLID = $EmplId
+		//AND TO_CHAR(P.EFFDT, 'YYYY-MM-DD') = $PSEffDt
+		//AND P.EFFSEQ =
+				//(SELECT MAX(P2.EFFSEQ) FROM  PS_JOB P2
+				//WHERE P2.EMPLID   = P.EmplId
+				//AND P2.EMPL_RCD = P.Empl_Rcd
+				//AND P2.EFFDT    = P.EffDt)
 		//AND P.Empl_Rcd = 0
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PsJob> resultList = em.createQuery(
 	    		    "SELECT pj FROM PsJob pj "
-	    		    		+ "WHERE UPPER(TRIM(pj.employeeId)) = :employeeId "
-	    		    		+ "		AND pj.effectiveDate <= :effectiveDate "	
-	    		    		+ "		AND pj.effectiveSequence = (SELECT MAX(pj2.effectiveSequence) FROM PsJob pj2 "
-	    		    		+ "				WHERE pj2.employeeId = pj.employeeId "
-	    		    		+ "					AND pj2.employmentRecordNumber = pj.employmentRecordNumber "
-	    		    		+ "					AND pj2.effectiveDate = pj.effectiveDate) "
-	    		    		+ "		AND pj.employmentRecordNumber = 0"
+	    		    		+ "WHERE UPPER(TRIM(pj.employeeId)) = UPPER(TRIM(:employeeId)) "
+	    		    		+ "AND pj.effectiveDate <= :effectiveDate "
+	    		    		+ "AND pj.effectiveSequence = "
+	    		    				+ "(SELECT MAX(pj2.effectiveSequence) FROM PsJob pj2 "
+	    		    				+ "WHERE UPPER(TRIM(pj2.employeeId)) = UPPER(TRIM(pj.employeeId)) "
+	    		    				+ "AND pj2.employeeRecordNumber = pj.employeeRecordNumber "
+	    		    				+ "AND pj2.effectiveDate = pj.effectiveDate) "
+	    		    		+ "AND pj.employeeRecordNumber = 0"
 	    			, PsJob.class)
-	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
@@ -1584,41 +1554,40 @@ public class PsJob implements Serializable {
 	 * This procedure will get REG_REGION from PS_JOB
 	 * @see HR05-Get-Region
 	 * @param employeeId
-	 * @return regulatoryRegion
+	 * @return region
 	 */
-	public static String findRegulatoryRegionByEmployeeId(String employeeId) {
+	public static String findRegionByEmployeeId(String employeeId) {
 		logger.debug("findRegulatoryRegionByEmployeeId() ***");
-		//SELECT
-		//FROM PS_JOB P
+		//SELECT FROM PS_JOB P
 		//WHERE P.EmplId = $PsEmplId
 		//AND P.EffDt = 
-			//(SELECT MAX(EffDt) FROM PS_JOB P2
-			//WHERE P2.EmplId = P.EmplId
-			//AND P2.Empl_Rcd = P.Empl_Rcd)
+			 //(SELECT MAX(EffDt) FROM PS_JOB P2
+			 //WHERE P2.EmplId = P.EmplId
+			 //AND P2.Empl_Rcd = P.Empl_Rcd)
 		//AND P.EffSeq = 
-			//(SELECT MAX(EffSeq) FROM PS_JOB P3
-			//WHERE P3.EmplId = P.EmplId
-			//AND P3.Empl_Rcd = P.Empl_Rcd
-			//AND P3.EffDt = P.EffDt)                     
+			 //(SELECT MAX(EffSeq) FROM PS_JOB P3
+			 //WHERE P3.EmplId = P.EmplId
+			 //AND P3.Empl_Rcd = P.Empl_Rcd
+			 //AND P3.EffDt = P.EffDt)                     
 		//AND P.Empl_Rcd = 0                   
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<String> resultList = em.createQuery(
-	    			"SELECT p.regulatoryRegion FROM PsJob p "
-	    				+ "WHERE TRIM(UPPER(p.employeeId)) = :employeeId "
+	    			"SELECT TRIM(UPPER(p.region)) FROM PsJob p "
+	    				+ "WHERE TRIM(UPPER(p.employeeId)) = TRIM(UPPER(:employeeId)) "
 	    					+ "AND p.effectiveDate = "
 	    						+ "(SELECT MAX(p2.effectiveDate) FROM PsJob p2 "
 	    						+ "WHERE TRIM(UPPER(p2.employeeId)) = TRIM(UPPER(p.employeeId)) "
-	    							+ "AND p2.employmentRecordNumber = p.employmentRecordNumber) "
+	    							+ "AND p2.employeeRecordNumber = p.employeeRecordNumber) "
 	    					+ "AND p.effectiveSequence = "
 	    						+ "(SELECT MAX(p3.effectiveSequence) FROM PsJob p3 "
 	    						+ "WHERE TRIM(UPPER(p3.employeeId)) = TRIM(UPPER(p.employeeId)) "
-	    							+ "AND p3.employmentRecordNumber = p.employmentRecordNumber "
+	    							+ "AND p3.employeeRecordNumber = p.employeeRecordNumber "
 	    							+ "AND p3.effectiveDate = p.effectiveDate) "
-	    					+ "AND p.employmentRecordNumber = 0 "
+	    					+ "AND p.employeeRecordNumber = 0 "
 	    			, String.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList.get(0);
@@ -1636,27 +1605,27 @@ public class PsJob implements Serializable {
 	/**
 	 * 
 	 * @param employeeId
-	 * @param employmentRecordNumber
+	 * @param employeeRecordNumber
 	 * @param effectiveDate
 	 * @return max effective sequence
 	 */
-	public static BigInteger findMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate(String employeeId, BigInteger employmentRecordNumber, Date effectiveDate) {
-		logger.debug("findMaxEffectiveSequenceByEmployeeIdAndEmploymentRecordNumberAndEffectiveDate() ***");
-		//SELECT MAX(EffSeq) FROM PS_JOB P
-		//WHERE P.EmplId = $EmplId
-		//AND P.Empl_Rcd = $Empl_Rcd
-		//AND P.EffDt = $EffDt
+	public static BigInteger findMaxEffectiveSequenceByEmployeeIdAndemployeeRecordNumberAndEffectiveDate(String employeeId, BigInteger employeeRecordNumber, Date effectiveDate) {
+		logger.debug("findMaxEffectiveSequenceByEmployeeIdAndemployeeRecordNumberAndEffectiveDate() ***");
+		//SELECT MAX(EFFSEQ) FROM PS_JOB P
+		//WHERE P.EMPLID = $EmplId
+		//AND P.EMPL_RCD = $Empl_Rcd
+		//AND P.EFFDT = $EffDt
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<BigInteger> resultList = em.createQuery(
 	    			"SELECT MAX(p.effectiveSequence) FROM PsJob p "
-	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-	    				+ "AND p.employmentRecordNumber = :employmentRecordNumber "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
+	    				+ "AND p.employeeRecordNumber = :employeeRecordNumber "
 	    				+ "AND p.effectiveDate <= :effectiveDate ",
 	    				BigInteger.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-	    		    .setParameter("employmentRecordNumber", employmentRecordNumber)
+	    		    .setParameter("employeeId", employeeId)
+	    		    .setParameter("employeeRecordNumber", employeeRecordNumber)
 	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
@@ -1675,26 +1644,28 @@ public class PsJob implements Serializable {
 	/**
 	 * 
 	 * @param employeeId
-	 * @param employmentRecordNumber
+	 * @param employeeRecordNumber
 	 * @return max effective date
 	 */
-	public static Date findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber(String employeeId, BigInteger employmentRecordNumber) {
-		logger.debug("findMaxEffectiveDateByEmployeeIdAndEmploymentRecordNumber() ***");
-		//SELECT MAX(EffDt) FROM PS_JOB P
-		//WHERE P.EmplId = $EmplId
-		//AND P.Empl_Rcd = $Empl_Rcd
-		//AND P.EffDt <= $AsOfToday
+	public static Date findMaxEffectiveDateByEmployeeIdAndemployeeRecordNumber(String employeeId, BigInteger employeeRecordNumber) {
+		logger.debug("findMaxEffectiveDateByEmployeeIdAndemployeeRecordNumber() ***");
+		Date asOfToday = ErdUtils.asOfToday();
+		//SELECT MAX(EFFDT) FROM PS_JOB P
+		//WHERE P.EMPLID = $EmplId
+		//AND P.EMPL_RCD = $Empl_Rcd
+		//AND P.EFFDT <= $AsOfToday
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<Date> resultList = em.createQuery(
 	    			"SELECT MAX(p.effectiveDate) FROM PsJob p "
-	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-	    				+ "AND p.employmentRecordNumber = :employmentRecordNumber "
-	    				+ "AND p.effectiveDate <= CURRENT_DATE ",
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
+	    				+ "AND p.employeeRecordNumber = :employeeRecordNumber "
+	    				+ "AND p.effectiveDate <= :asOfToday ",
 	    				Date.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-	    		    .setParameter("employmentRecordNumber", employmentRecordNumber)
+	    		    .setParameter("employeeId", employeeId)
+	    		    .setParameter("employeeRecordNumber", employeeRecordNumber)
+	    		    .setParameter("asOfToday", asOfToday, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
@@ -1710,22 +1681,21 @@ public class PsJob implements Serializable {
 	}
 
 	/**
-	 * 
 	 * @param employeeId
 	 * @param effectiveDate
 	 * @return PsJob records
 	 */
-	public static List<PsJob> findByEmployeeIdAndEffectiveDate(String employeeId, java.util.Date effectiveDate) {
+	public static List<PsJob> findByEmployeeIdAndEffectiveDate(String employeeId, Date effectiveDate) {
 		logger.debug("findByEmployeeIdAndEffectiveDate() ***");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PsJob> resultList = em.createQuery(
 	    			"SELECT p FROM PsJob p "
-	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    				+ "AND p.effectiveDate <= :effectiveDate ",
 	    				PsJob.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
@@ -1744,19 +1714,19 @@ public class PsJob implements Serializable {
 	/**
 	 * 
 	 * @param employeeId
-	 * @return employmentRecordNumber
+	 * @return employeeRecordNumber
 	 */
-	public static BigInteger findEmploymentRecordNumberByEmployeeId(String employeeId) {
+	public static BigInteger findEmployeeRecordNumberByEmployeeId(String employeeId) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<BigInteger> resultList = em.createQuery(
-	    			"SELECT p.employmentRecordNumber FROM PsJob p "
-	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-	    				+ "AND p.employmentRecordNumber = :employmentRecordNumber "
+	    			"SELECT p.employeeRecordNumber FROM PsJob p "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
+	    				+ "AND p.employeeRecordNumber = :employeeRecordNumber "
 	    				+ "AND p.effectiveDate <= CURRENT_DATE ",
 	    				BigInteger.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
@@ -1774,42 +1744,39 @@ public class PsJob implements Serializable {
 	 * @param employeeId
 	 * @return true if employee is a contractor
 	 */
-	public static Boolean employeeIsContractor(String employeeId) {
-		logger.debug("employeeIsContractor() ***");
-		//SELECT
-		//FROM PS_JOB P
+	public static Boolean isContractor(String employeeId) {
+		logger.debug("isContractor() ***");
+		//SELECT FROM PS_JOB P
 		//WHERE P.EmplId = $PsEmplId
-		//		AND P.Empl_Class = 'R'
-		//		AND P.EffDt = 
-		//				(SELECT MAX(EffDt) FROM PS_JOB P2
-		//					WHERE P2.EmplId = P.EmplId
-		//						AND P2.Empl_Rcd = P.Empl_Rcd
-		//						AND P2.EffDt <= $AsOfToday)
-		//		AND P.EffSeq = 
-		//				(SELECT MAX(EffSeq) FROM PS_JOB P3
-		//					WHERE P3.EmplId = P.EmplId
-		//						AND P3.Empl_Rcd = P.Empl_Rcd
-		//						AND P3.EffDt = P.EffDt)
+		//AND P.Empl_Class = 'R'
+		//AND P.EffDt = 
+		//			(SELECT MAX(EffDt) FROM PS_JOB P2 WHERE P2.EmplId = P.EmplId
+		//			AND P2.Empl_Rcd = P.Empl_Rcd
+		//			AND P2.EffDt <= $AsOfToday)
+		//AND P.EffSeq = 
+		//			(SELECT MAX(EffSeq) FROM PS_JOB P3 WHERE P3.EmplId = P.EmplId
+		//			AND P3.Empl_Rcd = P.Empl_Rcd
+		//			AND P3.EffDt = P.EffDt)
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<Date> resultList = em.createQuery(
 	    			"SELECT p FROM PsJob p "
-		    			+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-		    			+ "AND p.employeeClass = 'R' "
+		    			+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
+		    			+ "AND UPPER(TRIM(p.employeeClass)) = 'R' "
 		    			+ "AND p.effectiveDate = "
-		    			+ "		(SELECT MAX(p2.effectiveDate) FROM PsJob p2 "
-		    			+ "			WHERE p2.employeeId = p.employeeId "
-		    			+ "				AND p2.employmentRecordNumber = p.employmentRecordNumber "
-		    			+ "				AND p2.effectiveDate <= :asOfToday) "
+				    			+ "(SELECT MAX(p2.effectiveDate) FROM PsJob p2 "
+				    			+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
+				    			+ "AND p2.employeeRecordNumber = p.employeeRecordNumber "
+				    			+ "AND p2.effectiveDate <= :asOfToday) "
 		    			+ "AND p.effectiveSequence = "
-		    			+ "		(SELECT MAX(p3.effectiveSequence) FROM PsJob p3 "
-		    			+ "			WHERE p3.employeeId = p.employeeId "
-		    			+ "				AND p3.employmentRecordNumber = p.employmentRecordNumber "
-		    			+ "				AND p3.effectiveDate = p.effectiveDate) ",
+				    			+ "(SELECT MAX(p3.effectiveSequence) FROM PsJob p3 "
+				    			+ "WHERE UPPER(TRIM(p3.employeeId)) = UPPER(TRIM(p.employeeId)) "
+				    			+ "AND p3.employeeRecordNumber = p.employeeRecordNumber "
+				    			+ "AND p3.effectiveDate = p.effectiveDate) ",
 	    				Date.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-	    		    .setParameter("asOfToday", ErdUtil.asOfToday(), TemporalType.DATE)
+	    		    .setParameter("employeeId", employeeId)
+	    		    .setParameter("asOfToday", ErdUtils.asOfToday(), TemporalType.DATE)
 	    		    .getResultList();
 	    	return (resultList != null && resultList.size() > 0);
 	    }
@@ -1834,7 +1801,7 @@ public class PsJob implements Serializable {
 	public static Boolean correspondingJobRecordExists(String employeeId, Date effectiveDate, String processName) {
 		logger.debug("correspondingJobRecordExists() ***");
 		//add a day to current effective date
-		Date effectiveDatePlusOne = ErdUtil.addDays(effectiveDate, 1);
+		Date effectiveDatePlusOne = ErdUtils.addDays(effectiveDate, 1);
 		//SELECT FROM PS_JOB P
 		//WHERE P.EMPLID = $PsEmplId
 			//AND TO_CHAR(P.EFFDT, 'YYYY-MM-DD') = $effectiveDatePlusOne
@@ -1843,9 +1810,9 @@ public class PsJob implements Serializable {
 	    try {
 	    	List<PsJob> resultList = em.createQuery(
 	    			"SELECT p FROM PsJob p "
-	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    				+ "AND p.effectiveDate <= :effectiveDatePlusOne ", PsJob.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("effectiveDatePlusOne", effectiveDatePlusOne, TemporalType.DATE)
 	    		    .getResultList();
 	    	return (resultList != null && resultList.size() > 0);
@@ -1859,10 +1826,16 @@ public class PsJob implements Serializable {
 	    return false;	
 	}
 
+	/**
+	 * @see HR01-Get-Job-Data
+	 * @param employeeId
+	 * @param effectiveDate
+	 * @return PsJob record
+	 */
 	public static PsJob findJobData(String employeeId, Date effectiveDate) {
 		logger.debug("findJobData() ***");
-		//SELECT FROM PS_JOB CJ
-		//WHERE CJ.EMPLID = $Wrk_Emplid
+		//SELECT CJ.REG_REGION FROM PS_JOB CJ
+		//WHERE CJ.EMPLID = $EmplId
 		//AND CJ.EMPL_RCD = 0
 		//AND CJ.EFFDT = 
 				//(SELECT MAX(EFFDT) FROM PS_JOB CJ2
@@ -1881,26 +1854,26 @@ public class PsJob implements Serializable {
 	    try {
 	    	List<PsJob> resultList = em.createQuery(
 					"SELECT p FROM PsJob p "
-					+ "WHERE TRIM(UPPER(p.employeeId)) = :employeeId "
-					+ "AND p.employmentRecordNumber = 0 "
+					+ "WHERE TRIM(UPPER(p.employeeId)) = UPPER(TRIM(:employeeId)) "
+					+ "AND p.employeeRecordNumber = 0 "
 					+ "AND p.effectiveDate = "
 							+ "(SELECT MAX(p2.effectiveDate) FROM PsJob p2 "
-							+ "WHERE p2.employeeId = p.employeeId "
-							+ "AND p2.employmentRecordNumber = p.employmentRecordNumber "
+							+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
+							+ "AND p2.employeeRecordNumber = p.employeeRecordNumber "
 							+ "AND (p2.action IN ('HIR','REH') "
 									+ "OR (p2.action = 'DTA' AND p2.actionReason = 'CNV') "
 									+ "OR (p2.action = 'TER' AND p2.actionReason = 'CNV')) "
 							+ "AND p2.effectiveDate <= :effectiveDate) "
 					+ "AND p.effectiveSequence = "
 							+ "(SELECT MAX(p3.effectiveSequence) FROM PsJob p3 "
-							+ "WHERE p3.employeeId = p.employeeId "
-							+ "AND p3.employmentRecordNumber = p.employmentRecordNumber "
+							+ "WHERE UPPER(TRIM(p3.employeeId)) = UPPER(TRIM(p.employeeId)) "
+							+ "AND p3.employeeRecordNumber = p.employeeRecordNumber "
 							+ "AND (p3.action IN ('HIR','REH') "
 									+ "OR (p3.action = 'DTA' AND p3.actionReason = 'CNV') "
 									+ "OR (p3.action = 'TER' AND p3.actionReason = 'CNV')) "
-					+ "AND p3.effectiveDate = p.effectiveDate) "
+							+ "AND p3.effectiveDate = p.effectiveDate) "
 	    			, PsJob.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {

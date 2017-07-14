@@ -11,7 +11,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import erd.ErdUtil;
+import erd.ErdUtils;
 import erd.model.CrossReferenceCompany;
 import erd.model.CrossReferenceEmployeeId;
 import erd.model.CrossReferenceEthnicGroup;
@@ -31,7 +31,8 @@ import erd.model.PsPersonalData;
 import erd.model.PsPersonalNationalId;
 import erd.model.PsPersonalPhone;
 import erd.model.PsRecruitmentSource;
-import erd.model.PsReferralSource;
+import erd.model.PsTranslationItem;
+import erd.model.PsPersonalApplicantReferral;
 
 /**
  * Employee Demographic Change Process
@@ -59,7 +60,7 @@ public class EmployeeDemographicChange extends Employee {
 		//DO HR05-Get-Job
 		parameterMap = fetchJobData(parameterMap);
 		//DO HR05-Get-Region
-		parameterMap.put("regulatoryRegion", PsJob.findRegulatoryRegionByEmployeeId((String)parameterMap.get("employeeId")));
+		parameterMap.put("regulatoryRegion", PsJob.findRegionByEmployeeId((String)parameterMap.get("employeeId")));
 		//DO HR05-Get-Location-Country
 //		parameterMap.put("regulatoryRegion", PsLocation.findCountryByLocation(location));
 		//DO HR05-GET-2CHAR-COUNTRY
@@ -93,15 +94,15 @@ public class EmployeeDemographicChange extends Employee {
 	 */
 	private static HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		if(Main.DEBUG) logger.debug("*** EmployeeDemographicChange.fetchProcessParameters()");
-		parameterMap.put("errorProgramParameter", "HRZ105A");
+		parameterMap.put("errorProgram", "HRZ105A");
 		parameterMap = fetchDriversLicenseData(parameterMap);
 		parameterMap = fetchEmergencyContactData(parameterMap);
 		parameterMap = fetchNameData(parameterMap);
-		parameterMap.put("changeDate", new SimpleDateFormat("yyyyMMdd").format(ErdUtil.asOfToday()).toUpperCase());
-		parameterMap.put("nationalId", PsPersonalNationalId.findNationalIdByEmployeeIdAndCountry((String)parameterMap.get("employeeId"), (String)parameterMap.get("region")));
+		parameterMap.put("changeDate", new SimpleDateFormat("yyyyMMdd").format(ErdUtils.asOfToday()).toUpperCase());
+		parameterMap.put("nationalId", PsPersonalNationalId.findPrimaryNationalIdByEmployeeIdAndCountry((String)parameterMap.get("employeeId"), (String)parameterMap.get("region")));
 		parameterMap.put("homePhone", PsPersonalPhone.findPhoneByEmployeeIdAndPhoneType((String)parameterMap.get("employeeId"), "MAIN"));
 		parameterMap.put("businessPhone", PsPersonalPhone.findPhoneByEmployeeIdAndPhoneType((String)parameterMap.get("employeeId"), "BUSN"));
-		parameterMap.put("citizenshipCountry", PsCountry.findCountryIsoAlpha2CodeByEmployeeId((String)parameterMap.get("employeeId")));
+		parameterMap.put("citizenshipCountry", PsCountry.findCitizenshipCountryIsoAlpha2CodeByEmployeeId((String)parameterMap.get("employeeId")));
 		parameterMap.put("nationalIdCountry", PsCountry.findCountryIsoAlpha2CodeByCountryIsoAlpha3Code((String)parameterMap.get("region")));
 		parameterMap.put("recruiterId", fetchRecruiterId(parameterMap));
 		parameterMap.put("nickname", fetchNickname(parameterMap));
@@ -177,13 +178,13 @@ public class EmployeeDemographicChange extends Employee {
 	 * @return parameterMap
 	 */
 	private static HashMap<String, Object> fetchEmergencyContactData(HashMap<String, Object> parameterMap) {
-		PsEmergencyContact psEmergencyContact = PsEmergencyContact.findByEmployeeIdAndPrimaryContact((String)parameterMap.get("employeeId"));
+		PsEmergencyContact psEmergencyContact = PsEmergencyContact.findPrimaryByEmployeeId((String)parameterMap.get("employeeId"));
 		if(psEmergencyContact != null) {
     		if(psEmergencyContact.getContactName() != null) {
     			psEmergencyContact.setContactName(psEmergencyContact.getContactName().trim().toUpperCase().replaceAll("'", "''"));
     		}
     		psEmergencyContact.setPhone(psEmergencyContact.getPhone() != null ? psEmergencyContact.getPhone().trim().replaceAll("[^a-zA-Z0-9] ", "") : psEmergencyContact.getPhone());
-    		psEmergencyContact.setRelationship(PsEmergencyContact.formatRelationship(psEmergencyContact.getRelationship()));
+    		psEmergencyContact.setRelationship(formatRelationship(psEmergencyContact.getRelationship()));
     		parameterMap.put("emergencyContactName", psEmergencyContact.getContactName());
     		parameterMap.put("emergencyContactPhone", psEmergencyContact.getPhone());
     		parameterMap.put("emergencyContactRelation", psEmergencyContact.getRelationship());
@@ -225,7 +226,7 @@ public class EmployeeDemographicChange extends Employee {
 	public static HashMap<String, Object> fetchNameData(HashMap<String, Object> parameterMap) {
 		PsName psName = PsName.findByEmployeeIdAndNameTypeAndEffectiveDate((String)parameterMap.get("employeeId"), "PRI", (Date)parameterMap.get("effectiveDate"));
 		if(psName != null) {
-		    String name = ErdUtil.formatPeopleSoftEmployeeNameToLegacyEmployeeName(psName.getFirstName(), psName.getMiddleName(), psName.getLastName(), psName.getNameSuffix());
+		    String name = ErdUtils.formatPeopleSoftEmployeeNameToLegacyEmployeeName(psName.getFirstName(), psName.getMiddleName(), psName.getLastName(), psName.getNameSuffix());
 			if(name != null) {
 				parameterMap.put("name", name.trim().toUpperCase().replaceAll("'", "''"));
 			}
@@ -255,7 +256,7 @@ public class EmployeeDemographicChange extends Employee {
 	//TODO: NEEDS MORE TESTING; not sure if this is 100% correct
 	private static HashMap<String, Object> fetchReferralRecruitmentData(HashMap<String, Object> parameterMap) {
 		//BEGIN-PROCEDURE HR05-GET-REFERRAL-SOURCE
-		PsReferralSource psReferralSource = PsReferralSource.findByEmployeeIdAndEffectiveDate((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate")); //PS_PERS_APPL_REF
+		PsPersonalApplicantReferral psReferralSource = PsPersonalApplicantReferral.findByEmployeeIdAndEffectiveDate((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate")); //PS_PERS_APPL_REF
 		BigInteger referralSourceId = psReferralSource.getSourceId();
 		PsRecruitmentSource psRecruitmentSource = PsRecruitmentSource.findBySourceId(referralSourceId); //PS_HRS_SOURCE_I
 		String referralSourceDescription = psRecruitmentSource.getSourceDescription();
@@ -276,9 +277,9 @@ public class EmployeeDemographicChange extends Employee {
 				referralSource = "";
 				//IF $PSRecruit_Source_Code = ' '   !If the Referral Source code was not entered in PS
 				if(referralSourceName == null || referralSourceName.isEmpty()) {
-					parameterMap.put("errorProgramParameter", "ZHRI105A");
+					parameterMap.put("errorProgram", "ZHRI105A");
 					//LET $ErrorMessageParm = 'Referral source not selected in PeopleSoft.'
-					parameterMap.put("errorMessageParameter", "Referral source not selected in PeopleSoft.");
+					parameterMap.put("errorMessage", "Referral source not selected in PeopleSoft.");
 					//DO Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
 					//DO Call-Error-Routine                 !From ZHRI100A.SQR
 					Main.doErrorCommand(parameterMap);
@@ -309,24 +310,6 @@ public class EmployeeDemographicChange extends Employee {
 		referralSource = referralSource != null ? referralSource.trim() : referralSource;
 		parameterMap.put("referralSource", referralSource);
 		return parameterMap;
-	}
-	
-	/**
-	 * @see HR05-Call-RPG-Program in ZHRI105A.SQC
-	 * @return list of parameter names for this process
-	 */
-	private static List<String> getParameterNameList() {
-		return Arrays.asList("employeeId", "group", "region", "branch", "operatorId",
-				"nationalId", "healthStat", "healthStatDescription",
-				"vehicleReport", "name", "namePrefix", "nickname",
-				"address", "city", "state", "postalCode",
-				"homePhone", "businessPhone", "citizenshipCountry",
-				"gender", "maritalStatus", "ethnicGroup",
-				"changeDate", "birthDate", "partTimeEffectiveDate", "startDate",
-				"driversLicenseNumber", "driversLicenseState",
-				"emergencyContactName", "emergencyContactPhone", "emergencyContactRelation", "employeeSpouse",
-				"referralSource", "recruiterGroup", "recruiterId", "referralSourceId",
-				"collegeName","collegeGradYear","collegeMajor", "nationalIdCountry");
 	}
 	
 	/**
@@ -406,8 +389,8 @@ public class EmployeeDemographicChange extends Employee {
 		String ethnicGroup = PsEthnicGroup.findEthnicGroupByEthnicGroupCode(ethnicGroupCode);
 		String legacyEthnicCode = CrossReferenceEthnicGroup.findActiveLegacyEthnicCodeByEthnicGroup(ethnicGroup);
 		if(legacyEthnicCode == null || legacyEthnicCode.isEmpty()) {
-			parameterMap.put("errorProgramParameter", "ZHRI105A");
-			parameterMap.put("errorMessageParameter", "Ethnic Group is not found in XRef table PS_ZHRT_ETHCD_CREF");
+			parameterMap.put("errorProgram", "ZHRI105A");
+			parameterMap.put("errorMessage", "Ethnic Group is not found in XRef table PS_ZHRT_ETHCD_CREF");
 			Main.doErrorCommand(parameterMap);
 		}
 		return legacyEthnicCode;
@@ -421,23 +404,15 @@ public class EmployeeDemographicChange extends Employee {
 	public static HashMap<String, Object> fetchJobData(HashMap<String, Object> parameterMap) {
 		PsJob psJob = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence((String)parameterMap.get("employeeId"), (Date)parameterMap.get("effectiveDate"), (BigInteger)parameterMap.get("effectiveSequence"));
 		if(psJob != null) {
-			parameterMap.put("PSDate", psJob.getLocation());
-			parameterMap.put("PSLocation", psJob.getLocation());
-			parameterMap.put("PSBusiness_unit", psJob.getLocation());
-			parameterMap.put("PSCompany", psJob.getLocation());
-			parameterMap.put("PSFullPartTime", psJob.getLocation());
-			parameterMap.put("PSEmplClass", psJob.getLocation());
-			parameterMap.put("PSEmplStatus", psJob.getLocation());
-			parameterMap.put("PSDeptid", psJob.getLocation());
-			parameterMap.put("PSJobcode", psJob.getLocation());
+			parameterMap = setJobParamters(psJob, parameterMap);
 			CrossReferencePt12p crossReferencePt12p = CrossReferencePt12p.findByDepartment(psJob.getLocation()); //location == department
 			if(crossReferencePt12p != null) {
 				parameterMap.put("group", crossReferencePt12p.getGroup());
 				parameterMap.put("branch", crossReferencePt12p.getBranch());
 			}
 			else {
-				parameterMap.put("errorProgramParameter", "ZHRI105A");
-				parameterMap.put("errorMessageParameter", "Location not in XRef table");
+				parameterMap.put("errorProgram", "ZHRI105A");
+				parameterMap.put("errorMessage", "Location not in XRef table");
 				Main.doErrorCommand(parameterMap);
 			}
 			parameterMap.put("region", CrossReferenceCompany.findLegacyRegionByBusinessUnit(psJob.getBusinessUnit()));
@@ -448,6 +423,43 @@ public class EmployeeDemographicChange extends Employee {
 		    //Do HR05-Get-Business-Unit
 		}
 		return parameterMap;
+	}
+	
+	/**
+	 * This procedure converts the PeopleSoft relationship codes to legacy system relationship descriptions.
+	 * @see HR05-Format-Relationships in ZHRI105A.SQC
+	 * @param relationship
+	 * @return relationship
+	 */
+	public static String formatRelationship(String relationship) {
+		Date asofToday = ErdUtils.asOfToday();
+		PsTranslationItem psXlatItem = PsTranslationItem.findByFieldNameAndFieldValueAndEffectiveDate("RELATIONSHIP", relationship, asofToday);
+		relationship = psXlatItem.getXlatLongName();
+		if(relationship != null) {
+			relationship = relationship.toUpperCase();
+			if(relationship.length() > 20) {
+				relationship = relationship.substring(0, 20);
+			}
+		}
+		return relationship;
+	}
+	
+	/**
+	 * @see HR05-Call-RPG-Program in ZHRI105A.SQC
+	 * @return list of parameter names for this process
+	 */
+	private static List<String> getParameterNameList() {
+		return Arrays.asList("employeeId", "group", "region", "branch", "operatorId",
+				"nationalId", "healthStat", "healthStatDescription",
+				"vehicleReport", "name", "namePrefix", "nickname",
+				"address", "city", "state", "postalCode",
+				"homePhone", "businessPhone", "citizenshipCountry",
+				"gender", "maritalStatus", "ethnicGroup",
+				"changeDate", "birthDate", "partTimeEffectiveDate", "startDate",
+				"driversLicenseNumber", "driversLicenseState",
+				"emergencyContactName", "emergencyContactPhone", "emergencyContactRelation", "employeeSpouse",
+				"referralSource", "recruiterGroup", "recruiterId", "referralSourceId",
+				"collegeName","collegeGradYear","collegeMajor", "nationalIdCountry");
 	}
 
 	

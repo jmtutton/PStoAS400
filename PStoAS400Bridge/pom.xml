@@ -96,6 +96,14 @@
 		    <artifactId>log4j-core</artifactId>
 		</dependency>
 		
+        <!-- ********** APACHE COMMONS LANG3 ********** -->
+		<!-- Provides highly reusable static utility methods, chiefly concerned with adding value to the java.lang classes. -->
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-lang3</artifactId>
+		    <version>3.0</version>
+		</dependency>
+		
 		
     </dependencies>
 

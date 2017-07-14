@@ -113,21 +113,20 @@ public class PsCountry implements Serializable {
 	 * @param employeeId
 	 * @return countryIsoAlpha2Code
 	 */
-	public static String findCountryIsoAlpha2CodeByEmployeeId(String employeeId) {
-		//SELECT P2.COUNTRY_2CHAR
-		//FROM PS_CITIZENSHIP P, PS_COUNTRY_TBL P2
-		//WHERE P.EMPLID = $PSEmplid
-		//AND P2.COUNTRY = P.COUNTRY
+	public static String findCitizenshipCountryIsoAlpha2CodeByEmployeeId(String employeeId) {
+		//SELECT P.COUNTRY_2CHAR
+		//FROM PS_COUNTRY_TBL P, PS_CITIZENSHIP P2
+		//WHERE P2.EMPLID = $PSEmplid AND P.COUNTRY = P2.COUNTRY
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<String> resultList = (List<String>) em.createQuery(
-	    			"SELECT p.countryIsoAlpha2Code "
-	    				+ "FROM PsCitizenship p, PsCountry p2 "
-	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-	    				+ "AND UPPER(TRIM(p2.countryIsoAlpha3Code)) = UPPER(TRIM(p.countryIsoAlpha3Code)) "
+	    			"SELECT UPPER(TRIM(p.countryIsoAlpha2Code)) "
+	    				+ "FROM PsCountry p, PsCitizenship p2 "
+	    				+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(:employeeId)) "
+	    				+ "AND UPPER(TRIM(p.countryIsoAlpha3Code)) = UPPER(TRIM(p2.countryIsoAlpha3Code)) "
 	    				, String.class)
-	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
@@ -151,17 +150,17 @@ public class PsCountry implements Serializable {
 	 * @return countryIsoAlpha2Code
 	 */
 	public static String findCountryIsoAlpha2CodeByCountryIsoAlpha3Code(String countryIsoAlpha3Code) {
-		//SELECT P.COUNTRY_2CHAR
-		//FROM PS_COUNTRY_TBL  P
-		//WHERE P.country = $PsRegRegion
+		//SELECT P.COUNTRY_2CHAR 
+		//FROM PS_COUNTRY_TBL P 
+		//WHERE P.COUNTRY = $PsRegRegion
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<String> resultList = em.createQuery(
-	    			"SELECT c.countryIsoAlpha2Code FROM PsCountry c "
-	    					+ "WHERE UPPER(TRIM(c.countryIsoAlpha3Code)) = :countryIsoAlpha3Code "
+	    			"SELECT UPPER(TRIM(c.countryIsoAlpha2Code)) FROM PsCountry c "
+	    					+ "WHERE UPPER(TRIM(c.countryIsoAlpha3Code)) = UPPER(TRIM(:countryIsoAlpha3Code)) "
 	    			, String.class)
-	    		    .setParameter("countryIsoAlpha3Code", countryIsoAlpha3Code.toUpperCase().trim())
+	    		    .setParameter("countryIsoAlpha3Code", countryIsoAlpha3Code)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList.get(0);

@@ -5,8 +5,6 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import erd.ErdUtil;
-
 /**
  * Entity implementation class for Entity: HR006P
  * @author John Tutton john@tutton.net
@@ -88,8 +86,6 @@ public class HR006P implements Serializable {
 	private Integer overallRatingReview;
 	
 	@Column(name="HMRNXA", length=8) //YYYYMMDD
-//	@Temporal(TemporalType.DATE)
-//	private Date nextAppraisalDate;
 	private String nextAppraisalDate;
 	
 	@Column(name="HMRDLN", length=20)
@@ -102,8 +98,6 @@ public class HR006P implements Serializable {
 	private String gender;
 	
 	@Column(name="HMRBDT", length=8) //YYYYMMDD
-//	@Temporal(TemporalType.DATE)
-//	private Date birthDate;
 	private String birthDate;
 	
 	@Column(name="HMRGP", length=2)
@@ -125,8 +119,6 @@ public class HR006P implements Serializable {
 	private String recruitmentSource;
 	
 	@Column(name="HMRGYR", length=4) //YYYY
-//	@Temporal(TemporalType.DATE)
-//	private Date graduationYear;
 	private String graduationYear;
 	
 	@Column(name="HMRMJR", length=25)
@@ -142,13 +134,9 @@ public class HR006P implements Serializable {
 	private String nickname;
 	
 	@Column(name="HMRHDT", length=8) //YYYYMMDD
-//	@Temporal(TemporalType.DATE)
-//	private Date lastHireDate;
 	private String lastHireDate;
 	
 	@Column(name="HMRLTD", length=8) //YYYYMMDD
-//	@Temporal(TemporalType.DATE)
-//	private Date lastTerminationDate;
 	private String lastTerminationDate;
 	
 	@Column(name="HMRCTZ", length=2)
@@ -191,8 +179,6 @@ public class HR006P implements Serializable {
 	private Integer alternateEmployeeNumber;
 	
 	@Column(name="HMRADT", length=8) //YYYYMMDD
-//	@Temporal(TemporalType.DATE)
-//	private Date auditDate;
 	private String auditDate;
 	
 	@Column(name="HMRPGM", length=10)
@@ -394,18 +380,6 @@ public class HR006P implements Serializable {
 		return nextAppraisalDate;
 	}
 
-//	public Date getNextAppraisalDate() {
-//		if(nextAppraisalDate != null) {
-//			try {
-//				return simpleDateFormatYyyyMmDd.parse(nextAppraisalDate);
-//			} 
-//			catch (ParseException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		return null;
-//	}
-
 	public void setNextAppraisalDate(String nextAppraisalDate) {
 		this.nextAppraisalDate = nextAppraisalDate;
 	}
@@ -433,14 +407,6 @@ public class HR006P implements Serializable {
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
-
-//	public Date getBirthDate() {
-//		return birthDate;
-//	}
-//
-//	public void setBirthDate(Date birthDate) {
-//		this.birthDate = birthDate;
-//	}
 
 	public String getBirthDate() {
 		return birthDate;
@@ -682,76 +648,18 @@ public class HR006P implements Serializable {
 		this.changedByEmployeeId = changedByEmployeeId;
 	}
 
-	/**
-	 * ZHRI100A.Get-Legacy-OprId
-	 * Formulates legacy OprId from HR036P where HR036P.H36EM# = #wrk_emplid and HR036P.H36INX = #indexNum UNION
-	 */
-	public static HR006P zhri100AGetLegacyOprId(String employeeId, Boolean isPoi, Integer indexNumber) {
-//		LET $LegEmplId = ''
-//		String legacyEmployeeId = "";
-//		MOVE $Wrk_Emplid to #wrk_emplid
-//		IF $PoiFlag = 'N'
-		if(!isPoi) {
-//			MOVE 0 to #indexNum
-			indexNumber = 0;
-//		END-IF
-		}
-//		Begin-Select
-//		HR036P.H36NAM
-//		HR036P.H36EMP
-//		HR036P.H36EM#
-//	  	!This IF statement and OR part of Select is a workaround to some problem in v8 (gateway and new version of SQR). 
-//		!The Select was hanging if it couldn't find a match in HR036P, so the Select assures that the Select always finds a match.
-//	  	LET #WRK_CHR36_H36EM_NUM = &HR036P.H36EM#
-//		Integer WRK_CHR36_H36EM_NUM;
-//	  	IF #WRK_CHR36_H36EM_NUM = #wrk_emplid
-//	    	LET $LegEmpName = &HR036P.H36NAM
-//	    	DO Format-Employee-Name
-//	    	LET $LegEmplid = &HR036P.H36EMP
-//	    	LET $LegEmplid = substr($LegEmplid,1,5)
-//	    	IF (#indexNum = 0 and $PoiFlag = 'Y') OR $PoiFlag = 'N'
-//	    		DO Insert-OprId
-//	    	ELSE
-//	    		IF (#indexNum <> 0 AND $PoiFlag = 'Y')
-//	        		DO Update-OprId
-//	      		END-IF
-//	    	END-IF  
-//		END-IF    !#WRK_CHR36_H36EM_NUM = #wrk_emplid
-//		FROM HR036P
-//		WHERE HR036P.H36EM# = #wrk_emplid
-//		AND HR036P.H36INX = #indexNum 
-//		UNION
-//		SELECT
-//			' ', ' ' , 9999999999
-//		FROM DUAL
-//		End-Select
+	public static HR006P findByEmployeeId(String employeeId) {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<HR006P> resultList = em.createQuery(
-	    		    "SELECT h FROM HR036P t "
-	    		    		+ "WHERE h.employeeId = :employeeId"
-	    		    		+ "AND h.indexNumber = :indexNumber", HR006P.class)
+	    		    "SELECT h FROM HR036P h "
+	    		    		+ "WHERE TRIM(UPPER(h.employeeId)) = TRIM(UPPER(:employeeId))"
+	    		    		, HR006P.class)
 	    		    .setParameter("employeeId", employeeId)
-	    		    .setParameter("indexNumber", indexNumber)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
-	    		HR006P hr036P = resultList.get(0);
-		    	if(hr036P.getEmployeeName() != null && !hr036P.getEmployeeName().isEmpty()) {
-		    		hr036P.setEmployeeName(ErdUtil.formatLegacyEmployeeNameToPeopleSoftEmployeeName(hr036P.getEmployeeName()));
-	    		}
-//		    	LET $LegEmplid = substr($LegEmplid,1,5)
-		    	if(hr036P.getEmployeeId() != null && !hr036P.getEmployeeId().isEmpty()) {
-		    		hr036P.setEmployeeId(hr036P.getEmployeeId().substring(0,5));
-	    		}
-//		    	IF (#indexNum = 0 and $PoiFlag = 'Y') OR $PoiFlag = 'N'
-//	    			DO Insert-OprId
-//	    		ELSE
-//	    			IF (#indexNum <> 0 AND $PoiFlag = 'Y')
-//	        			DO Update-OprId
-//	      			END-IF
-//	    		END-IF  
-	    		return hr036P;
+	    		return resultList.get(0);
 	    	}
 	    } 
 	    catch (Exception e) {
@@ -762,5 +670,5 @@ public class HR006P implements Serializable {
 	    }
 		return null;
 	}
-   
+
 }

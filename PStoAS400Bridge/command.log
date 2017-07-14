@@ -1,0 +1,14 @@
+$Command=> CALL EHRHRMS06#/HRZ202A PARM('208T1' '0000500V8' '20170627')
+Calling Command at: 13-JUL-2017_04:26:59.000038_PM
+$Command=> CALL EHRHRMS06#/HRZ202A PARM('208T1' '500V8' '20170627')
+Calling Command at: 13-JUL-2017_04:33:58.000774_PM
+$Command=> CALL EHRHRMS06#/HRZ110A PARM('' '323506' '0' '' '                                                                           ' 'Y' '20170613' '191715' '999X1' 'Y')
+Calling Command at: 13-JUL-2017_07:17:15.000849_PM
+$Command=> CALL EHRHRMS06#/HRZ110A PARM('' '323506' '0' '' '                                                                           ' 'Y' '20170613' '192725' '999X1' 'Y')
+Calling Command at: 13-JUL-2017_07:27:25.000799_PM
+$Command=> CALL EHRHRMS06#/HRZ110A PARM('' '323506' '0' '' '                                                                           ' 'Y' '20170613' '192956' '999X1' 'Y')
+Calling Command at: 13-JUL-2017_07:29:56.000371_PM
+$Command=> CALL EHRHRMS06#/HRZ101A PARM('999X1' '323506' '16' '' 'VENTURA' 'HENRY' 'Y' 'S' 'HENRY' 'F' 'M' '1991' '00' '12' '2017' '00' '09' 'N' 'B' 'Y' '' 'D' '' 'MGTRN' 'O' 'Internet-Indeed                    ' '123 ANY STREET' 'SILVER SPRING' 'MD' '20902' '' '' 'N' '' '' 'N' 'MR' 'H' '')
+Calling Command at: 13-JUL-2017_07:33:58.000647_PM
+$Command=> CALL EHRHRMS06#/HRZ101A PARM('999X1' '323506' '16' '' 'VENTURA' 'HENRY' 'Y' 'S' 'HENRY' 'F' 'M' '1991' '00' '12' '2017' '00' '09' 'N' 'B' 'Y' '' 'D' '' 'MGTRN' 'O' 'Internet-Indeed                    ' '123 ANY STREET' 'SILVER SPRING' 'MD' '20902' '' '' 'N' '' '' 'N' 'MR' 'H' '')
+Calling Command at: 13-JUL-2017_07:39:15.000804_PM

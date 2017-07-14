@@ -69,12 +69,12 @@ public class CrossReferenceEthnicGroup implements Serializable {
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<String> resultList = (List<String>) em.createQuery(
-	    			"SELECT p.legacyEthnicCode "
+	    			"SELECT UPPER(TRIM(p.legacyEthnicCode)) "
 	    				+ "FROM CrossReferenceEthnicGroup p "
-	    				+ "WHERE UPPER(TRIM(p.ethnicGroup)) = :ethnicGroup "
+	    				+ "WHERE UPPER(TRIM(p.ethnicGroup)) = UPPER(TRIM(:ethnicGroup)) "
 	    				+ "AND UPPER(TRIM(p.status)) = 'A' "
 	    				, String.class)
-	    		    .setParameter("ethnicGroup", ethnicGroup.trim().toUpperCase())
+	    		    .setParameter("ethnicGroup", ethnicGroup)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);

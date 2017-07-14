@@ -36,7 +36,7 @@ public class PsJobTest {
 	public void testCheckIfContractor() {
 		//TODO: need a test case where EMPL_CLASS = 'R'
 		String employeeId = "524338";
-		boolean result = PsJob.employeeIsContractor(employeeId);
+		boolean result = PsJob.isContractor(employeeId);
 		assertNotNull(result);
 		assertFalse(result);
 		System.out.println("\nresult: " + result);
@@ -72,7 +72,7 @@ public class PsJobTest {
 		catch (ParseException e) {
 			e.printStackTrace();
 		}
-		Date effectiveDatePlusOne = ErdUtil.addDays(effectiveDate, 1);
+		Date effectiveDatePlusOne = ErdUtils.addDays(effectiveDate, 1);
 		BigInteger effectiveSequence = new BigInteger("0");
 		PsJob result = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence(employeeId, effectiveDatePlusOne, effectiveSequence);
 		assertNotNull(result);
@@ -81,7 +81,7 @@ public class PsJobTest {
 	@Test
 	public void testFindRegulatoryRegionByEmployeeId() {
 		String employeeId = "323506";
-		String result = PsJob.findRegulatoryRegionByEmployeeId(employeeId);
+		String result = PsJob.findRegionByEmployeeId(employeeId);
 		assertNotNull(result);
 		System.out.println("\nresult = " + result);
 	}

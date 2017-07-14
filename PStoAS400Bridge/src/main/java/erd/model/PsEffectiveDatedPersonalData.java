@@ -9,6 +9,7 @@ import javax.persistence.*;
 
 /**
  * The persistent class for the PS_PERS_DATA_EFFDT database table.
+ * Effective Dated Personal Data
  * @author	John Tutton john@tutton.net
  */
 @Entity
@@ -144,116 +145,6 @@ public class PsEffectiveDatedPersonalData implements Serializable {
 		this.gender = gender;
 	}
 	
-	public static PsEffectiveDatedPersonalData GetPersonalData205(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR205-Get-Personal-Data
-//		! Desc:  This routine will get the Personal Data row for each of the
-//		!        employee numbers entered in the trigger file.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR205-Get-Personal-Data
-//		Begin-Select  
-//		PER5.SEX            
-//		     Let $PSGender = ltrim(rtrim(&PER5.Sex,' '),' ') 
-//		     IF  $PSGender = 'U' 
-//		      LET  $PSGender = ''
-//		     END-IF            
-//		from  PS_PERS_DATA_EFFDT PER5
-//		where PER5.EMPLID = $Wrk_Emplid
-//		  and PER5.EFFDT = (SELECT MAX(PER52.EFFDT)
-//		                      FROM PS_PERS_DATA_EFFDT PER52
-//		                     WHERE PER52.EMPLID = PER5.EMPLID
-//		                       AND  to_char(PER52.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		End-Select
-//		Begin-Select  
-//		N5.MIDDLE_NAME
-//		    Let $PSMName = ltrim(rtrim(&N5.MIDDLE_NAME,' '),' ')
-//		N5.FIRST_NAME
-//		    Let $PSFName = ltrim(rtrim(&N5.FIRST_NAME,' '),' ')
-//		N5.LAST_NAME
-//		    Let $PSLName = ltrim(rtrim(&N5.LAST_NAME,' '),' ')
-//		from  PS_NAMES N5
-//		where N5.EMPLID = $Wrk_Emplid
-//		and N5.NAME_TYPE = 'PRI'
-//		and N5.EFFDT     = (SELECT MAX(N52.EFFDT) FROM PS_NAMES N52
-//		                      WHERE N52.EMPLID   = N5.EMPLID
-//		                      AND   N52.NAME_TYPE  = N5.NAME_TYPE
-//		                      AND   to_char(N52.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		End-Select
-//		End-Procedure HR205-Get-Personal-Data
-		return null;
-	}
-
-	public static PsEffectiveDatedPersonalData GetPersonalData201(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR201-Get-Personal-Data
-//		! Desc:  Gets the employees data from the personal data effdt table that
-//		!        needs to be interfaced to the legacy system.
-//		!        All this data used to come from pers_data_effdt.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR201-Get-Personal-Data
-//		Begin-Select  
-//		P.SEX            
-//		     Let $PSSex = ltrim(rtrim(&P.SEX,' '),' ') 
-//		     IF  $PSSex = 'U' 
-//		      LET  $PSSex = ''
-//		     END-IF            
-//		from  PS_PERS_DATA_EFFDT P
-//		where P.EMPLID = $Wrk_Emplid
-//		  and P.EFFDT = (SELECT MAX(P2.EFFDT)
-//		                      FROM PS_PERS_DATA_EFFDT P2
-//		                     WHERE P2.EMPLID = P.EMPLID
-//		                       AND  to_char(P2.EFFDT,'YYYY-MM-DD') <= $Wrk_Effdt)
-//		End-Select 
-//		Begin-Select  
-//		N1.MIDDLE_NAME
-//		    Let $PSMiddleName = ltrim(rtrim(&N1.MIDDLE_NAME,' '),' ')
-//		N1.FIRST_NAME
-//		    Let $PSFirstName = ltrim(rtrim(&N1.FIRST_NAME,' '),' ')
-//		N1.LAST_NAME
-//		    Let $PSLastName = ltrim(rtrim(&N1.LAST_NAME,' '),' ')
-//		from  PS_NAMES N1
-//		where N1.EMPLID = $Wrk_Emplid
-//		and N1.NAME_TYPE = 'PRI'
-//		and N1.EFFDT     = (SELECT MAX(N12.EFFDT) FROM PS_NAMES N12
-//		                      WHERE N12.EMPLID   = N1.EMPLID
-//		                      AND   N12.NAME_TYPE  = N1.NAME_TYPE
-//		                      AND   to_char(N12.EFFDT,'YYYY-MM-DD') <= $Wrk_Effdt)
-//		End-Select
-//		End-Procedure HR201-Get-Personal-Data
-		return null;
-	}
-
-	public static PsEffectiveDatedPersonalData CheckEffdtTransaction(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  Check-Effdt-Transaction
-//		!----------------------------------------------------------------------
-//		Begin-Procedure Check-Effdt-Transaction
-//		Let $WrkADEffdt = ''
-//		IF $Wrkprocess = 'ZHRI102A'
-//		  DO dtu-add-days($PSEffdt,1,$WrkADEffdt)
-//		 ELSE
-//		  Let $WrkADEffdt = $PSEffdt
-//		END-IF
-//		Let $AdFound = 'N'
-//		BEGIN-SELECT
-//		'XA'
-//		   Let $AdFound = 'Y'
-//		FROM  PS_JOB AD01
-//		WHERE AD01.EMPLID = $PSEmplid
-//		      AND to_char(AD01.EFFDT,'YYYY-MM-DD') > $WrkADEffdt
-//		END-SELECT
-//		!-----------------------------!
-//		BEGIN-SELECT
-//		'XB'
-//		   Let $AdFound = 'Y'
-//		FROM  PS_PERS_DATA_EFFDT AD02
-//		WHERE AD02.EMPLID = $PSEmplid
-//		    AND  to_char(AD02.EFFDT,'YYYY-MM-DD') > $Wrk_ADEffdt
-//		END-SELECT
-//		End-Procedure Check-Effdt-Transaction		
-		return null;
-	}
-
 	/**
 	 * @see HR01-Get-Personal-Data
 	 * @see HR05-Get-Info
@@ -273,13 +164,13 @@ public class PsEffectiveDatedPersonalData implements Serializable {
 		try {
 			List<PsEffectiveDatedPersonalData> resultList = em.createQuery(
 					"SELECT p FROM PsEffectiveDatedPersonalData p "
-					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+					+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
 					+ "AND p.effectiveDate = "
 							+ "(SELECT MAX(p2.effectiveDate) FROM PsEffectiveDatedPersonalData p2 "
 							+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
 							+ "AND p2.effectiveDate <= :effectiveDate) "
 					, PsEffectiveDatedPersonalData.class)
-					.setParameter("employeeId", employeeId.trim().toUpperCase())
+					.setParameter("employeeId", employeeId)
 					.setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {

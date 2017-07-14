@@ -288,249 +288,26 @@ public class CrossReferencePersonOfInterest implements Serializable {
 		this.role = role;
 	}
 
-	public CrossReferencePersonOfInterest HR205GetPoiData(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR205-Get-POI-data
-//		! Desc:  Gets the POIs data from the POI table that needs to be
-//		!        interfaced to the legacy system
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR205-Get-POI-data
-//		Begin-Select
-//		POI5.ZHRF_POI_CATEGORY
-//		POI5.ZHRF_GRP_NBR,
-//		POI5.ZHRF_BRANCH,
-//		POI5.EXPECTED_END_DATE,
-//		POI5.MANAGER_ID, 
-//		POI5.ZHRF_PWORD_1,
-//		POI5.ZHRF_PWORD_2 
-//		    let $POICat = ltrim(rtrim(&POI5.ZHRF_POI_CATEGORY,' '),' ') 
-//		    let $PSGroup = ltrim(rtrim(&POI5.ZHRF_GRP_NBR,' '),' ') 
-//		    let $PSbranch = ltrim(rtrim(&POI5.ZHRF_BRANCH,' '),' ') 
-//		    let $PSNickname = ltrim(rtrim(&POI5.EXPECTED_END_DATE,' '),' ') 
-//		    let $PSDeptid  = ltrim(rtrim('A',' '),' ')  
-//		    let $PSReferral_Source  = ltrim(rtrim(&POI5.MANAGER_ID,' '),' ') 
-//		    let $PSAddress =  ltrim(rtrim(&POI5.ZHRF_PWORD_1,' '),' ')                      
-//		    let $PSCity = ltrim(rtrim(&POI5.ZHRF_PWORD_2,' '),' ') 
-//		      do HR205-Get-POI-LegPosNo
-//		FROM PS_ZHRT_PER_POI_TR POI5
-//		WHERE POI5.EMPLID =  $Wrk_Emplid
-//		AND POI5.EFFDT = (SELECT MAX(POI1.EFFDT) FROM PS_ZHRT_PER_POI_TR POI1
-//		                WHERE POI5.EMPLID = POI1.EMPLID
-//		                AND POI5.POI_TYPE = POI1.POI_TYPE
-//		                AND to_char(POI1.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		End-Select
-//		End-Procedure HR205-Get-POI-data
-		return null;
-	}
-
-	public CrossReferencePersonOfInterest HR205GetPrimEidPoiData(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR205-Get-primEid-POIdata
-//		! Desc:  Gets the primary Eids data when the 
-//		!        interfaced to the legacy system
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR205-Get-primEid-POIdata
-//		Begin-Select
-//		POI5A.ZHRF_POI_CATEGORY
-//		POI5A.EXPECTED_END_DATE,
-//		POI5A.MANAGER_ID, 
-//		POI5A.ZHRF_PWORD_1,
-//		POI5A.ZHRF_PWORD_2 
-//		    let $POICat = ltrim(rtrim(&POI5A.ZHRF_POI_CATEGORY,' '),' ') 
-//		    let $PSNickname = ltrim(rtrim(&POI5A.EXPECTED_END_DATE,' '),' ') 
-//		    let $PSReferral_Source  = ltrim(rtrim(&POI5A.MANAGER_ID,' '),' ') 
-//		    let $PSAddress =  ltrim(rtrim(&POI5A.ZHRF_PWORD_1,' '),' ')                      
-//		    let $PSCity = ltrim(rtrim(&POI5A.ZHRF_PWORD_2,' '),' ') 
-//		    do HR205-Get-POI-LegPosNo
-//		FROM PS_ZHRT_PER_POI_TR POI5A
-//		WHERE POI5A.EMPLID =  $Wrk_Emplid
-//		AND POI5A.EFF_STATUS = 'A'
-//		AND POI5A.EFFDT = (SELECT MAX(POI5A1.EFFDT) FROM PS_ZHRT_PER_POI_TR POI5A1
-//		                WHERE POI5A1.EMPLID = POI5A.EMPLID
-//		                AND POI5A1.EFF_STATUS = 'A'
-//		                AND POI5A1.POI_TYPE = POI5A.POI_TYPE
-//		                AND POI5A1.EFFDT <= SYSDATE)
-//		End-Select
-//		End-Procedure HR205-Get-primEid-POIdata
-		return null;
-	}
-
-	public CrossReferencePersonOfInterest MainSqlPoi(String employeeId) {
-//		!******************************
-//		!get the max effdt for every employee
-//		!  -store the last inactive row before the max effdt into s_dt. If null, use dummy date.
-//		!  -get the min active effdt after s_dt
-//		BEGIN-PROCEDURE MAIN-SQL-POI
-//		BEGIN-SELECT
-//		A.EMPLID
-//		A.EFFDT &A.EFFDT
-//		A.EFF_STATUS
-//		  Let $MAX_EFFDT = (&A.EFFDT)
-//		  do get-last-inactive-dt-poi
-//		  !if there are no inactive rows before, assign dummy date
-//		  if $last_inactive_dt = '' 
-//		    let $s_dt = strtodate('01-JAN-1900','DD-MON-YYYY')
-//		  else
-//		    let $s_dt = $last_inactive_dt
-//			END-IF
-//			!get the min(effdt) greater than the last inactive date
-//			do get-min-effdt-poi
-//		FROM PS_ZHRT_PER_POI_TR A
-//		WHERE A.EMPLID = $Wrk_Emplid
-//		AND A.EFFDT = (SELECT MAX(A1.EFFDT) FROM PS_ZHRT_PER_POI_TR A1 WHERE A1.EMPLID = A.EMPLID AND A1.POI_TYPE = A.POI_TYPE AND A1.EFFDT <= SYSDATE)
-//		END-SELECT
-//		END-PROCEDURE MAIN-SQL-POI
-		return null;
-	}
-
-	public CrossReferencePersonOfInterest getMinEffDtPoi(String employeeId) {
-//		!****************************
-//		begin-procedure get-min-effdt-poi
-//		LET $LegServiceDate =''
-//		begin-select
-//		min(A2.EFFDT) &A2.EFFDT
-//		  Let $min_active_effdt = (&A2.EFFDT)
-//		  Let $LegServiceDate = datetostr(strtodate($min_active_effdt,'DD-MON-YYYY'),'YYYYMMDD')
-//		from PS_ZHRT_PER_POI_TR A2
-//		WHERE A2.EMPLID = $Wrk_Emplid
-//		AND A2.EFFDT > $s_dt
-//		end-select
-//		end-procedure get-min-effdt-poi				
-		return null;
-	}
-
-	public CrossReferencePersonOfInterest getLastInactiveDtPoi(String employeeId) {
-//		!*************************************
-//		begin-procedure get-last-inactive-dt-poi
-//		begin-select
-//		A3.EFFDT &A3.EFFDT 
-//		  Let $last_inactive_dt = (&A3.EFFDT )
-//		from Ps_Zhrt_Per_Poi_Tr A3
-//		WHERE A3.emplid = $Wrk_Emplid
-//		AND A3.EFFDT = (SELECT MAX(A3A.EFFDT) FROM PS_ZHRT_PER_POI_TR A3A WHERE A3A.EMPLID = A3.EMPLID AND A3A.EFF_STATUS = 'I' AND to_char(A3A.EFFDT,'YYYY-MM-DD') < $MAX_EFFDT)
-//		end-select
-//		end-procedure get-last-inactive-dt-poi		
-		return null;
-	}
-
-	public CrossReferencePersonOfInterest HR202GetTermDate(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR202-get-term-date
-//		! Desc:  Gets the term date for POI/EMP
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR202-get-term-date
-//		Begin-Select
-//		POI2.EFFDT
-//		    let $PSTermDate = LTRIM(RTRIM(&POI2.EFFDT,' '),' ')
-//		FROM PS_ZHRT_PER_POI_TR POI2
-//		WHERE POI2.EMPLID =  $Wrk_Emplid
-//		AND POI2.EFFDT = (SELECT MAX(POI1.EFFDT) FROM PS_ZHRT_PER_POI_TR POI1
-//		                WHERE POI1.EMPLID = POI2.EMPLID
-//		                AND POI1.POI_TYPE = POI2.POI_TYPE
-//		                AND to_char(POI1.EFFDT,'YYYY-MM-DD') <= $PSDateIn)
-//		End-Select
-//		Begin-Select
-//		EMP2.EFFDT
-//		    let $PSTermDate = LTRIM(RTRIM(&EMP2.EFFDT,' '),' ')
-//		FROM PS_ZHRR_MULTPL_EID EMP2
-//		WHERE EMP2.EMPLID = $Wrk_Emplid
-//		AND EMP2.SEQUENCE = $Wrk_indexNum
-//		AND EMP2.EFFDT = (SELECT MAX(EMP1.EFFDT) FROM PS_ZHRR_MULTPL_EID EMP1
-//		                WHERE EMP1.EMPLID = EMP2.EMPLID
-//		                AND to_char(EMP1.EFFDT,'YYYY-MM-DD') <= $PSDateIn)
-//		End-Select
-//		End-Procedure HR202-get-term-date
-		return null;
-	}
-
-	public CrossReferencePersonOfInterest HR201GetPoiData(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR201-Get-POI-data
-//		! Desc:  Gets the POIs data from the POI table that needs to be
-//		!        interfaced to the legacy system
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR201-Get-POI-data
-//		Begin-Select
-//		POI.ZHRF_POI_CATEGORY
-//		POI.ZHRF_GRP_NBR,
-//		POI.ZHRF_BRANCH,
-//		POI.EXPECTED_END_DATE,
-//		POI.MANAGER_ID, 
-//		POI.ZHRF_PWORD_1,
-//		POI.ZHRF_PWORD_2 
-//		    let $POICat = ltrim(rtrim(&POI.ZHRF_POI_CATEGORY,' '),' ') 
-//		    let $LegGroup = ltrim(rtrim(&POI.ZHRF_GRP_NBR,' '),' ') 
-//		    let $LegBranch = ltrim(rtrim(&POI.ZHRF_BRANCH,' '),' ') 
-//		    let $LegNickName = ltrim(rtrim(&POI.EXPECTED_END_DATE,' '),' ') 
-//		    let $LegDepartment  = ltrim(rtrim('A',' '),' ') 
-//		    let $LegReferralSource  = ltrim(rtrim(&POI.MANAGER_ID,' '),' ') 
-//		    let $LegAddress1 =  ltrim(rtrim(&POI.ZHRF_PWORD_1,' '),' ')                      
-//		    let $LegCity = ltrim(rtrim(&POI.ZHRF_PWORD_2,' '),' ') 
-//		    do HR201-Get-POI-LegPosNo
-//		FROM PS_ZHRT_PER_POI_TR POI
-//		WHERE POI.EMPLID =  $Wrk_Emplid
-//		AND POI.EFFDT = (SELECT MAX(POI1.EFFDT) FROM PS_ZHRT_PER_POI_TR POI1
-//		                WHERE POI.EMPLID = POI1.EMPLID
-//		                AND POI.POI_TYPE = POI1.POI_TYPE
-//		                AND to_char(POI1.EFFDT,'YYYY-MM-DD') <= $Wrk_Effdt)
-//		End-Select
-//		End-Procedure HR201-Get-POI-data
-		return null;
-	}
-
-	public CrossReferencePersonOfInterest HR201GetPrimEidPoiData(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR201-Get-primEid-POIdata
-//		! Desc:  Gets the primary Eids data when the 
-//		!        interfaced to the legacy system
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR201-Get-primEid-POIdata
-//		Begin-Select
-//		PED.ZHRF_POI_CATEGORY
-//		PED.EXPECTED_END_DATE,
-//		PED.MANAGER_ID, 
-//		PED.ZHRF_PWORD_1,
-//		PED.ZHRF_PWORD_2 
-//		    let $POICat = ltrim(rtrim(&PED.ZHRF_POI_CATEGORY,' '),' ') 
-//		    let $LegNickName = ltrim(rtrim(&PED.EXPECTED_END_DATE,' '),' ') 
-//		    let $LegReferralSource  = ltrim(rtrim(&PED.MANAGER_ID,' '),' ') 
-//		    let $LegAddress1 =  ltrim(rtrim(&PED.ZHRF_PWORD_1,' '),' ')                      
-//		    let $LegCity = ltrim(rtrim(&PED.ZHRF_PWORD_2,' '),' ') 
-//		    do HR201-Get-POI-LegPosNo
-//		FROM PS_ZHRT_PER_POI_TR PED
-//		WHERE PED.EMPLID =  $Wrk_Emplid
-//		AND PED.EFF_STATUS = 'A'
-//		AND PED.EFFDT = (SELECT MAX(PED1.EFFDT) FROM PS_ZHRT_PER_POI_TR PED1
-//		                WHERE PED1.EMPLID = PED.EMPLID
-//		                AND PED1.EFF_STATUS = 'A'
-//		                AND PED1.POI_TYPE = PED.POI_TYPE
-//		                AND PED1.EFFDT <= SYSDATE)
-//		End-Select
-//		End-Procedure HR201-Get-primEid-POIdata
-		return null;
-	}
-
 	public static CrossReferencePersonOfInterest findByEmployeeIdAndEffectiveDate(String employeeId, Date effectiveDate) {
-		//SELECT
-		//FROM PS_ZHRT_PER_POI_TR P
+		//SELECT FROM PS_ZHRT_PER_POI_TR P
 		//WHERE P.EMPLID = $EmplId
 		//AND P.EFFDT = 
 				//(SELECT MAX(POI1.EFFDT) FROM PS_ZHRT_PER_POI_TR P2
 				//WHERE P.EMPLID = P2.EMPLID
 				//AND P.POI_TYPE = P2.POI_TYPE
-				//AND to_char(P2.EFFDT,'YYYY-MM-DD') <= $EffDt)
+				//AND TO_CHAR(P2.EFFDT,'YYYY-MM-DD') <= $EffDt)
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		try {
 			List<CrossReferencePersonOfInterest> resultList = em.createQuery(
 					"SELECT c FROM CrossReferencePersonOfInterest c "
-					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 						+ "AND c.effectiveDate = "
 							+ "(SELECT MAX(c2.effectiveDate) FROM CrossReferencePersonOfInterest c2 "
 							+ "WHERE UPPER(TRIM(c2.employeeId)) = UPPER(TRIM(c.employeeId)) "
 								+ "AND c2.effectiveDate <= :effectiveDate) "
 					, CrossReferencePersonOfInterest.class)
-					.setParameter("employeeId", employeeId.trim().toUpperCase())
+					.setParameter("employeeId", employeeId)
 					.setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
@@ -558,14 +335,14 @@ public class CrossReferencePersonOfInterest implements Serializable {
 		try {
 			List<CrossReferencePersonOfInterest> resultList = em.createQuery(
 					"SELECT c FROM CrossReferencePersonOfInterest c "
-					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 					+ "AND c.effectiveDate = "
 							+ "(SELECT MAX(c2.effectiveDate) FROM CrossReferencePersonOfInterest c2 "
 							+ "WHERE UPPER(TRIM(c2.employeeId)) = UPPER(TRIM(c.employeeId)) "
 							+ "AND UPPER(TRIM(c2.status)) = 'A' "
 							+ "AND c2.effectiveDate <= CURRENT_DATE) "
 					, CrossReferencePersonOfInterest.class)
-					.setParameter("employeeId", employeeId.trim().toUpperCase())
+					.setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
@@ -598,14 +375,14 @@ public class CrossReferencePersonOfInterest implements Serializable {
 		try {
 			List<Date> resultList = em.createQuery(
 					"SELECT c.effectiveDate FROM CrossReferencePersonOfInterest c "
-					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 					+ "AND c.effectiveDate = "
 							+ "(SELECT MAX(c2.effectiveDate) FROM CrossReferencePersonOfInterest c2 "
 							+ "WHERE UPPER(TRIM(c2.employeeId)) = UPPER(TRIM(c.employeeId)) "
 							+ "WHERE UPPER(TRIM(c2.type)) = UPPER(TRIM(c.type)) "
 							+ "AND c2.effectiveDate <= CURRENT_DATE) "
 					, Date.class)
-					.setParameter("employeeId", employeeId.trim().toUpperCase())
+					.setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
@@ -638,14 +415,14 @@ public class CrossReferencePersonOfInterest implements Serializable {
 		try {
 			List<Date> resultList = em.createQuery(
 					"SELECT c.effectiveDate FROM CrossReferencePersonOfInterest c "
-					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 					+ "AND c.effectiveDate = "
 							+ "(SELECT MAX(c2.effectiveDate) FROM CrossReferencePersonOfInterest c2 "
 							+ "WHERE UPPER(TRIM(c2.employeeId)) = UPPER(TRIM(c.employeeId)) "
 							+ "WHERE UPPER(TRIM(c2.status)) = 'I' "
 							+ "AND c2.effectiveDate < :maxEffectiveDate) "
 					, Date.class)
-					.setParameter("employeeId", employeeId.trim().toUpperCase())
+					.setParameter("employeeId", employeeId)
 					.setParameter("maxEffectiveDate", maxEffectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
@@ -670,16 +447,16 @@ public class CrossReferencePersonOfInterest implements Serializable {
 	 */
 	public static Date findMinEffectiveDateByEmployeeIdAndLastInactiveDate(String employeeId, Date lastInactiveDate) {
 		//SELECT MIN(C.EFFDT) FROM PS_ZHRT_PER_POI_TR C
-		//WHERE C.EMPLID = $EmplId AND C.EFFDT > $S_DT
+		//WHERE C.EMPLID = $EmplId AND C.EFFDT > $LastInactiveDate
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		try {
 			List<Date> resultList = em.createQuery(
 					"SELECT MIN(c.effectiveDate) FROM CrossReferencePersonOfInterest c "
-					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 					+ "AND c.effectiveDate > :lastInactiveDate "
 					, Date.class)
-					.setParameter("employeeId", employeeId.trim().toUpperCase())
+					.setParameter("employeeId", employeeId)
 					.setParameter("lastInactiveDate", lastInactiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {

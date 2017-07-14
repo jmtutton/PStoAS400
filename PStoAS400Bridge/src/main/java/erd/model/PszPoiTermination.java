@@ -53,15 +53,17 @@ public class PszPoiTermination implements Serializable {
 		logger.debug("*** PszPoiTermination.insertTimestamp()");
 		//INSERT INTO PS_ZHRT_POI_TERM (EMPLID, PROC_NAME, UPDATED_DATETIME)
 		//VALUES ( $Wrk_Emplid, 'TERM', $SysDateTime)
+		employeeId = employeeId != null ? employeeId.toUpperCase().trim() : employeeId;
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	PszPoiTermination poiTermination = new PszPoiTermination();
-	    	poiTermination.setEmployeeId(employeeId.toUpperCase().trim());
+	    	poiTermination.setEmployeeId(employeeId);
 	    	poiTermination.setProcessName("TERM");
 	    	poiTermination.setUpdatedDateTime(new Date());
 	    	em.getTransaction().begin();
 	    	em.persist(poiTermination);
+	    	em.flush();
 	    	em.getTransaction().commit();
 	    }
 	    catch (Exception e) {

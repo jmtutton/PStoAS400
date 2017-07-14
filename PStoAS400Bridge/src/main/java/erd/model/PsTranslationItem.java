@@ -134,17 +134,18 @@ public class PsTranslationItem implements Serializable {
 		EntityManager em = emfactory.createEntityManager();
 		
 		try {
-			List<String> resultList = em.createQuery("SELECT p.xlatLongName FROM PsXlatItem p "
-					+ "WHERE UPPER(TRIM(p.fieldName)) = :fieldName "
-					+ "AND UPPER(TRIM(p.fieldValue)) = :fieldValue "
+			List<String> resultList = em.createQuery(
+					"SELECT UPPER(TRIM(p.xlatLongName)) FROM PsTranslationItem p "
+					+ "WHERE UPPER(TRIM(p.fieldName)) = TRIM(UPPER(:fieldName)) "
+					+ "AND UPPER(TRIM(p.fieldValue)) = TRIM(UPPER(:fieldValue)) "
 					+ "AND p.effectiveDate = :effectiveDate ",
 					String.class)
-			    .setParameter("processName", fieldName.toUpperCase())
-			    .setParameter("fieldName", fieldValue.toUpperCase())
+			    .setParameter("processName", fieldName)
+			    .setParameter("fieldName", fieldValue)
 			    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
-	    		return resultList.get(0).trim();
+	    		return resultList.get(0);
 	    	}
 	    }
 	    catch (Exception e) {
@@ -172,13 +173,14 @@ public class PsTranslationItem implements Serializable {
 		EntityManager em = emfactory.createEntityManager();
 		
 	    try {
-	    	List<Date> resultList = em.createQuery("SELECT MAX(p.effectiveDate) FROM PsXlatItem p "
-	    				+ "WHERE UPPER(TRIM(p.fieldName)) = :fieldName "
-	    				+ "AND UPPER(TRIM(p.fieldValue)) = :fieldValue "
+	    	List<Date> resultList = em.createQuery(
+	    			"SELECT MAX(p.effectiveDate) FROM PsTranslationItem p "
+	    				+ "WHERE UPPER(TRIM(p.fieldName)) = UPPER(TRIM(:fieldName)) "
+	    				+ "AND UPPER(TRIM(p.fieldValue)) = UPPER(TRIM(:fieldValue)) "
 	    				+ "AND p.effectiveDate <= CURRENT_DATE ",
 	    				Date.class)
-	    		    .setParameter("fieldName", fieldName.toUpperCase())
-	    		    .setParameter("fieldValue", fieldValue.toUpperCase())
+	    		    .setParameter("fieldName", fieldName)
+	    		    .setParameter("fieldValue", fieldValue)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
@@ -219,17 +221,18 @@ public class PsTranslationItem implements Serializable {
 		EntityManager em = emfactory.createEntityManager();
 		
 		try {
-			List<PsTranslationItem> resultList = em.createQuery("SELECT p FROM PsTranslationItem p "
-						+ "WHERE UPPER(TRIM(p.fieldName)) = :fieldName "
-						+ "AND UPPER(TRIM(p.fieldValue)) = :fieldValue "
+			List<PsTranslationItem> resultList = em.createQuery(
+					"SELECT p FROM PsTranslationItem p "
+						+ "WHERE UPPER(TRIM(p.fieldName)) = UPPER(TRIM(:fieldName)) "
+						+ "AND UPPER(TRIM(p.fieldValue)) = UPPER(TRIM(:fieldValue)) "
 						+ "AND p.effectiveDate = "
 								+ "(SELECT MAX(p2.effectiveDate) FROM PsTranslationItem p2 "
-									+ "WHERE UPPER(TRIM(p2.fieldName)) = :fieldName "
-									+ "AND UPPER(TRIM(p2.fieldValue)) = :fieldValue "
+									+ "WHERE UPPER(TRIM(p2.fieldName)) = UPPER(TRIM(:fieldName)) "
+									+ "AND UPPER(TRIM(p2.fieldValue)) = UPPER(TRIM(:fieldValue)) "
 									+ "AND p2.effectiveDate <= :effectiveDate) "
 					, PsTranslationItem.class)
-			    .setParameter("processName", fieldName.trim().toUpperCase())
-			    .setParameter("fieldName", fieldValue.trim().toUpperCase())
+			    .setParameter("processName", fieldName)
+			    .setParameter("fieldName", fieldValue)
 			    .setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {

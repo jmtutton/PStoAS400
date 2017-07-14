@@ -294,44 +294,17 @@ public class PsEmployment implements Serializable {
 	}
 
 	/**
-	 * This routine will get the Termination Data row for Active Directory File Build
-	 * and convert hiredt, rehiredt, terminationdt to YYYYMMDD format
-	 * @see AD-Get-Employment-Data in ZHRI100A.SQR
 	 * @param employeeId
-	 * @return
+	 * @return PsEmployment
 	 */
 	public PsEmployment findByEmployeeId(String employeeId) {
-//		Let $PSHiredt = ' '
-//		Let $PSRehiredt = ' '
-//		Let $PSTerminationdt = ' '
-//		Let $ADSupervisorID = ' '
-//		begin-select
-//		to_char(ADE.HIRE_DT,'YYYY-MM-DD')       &ADEHire_Dt
-//		  Let $PSHireYr = substr(&ADEHire_Dt,1,4)
-//		  Let $PSHireMnth = substr(&ADEHire_Dt,6,2)
-//		  Let $PSHireDay = substr(&ADEHire_Dt,9,2)
-//		  Let $PSHiredt = $PSHireYr || $PSHireMnth || $PSHireDay
-//		to_char(ADE.REHIRE_DT,'YYYY-MM-DD')       &ADERehire_Dt
-//		  Let $PSRehireYr = substr(&ADERehire_Dt,1,4)
-//		  Let $PSRehireMnth = substr(&ADERehire_Dt,6,2)
-//		  Let $PSRehireDay = substr(&ADERehire_Dt,9,2)
-//		  Let $PSRehiredt = $PSRehireYr || $PSRehireMnth || $PSRehireDay
-//		to_char(ADE.TERMINATION_DT,'YYYY-MM-DD')  &ADETermination_Dt
-//		  Let $PSTermYr = substr(&ADETermination_Dt,1,4)
-//		  Let $PSTermMnth = substr(&ADETermination_Dt,6,2)
-//		  Let $PSTermDay = substr(&ADETermination_Dt,9,2)
-//		  Let $PSTerminationdt =  $PSTermYr || $PSTermMnth || $PSTermDay
-//		ADE.SUPERVISOR_ID
-//		  Let $ADSupervisorID = &ADE.SUPERVISOR_ID
-//		from PS_Employment ADE
-//		where ADE.Emplid = $PSEmplid
-//		end-select
-//		end-procedure AD-Get-Employment-Data
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PsEmployment> resultList = em.createQuery(
-	    		    "SELECT p FROM PsEmployment p WHERE p.employeeId = :employeeId ", PsEmployment.class)
+	    		    "SELECT p FROM PsEmployment p "
+	    		    		+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
+	    		    , PsEmployment.class)
 	    		    .setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {

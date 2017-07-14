@@ -44,7 +44,6 @@ public class EmployeeNewHireRehire extends Employee {
 		parameterMap = fetchEffectiveDatedPersonalData(parameterMap);
 		parameterMap = fetchPersonData(parameterMap);
 		parameterMap = fetchPersonalData(parameterMap);
-//		parameterMap = fetchLocationData(parameterMap);
 		parameterMap = fetchPersonalNationalIdData(parameterMap);
 		parameterMap = fetchReferralSourceData(parameterMap);
 		parameterMap = fetchNameData(parameterMap);
@@ -56,29 +55,17 @@ public class EmployeeNewHireRehire extends Employee {
 		return parameterMap;
 	}
 	
-
-//	/**
-//	 * @see HR01-Get-Location-Country
-//	 * @param location
-//	 * @return country
-//	 */
-//	private static HashMap<String, Object> fetchLocationData(HashMap<String, Object> parameterMap) {
-//		String locationCountry = PsLocation.findCountryByLocation((String)parameterMap.get(""));
-//		return parameterMap;
-//	}
-
 	/**
 	 * @see HR01-Build-Call-Statement in ZHRI101A.SQC
 	 * @return list of parameter names for this process
 	 */
 	private static List<String> getParameterNameList() {
-		return Arrays.asList("operatorId", "employeeId",
-						"group", "branch",
+		return Arrays.asList("operatorId", "employeeId", "group", "branch",
 						"lastName", "firstName", "middleInitial", "maritalStatus", "nickname",
 						"jobStatus", "gender", "birthYear", "birthMonth", "birthDay",
 						"serviceYear", "serviceMonth", "serviceDay",
 						"unionFlag", "race", "timeCardFlag", 
-						"nationalId", "department", "subDepartment", "position",
+						"nationalId", "department", "subdepartment", "position",
 						"referralSource", "referralSourceId", 
 						"address", "city", "state", "postalCode",
 						"homePhoneAreaCode", "homePhoneNumber","homePhoneError",

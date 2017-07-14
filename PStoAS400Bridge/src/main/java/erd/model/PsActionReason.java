@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * The persistent class for the PS_ACTN_REASON_TBL database table.
+ * Associates and action and action reason combination to a benefits status value.
  * @author John Tutton john@tutton.net
  */
 @Entity
@@ -176,11 +177,13 @@ public class PsActionReason implements Serializable {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<PsActionReason> resultList = (List<PsActionReason>) em.createQuery("SELECT p FROM PsActionReason p "
-	    				+ "WHERE UPPER(TRIM(p.actionCode)) = :actionCode "
-	    				+ "AND UPPER(TRIM(p.actionReasonCode)) = :actionReasonCode", PsActionReason.class)
-	    		    .setParameter("actionCode", actionCode.toUpperCase())
-	    		    .setParameter("actionReasonCode", actionReasonCode.toUpperCase())
+	    	List<PsActionReason> resultList = (List<PsActionReason>) em.createQuery(
+	    			"SELECT p FROM PsActionReason p "
+	    				+ "WHERE UPPER(TRIM(p.actionCode)) = UPPER(TRIM(:actionCode)) "
+	    				+ "AND UPPER(TRIM(p.actionReasonCode)) = UPPER(TRIM(:actionReasonCode))"
+	    				, PsActionReason.class)
+	    		    .setParameter("actionCode", actionCode)
+	    		    .setParameter("actionReasonCode", actionReasonCode)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);

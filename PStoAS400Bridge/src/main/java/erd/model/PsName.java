@@ -1,21 +1,27 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.util.Date;
 import java.util.List;
 import java.sql.Timestamp;
 
 import javax.persistence.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * The persistent class for the PS_NAMES database table.
- * @author	John Tutton john@tutton.net
+ * All Names for an Individual
+ * @author John Tutton john@tutton.net
  */
 @Entity
 @Table(name="PS_NAMES")
 @NamedQuery(name="PsName.findAll", query="SELECT p FROM PsName p")
 public class PsName implements Serializable {
 	private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	@Id
 	@Column(name="EMPLID", nullable=false, length=11)
@@ -352,8 +358,8 @@ public class PsName implements Serializable {
 	 * @return PsName record
 	 */
 	public static PsName findByEmployeeIdAndNameTypeAndEffectiveDate(String employeeId, String nameType, Date effectiveDate) {
-		//SELECT
-		//FROM PS_Names P
+		logger.debug("findByEmployeeIdAndNameTypeAndEffectiveDate() ***");
+		//SELECT FROM PS_Names P
 		//WHERE P.Emplid = $PsEmplId
 		//AND P.NAME_TYPE = 'PRF'
 		//AND P.EFFDT = 
@@ -365,17 +371,17 @@ public class PsName implements Serializable {
 		EntityManager em = emfactory.createEntityManager();
 		try {
 			List<PsName> resultList = em.createQuery(
-					"SELECT PsName FROM PsName p "
-							+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-							+ "WHERE UPPER(TRIM(p.nameType)) = :nameType "
+					"SELECT p FROM PsName p "
+							+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
+							+ "AND UPPER(TRIM(p.nameType)) = UPPER(TRIM(:nameType)) "
 							+ "AND p.effectiveDate = "
 							+ "(SELECT MAX(p2.effectiveDate) FROM PsName p2 "
 								+ "WHERE UPPER(TRIM(p2.employeeId)) = UPPER(TRIM(p.employeeId)) "
 								+ "AND UPPER(TRIM(p2.nameType)) = UPPER(TRIM(p.nameType)) "
 								+ "AND p2.effectiveDate <= :effectiveDate) "
 					, PsName.class)
-					.setParameter("employeeId", employeeId.trim().toUpperCase())
-					.setParameter("nameType", nameType.trim().toUpperCase())
+					.setParameter("employeeId", employeeId)
+					.setParameter("nameType", nameType)
 					.setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
@@ -388,144 +394,6 @@ public class PsName implements Serializable {
 	    finally {
 	    	em.close();
 	    }
-	    return null;	
-	}
-
-	
-	public static PsName findByEmployeeId205(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR205-Get-Personal-Data
-//		! Desc:  This routine will get the Personal Data row for each of the
-//		!        employee numbers entered in the trigger file.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR205-Get-Personal-Data
-//		Begin-Select  
-//		PER5.SEX            
-//		     Let $PSGender = ltrim(rtrim(&PER5.Sex,' '),' ') 
-//		     IF  $PSGender = 'U' 
-//		      LET  $PSGender = ''
-//		     END-IF            
-//		from  PS_PERS_DATA_EFFDT PER5
-//		where PER5.EMPLID = $Wrk_Emplid
-//		  and PER5.EFFDT = (SELECT MAX(PER52.EFFDT)
-//		                      FROM PS_PERS_DATA_EFFDT PER52
-//		                     WHERE PER52.EMPLID = PER5.EMPLID
-//		                       AND  to_char(PER52.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		End-Select
-//		Begin-Select  
-//		N5.MIDDLE_NAME
-//		    Let $PSMName = ltrim(rtrim(&N5.MIDDLE_NAME,' '),' ')
-//		N5.FIRST_NAME
-//		    Let $PSFName = ltrim(rtrim(&N5.FIRST_NAME,' '),' ')
-//		N5.LAST_NAME
-//		    Let $PSLName = ltrim(rtrim(&N5.LAST_NAME,' '),' ')
-//		from  PS_NAMES N5
-//		where N5.EMPLID = $Wrk_Emplid
-//		and N5.NAME_TYPE = 'PRI'
-//		and N5.EFFDT     = (SELECT MAX(N52.EFFDT) FROM PS_NAMES N52
-//		                      WHERE N52.EMPLID   = N5.EMPLID
-//		                      AND   N52.NAME_TYPE  = N5.NAME_TYPE
-//		                      AND   to_char(N52.EFFDT,'YYYY-MM-DD') <= $PSEffdt)
-//		End-Select
-//		End-Procedure HR205-Get-Personal-Data
-		return null;
-	}
-
-	public static PsName findByEmployeeId201(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR201-Get-Personal-Data
-//		! Desc:  Gets the employees data from the personal data effdt table that
-//		!        needs to be interfaced to the legacy system.
-//		!        All this data used to come from pers_data_effdt.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR201-Get-Personal-Data
-//		Begin-Select  
-//		PER1.SEX            
-//		     Let $PSSex = ltrim(rtrim(&PER1.SEX,' '),' ') 
-//		     IF  $PSSex = 'U' 
-//		      LET  $PSSex = ''
-//		     END-IF            
-//		from  PS_PERS_DATA_EFFDT PER1
-//		where PER1.EMPLID = $Wrk_Emplid
-//		  and PER1.EFFDT = (SELECT MAX(PER12.EFFDT)
-//		                      FROM PS_PERS_DATA_EFFDT PER12
-//		                     WHERE PER12.EMPLID = PER1.EMPLID
-//		                       AND  to_char(PER12.EFFDT,'YYYY-MM-DD') <= $Wrk_Effdt)
-//		End-Select 
-//		Begin-Select  
-//		N1.MIDDLE_NAME
-//		    Let $PSMiddleName = ltrim(rtrim(&N1.MIDDLE_NAME,' '),' ')
-//		N1.FIRST_NAME
-//		    Let $PSFirstName = ltrim(rtrim(&N1.FIRST_NAME,' '),' ')
-//		N1.LAST_NAME
-//		    Let $PSLastName = ltrim(rtrim(&N1.LAST_NAME,' '),' ')
-//		from  PS_NAMES N1
-//		where N1.EMPLID = $Wrk_Emplid
-//		and N1.NAME_TYPE = 'PRI'
-//		and N1.EFFDT     = (SELECT MAX(N12.EFFDT) FROM PS_NAMES N12
-//		                      WHERE N12.EMPLID   = N1.EMPLID
-//		                      AND   N12.NAME_TYPE  = N1.NAME_TYPE
-//		                      AND   to_char(N12.EFFDT,'YYYY-MM-DD') <= $Wrk_Effdt)
-//		End-Select
-//		End-Procedure HR201-Get-Personal-Data		
-		return null;
-	}
-
-
-	/**
-	 * This routine Gets the nickname for employee and formats it in the form acceptable to the legacy system.
-	 * @see HR05-Get-Names-Table in ZHRI105A.SQC
-	 * @param employeeId
-	 * @return nickname
-	 */
-	public static String findNicknameByEmployeeIdAndEffectiveDate(String employeeId, Date effectiveDate) {
-//		//Begin-Procedure HR05-Get-Names-Table
-//		//Let $Found = 'N'
-//		//Let $PSNickname = ' '  !Initialize the nickname field to blanks
-//		//begin-select
-//		//CN5.Name_Type
-//		//CN5.FIRST_NAME            !changed for v8.3
-//		//Let $PSNickname = ltrim(rtrim(&CN5.FIRST_NAME,' '),' ') !changed for v8.3
-//		//Let $PSPrfName = $PSNickname                                 !sree-UAAMOD
-//		//Let $PSNickname = substr($PSNickName,1,20)
-//		//uppercase $PSNickName
-//		//Do Replace-Character($PSNickName,'''','''''',$PSNickName)   !From ZRmvSpcChr.sqc
-//		//Let $Found = 'Y'
-//		//Let $Wrk_AD_NamesBuild = 'Y'
-//		//from PS_Names CN5
-//		//where CN5.Emplid = $PSEmplid
-//		//and CN5.NAME_TYPE = 'PRF'    !changed for v8.3
-//		//and CN5.EFFDT = 
-//		//	(SELECT MAX(EFFDT) FROM PS_Names CN6   !added for v8.3
-//		//                      WHERE CN6.EMPLID     = CN5.EMPLID      !added for v8.3
-//		//                      AND   CN6.NAME_TYPE  = CN5.NAME_TYPE
-//		//                      AND   to_char(CN6.EFFDT,'YYYY-MM-DD') <= $PSEffdt) !added for v8.3
-//		//end-select
-//		//If $Found = 'N'
-//		//Let $PSNickName = ' '
-//		//End-if    !$Found = 'N'
-//		//End-Procedure HR05-Get-Names-Table
-//		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-//		EntityManager em = emfactory.createEntityManager();
-//		try {
-//			List<PsName> resultList = em.createQuery(
-//					"SELECT p.phone FROM PsPersonalPhone p "
-//					+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
-//					+ "AND UPPER(TRIM(p.phoneType)) = :phoneType "
-//					, String.class)
-//					.setParameter("employeeId", employeeId.trim().toUpperCase())
-//					.setParameter("phoneType", phoneType.trim().toUpperCase())
-//	    		    .getResultList();
-//	    	if(resultList != null && resultList.size() > 0) {
-//	    		return resultList.get(0);
-//	    	}
-//	    }
-//	    catch (Exception e) {
-//	    	e.printStackTrace();
-//	    } 
-//	    finally {
-//	    	em.close();
-//	    }
 	    return null;	
 	}
 

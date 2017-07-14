@@ -46,10 +46,10 @@ public class CrossReferencePersonOfInterestEmployee implements Serializable {
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<String> resultList = em.createQuery(
-	    			"SELECT c.type FROM CrossReferencePersonOfInterestEmployee c "
-	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+	    			"SELECT UPPER(TRIM(c.type)) FROM CrossReferencePersonOfInterestEmployee c "
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    			, String.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList.get(0);

@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 /**
  * The persistent class for the PS_DIVERS_ETHNIC database table.
+ * Ethnic Diversity
  * @author	John Tutton john@tutton.net
  */
 @Entity
@@ -99,11 +100,11 @@ public class PsDiversityEthnicity implements Serializable {
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<String> resultList = (List<String>) em.createQuery(
-	    			"SELECT p.ethnicGroupCode "
+	    			"SELECT UPPER(TRIM(p.ethnicGroupCode)) "
 	    				+ "FROM PsDiversityEthnicity p "
-	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    				, String.class)
-	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		if(resultList.size() > 1) {

@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * The persistent class for the PS_LOCATION_TBL database table.
- * @author	John Tutton john@tutton.net
+ * @author John Tutton john@tutton.net
  */
 @Entity
 @Table(name="PS_LOCATION_TBL")
@@ -789,24 +789,6 @@ public class PsLocation implements Serializable {
 		this.zhrfAreaPs = zhrfAreaPs;
 	}
 
-//	public PsLocation findByLocation01(String location) {
-////		!----------------------------------------------------------------------
-////		! Procedure:  HR01-Get-Location-Country
-////		! Desc:  Gets the country that the location is in to determine which
-////		!        national id to pass back to the legacy system
-////		!----------------------------------------------------------------------
-////		Begin-Procedure HR01-Get-Location-Country
-////		Begin-Select
-////		CLT.COUNTRY
-////		    LET $PSLoc_Country = &CLT.COUNTRY
-////		    Let $Wrk_AD_CountryCdBuild = 'Y'
-////		from PS_LOCATION_TBL CLT
-////		where CLT.LOCATION = $PSLocation
-////		End-Select
-////		End-Procedure HR01-Get-Location-Country
-//		return null;
-//	}
-
 	/**
 	 * This routine gets the country in which an employee is currently working.
 	 * @see HR01-Get-Personal-Data
@@ -815,17 +797,16 @@ public class PsLocation implements Serializable {
 	 * @return countryIsoAlpha3Code
 	 */
 	public static String findCountryByLocation(String location) {
-		//SELECT P.Country
-		//FROM PS_Location_Tbl P
+		//SELECT P.Country FROM PS_Location_Tbl P
 		//WHERE P.Location = $PSLocation
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<String> resultList = em.createQuery(
 	    			"SELECT p.countryIsoAlpha3Code FROM PsLocation p "
-	    				+ "WHERE TRIM(UPPER(p.location)) = :location "
+	    				+ "WHERE TRIM(UPPER(p.location)) = TRIM(UPPER(:location)) "
 	    			, String.class)
-	    		    .setParameter("location", location.toUpperCase().trim())
+	    		    .setParameter("location", location)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList.get(0);
@@ -838,74 +819,6 @@ public class PsLocation implements Serializable {
 	    	em.close();
 	    }
 	    return null;	
-	}
-
-	public static PsLocation HR09Getjobdata(String location) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR09-Get-job-data
-//		! Desc:  Gets the employees data from the job table that needs to be
-//		!        interfaced to the legacy system
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR09-Get-job-data
-//		Begin-Select
-//		CJ8.COMPANY
-//		    let $PSCompany = ltrim(rtrim(&CJ8.COMPANY,' '),' ')              !Remove leading and trailing blanks
-//		CJ8.LOCATION
-//		    let $PSLocation = ltrim(rtrim(&CJ8.LOCATION,' '),' ')            !Remove leading and trailing blanks
-//		CJ8.DEPTID
-//		    let $PSDeptid = ltrim(rtrim(&CJ8.DEPTID,' '),' ')                !Remove leading and trailing blanks
-//		CJ8.BUSINESS_UNIT
-//		    let $PSBusinessUnit = ltrim(rtrim(&CJ8.BUSINESS_UNIT,' '),' ')   !Remove leading and trailing blanks
-//		CJ8.JOBCODE
-//		    let $PSJobCode = ltrim(rtrim(&CJ8.JOBCODE,' '),' ')                  !Remove leading and trailing blanks
-//		CJ8.EMPL_CLASS
-//		    let $PSEmplClass = ltrim(rtrim(&CJ8.EMPL_CLASS,' '),' ')         !Remove leading and trailing blanks
-//		CJ8.EMPL_STATUS
-//		    let $PSEmplStatus = ltrim(rtrim(&CJ8.EMPL_STATUS,' '),' ')       !Remove leading and trailing blanks
-//		CJ8.FULL_PART_TIME
-//		    let $PSfullparttime = ltrim(rtrim(&CJ8.FULL_PART_TIME,' '),' ')  !Remove leading and trailing blanks
-//		 let $Wrk_AD_JobDataBuild = 'Y'
-//		from PS_JOB CJ8
-//		where CJ8.EMPLID = $Wrk_Emplid
-//		and to_char(CJ8.EFFDT,'YYYY-MM-DD') = $PSEffdt
-//		AND CJ8.EFFSEQ =
-//		         (SELECT MAX(CJ8B.EFFSEQ)
-//		          FROM  PS_JOB CJ8B
-//		          WHERE CJ8B.EMPLID   = CJ8.EMPLID
-//		            AND CJ8B.EMPL_RCD = CJ8.EMPL_RCD
-//		            AND CJ8B.EFFDT    = CJ8.EFFDT)
-//		and CJ8.EMPL_RCD = 0
-//		End-Select
-//		Begin-Select
-//		CLT3.COUNTRY
-//		    let $PSLoc_Country = ltrim(rtrim(&CLT3.COUNTRY,' '),' ')         !Remove leading and trailing blanks
-//		    Let $Wrk_AD_CountryCdBuild = 'Y'
-//		from PS_LOCATION_TBL CLT3
-//		where CLT3.LOCATION = $PSLOCATION
-//		End-Select
-//		End-Procedure HR09-Get-job-data
-		return null;
-	}
-
-	public static PsLocation findByLocation(String location) {
-//		!----------------------------------------------------------------------
-//		! Procedure: AD-Get-Country-Code
-//		! Desc:  This routine will get the Country Code for Active Directory File Build
-//		!----------------------------------------------------------------------
-//		Begin-Procedure AD-Get-Country-Code
-//		Let $PSLoc_Country = ''
-//		Begin-Select
-//		ADL2.COUNTRY
-//		    let $PSLoc_Country = ltrim(rtrim(&ADL2.COUNTRY,' '),' ')         !Remove leading and trailing blanks
-//		from PS_LOCATION_TBL ADL2
-//		where ADL2.LOCATION = $PSLOCATION
-//		end-select
-//		End-Procedure AD-Get-Country-Code
-		return null;
-	}
-	
-	public static String findCountryIsoAlpha3CodeByLocation(String location) {
-		return null;
 	}
 
 }

@@ -8,6 +8,7 @@ import javax.persistence.*;
 
 /**
  * The persistent class for the PS_PERSON database table.
+ * Employee Record
  * @author	John Tutton john@tutton.net
  */
 @Entity
@@ -105,11 +106,11 @@ public class PsPerson implements Serializable {
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<PsPerson> resultList = (List<PsPerson>) em.createQuery(
-	    			"SELECT PsPerson "
+	    			"SELECT p "
 	    				+ "FROM PsPerson p "
-	    				+ "WHERE UPPER(TRIM(p.employeeId)) = :employeeId "
+	    				+ "WHERE UPPER(TRIM(p.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    				, PsPerson.class)
-	    		    .setParameter("employeeId", employeeId.trim().toUpperCase())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);

@@ -55,9 +55,9 @@ public class EmployeeJobProfileChange {
 	 */
 	private static List<String> getParameterNameList() {
 		return Arrays.asList("employeeId","operatorId",
-				"employeeBranch", "employeeDepartment", "employeeSubDepartment",
-				"employeePosition", "employeeJobStatus", "employeeWorkStatus",
-				"employeeUnionFlag", "employeeTimeCardFlag", "effectiveDate");
+				"branch", "department", "subdepartment",
+				"position", "jobStatus", "workStatus",
+				"unionFlag", "timeCardFlag", "effectiveDate");
 	}
 
 }

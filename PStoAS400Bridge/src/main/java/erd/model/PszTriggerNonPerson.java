@@ -58,44 +58,36 @@ public class PszTriggerNonPerson extends PszTriggerSuperclass {
 	 * This routine checks if it is a POI to EMP transfer. If it is then the the flag is changed to W and wait for Hire
 	 * @see Check-If-POI-Termed in ZHRI100A.SQR
 	 * @param employeeId
-	 * @return true if completionStatus equals 'C' or 'P' in trigger record 
+	 * @return true if record exists and completionStatus is 'C' or 'P'
 	 */
 	//TODO: 
-	public static Boolean isPoiToEmpTransfer(String employeeId) {
+	public static Boolean isPoiTermed(String employeeId) {
 		logger.debug("*** PszTriggerNonPerson.ZHRI100A_checkIfPoiTermed()");
-		//BEGIN-SELECT
-		//SEC.TASK_FLAG
-		//FROM PS_ZHRT_ALTTRIGGER SEC
-		//WHERE SEC.PROC_NAME = 'ZHRI202A'
-		//		AND SEC.EMPLID = $PSEmplid
-		//		AND SEC.SEQUENCE = 0
-		//		AND SEC.SEQ_NBR = 
-		//			(SELECT MAX(SEC1.SEQ_NBR) FROM PS_ZHRT_ALTTRIGGER SEC1
-		//				WHERE SEC1.PROC_NAME = 'ZHRI202A'
-		//					AND SEC1.EMPLID = $PSEmplid
-		//					AND SEC1.SEQUENCE = 0)     
-		//END-SELECT
+		//SELECT P.TASK_FLAG FROM PS_ZHRT_ALTTRIGGER P
+		//WHERE P.PROC_NAME = 'ZHRI202A'
+		//AND P.EMPLID = $PSEmplid AND P.SEQUENCE = 0
+		//AND P.SEQ_NBR = 
+				//(SELECT MAX(P2.SEQ_NBR) FROM PS_ZHRT_ALTTRIGGER P2
+				//WHERE P2.PROC_NAME = 'ZHRI202A'
+				//AND P2.EMPLID = $PSEmplid AND P2.SEQUENCE = 0)     
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<String> resultList = em.createQuery(
 	    		    "SELECT p.completionStatus FROM PszTriggerNonPerson p "
-	    		    		+ "WHERE TRIM(UPPER(p.processName)) = :processName "
-	    		    		+ "		AND TRIM(UPPER(p.employeeId)) = :employeeId "
-	    		    		+ "		AND p.eidIndexNumber = :eidIndexNumber "
+	    		    		+ "WHERE TRIM(UPPER(p.processName)) = 'ZHRI202A' "
+	    		    		+ "		AND TRIM(UPPER(p.employeeId)) = TRIM(UPPER(:employeeId)) "
+	    		    		+ "		AND p.eidIndexNumber = 0 "
 	    		    		+ "		AND p.sequenceNumber = "
 	    		    		+ "			(SELECT MAX(p2.sequenceNumber) FROM PszTriggerNonPerson p2 "
-	    		    		+ "				WHERE TRIM(UPPER(p2.processName)) = :processName "
-	    		    		+ "					AND TRIM(UPPER(p2.employeeId)) = :employeeId "
-	    		    		+ "					AND TRIM(UPPER(p2.eidIndexNumber)) = :eidIndexNumber) "
+	    		    		+ "				WHERE TRIM(UPPER(p2.processName)) = 'ZHRI202A' "
+	    		    		+ "					AND TRIM(UPPER(p2.employeeId)) = TRIM(UPPER(:employeeId)) "
+	    		    		+ "					AND TRIM(UPPER(p2.eidIndexNumber)) = 0) "
 	    		    , String.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
-	    		    .setParameter("eidIndexNumber", 0)
-	    		    .setParameter("processName", "ZHRI202A")
+	    		    .setParameter("employeeId", employeeId)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
-	    		String completionStatus = resultList.get(0);
-	    		return ("C".equalsIgnoreCase(completionStatus) || "P".equalsIgnoreCase(completionStatus));
+	    		return ("C".equalsIgnoreCase(resultList.get(0)) || "P".equalsIgnoreCase(resultList.get(0)));
 	    	}
 	    }
 	    catch (Exception e) {

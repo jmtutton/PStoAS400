@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * The persistent class for the PS_JOBCODE_TBL database table.
  * This table holds job codes, descriptions and related data such as FLSA classification, pay plan, grade and structure information. 
- * @author	John Tutton john@tutton.net
+ * @author John Tutton john@tutton.net
  */
 @Entity
 @Table(name="PS_JOBCODE_TBL")
@@ -1458,33 +1458,25 @@ public class PsJobCode implements Serializable {
 		this.workersCompCd = workersCompCd;
 	}
 
-	public PsJobCode findByJobCode(String jobCode) {
-		return null;
-	}
-
 	/**
-	 * Gets the job description for Active Directory File Build
 	 * @see AD-Get-Job-Description in ZHRI100A.SQR
 	 * @param jobCode
-	 * @return
+	 * @return PsJobCode
 	 */
-	public String findJobDescriptionByJobCode(String jobCode) {
-//		Begin-Select
-//		AD9.JOBCODE
-//		AD9.DESCR
-//		 let $PSJobDescription = ltrim(rtrim(&AD9.DESCR,' '),' ')
-//		from PS_JOBCODE_TBL AD9
-//		where AD9.JOBCODE = $PSJobcode
-//		End-select
+	public PsJobCode findByJobCode(String jobCode) {
+		//SELECT FROM PS_JOBCODE_TBL P
+		//WHERE P.JOBCODE = $PSJobcode
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<String> resultList = em.createQuery(
-	    		    "SELECT p.jobDescription FROM PsJobCode p WHERE p.sequenceNumber = :jobCode", String.class)
+	    	List<PsJobCode> resultList = em.createQuery(
+	    		    "SELECT p FROM PsJobCode p "
+	    		    		+ "WHERE UPPER(TRIM(p.jobCode)) = UPPER(TRIM(:jobCode))"
+	    		    , PsJobCode.class)
 	    		    .setParameter("jobCode", jobCode)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
-	    		return resultList.get(0).trim();
+	    		return resultList.get(0);
 	    	}
 	    } 
 	    catch (Exception e) {

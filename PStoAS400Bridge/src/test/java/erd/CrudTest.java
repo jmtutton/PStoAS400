@@ -31,7 +31,7 @@ import erd.model.PsJob;
 import erd.model.PsJobCode;
 import erd.model.PsLocation;
 import erd.model.PsName;
-import erd.model.PsReferralSource;
+import erd.model.PsPersonalApplicantReferral;
 import erd.model.PsTranslationItem;
 import erd.model.PszPeopleToolsTranslation;
 import erd.model.PszPoiTermination;
@@ -489,10 +489,10 @@ public class CrudTest {
 	public void testPsReferralSource() {
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
-		TypedQuery<PsReferralSource> query =
-				em.createNamedQuery("PsReferralSource.findAll", PsReferralSource.class);
+		TypedQuery<PsPersonalApplicantReferral> query =
+				em.createNamedQuery("PsReferralSource.findAll", PsPersonalApplicantReferral.class);
 		query.setMaxResults(MAX_RESULTS);
-		List<PsReferralSource> results = query.getResultList();
+		List<PsPersonalApplicantReferral> results = query.getResultList();
 		assertNotNull(results);
 	}
 	

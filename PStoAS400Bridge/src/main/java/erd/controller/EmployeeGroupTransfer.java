@@ -55,7 +55,7 @@ public class EmployeeGroupTransfer {
 	 * @return list of parameter names for this process
 	 */
 	private static List<String> getParameterNameList() {
-		return Arrays.asList("employeeId", "operatorId", "employeeGroup", "employeeBranch", 
+		return Arrays.asList("employeeId", "operatorId", "group", "branch", 
 				"nationalIdCountry", "nationalId", "effectiveDate");
 	}
 

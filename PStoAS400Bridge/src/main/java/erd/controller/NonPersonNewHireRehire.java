@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * Contingent Employee and Multiple EID New Hire / Rehire Process
- * @see ZHRI201A.SQC
+ * @see ZHRI201A.SQC PeopleCode file
  * @author John Tutton john@tutton.net
  */
 public class NonPersonNewHireRehire extends NonPerson {
@@ -26,9 +26,10 @@ public class NonPersonNewHireRehire extends NonPerson {
 		if(Main.DEBUG) logger.debug("*** NonPersonNewHireRehire.doProcess()");
 		parameterMap = fetchProcessParameters(parameterMap);
 		parameterMap.put("parameterString", Main.composeParameterString(parameterMap));
-		//DO HR201-Build-Call-Statement //TODO: make sure I didn't miss anything
-		//DO Get-OprId //TODO
-		return Main.doCommand(parameterMap);
+		String completionStatus = Main.doCommand(parameterMap);
+	    //if operatorId doesn't already exists, add the new employee as a PeopleSoft Operator
+		Main.fetchLegacyEmployeeId(parameterMap);
+		return completionStatus;
 	}
 
 	/**
@@ -69,15 +70,6 @@ public class NonPersonNewHireRehire extends NonPerson {
 	private HashMap<String, Object> fetchPersonalData(HashMap<String, Object> parameterMap) {
 		parameterMap = fetchEffectiveDatedPersonalData(parameterMap);
 		parameterMap = fetchPsNamesData(parameterMap);
-		return parameterMap;
-	}
-	
-	/**
-	 * @see HR201-Massage-Data
-	 * @param parameterMap
-	 * @return parameterMap
-	 */
-	private HashMap<String, Object> massageData(HashMap<String, Object> parameterMap) {
 		return parameterMap;
 	}
 

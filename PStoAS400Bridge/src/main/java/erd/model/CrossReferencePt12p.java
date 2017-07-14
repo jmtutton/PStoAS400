@@ -92,9 +92,9 @@ public class CrossReferencePt12p implements Serializable {
 		
 		try {
 			List<CrossReferencePt12p> resultList = em.createQuery("SELECT CrossReferencePt12p FROM CrossReferencePt12p c "
-						+ "WHERE UPPER(TRIM(c.department)) = :department "
+						+ "WHERE UPPER(TRIM(c.department)) = UPPER(TRIM(:department)) "
 					, CrossReferencePt12p.class)
-					.setParameter("department", department.trim().toUpperCase())
+					.setParameter("department", department)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
@@ -125,10 +125,10 @@ public class CrossReferencePt12p implements Serializable {
 	    	List<String> resultList = (List<String>) em.createQuery(
 	    			"SELECT UPPER(TRIM(p.branch)) "
 	    				+ "FROM CrossReferencePt12p p "
-	    				+ "WHERE UPPER(TRIM(p.department)) = :department "
+	    				+ "WHERE UPPER(TRIM(p.department)) = UPPER(TRIM(:department)) "
 	    				+ "AND UPPER(TRIM(p.status)) = 'A' "
 	    				, String.class)
-	    		    .setParameter("department", department.trim().toUpperCase())
+	    		    .setParameter("department", department)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);

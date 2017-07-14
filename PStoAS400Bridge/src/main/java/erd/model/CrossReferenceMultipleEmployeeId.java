@@ -262,10 +262,10 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    try {
 	    	List<String> resultList = em.createQuery(
 	    			"SELECT UPPER(TRIM(c.legacyEmployeeId)) FROM CrossReferenceMultipleEmployeeId c "
-	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    					+ "AND c.eidIndexNumber = :eidIndexNumber"
 	    			, String.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("eidIndexNumber", eidIndexNumber)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
@@ -293,19 +293,20 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		//UPDATE PS_ZHRR_MULTPL_EID
 		//SET ZHRF_LEG_EMPL_ID = $LegEmplId 
 		//WHERE EMPLID = $EmplId AND SEQUENCE = #IndexNum
+		legacyEmployeeId = legacyEmployeeId != null ? legacyEmployeeId.trim().toUpperCase() : legacyEmployeeId;
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
 	    	List<CrossReferenceMultipleEmployeeId> resultList = em.createQuery(
 	    			"SELECT c FROM CrossReferenceMultipleEmployeeId c "
-	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    					+ "AND c.eidIndexNumber = :eidIndexNumber", CrossReferenceMultipleEmployeeId.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("eidIndexNumber", eidIndexNumber)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		CrossReferenceMultipleEmployeeId xrefEmployeeId = resultList.get(0);
-		    	xrefEmployeeId.setLegacyEmployeeId(legacyEmployeeId.toUpperCase().trim());
+		    	xrefEmployeeId.setLegacyEmployeeId(legacyEmployeeId);
 		    	EntityTransaction entityTransaction = em.getTransaction();
 		    	entityTransaction.begin();
 		    	em.persist(xrefEmployeeId);
@@ -337,10 +338,12 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 		//INSERT INTO PS_ZHRT_EMPID_CREF (EMPLID, ZHRF_LEG_EMPL_ID) VALUES ($EmplId, $LegEmplId)
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
+		employeeId = employeeId != null ? employeeId.toUpperCase().trim() : employeeId;
+		legacyEmployeeId = legacyEmployeeId != null ? legacyEmployeeId.toUpperCase().trim() : legacyEmployeeId;
 	    try {
     		CrossReferenceMultipleEmployeeId xrefEmployeeId = new CrossReferenceMultipleEmployeeId();
-	    	xrefEmployeeId.setEmployeeId(employeeId.toUpperCase().trim());
-	    	xrefEmployeeId.setLegacyEmployeeId(legacyEmployeeId.toUpperCase().trim());
+	    	xrefEmployeeId.setEmployeeId(employeeId);
+	    	xrefEmployeeId.setLegacyEmployeeId(legacyEmployeeId);
 	    	em.getTransaction().begin();
 	    	em.persist(xrefEmployeeId);
 	    	em.getTransaction().commit();
@@ -383,14 +386,14 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    try {
 	    	List<CrossReferenceMultipleEmployeeId> resultList = em.createQuery(
 	    			"SELECT c FROM CrossReferenceMultipleEmployeeId c "
-	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    					+ "AND c.eidIndexNumber = :eidIndexNumber "
 	    					+ "AND c.effectiveDate = "
 	    							+ "(SELECT MAX(c2.effectiveDate) FROM CrossReferenceMultipleEmployeeId c2 "
 	    							+ "WHERE UPPER(TRIM(c2.employeeId)) = UPPER(TRIM(c.employeeId)) "
 	    							+ "AND c2.effectiveDate <= :effectiveDate) "
 	    			, CrossReferenceMultipleEmployeeId.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("eidIndexNumber", eidIndexNumber)
 					.setParameter("effectiveDate", effectiveDate, TemporalType.DATE)
 	    		    .getResultList();
@@ -427,7 +430,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    try {
 	    	List<Date> resultList = em.createQuery(
 	    			"SELECT c.effectiveDate FROM CrossReferenceMultipleEmployeeId c "
-	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    					+ "AND c.eidIndexNumber = :eidIndexNumber "
 	    					+ "AND c.effectiveDate = "
 	    							+ "(SELECT MAX(c2.effectiveDate) FROM CrossReferenceMultipleEmployeeId c2 "
@@ -435,7 +438,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    							+ "WHERE c2.eidIndexNumber = c.eidIndexNumber "
 	    							+ "AND c2.effectiveDate <= CURRENT_DATE) "
 	    			, Date.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("eidIndexNumber", eidIndexNumber)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
@@ -473,7 +476,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    try {
 	    	List<Date> resultList = em.createQuery(
 	    			"SELECT c.effectiveDate FROM CrossReferenceMultipleEmployeeId c "
-	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    					+ "AND c.eidIndexNumber = :eidIndexNumber "
 	    					+ "AND c.effectiveDate = "
 	    							+ "(SELECT MAX(c2.effectiveDate) FROM CrossReferenceMultipleEmployeeId c2 "
@@ -482,7 +485,7 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    							+ "AND c2.status = 'I' "
 	    							+ "AND c2.effectiveDate < :maxEffectiveDate) "
 	    			, Date.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("eidIndexNumber", eidIndexNumber)
 	    		    .setParameter("maxEffectiveDate", maxEffectiveDate, TemporalType.DATE)
 	    		    .getResultList();
@@ -516,11 +519,11 @@ public class CrossReferenceMultipleEmployeeId implements Serializable {
 	    try {
 	    	List<Date> resultList = em.createQuery(
 	    			"SELECT MIN(c.effectiveDate) FROM CrossReferenceMultipleEmployeeId c "
-	    					+ "WHERE UPPER(TRIM(c.employeeId)) = :employeeId "
+	    					+ "WHERE UPPER(TRIM(c.employeeId)) = UPPER(TRIM(:employeeId)) "
 	    					+ "AND c.eidIndexNumber = :eidIndexNumber "
 	    					+ "AND c.effectiveDate > :lastInactiveDate "
 	    			, Date.class)
-	    		    .setParameter("employeeId", employeeId.toUpperCase().trim())
+	    		    .setParameter("employeeId", employeeId)
 	    		    .setParameter("eidIndexNumber", eidIndexNumber)
 	    		    .setParameter("lastInactiveDate", lastInactiveDate, TemporalType.DATE)
 	    		    .getResultList();

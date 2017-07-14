@@ -69,7 +69,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getComments() {
-		return this.comments.trim();
+		return this.comments;
 	}
 
 	public void setComments(String comments) {
@@ -77,7 +77,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getStatus() {
-		return this.status.trim();
+		return this.status;
 	}
 
 	public void setStatus(String status) {
@@ -85,7 +85,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getInput01() {
-		return this.input01.trim();
+		return this.input01;
 	}
 
 	public void setInput01(String input01) {
@@ -93,7 +93,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getInput02() {
-		return this.input02.trim();
+		return this.input02;
 	}
 
 	public void setInput02(String input02) {
@@ -101,7 +101,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getInput03() {
-		return this.input03.trim();
+		return this.input03;
 	}
 
 	public void setInput03(String input03) {
@@ -109,7 +109,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getInput04() {
-		return this.input04.trim();
+		return this.input04;
 	}
 
 	public void setInput04(String input04) {
@@ -117,7 +117,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getInput05() {
-		return this.input05.trim();
+		return this.input05;
 	}
 
 	public void setInput05(String input05) {
@@ -125,7 +125,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getInput06() {
-		return this.input06.trim();
+		return this.input06;
 	}
 
 	public void setInput06(String input06) {
@@ -133,7 +133,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getOutput01() {
-		return this.output01.trim();
+		return this.output01;
 	}
 
 	public void setOutput01(String output01) {
@@ -141,7 +141,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getOutput02() {
-		return this.output02.trim();
+		return this.output02;
 	}
 
 	public void setOutput02(String output02) {
@@ -149,7 +149,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getOutput03() {
-		return this.output03.trim();
+		return this.output03;
 	}
 
 	public void setOutput03(String output03) {
@@ -157,7 +157,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getOutput04() {
-		return this.output04.trim();
+		return this.output04;
 	}
 
 	public void setOutput04(String output04) {
@@ -165,7 +165,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getOutput05() {
-		return this.output05.trim();
+		return this.output05;
 	}
 
 	public void setOutput05(String output05) {
@@ -173,7 +173,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getOutput06() {
-		return this.output06.trim();
+		return this.output06;
 	}
 
 	public void setOutput06(String output06) {
@@ -181,7 +181,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getOutput07() {
-		return this.output07.trim();
+		return this.output07;
 	}
 
 	public void setOutput07(String output07) {
@@ -189,7 +189,7 @@ public class PszPeopleToolsTranslation implements Serializable {
 	}
 
 	public String getOutput08() {
-		return this.output08.trim();
+		return this.output08;
 	}
 
 	public void setOutput08(String output08) {
@@ -210,10 +210,11 @@ public class PszPeopleToolsTranslation implements Serializable {
 	    try {
 	    	List<String> resultList = em.createQuery(
 	    		    "SELECT UPPER(TRIM(p.output01)) FROM PszPeopleToolsTranslation p "
-	    		    		+ "WHERE UPPER(TRIM(p.input01)) = :input01 "
-	    		    		+ "AND UPPER(TRIM(p.input02)) = :input02 ", String.class)
-	    		    .setParameter("input01", input01.trim().toUpperCase())
-	    		    .setParameter("input02", input02.trim().toUpperCase())
+	    		    		+ "WHERE UPPER(TRIM(p.input01)) = TRIM(UPPER(:input01)) "
+	    		    		+ "AND UPPER(TRIM(p.input02)) = TRIM(UPPER(:input02)) "
+	    		    , String.class)
+	    		    .setParameter("input01", input01)
+	    		    .setParameter("input02", input02)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList.get(0);
@@ -240,9 +241,9 @@ public class PszPeopleToolsTranslation implements Serializable {
 	    		    		+ "WHERE UPPER(TRIM(p.input01)) = 'TEMPMAST' "
 	    		    		+ "AND UPPER(TRIM(p.input02)) = 'POSITION' "
 	    		    		+ "AND p.status = 'A' "
-	    		    		+ "AND UPPER(TRIM(p.input03)) = :input03 "
+	    		    		+ "AND UPPER(TRIM(p.input03)) = TRIM(UPPER(:input03)) "
 	    		    , PszPeopleToolsTranslation.class)
-	    		    .setParameter("input03", input03.trim().toUpperCase())
+	    		    .setParameter("input03", input03)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList.get(0);
@@ -274,14 +275,14 @@ public class PszPeopleToolsTranslation implements Serializable {
 	    try {
 	    	List<PszPeopleToolsTranslation> resultList = em.createQuery(
 	    		    "SELECT p FROM PszPeopleToolsTranslation p "
-	    		    		+ "WHERE UPPER(TRIM(p.input01)) = input01 "
-	    		    		+ "AND UPPER(TRIM(p.input02)) = input02 "
-	    		    		+ "AND UPPER(TRIM(p.input03)) = :input03 "
+	    		    		+ "WHERE UPPER(TRIM(p.input01)) = TRIM(UPPER(:input01)) "
+	    		    		+ "AND UPPER(TRIM(p.input02)) = TRIM(UPPER(:input02)) "
+	    		    		+ "AND UPPER(TRIM(p.input03)) = TRIM(UPPER(:input03)) "
 	    		    		+ "AND p.status = 'A' "
 	    		    , PszPeopleToolsTranslation.class)
-	    		    .setParameter("input01", input01.trim().toUpperCase())
-	    		    .setParameter("input02", input02.trim().toUpperCase())
-	    		    .setParameter("input03", input03.trim().toUpperCase())
+	    		    .setParameter("input01", input01)
+	    		    .setParameter("input02", input02)
+	    		    .setParameter("input03", input03)
 	    		    .getResultList();
 	    	if(resultList != null && !resultList.isEmpty()) {
 	    		return resultList.get(0);

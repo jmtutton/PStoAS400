@@ -95,28 +95,26 @@ public class PszVariable implements Serializable {
 	 * @return
 	 */
 	public static String findVariableValueByProcessNameAndDbNameAndVariableName(String processName, String dbName, String variableName) {
-//		BEGIN-SELECT
-//			VAR.ZPTF_VARIABLE_VAL
-//			MOVE &VAR.ZPTF_VARIABLE_VAL to $PSZPTT_VARIABLE_VAL
-//			FROM  PS_ZPTT_VARIABLES VAR WHERE VAR.PRCSNAME = 'ZHRI100A'
-//				AND VAR.DBNAME = (SELECT dbname FROM PSDBOWNER)
-//				AND VAR.VARIABLE_NAME = $Variable_Needed
-//		END-SELECT
+		//SELECT VAR.ZPTF_VARIABLE_VAL
+		//FROM PS_ZPTT_VARIABLES VAR WHERE VAR.PRCSNAME = 'ZHRI100A'
+		//AND VAR.DBNAME = (SELECT dbname FROM PSDBOWNER)
+		//AND VAR.VARIABLE_NAME = $Variable_Needed
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		
 	    try {
-	    	List<String> resultList = em.createQuery("SELECT p.variableValue FROM PszVariable p "
-	    				+ "WHERE UPPER(TRIM(p.processName)) = :processName "
-	    				+ "AND UPPER(TRIM(p.dbName)) = :dbName "
-	    				+ "AND UPPER(TRIM(p.variableName)) = :variableName ",
-	    				String.class)
-	    		    .setParameter("processName", processName.toUpperCase().trim())
-	    		    .setParameter("dbName", dbName.toUpperCase().trim())
-	    		    .setParameter("variableName", variableName.toUpperCase().trim())
+	    	List<String> resultList = em.createQuery(
+	    			"SELECT UPPER(TRIM(p.variableValue)) FROM PszVariable p "
+	    					+ "WHERE UPPER(TRIM(p.processName)) = UPPER(TRIM(:processName)) "
+	    					+ "AND UPPER(TRIM(p.dbName)) = UPPER(TRIM(:dbName)) "
+	    					+ "AND UPPER(TRIM(p.variableName)) = UPPER(TRIM(:variableName)) "
+	    			, String.class)
+	    		    .setParameter("processName", processName)
+	    		    .setParameter("dbName", dbName)
+	    		    .setParameter("variableName", variableName)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
-	    		return resultList.get(0).trim();
+	    		return resultList.get(0);
 	    	}
 	    }
 	    catch (Exception e) {

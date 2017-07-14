@@ -102,10 +102,10 @@ public class CrossReferenceCompany implements Serializable {
 		try {
 			List<String> resultList = em.createQuery(
 					"SELECT UPPER(TRIM(c.legacyRegion)) FROM CrossReferenceCompany c "
-					+ "WHERE UPPER(TRIM(c.businessUnit)) = :businessUnit "
+					+ "WHERE UPPER(TRIM(c.businessUnit)) = UPPER(TRIM(:businessUnit)) "
 					+ "AND UPPER(TRIM(c.status)) = 'A' "
 					, String.class)
-					.setParameter("businessUnit", businessUnit.trim().toUpperCase())
+					.setParameter("businessUnit", businessUnit)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);
@@ -137,10 +137,10 @@ public class CrossReferenceCompany implements Serializable {
 		try {
 			List<String> resultList = em.createQuery(
 					"SELECT UPPER(TRIM(c.legacyGroup)) FROM CrossReferenceCompany c "
-					+ "WHERE UPPER(TRIM(c.company)) = :company "
+					+ "WHERE UPPER(TRIM(c.company)) = UPPER(TRIM(:company)) "
 					+ "AND UPPER(TRIM(c.status)) = 'A' "
 					, String.class)
-					.setParameter("company", company.trim().toUpperCase())
+					.setParameter("company", company)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);

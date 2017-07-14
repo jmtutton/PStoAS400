@@ -35,15 +35,17 @@ public class PsDbOwner implements Serializable {
 	}
 	
 	public static String findDbName() {
-		//VAR.DBNAME = (SELECT dbname FROM PSDBOWNER)
+		//SELECT DBNAME FROM PSDBOWNER
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		
 	    try {
-	    	List<String> resultList = em.createQuery("SELECT p.dbName FROM PsDbOwner p", String.class)
+	    	List<String> resultList = em.createQuery(
+	    			"SELECT UPPER(TRIM(p.dbName)) FROM PsDbOwner p"
+	    			, String.class)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
-	    		return resultList.get(0).trim();
+	    		return resultList.get(0);
 	    	}
 	    }
 	    catch (Exception e) {

@@ -2,7 +2,6 @@ package erd.controller;
 
 import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,7 +10,8 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import erd.ErdUtil;
+import erd.ErdUtils;
+import erd.ErdUtils.SplitDate;
 import erd.model.CrossReferenceTerminationReason;
 import erd.model.PsActionReason;
 import erd.model.PsJob;
@@ -29,7 +29,7 @@ public class EmployeeTermination {
     /**
 	 * This is the main processing procedure.
 	 * @see HR02-Process-Main in ZHRI102A.SQC
-	 * @param commonParameters
+	 * @param parameterMap
 	 * @return completionStatus
 	 */
 	public String doProcess(HashMap<String, Object> parameterMap) {
@@ -46,13 +46,13 @@ public class EmployeeTermination {
 	/**
 	 * Fetches the termination reason by querying the PsActionReason table.
 	 * @see HR02-Get-Action-Reason in ZHRI102A.SQC
-	 * @param psJob
-	 * @return processParameters
+	 * @param parameterMap
+	 * @return parameterMap
 	 */
 	private static HashMap<String, Object> fetchProcessParameters(HashMap<String, Object> parameterMap) {
 		logger.debug("*** EmployeeTermination.fetchProcessParameters()");
 		parameterMap.put("errorProgramParameter", "HRZ102A");
-		Date effectiveTerminationDate = ErdUtil.addDays((Date)parameterMap.get("effectiveDate"), 1);
+		Date effectiveTerminationDate = ErdUtils.addDays((Date)parameterMap.get("effectiveDate"), 1);
 		parameterMap.put("employeeId", Main.fetchLegacyEmployeeId(parameterMap));
 		PsJob psJob = PsJob.findByEmployeeIdAndEffectiveDateAndEffectiveSequence(
 				(String)parameterMap.get("employeeId"), effectiveTerminationDate, 
@@ -118,15 +118,18 @@ public class EmployeeTermination {
 	 */
 	private static HashMap<String, Object> fetchDates(PsJob psJob, HashMap<String, Object> parameterMap) {
 		logger.debug("*** EmployeeTermination.fetchDates()");
-		if("REH".equals(psJob.getAction()) && "REH".equals(psJob.getActionReason())) {
-			parameterMap.put("rehireYear", new SimpleDateFormat("yyyy").format(psJob.getEffectiveDate()));
-			parameterMap.put("rehireMonth", new SimpleDateFormat("mm").format(psJob.getEffectiveDate()));
-			parameterMap.put("rehireDay", new SimpleDateFormat("dd").format(psJob.getEffectiveDate()));
-		}
-		if("TER".equals(psJob.getAction()) || "RET".equals(psJob.getAction()) || "TWP".equals(psJob.getAction()) || "TWB".equals(psJob.getAction())) {
-			parameterMap.put("terminationYear", new SimpleDateFormat("yyyy").format(psJob.getEffectiveDate()));
-			parameterMap.put("terminationMonth", new SimpleDateFormat("MM").format(psJob.getEffectiveDate()));
-			parameterMap.put("terminationDay", new SimpleDateFormat("dd").format(psJob.getEffectiveDate()));
+		if(psJob.getEffectiveDate() != null) {
+			SplitDate splitDate = new ErdUtils().new SplitDate(psJob.getEffectiveDate());
+			if("REH".equals(psJob.getAction()) && "REH".equals(psJob.getActionReason())) {
+				parameterMap.put("rehireYear", splitDate.getYear());
+				parameterMap.put("rehireMonth", splitDate.getMonth());
+				parameterMap.put("rehireDay", splitDate.getDay());
+			}
+			if("TER".equals(psJob.getAction()) || "RET".equals(psJob.getAction()) || "TWP".equals(psJob.getAction()) || "TWB".equals(psJob.getAction())) {
+				parameterMap.put("terminationYear", splitDate.getYear());
+				parameterMap.put("terminationMonth", splitDate.getMonth());
+				parameterMap.put("terminationDay", splitDate.getDay());
+			}
 		}
 		return parameterMap;
 	}

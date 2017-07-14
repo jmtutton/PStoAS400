@@ -152,119 +152,9 @@ public class CrossReferenceJobCode implements Serializable {
 		this.legacyPositionCode = legacyPositionCode;
 	}
 
-	public CrossReferenceJobCode HR01GetPosition(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR01-Get-Position
-//		! Desc:  Get the Legacy position from the cross reference table using the
-//		!        jobcode setid, jobcode, empl_class, full_part_time, reg_temp,
-//		!        and departmentId from PeopleSoft
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR01-Get-Position
-//		Let $Found = 'N'
-//		Begin-Select
-//		RPT3.ZHRF_LEGPOSITIONCD
-//		    Let $LegPosition = &RPT3.ZHRF_LEGPOSITIONCD      !Move to a program field
-//		RPT3.ZHRF_LEGDEPTCD
-//		    Let $LegDepartment = &RPT3.ZHRF_LEGDEPTCD        !Move to a program field
-//		RPT3.ZHRF_LEGJOBSTSCD
-//		    Let $LegJobStatus = &RPT3.ZHRF_LEGJOBSTSCD       !Move to a program field
-//		    Let $Found = 'Y'
-//		from PS_ZHRT_JOBCD_CREF RPT3
-//		where RPT3.SETID_JOBCODE = $PSSetID and RPT3.JOBCODE = $PSJobCode
-//		  and RPT3.EMPL_CLASS = $PSEmplClass and RPT3.FULL_PART_TIME = $PSFullPartTime
-//		  and RPT3.REG_TEMP = $PSRegTemp and RPT3.DEPARTMENT = $PSDeptid
-//		  and RPT3.STATUS = 'A'
-//		End-Select
-//		If $Found = 'N'
-//		    ! Let $WrkCriticalFlag = 'Y'
-//		    ! Let $CallRPG = 'N'
-//		    ! Let $ErrorMessageParm = 'Setid,Jobcode,EmplClass,F/P Time,R/T,Deptid not found in PS_ZHRT_JOBCD_CREF'
-//		   !  Do Call-Error-Routine
-//		    ! Let $WrkCriticalFlag = 'N'
-//		End-If    !$Found = 'N'
-//		End-Procedure HR01-Get-Position
-		return null;
-	}
-
-	public CrossReferenceJobCode HR04GetPosition(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR04-Get-Position
-//		! Desc:  Get the Legacy position from the cross reference table using the
-//		!        jobcode setid, jobcode, empl_class, full_part_time, reg_temp,
-//		!        and departmentId from PeopleSoft
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR04-Get-Position
-//		Let $Found = 'N'
-//		Begin-Select
-//		CPT3.ZHRF_LEGPOSITIONCD
-//		    let $LegPosition = &CPT3.ZHRF_LEGPOSITIONCD
-//		CPT3.ZHRF_LEGDEPTCD
-//		    Let $LegDepartment = &CPT3.ZHRF_LEGDEPTCD
-//		CPT3.ZHRF_LEGJOBSTSCD
-//		    Let $LegJobStatus = &CPT3.ZHRF_LEGJOBSTSCD
-//		    Let $Found = 'Y'
-//		from PS_ZHRT_JOBCD_CREF CPT3
-//		where CPT3.SETID_JOBCODE = $PSSetID     and CPT3.JOBCODE = $PSJobCode
-//		  and CPT3.EMPL_CLASS = $PSEmplClass and CPT3.FULL_PART_TIME = $PSFullPartTime
-//		  and CPT3.REG_TEMP = $PSRegTemp   and CPT3.DEPARTMENT = $PSDeptid
-//		  and CPT3.STATUS = 'A'
-//		End-Select
-//		If $Found = 'N'
-//		   ! Let $ErrorMessageParm = 'Setid,Jobcode,EmplClass,F/P Time,R/T,Deptid not in XRef PS_ZHRT_JOBCD_CREF'
-//		   ! Let $WrkCriticalFlag = 'Y'
-//		   ! Let $CallRpg = 'N'
-//		   ! Do Prepare-Error-Parms           ! JHV  09/11/02  fix Date Mask error  ZHR_PRDSPT_INTF_ERROR
-//		   ! Do Call-Error-Routine         !From ZHRI100A.SQR
-//		End-If    !$Found = 'N'
-//		End-Procedure HR04-Get-Position
-		return null;
-	}
-	
-	/**
-	 * Replaces SQC procedure HR01-Get-Position from ZHRI101A.SQC and HR04-Get-Position from ZHRI104A.SQC
-	 * This procedure finds the legacy Job Code Cross with matching setIdJobCode, jobCode, employeeClass, 
-	 * fullOrPartTime, regularOrTemporary, and department.
-	 * @see HR01-Get-Position procedure in ZHRI101A.SQC
-	 * @see HR04-Get-Position procedure in ZHRI104A.SQC
-	 * @param setIdJobCode
-	 * @param jobCode
-	 * @param employeeClass
-	 * @param fullOrPartTime
-	 * @param regularOrTemporary
-	 * @param department
-	 * @return CrossReferenceJobCode records
-	 */
-	public static List<CrossReferenceJobCode> findPosition(String setIdJobCode, String jobCode, String employeeClass, 
-			String fullOrPartTime, String regularOrTemporary, String department) {
-		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
-		EntityManager em = emfactory.createEntityManager();
-	    try {
-	    	List<CrossReferenceJobCode> resultList = (List<CrossReferenceJobCode>) em.createQuery("SELECT p FROM CrossReferenceJobCode p "
-	    				+ "WHERE p.setIdJobCode = :setIdJobCode AND p.jobCode = :jobCode AND p.employeeClass = :employeeClass "
-	    				+ "AND p.fullOrPartTime = :fullOrPartTime AND p.regularOrTemporary = :regularOrTemporary AND p.department = :department AND p.status = :status ", CrossReferenceJobCode.class)
-	    		    .setParameter("setIdJobCode", setIdJobCode)
-	    		    .setParameter("jobCode", jobCode)
-	    		    .setParameter("employeeClass", employeeClass)
-	    		    .setParameter("fullOrPartTime", fullOrPartTime)
-	    		    .setParameter("regularOrTemporary", regularOrTemporary)
-	    		    .setParameter("department", department)
-	    		    .setParameter("status", "A")
-	    		    .getResultList();
-	    	if(resultList != null && resultList.size() > 0) {
-	    		return resultList;
-	    	}
-	    }
-	    catch (Exception e) {
-	       e.printStackTrace();
-	    } 
-	    finally {
-	    	em.close();
-	    }
-	    return null;	
-	}
-
 	/**
 	 * @see HR01-Get-Position
+	 * @see HR04-Get-Position procedure in ZHRI104A.SQC
 	 * @param setIdJobCode
 	 * @param jobCode
 	 * @param employeeClass
@@ -275,8 +165,7 @@ public class CrossReferenceJobCode implements Serializable {
 	 */
 	public static CrossReferenceJobCode findActiveBySetIdJobCodeAndJobCodeAndEmployeeClassAndFullOrPartTimeAndRegularOrTemporaryAndDepartment(
 			String setIdJobCode, String jobCode, String employeeClass, String fullOrPartTime, String regularOrTemporary, String department) {
-		//SELECT
-		//FROM PS_ZHRT_JOBCD_CREF C
+		//SELECT FROM PS_ZHRT_JOBCD_CREF C
 		//WHERE C.SETID_JOBCODE = $PSSetID AND C.JOBCODE = $PSJobCode
 		//AND C.EMPL_CLASS = $PSEmplClass AND C.FULL_PART_TIME = $PSFullPartTime
 		//AND C.REG_TEMP = $PSRegTemp AND C.DEPARTMENT = $PSDeptid
@@ -286,17 +175,20 @@ public class CrossReferenceJobCode implements Serializable {
 	    try {
 	    	List<CrossReferenceJobCode> resultList = (List<CrossReferenceJobCode>) em.createQuery(
 	    			"SELECT p FROM CrossReferenceJobCode p "
-	    					+ "WHERE TRIM(UPPER(p.setIdJobCode)) = :setIdJobCode AND TRIM(UPPER(p.jobCode)) = :jobCode "
-	    					+ "AND TRIM(UPPER(p.employeeClass)) = :employeeClass AND TRIM(UPPER(p.fullOrPartTime)) = :fullOrPartTime "
-	    					+ "AND TRIM(UPPER(p.regularOrTemporary)) = :regularOrTemporary AND TRIM(UPPER(p.department)) = :department "
+	    					+ "WHERE TRIM(UPPER(p.setIdJobCode)) = TRIM(UPPER(:setIdJobCode)) "
+	    					+ "AND TRIM(UPPER(p.jobCode)) = TRIM(UPPER(:jobCode)) "
+	    					+ "AND TRIM(UPPER(p.employeeClass)) = TRIM(UPPER(:employeeClass)) "
+	    					+ "AND TRIM(UPPER(p.fullOrPartTime)) = TRIM(UPPER(:fullOrPartTime)) "
+	    					+ "AND TRIM(UPPER(p.regularOrTemporary)) = TRIM(UPPER(:regularOrTemporary)) "
+	    					+ "AND TRIM(UPPER(p.department)) = TRIM(UPPER(:department)) "
 	    					+" AND TRIM(UPPER(p.status)) = 'A' "
 	    			, CrossReferenceJobCode.class)
-	    		    .setParameter("setIdJobCode", setIdJobCode.trim().toUpperCase())
-	    		    .setParameter("jobCode", jobCode.trim().toUpperCase())
-	    		    .setParameter("employeeClass", employeeClass.trim().toUpperCase())
-	    		    .setParameter("fullOrPartTime", fullOrPartTime.trim().toUpperCase())
-	    		    .setParameter("regularOrTemporary", regularOrTemporary.trim().toUpperCase())
-	    		    .setParameter("department", department.trim().toUpperCase())
+	    		    .setParameter("setIdJobCode", setIdJobCode)
+	    		    .setParameter("jobCode", jobCode)
+	    		    .setParameter("employeeClass", employeeClass)
+	    		    .setParameter("fullOrPartTime", fullOrPartTime)
+	    		    .setParameter("regularOrTemporary", regularOrTemporary)
+	    		    .setParameter("department", department)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);

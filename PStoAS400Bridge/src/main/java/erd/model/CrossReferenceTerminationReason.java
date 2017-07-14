@@ -72,56 +72,25 @@ public class CrossReferenceTerminationReason implements Serializable {
 		this.legacyTerminationReason = legacyTerminationReason;
 	}
 
-	public CrossReferenceTerminationReason HR02_getActionReason(String employeeId) {
-		logger.debug("*** CrossReferenceTerminationReason.HR02_getActionReason()");
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR02-Get-Action-Reason
-//		! Desc:  This routine will determine if a termination was voluntary or
-//		!        involuntary based on Action and Action Reason codes.
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR02-Get-Action-Reason
-//		Let $Found = 'N'   !Initialize the record found variable
-//		Begin-Select
-//		CPT16.ZHRF_LEGTERMCD
-//		    Let $PSVolInvol = &CPT16.ZHRF_LEGTERMCD
-//		CPT16.ZHRF_LEGTERMRSN
-//		    Let $PSTermCode = &CPT16.ZHRF_LEGTERMRSN
-//		     If $PSTermCode = 'O' and $PSAction = 'TER'
-//		        Do HR02-Get-Reason-Description
-//		     End-If    !$PSTermCode = 'O'
-//		    Let $Found = 'Y'     !Mark that a record was found
-//		from PS_ZHRT_TRMRS_CREF CPT16
-//		where CPT16.STATUS = 'A'
-//		  and CPT16.ACTION = $PSAction
-//		  and CPT16.ACTION_REASON = $PSAction_Reason
-//		End-Select
-//		If $Found = 'N'
-//		     Let $ErrorMessageParm = 'Action Reason Code not found in XRef Tbl PS_ZHRT_TRMRS_CREF'
-//		     Do Call-Error-Routine       !From ZHRI100A.SQR
-//		     !Default the Action and reason in the legacy system
-//		     Let $PSVolInvol = 'V'
-//		     Let $PSTermCode = 'O'
-//		     Let $PSTermReason = 'ACTION REASON NOT SELECTED IN PS'
-//		End-If    !$Found = 'N'
-//		End-Procedure HR02-Get-Action-Reason
-		return null;
-	}
-	
 	/**
 	 * Replaces SQC procedure HR02-Get-Action-Reason from ZHRI102A.SQC
 	 * This routine will determine if a termination was voluntary or involuntary based on Action and Action Reason codes.
 	 * @see HR02-Get-Action-Reason in ZHRI102A.SQC
 	 */
 	public static CrossReferenceTerminationReason findByActionAndActionReasonAndStatus(String action, String actionReason, String status) {
-		logger.debug("*** CrossReferenceTerminationReason.findByActionAndActionReasonAndStatus()");
+		logger.debug("findByActionAndActionReasonAndStatus()");
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 	    try {
-	    	List<CrossReferenceTerminationReason> resultList = (List<CrossReferenceTerminationReason>) em.createQuery("SELECT p FROM CrossReferenceTerminationReason p "
-	    				+ "WHERE UPPER(TRIM(p.status)) = :status AND  UPPER(TRIM(p.action)) = :action AND  UPPER(TRIM(p.actionReason)) = :actionReason ", CrossReferenceTerminationReason.class)
-	    		    .setParameter("action", action.toUpperCase().trim())
-	    		    .setParameter("actionReason", actionReason.toUpperCase().trim())
-	    		    .setParameter("status", status.toUpperCase().trim())
+	    	List<CrossReferenceTerminationReason> resultList = (List<CrossReferenceTerminationReason>) em.createQuery(
+	    			"SELECT p FROM CrossReferenceTerminationReason p "
+	    				+ "WHERE UPPER(TRIM(p.status)) = UPPER(TRIM(:status)) "
+	    				+ "AND UPPER(TRIM(p.action)) = UPPER(TRIM(:action)) "
+	    				+ "AND UPPER(TRIM(p.actionReason)) = UPPER(TRIM(:actionReason)) "
+	    				, CrossReferenceTerminationReason.class)
+	    		    .setParameter("action", action)
+	    		    .setParameter("actionReason", actionReason)
+	    		    .setParameter("status", status)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);

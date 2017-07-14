@@ -57,11 +57,10 @@ public class NonPersonDemographicChange {
 	 * @return list of parameter names for this process
 	 */
 	private static List<String> getParameterNameList() {
-		return Arrays.asList("operatorId", "employeeId",
-				"employeeGroup", "employeeBranch",
-				"employeeLastName", "employeeFirstName", "employeeMiddleName", "employeeNickname",
-				"employeeGender", "serviceDate", "employeeDepartmentId",
-				"employeePosition", "referralSource", "employeeAddress", "employeeCity");
+		return Arrays.asList("operatorId", "employeeId", "group", "branch",
+				"lastName", "firstName", "middleName", "nickname",
+				"gender", "serviceDate", "departmentId",
+				"position", "referralSource", "address", "city");
 	}
 	
 }

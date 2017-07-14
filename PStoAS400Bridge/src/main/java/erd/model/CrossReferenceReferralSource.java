@@ -1,9 +1,13 @@
 package erd.model;
 
 import java.io.Serializable;
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import javax.persistence.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The persistent class for the PS_ZHRT_RFSRC_CREF database table.
@@ -15,6 +19,7 @@ import javax.persistence.*;
 @NamedQuery(name="CrossReferenceReferralSource.findAll", query="SELECT p FROM CrossReferenceReferralSource p")
 public class CrossReferenceReferralSource implements Serializable {
 	private static final long serialVersionUID = 1L;
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	@Id
 	@Column(name="REFERRAL_SOURCE", nullable=false, length=2)
@@ -53,60 +58,28 @@ public class CrossReferenceReferralSource implements Serializable {
 		this.legacyRecruiterSource = legacyRecruiterSource;
 	}
 
-	public static CrossReferenceReferralSource HR01GetReferralSource(String employeeId) {
-//		!----------------------------------------------------------------------
-//		! Procedure:  HR01-Get-Referral-Source
-//		! Desc:  Gets the legacy referral source from the cross reference file
-//		!        using the PeopleSoft Referral Source code
-//		!----------------------------------------------------------------------
-//		Begin-Procedure HR01-Get-Referral-Source
-//		Let $Found = 'N'
-//		Begin-Select
-//		CPT10.ZHRF_LEGRECRUITSRC
-//		    Let $LegReferralSource = &CPT10.ZHRF_LEGRECRUITSRC         !Move to a program field
-//		    Let $Found = 'Y'
-//		from PS_ZHRT_RFSRC_CREF CPT10
-//		where CPT10.REFERRAL_SOURCE = $PSReferralSource
-//		  and CPT10.STATUS = 'A'
-//		End-Select
-//		if ($Found = 'N')
-//		    If $PSReferralSource = ' '   !If the Referral Source code was not entered in PS
-//		       Let $LegReferralSource = ' '
-//		       Let $ErrorMessageParm = 'Referral source not selected in PeopleSoft.'
-//		       Do Call-Error-Routine
-//		    Else
-//		       Let $LegReferralSource = 'O'   !If not found default to O (Other)
-//		       Let $PSSpecific_Refer_Src = substr($PSRefSourceDescr,1,35)
-//		    End-If    !$PSReferralSource = ' '
-//		end-if    !$Found = 'N'
-//		Let $PSSpecific_Refer_Src = Rpad($PSSpecific_Refer_Src,35,' ')  !Make sure not less than 35 long
-//		End-Procedure HR01-Get-Referral-Source
-		return null;
-	}
-
-	
 	/**
+	 * @see HR01-Get-Referral-Source in ZHRI101A.SQC
 	 * @see HR05-Format-Referal-Source in ZHRI105A.SQC
 	 * @param parameterMap
-	 * @return referralSource
+	 * @return legacyRecruiterSource
 	 */
 	public static String findActiveLegacyRecruiterSourceByReferralSource(String referralSource) {
-		//BEGIN-SELECT
-		//CPT101.ZHRF_LEGRECRUITSRC
-		//LET $PSReferral_Source = &CPT101.ZHRF_LEGRECRUITSRC
+		logger.debug("findActiveLegacyRecruiterSourceByReferralSource() ***");
+		logger.debug("referralSource: " + referralSource);
+		//SELECT CPT101.ZHRF_LEGRECRUITSRC
 		//FROM PS_ZHRT_RFSRC_CREF CPT101
-		//WHERE CPT101.REFERRAL_SOURCE = $PSRecruit_Source_Code
+		//WHERE CPT101.REFERRAL_SOURCE = $PSReferralSource
 		//AND CPT101.STATUS = 'A'
-		//END-SELECT
 		EntityManagerFactory emfactory = Persistence.createEntityManagerFactory("PStoAS400Bridge");
 		EntityManager em = emfactory.createEntityManager();
 		try {
 			List<String> resultList = em.createQuery(
-					"SELECT p.legacyRecruiterSource FROM CrossReferenceReferralSource p "
-							+ "WHERE UPPER(TRIM(p.referralSource)) = :referralSource "
+					"SELECT UPPER(TRIM(p.legacyRecruiterSource)) FROM CrossReferenceReferralSource p "
+							+ "WHERE UPPER(TRIM(p.referralSource)) = UPPER(TRIM(:referralSource)) "
 							+ "AND p.status = 'A' "
 					, String.class)
-					.setParameter("referralSource", referralSource.trim().toUpperCase())
+					.setParameter("referralSource", referralSource)
 	    		    .getResultList();
 	    	if(resultList != null && resultList.size() > 0) {
 	    		return resultList.get(0);

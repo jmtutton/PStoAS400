@@ -1,10 +1,14 @@
 package erd.controller;
 
+import java.lang.invoke.MethodHandles;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import erd.model.CrossReferenceMultipleEmployeeId;
 import erd.model.CrossReferencePersonOfInterest;
@@ -14,6 +18,7 @@ import erd.model.PsName;
 import erd.model.PszPeopleToolsTranslation;
 
 public class NonPerson {
+    private static final Logger logger = LogManager.getLogger(MethodHandles.lookup().lookupClass().getSimpleName());
 
 	/**
 	 * @see HR201-Get-Personal-Data
@@ -22,6 +27,7 @@ public class NonPerson {
 	 * @return parameterMap
 	 */
 	public HashMap<String, Object> fetchPsNamesData(HashMap<String, Object> parameterMap) {
+		if(Main.DEBUG) logger.debug("fetchPsNamesData()");
 		PsName psName = PsName.findByEmployeeIdAndNameTypeAndEffectiveDate((String)parameterMap.get("employeeId"), "PRI", (Date)parameterMap.get("effectiveDate"));  //PS_NAMES
 		//LET $PSFirstName = LTRIM(RTRIM(&PS_NAMES.FIRST_NAME,' '),' ')
 		String firstName = psName.getFirstName();
@@ -272,6 +278,15 @@ public class NonPerson {
     	Date minEffectiveDate = CrossReferenceMultipleEmployeeId.findMinEffectiveDateByEmployeeIdAndEidIndexNumberAndLastInactiveDate(employeeId, eidIndexNumber, lastInactiveDate);
 		return minEffectiveDate;
     }
+	
+	/**
+	 * @see HR201-Massage-Data
+	 * @param parameterMap
+	 * @return parameterMap
+	 */
+    public HashMap<String, Object> massageData(HashMap<String, Object> parameterMap) {
+		return parameterMap;
+	}
 	
 	
 }
